@@ -1,5 +1,6 @@
 .header {
    padding: 15px 40px;
+   border-bottom: #E5E8EB 1px solid;
 }
 
 .header__logo {

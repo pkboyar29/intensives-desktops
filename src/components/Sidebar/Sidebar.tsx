@@ -8,7 +8,9 @@ interface SidebarProps {
 const Sidebar: FC<SidebarProps> = ({ children }) => {
    return (
       <div className='sidebar'>
-         {children}
+         <ul className='sidebar__links'>
+            {children}
+         </ul>
       </div>
    )
 }
