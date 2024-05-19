@@ -111,3 +111,10 @@ h6 {
 * {
   box-sizing: border-box;
 }
+
+/* обшие стили */
+
+.container {
+  max-width: 1366px;
+  margin: 0 auto;
+}
