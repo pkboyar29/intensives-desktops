@@ -118,3 +118,12 @@ h6 {
   max-width: 1366px;
   margin: 0 auto;
 }
+
+.main {
+  height: 100%;
+  display: flex;
+}
+
+.content {
+  padding: 40px;
+}
