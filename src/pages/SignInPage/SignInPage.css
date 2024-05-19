@@ -1,0 +1,37 @@
+.sign-in {
+   margin-top: 200px;
+   display: flex;
+   justify-content: center;
+}
+
+.sign-in__form {
+   display: flex;
+   flex-direction: column;
+   gap: 24px;
+   width: 480px;
+}
+
+.form__title {
+   color: #232321;
+   font-family: 'Open Sans', sans-serif;
+   font-size: 26px;
+   font-weight: 700;
+}
+
+.sign-in__input {
+   font-family: 'Open Sans', sans-serif;
+   font-size: 16px;
+   border: #232321 1px solid;
+   border-radius: 8px;
+   padding: 14px;
+}
+
+.sign-in__button {
+   font-family: 'Open Sans', sans-serif;
+   font-size: 14px;
+   text-align: left;
+   padding: 14px;
+   background-color: #1A5CE5;
+   color: #fff;
+   border-radius: 8px;
+}
