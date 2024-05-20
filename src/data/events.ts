@@ -25,8 +25,8 @@ export const events: Event[] = [
       startDate: new Date(2024, 5, 15),
       finishDate: new Date(2024, 5, 16),
       auditory: "Аудитория 204",
-      markStrategy: "стобальная шкала",
-      criterias: ["технические навыки", "креативность"],
+      markStrategy: null,
+      criterias: null,
       teams: [
          { id: 1, name: "Команда 1" },
          { id: 2, name: "Команда 2" },

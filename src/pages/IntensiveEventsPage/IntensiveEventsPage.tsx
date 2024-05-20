@@ -1,4 +1,5 @@
 import { FC, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { EventsContext } from '../../context/EventsContext'
@@ -10,7 +11,10 @@ import Table from '../../components/Table/Table'
 
 const IntensiveEventsPage: FC = () => {
 
-   const events = useContext(EventsContext)
+   const navigate = useNavigate()
+
+   const events: Event[] = useContext(EventsContext)
+
    const columnHelper = createColumnHelper<Event>()
    const columns = [
       columnHelper.accessor('id', {
@@ -35,7 +39,7 @@ const IntensiveEventsPage: FC = () => {
    return (
       <>
          <Title text='Мероприятия' />
-         <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => console.log(id)} />
+         <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => navigate(`${id}`)} />
       </>
    )
 }
