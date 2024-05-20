@@ -40,7 +40,7 @@ const Table: FC<TableProps> = ({ data, columns, buttonText, onButtonClick }) => 
                         {row.getVisibleCells().map((cell) => (
                            <td key={cell.id} className='tbody__cell'>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                         ))}
-                        <td><button onClick={() => onButtonClick(row.getVisibleCells()[0].getValue() as number)} className='tbody__btn'>{buttonText}</button></td>
+                        <td><button onClick={() => onButtonClick(row.getAllCells()[0].getValue() as number)} className='tbody__btn'>{buttonText}</button></td>
                      </tr>
                   ))}
                </tbody>

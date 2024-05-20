@@ -1,18 +1,22 @@
-import { FC, ReactNode, createContext } from 'react'
-import { Intensive } from '../utils/types/Intensive'
+import { FC, createContext, ReactNode } from "react"
 
-export const IntensivesContext = createContext<Intensive[]>([])
+import { EducationRequest } from '../utils/types/EducationRequest'
 
-interface IntensivesContextProviderProps {
-   intensives: Intensive[],
+export const EducationRequestsContext = createContext<EducationRequest[]>([])
+
+interface EducationRequestsContextProviderProps {
+   educationRequests: EducationRequest[],
    children: ReactNode
 }
-const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ intensives, children }) => {
+
+const EducationRequestsProvider: FC<EducationRequestsContextProviderProps> = ({ educationRequests, children }) => {
    // можно прописать дополнительную бизнес логику (например, методы удаления, добавления) и передать методы в value, также надо будет создать состояние intensives, чтобы оно внутри провайдера изменялось
    // ну и соответственно надо будет дополнительно тип у контекста изменить, потому что там будут не только intensives
    return (
-      <IntensivesContext.Provider value={intensives}> {children} </IntensivesContext.Provider>
+      <EducationRequestsContext.Provider value={educationRequests}>
+         {children}
+      </EducationRequestsContext.Provider>
    )
 }
 
-export default IntensivesProvider
+export default EducationRequestsProvider
