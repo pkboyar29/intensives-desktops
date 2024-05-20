@@ -25,9 +25,9 @@ const IntensiveEducationRequestsPage: FC = () => {
          header: () => 'Тема запроса',
          cell: (info) => info.getValue()
       }),
-      columnHelper.accessor('teamNumber', {
+      columnHelper.accessor('teamName', {
          header: () => 'Команда',
-         cell: (info) => 'Команда ' + info.getValue()
+         cell: (info) => info.getValue()
       }),
       columnHelper.accessor('createdDate', {
          header: () => 'Дата создания запроса',
