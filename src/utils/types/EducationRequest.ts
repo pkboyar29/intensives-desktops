@@ -3,7 +3,7 @@ export type EducationRequest = {
    id: number,
    subject: string,
    descr: string,
-   teamNumber: number,
+   teamName: string,
    ownerName: string,
    createdDate: Date
 }

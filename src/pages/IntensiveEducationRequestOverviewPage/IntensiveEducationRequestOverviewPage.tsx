@@ -27,7 +27,7 @@ const IntensiveEducationRequestOverviewPage: FC = () => {
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Команда</h2>
-               <div className="overview__content">Команда {currentRequest?.teamNumber}</div>
+               <div className="overview__content">{currentRequest?.teamName}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Владелец запроса</h2>

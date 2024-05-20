@@ -5,7 +5,7 @@ export const educationRequests: EducationRequest[] = [
       id: 1,
       subject: "Нужен мастеркласс по Unity",
       descr: "Хотелось бы узнать основы создания игр на Unity.",
-      teamNumber: 1,
+      teamName: 'Команда 1',
       ownerName: "Иванов Иван Иванович",
       createdDate: new Date('2024-05-01')
    },
@@ -13,7 +13,7 @@ export const educationRequests: EducationRequest[] = [
       id: 2,
       subject: "Нужен мастеркласс по React",
       descr: "Хотелось бы углубиться в работу с React и Redux.",
-      teamNumber: 2,
+      teamName: 'Команда 2',
       ownerName: "Петров Петр Петрович",
       createdDate: new Date('2024-05-02')
    },
@@ -21,7 +21,7 @@ export const educationRequests: EducationRequest[] = [
       id: 3,
       subject: "Нужен мастеркласс по Data Science",
       descr: "Интересует работа с большими данными и машинное обучение.",
-      teamNumber: 3,
+      teamName: 'Команда 3',
       ownerName: "Сидоров Сидор Сидорович",
       createdDate: new Date('2024-05-03')
    },
@@ -29,7 +29,7 @@ export const educationRequests: EducationRequest[] = [
       id: 4,
       subject: "Нужен мастеркласс по Docker",
       descr: "Хотелось бы понять основы контейнеризации с Docker.",
-      teamNumber: 4,
+      teamName: 'Команда 4',
       ownerName: "Кузнецов Алексей Андреевич",
       createdDate: new Date('2024-05-04')
    }

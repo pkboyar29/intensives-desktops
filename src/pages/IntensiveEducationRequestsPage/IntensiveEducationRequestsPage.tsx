@@ -1,11 +1,10 @@
-import { FC } from 'react'
+import { FC, useContext } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useNavigate } from 'react-router-dom'
 
-
 import { EducationRequest } from '../../utils/types/EducationRequest'
 
-import { educationRequests } from '../../data/educationRequests'
+import { EducationRequestsContext } from '../../context/EducationRequestsContext'
 
 import './IntensiveEducationRequestsPage.css'
 import Title from '../../components/Title/Title'
@@ -15,6 +14,7 @@ const IntensiveEducationRequestsPage: FC = () => {
 
    const navigate = useNavigate()
 
+   const educationRequests: EducationRequest[] = useContext(EducationRequestsContext)
    const columnHelper = createColumnHelper<EducationRequest>()
    const columns = [
       columnHelper.accessor('id', {
@@ -25,9 +25,9 @@ const IntensiveEducationRequestsPage: FC = () => {
          header: () => 'Тема запроса',
          cell: (info) => info.getValue()
       }),
-      columnHelper.accessor('teamNumber', {
+      columnHelper.accessor('teamName', {
          header: () => 'Команда',
-         cell: (info) => 'Команда ' + info.getValue()
+         cell: (info) => info.getValue()
       }),
       columnHelper.accessor('createdDate', {
          header: () => 'Дата создания запроса',
