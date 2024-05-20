@@ -19,6 +19,10 @@
    font-size: 14px;
 }
 
+.sidebar__title {
+   font-weight: 700;
+}
+
 .sidebar__item {
    font-size: 18px;
 }

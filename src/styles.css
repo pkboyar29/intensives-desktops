@@ -127,3 +127,10 @@ h6 {
 .content {
   padding: 40px;
 }
+
+.mini-title {
+  font-size: 20px;
+  color: #121217;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
