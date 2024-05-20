@@ -19,7 +19,7 @@ const IntensivePage: FC = () => {
       <>
          <div className='main'>
             <Sidebar>
-               <li className='sidebar__item'>Интенсив {currentIntensive?.name}</li>
+               <li className='sidebar__item sidebar__title'>{currentIntensive?.name}</li>
                <li className='sidebar__item'><Link to="overview">Просмотр интенсива</Link></li>
                <li className='sidebar__item'><Link to="teams">Команды</Link></li>
                <li className='sidebar__item'><Link to="events">Мероприятия</Link></li>
