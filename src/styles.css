@@ -111,3 +111,27 @@ h6 {
 * {
   box-sizing: border-box;
 }
+
+/* обшие стили */
+
+.container {
+  max-width: 1366px;
+  margin: 0 auto;
+}
+
+.main {
+  height: 100%;
+  display: flex;
+}
+
+.content {
+  padding: 40px;
+  width: 100%;
+}
+
+.mini-title {
+  font-size: 20px;
+  color: #121217;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+}
