@@ -2,11 +2,11 @@ import { FC, useContext } from 'react'
 import { EducationRequestsContext } from '../../context/EducationRequestsContext'
 import { useParams } from 'react-router-dom'
 
-import './IntensiveEducationRequestOverviewPage.css'
+import './EducationRequestOverviewPage.css'
 import Title from '../../components/Title/Title'
 import { EducationRequest } from '../../utils/types/EducationRequest'
 
-const IntensiveEducationRequestOverviewPage: FC = () => {
+const EducationRequestOverviewPage: FC = () => {
 
    const educationRequests: EducationRequest[] = useContext(EducationRequestsContext)
    const params = useParams()
@@ -42,4 +42,4 @@ const IntensiveEducationRequestOverviewPage: FC = () => {
    )
 }
 
-export default IntensiveEducationRequestOverviewPage
+export default EducationRequestOverviewPage

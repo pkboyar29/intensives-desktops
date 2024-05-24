@@ -3,10 +3,10 @@ import { EventsContext } from '../../context/EventsContext'
 import { useParams } from 'react-router-dom'
 import { Event } from '../../utils/types/Event'
 
-import './IntensiveEventOverviewPage.css'
+import './EventOverviewPage.css'
 import Title from '../../components/Title/Title'
 
-const IntensiveEventOverviewPage: FC = () => {
+const EventOverviewPage: FC = () => {
 
    const events: Event[] = useContext(EventsContext)
    const params = useParams()
@@ -50,4 +50,4 @@ const IntensiveEventOverviewPage: FC = () => {
    )
 }
 
-export default IntensiveEventOverviewPage
+export default EventOverviewPage

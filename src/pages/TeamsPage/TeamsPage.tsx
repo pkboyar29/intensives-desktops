@@ -1,9 +1,9 @@
 import { FC } from 'react'
 
-import './IntensiveTeamsPage.css'
+import './TeamsPage.css'
 import Title from '../../components/Title/Title'
 
-const IntensiveTeamsPage: FC = () => {
+const TeamsPage: FC = () => {
    return (
       <>
          <Title text='Команды' />
@@ -11,4 +11,4 @@ const IntensiveTeamsPage: FC = () => {
    )
 }
 
-export default IntensiveTeamsPage
+export default TeamsPage
