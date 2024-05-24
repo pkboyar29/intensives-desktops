@@ -1,4 +1,4 @@
-import { FC, useContext } from 'react'
+import { FC, useContext, useEffect } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useNavigate } from 'react-router-dom'
 
@@ -13,6 +13,12 @@ const IntensivesPage: FC = () => {
 
    const navigate = useNavigate()
 
+   const { intensives, getIntensives } = useContext(IntensivesContext)
+
+   useEffect(() => {
+      getIntensives()
+   }, [])
+
    const columnHelper = createColumnHelper<Intensive>()
    const columns = [
       columnHelper.accessor('id', {
@@ -23,25 +29,23 @@ const IntensivesPage: FC = () => {
          header: () => 'Наименование',
          cell: (info) => info.getValue()
       }),
-      columnHelper.accessor('descr', {
+      columnHelper.accessor('description', {
          header: () => 'Описание',
          cell: (info) => info.getValue()
       }),
-      columnHelper.accessor('openDate', {
+      columnHelper.accessor('open_dt', {
          header: () => 'Начало интенсива',
-         cell: (info) => info.getValue().toLocaleDateString()
-      }),
-      columnHelper.accessor('closeDate', {
-         header: () => 'Конец интенсива',
-         cell: (info) => info.getValue().toLocaleDateString()
-      }),
-      columnHelper.accessor('flow', {
-         header: () => 'Поток',
          cell: (info) => info.getValue()
       }),
+      columnHelper.accessor('close_dt', {
+         header: () => 'Конец интенсива',
+         cell: (info) => info.getValue()
+      }),
+      // columnHelper.accessor('flow', {
+      //    header: () => 'Поток',
+      //    cell: (info) => info.getValue()
+      // }),
    ]
-
-   const intensives: Intensive[] = useContext(IntensivesContext)
 
    return (
       <>

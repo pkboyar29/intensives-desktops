@@ -19,11 +19,6 @@ import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 
 const App: FC = () => {
 
-  useEffect(() => {
-    axios.get(process.env.REACT_APP_BACKEND_URL + 'intensives/')
-      .then(response => console.log(response.data))
-  })
-
   return (
     <div className='App'>
       <AppProviders>

@@ -12,7 +12,7 @@ const IntensivePage: FC = () => {
 
    const params = useParams()
 
-   const intensives: Intensive[] = useContext(IntensivesContext)
+   const { intensives } = useContext(IntensivesContext)
    const currentIntensive: Intensive | undefined = intensives.find((intensive: Intensive) => intensive.id === Number(params.intensiveId))
 
    return (

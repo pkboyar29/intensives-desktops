@@ -9,7 +9,7 @@ import Title from '../../components/Title/Title'
 
 const IntensiveOverviewPage: FC = () => {
 
-   const intensives: Intensive[] = useContext(IntensivesContext)
+   const { intensives } = useContext(IntensivesContext)
    const params = useParams()
    const currentIntensive: Intensive | undefined = intensives.find((intensive: Intensive) => intensive.id === Number(params.intensiveId))
 
@@ -24,23 +24,19 @@ const IntensiveOverviewPage: FC = () => {
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Описание</h2>
-               <div className="overview__content">{currentIntensive?.descr}</div>
+               <div className="overview__content">{currentIntensive?.description}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Начало интенсива</h2>
-               <div className="overview__content">{currentIntensive?.openDate.toLocaleDateString()}</div>
+               <div className="overview__content">{currentIntensive?.open_dt.toString()}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Окончание интенсива</h2>
-               <div className="overview__content">{currentIntensive?.closeDate.toLocaleDateString()}</div>
+               <div className="overview__content">{currentIntensive?.close_dt.toString()}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Команда преподавателей</h2>
                <div className="overview__content"></div>
-            </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Учебный поток</h2>
-               <div className="overview__content">{currentIntensive?.flow}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Команды</h2>
