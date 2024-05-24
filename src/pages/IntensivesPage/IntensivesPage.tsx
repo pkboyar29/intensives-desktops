@@ -33,10 +33,6 @@ const IntensivesPage: FC = () => {
          header: () => 'Наименование',
          cell: (info) => info.getValue()
       }),
-      columnHelper.accessor('description', {
-         header: () => 'Описание',
-         cell: (info) => info.getValue()
-      }),
       columnHelper.accessor('open_dt', {
          header: () => 'Начало интенсива',
          cell: (info) => info.getValue()
@@ -44,11 +40,7 @@ const IntensivesPage: FC = () => {
       columnHelper.accessor('close_dt', {
          header: () => 'Конец интенсива',
          cell: (info) => info.getValue()
-      }),
-      // columnHelper.accessor('flow', {
-      //    header: () => 'Поток',
-      //    cell: (info) => info.getValue()
-      // }),
+      })
    ]
 
    return (

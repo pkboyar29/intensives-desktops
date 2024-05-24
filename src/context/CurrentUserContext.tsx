@@ -53,6 +53,8 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
 
    const logOut = (): void => {
       setCurrentUser(null)
+      Cookies.remove('access')
+      Cookies.remove('refresh')
    }
 
    return (

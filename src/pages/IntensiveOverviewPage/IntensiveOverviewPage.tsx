@@ -35,9 +35,13 @@ const IntensiveOverviewPage: FC = () => {
                <div className="overview__content">{currentIntensive?.close_dt.toString()}</div>
             </div>
             <div className="overview__item">
+               <h2 className='mini-title'>Учебный поток</h2>
+               <div className="overview__content">{currentIntensive?.flow}</div>
+            </div>
+            {/* <div className="overview__item">
                <h2 className='mini-title'>Команда преподавателей</h2>
                <div className="overview__content"></div>
-            </div>
+            </div> */}
             <div className="overview__item">
                <h2 className='mini-title'>Команды</h2>
                <div className="overview__content"></div>
