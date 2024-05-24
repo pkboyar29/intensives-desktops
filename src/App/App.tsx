@@ -1,6 +1,7 @@
 import './App.css'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
+import axios from 'axios'
 
 import AppProviders from './AppProviders'
 
@@ -9,14 +10,19 @@ import SignInPage from '../pages/SignInPage/SignInPage'
 import Header from '../components/Header/Header'
 import IntensivesPage from '../pages/IntensivesPage/IntensivesPage'
 import IntensivePage from '../pages/IntensivePage/IntensivePage'
-import IntensiveEducationRequestsPage from '../pages/IntensiveEducationRequestsPage/IntensiveEducationRequestsPage'
-import IntensiveEventsPage from '../pages/IntensiveEventsPage/IntensiveEventsPage'
+import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
+import EventsPage from '../pages/EventsPage/EventsPage'
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage'
-import IntensiveTeamsPage from '../pages/IntensiveTeamsPage/IntensiveTeamsPage'
-import IntensiveEducationRequestOverviewPage from '../pages/IntensiveEducationRequestOverviewPage/IntensiveEducationRequestOverviewPage'
-import IntensiveEventOverviewPage from '../pages/IntensiveEventOverviewPage/IntensiveEventOverviewPage'
+import TeamsPage from '../pages/TeamsPage/TeamsPage'
+import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
+import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 
 const App: FC = () => {
+
+  useEffect(() => {
+    axios.get(process.env.REACT_APP_BACKEND_URL + 'intensives/')
+      .then(response => console.log(response.data))
+  })
 
   return (
     <div className='App'>
@@ -25,11 +31,11 @@ const App: FC = () => {
         <Routes>
           <Route path='/intensive/:intensiveId' element={<IntensivePage />}>
             <Route path='overview' element={<IntensiveOverviewPage />} />
-            <Route path='teams' element={<IntensiveTeamsPage />} />
-            <Route path='events' element={<IntensiveEventsPage />} />
-            <Route path='events/:eventId' element={<IntensiveEventOverviewPage />} />
-            <Route path='education-requests' element={<IntensiveEducationRequestsPage />} />
-            <Route path='education-requests/:requestId' element={<IntensiveEducationRequestOverviewPage />} />
+            <Route path='teams' element={<TeamsPage />} />
+            <Route path='events' element={<EventsPage />} />
+            <Route path='events/:eventId' element={<EventOverviewPage />} />
+            <Route path='education-requests' element={<EducationRequestsPage />} />
+            <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} />
           </Route>
           <Route path='/intensives' element={<IntensivesPage />} />
           <Route path='/sign-in' element={<SignInPage />} />

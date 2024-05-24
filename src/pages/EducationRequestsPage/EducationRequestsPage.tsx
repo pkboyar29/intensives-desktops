@@ -6,11 +6,11 @@ import { EducationRequest } from '../../utils/types/EducationRequest'
 
 import { EducationRequestsContext } from '../../context/EducationRequestsContext'
 
-import './IntensiveEducationRequestsPage.css'
+import './EducationRequestsPage.css'
 import Title from '../../components/Title/Title'
 import Table from '../../components/Table/Table'
 
-const IntensiveEducationRequestsPage: FC = () => {
+const EducationRequestsPage: FC = () => {
 
    const navigate = useNavigate()
 
@@ -45,4 +45,4 @@ const IntensiveEducationRequestsPage: FC = () => {
    )
 }
 
-export default IntensiveEducationRequestsPage
+export default EducationRequestsPage

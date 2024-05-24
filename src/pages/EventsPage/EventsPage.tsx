@@ -5,11 +5,11 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { EventsContext } from '../../context/EventsContext'
 import { Event } from '../../utils/types/Event'
 
-import './IntensiveEventsPage.css'
+import './EventsPage.css'
 import Title from '../../components/Title/Title'
 import Table from '../../components/Table/Table'
 
-const IntensiveEventsPage: FC = () => {
+const EventsPage: FC = () => {
 
    const navigate = useNavigate()
 
@@ -44,4 +44,4 @@ const IntensiveEventsPage: FC = () => {
    )
 }
 
-export default IntensiveEventsPage
+export default EventsPage
