@@ -4,5 +4,6 @@ export type Intensive = {
    description: string,
    is_open: boolean,
    open_dt: Date,
-   close_dt: Date
+   close_dt: Date,
+   flow: string
 }
