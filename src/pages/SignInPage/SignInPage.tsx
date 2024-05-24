@@ -1,4 +1,4 @@
-import { FC, useContext } from 'react'
+import { FC, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
@@ -14,9 +14,16 @@ interface SignInProps {
 
 const SignInPage: FC = () => {
 
-   const { updateCurrentUser } = useContext(CurrentUserContext)
+   const { currentUser, updateCurrentUser } = useContext(CurrentUserContext)
 
    const navigate = useNavigate()
+
+   useEffect(() => {
+      console.log('монтирование SignInPage')
+      if (currentUser) {
+         navigate('/intensives')
+      }
+   }, [])
 
    const { handleSubmit, register } = useForm<SignInProps>({
       mode: "onBlur"
@@ -29,7 +36,7 @@ const SignInPage: FC = () => {
             console.log(response.data)
             Cookies.set('refresh', response.data.refresh)
             Cookies.set('access', response.data.access)
-            updateCurrentUser(response.data.access)
+            updateCurrentUser()
             navigate('/intensives')
          })
          .catch(error => console.log(error.response.data))

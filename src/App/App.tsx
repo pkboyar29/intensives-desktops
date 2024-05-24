@@ -1,9 +1,7 @@
 import './App.css'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useContext } from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
-import axios from 'axios'
-
-import AppProviders from './AppProviders'
+import { CurrentUserContext } from '../context/CurrentUserContext'
 
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import SignInPage from '../pages/SignInPage/SignInPage'
@@ -17,27 +15,32 @@ import TeamsPage from '../pages/TeamsPage/TeamsPage'
 import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 
+
 const App: FC = () => {
+
+  const { updateCurrentUser } = useContext(CurrentUserContext)
+
+  useEffect(() => {
+    updateCurrentUser()
+  }, [])
 
   return (
     <div className='App'>
-      <AppProviders>
-        <Header />
-        <Routes>
-          <Route path='/intensive/:intensiveId' element={<IntensivePage />}>
-            <Route path='overview' element={<IntensiveOverviewPage />} />
-            <Route path='teams' element={<TeamsPage />} />
-            <Route path='events' element={<EventsPage />} />
-            <Route path='events/:eventId' element={<EventOverviewPage />} />
-            <Route path='education-requests' element={<EducationRequestsPage />} />
-            <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} />
-          </Route>
-          <Route path='/intensives' element={<IntensivesPage />} />
-          <Route path='/sign-in' element={<SignInPage />} />
-          <Route path='/' element={<Navigate to='/sign-in' />} />
-          <Route path='*' element={<NotFoundPage />} />
-        </Routes>
-      </AppProviders>
+      <Header />
+      <Routes>
+        <Route path='/intensive/:intensiveId' element={<IntensivePage />}>
+          <Route path='overview' element={<IntensiveOverviewPage />} />
+          <Route path='teams' element={<TeamsPage />} />
+          <Route path='events' element={<EventsPage />} />
+          <Route path='events/:eventId' element={<EventOverviewPage />} />
+          <Route path='education-requests' element={<EducationRequestsPage />} />
+          <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} />
+        </Route>
+        <Route path='/intensives' element={<IntensivesPage />} />
+        <Route path='/sign-in' element={<SignInPage />} />
+        <Route path='/' element={<Navigate to='/sign-in' />} />
+        <Route path='*' element={<NotFoundPage />} />
+      </Routes>
     </div>
   )
 }

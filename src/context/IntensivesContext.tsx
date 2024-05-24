@@ -1,7 +1,9 @@
-import { FC, ReactNode, createContext, useState, useEffect } from 'react'
+import { FC, ReactNode, createContext, useState, useContext } from 'react'
 import axios from 'axios'
 import { Intensive } from '../utils/types/Intensive'
 import Cookies from 'js-cookie'
+
+import { CurrentUserContext } from './CurrentUserContext'
 
 interface IntensiveContextType {
    intensives: Intensive[],
@@ -20,6 +22,19 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
 
    const [intensives, setIntensives] = useState<Intensive[]>([])
 
+   const { currentUser } = useContext(CurrentUserContext)
+
+   const mapIntensives = (items: any[]): Intensive[] => {
+      return items.map((item: any) => ({
+         id: item.id,
+         name: item.name,
+         description: item.description,
+         is_open: item.is_open,
+         open_dt: item.open_dt.split('T')[0],
+         close_dt: item.close_dt.split('T')[0]
+      }))
+   }
+
    const getIntensives = (): void => {
       // {
       //    headers: {
@@ -28,20 +43,26 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
       // }
       axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/`)
          .then(response => {
-            const filteredIntensives: Intensive[] = response.data.results.map((item: any) => ({
-               id: item.id,
-               name: item.name,
-               description: item.description,
-               is_open: item.is_open,
-               open_dt: item.open_dt.split('T')[0],
-               close_dt: item.close_dt.split('T')[0]
-            }))
-            setIntensives(filteredIntensives)
+            const openedIntensives = response.data.results.filter((item: any) => item.is_open)
+
+            let userRoleIntensives = openedIntensives
+            if (currentUser) {
+               if (currentUser.user_role_id === 3 || currentUser.user_role_id === 4) {
+                  console.log('ты препод')
+                  userRoleIntensives = openedIntensives.filter((item: any) =>
+                     item.teachers_command.some((teacherOnIntensive: any) => teacherOnIntensive.teacher.user.id === currentUser.id))
+               }
+
+               if (currentUser.user_role_id === 2) {
+                  console.log('ты студент')
+               }
+            }
+
+            const AllUserRoleIntensives: Intensive[] = mapIntensives(userRoleIntensives)
+            setIntensives(AllUserRoleIntensives)
          })
    }
 
-   // можно прописать дополнительную бизнес логику (например, методы удаления, добавления) и передать методы в value, также надо будет создать состояние intensives, чтобы оно внутри провайдера изменялось
-   // ну и соответственно надо будет дополнительно тип у контекста изменить, потому что там будут не только intensives
    return (
       <IntensivesContext.Provider value={{ intensives, getIntensives }}> {children} </IntensivesContext.Provider>
    )

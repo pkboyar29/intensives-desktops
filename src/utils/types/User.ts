@@ -4,5 +4,5 @@ export type User = {
    last_name: string,
    middle_name: string,
    email: string,
-   role_id: number
+   user_role_id: number
 }

@@ -2,6 +2,7 @@ import { createContext, FC, ReactNode, useState } from 'react'
 import { User } from '../utils/types/User'
 import { jwtDecode } from 'jwt-decode'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 interface CustomJwtPayload {
    user_id: number
@@ -9,7 +10,7 @@ interface CustomJwtPayload {
 
 interface CurrentUserContextType {
    currentUser: User | null,
-   updateCurrentUser: (currentUserJwt: string) => void,
+   updateCurrentUser: () => void,
    logOut: () => void
 }
 
@@ -27,22 +28,27 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
 
    const [currentUser, setCurrentUser] = useState<User | null>(null)
 
-   const updateCurrentUser = (currentUserJwt: string): void => {
-      const decodedJwt = jwtDecode<CustomJwtPayload>(currentUserJwt)
-      const currentUserId = decodedJwt.user_id
+   const updateCurrentUser = (): void => {
 
-      axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`)
-         .then(response => {
-            setCurrentUser({
-               id: response.data.id,
-               first_name: response.data.first_name,
-               last_name: response.data.last_name,
-               middle_name: response.data.middle_name,
-               email: response.data.email,
-               role_id: response.data.role.id
+      const token = Cookies.get('access')
+
+      if (token) {
+         const decodedJwt = jwtDecode<CustomJwtPayload>(token)
+         const currentUserId = decodedJwt.user_id
+
+         axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`)
+            .then(response => {
+               setCurrentUser({
+                  id: response.data.id,
+                  first_name: response.data.first_name,
+                  last_name: response.data.last_name,
+                  middle_name: response.data.middle_name,
+                  email: response.data.email,
+                  user_role_id: response.data.role.id
+               })
             })
-         })
-         .catch(error => console.log(error.response.data))
+            .catch(error => console.log(error.response.data))
+      }
    }
 
    const logOut = (): void => {
