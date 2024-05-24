@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Intensive } from '../../utils/types/Intensive'
 import { IntensivesContext } from '../../context/IntensivesContext'
+import { CurrentUserContext } from '../../context/CurrentUserContext'
 
 import './IntensivesPage.css'
 import Table from '../../components/Table/Table'
@@ -14,10 +15,13 @@ const IntensivesPage: FC = () => {
    const navigate = useNavigate()
 
    const { intensives, getIntensives } = useContext(IntensivesContext)
+   const { currentUser } = useContext(CurrentUserContext)
 
    useEffect(() => {
-      getIntensives()
-   }, [])
+      if (currentUser != null) {
+         getIntensives()
+      }
+   }, [currentUser])
 
    const columnHelper = createColumnHelper<Intensive>()
    const columns = [
@@ -50,7 +54,7 @@ const IntensivesPage: FC = () => {
    return (
       <>
          <div className='container'>
-            <Title text='Интенсивы' />
+            <Title text='Открытые интенсивы' />
 
             <Table onButtonClick={(id: number) => navigate(`/intensive/${id}/overview`)} buttonText='Посмотреть' columns={columns} data={intensives} />
          </div>
