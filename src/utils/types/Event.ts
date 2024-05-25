@@ -1,3 +1,4 @@
+import { Team } from './Team'
 
 export type Event = {
    id: number,
@@ -13,6 +14,7 @@ export type Event = {
    markStrategyName: string,
    criterias: number[] | null,
    criteriasNames: string[] | null,
-   teams: number[],
-   teachers_command: number[]
+   teams: Team[],
+   teachers_command: number[],
+   isCurrentTeacherJury: boolean
 }

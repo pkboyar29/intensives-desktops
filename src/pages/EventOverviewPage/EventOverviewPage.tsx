@@ -1,15 +1,26 @@
-import { FC, useContext } from 'react'
-import { EventsContext } from '../../context/EventsContext'
+import { FC, useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+
+import { EventsContext } from '../../context/EventsContext'
+import { CurrentUserContext } from '../../context/CurrentUserContext'
+
 import { Event } from '../../utils/types/Event'
+import { Team } from '../../utils/types/Team'
 
 import './EventOverviewPage.css'
 import Title from '../../components/Title/Title'
 
 const EventOverviewPage: FC = () => {
 
-   const { events } = useContext(EventsContext)
+   const { events, getEvents } = useContext(EventsContext)
+   const { currentUser } = useContext(CurrentUserContext)
    const params = useParams()
+
+   useEffect(() => {
+      if (params.intensiveId && currentUser) {
+         getEvents(parseInt(params.intensiveId, 10))
+      }
+   }, [currentUser])
 
    const currentEvent: Event | undefined = events.find((event: Event) => event.id === Number(params.eventId))
 
@@ -45,6 +56,22 @@ const EventOverviewPage: FC = () => {
             <div className="overview__item">
                <h2 className='mini-title'>Шкала оценивания</h2>
                <div className="overview__content">{currentEvent?.markStrategyName}</div>
+            </div>
+            {currentEvent?.isCurrentTeacherJury && (
+               <div className="overview__item">
+                  <h2 className='mini-title'>Вы являетесь жюри в этом интенсиве!</h2>
+               </div>
+            )}
+            <div className="overview__item">
+               <h2 className='mini-title'>Прикрепленные команды</h2>
+               <div className="overview__content">
+                  {currentEvent?.teams.map((team: Team) => (
+                     <div className='team'>
+                        <div key={team.id} className='team__item'>{team.name}</div>
+                        {currentEvent?.isCurrentTeacherJury && <button className='team__button'>поставить оценку</button>}
+                     </div>
+                  ))}
+               </div>
             </div>
 
          </div>
