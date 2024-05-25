@@ -1,6 +1,8 @@
 export type Team = {
    id: number,
-   tutor: number,
-   mentor: number,
-   name: string
+   name: string,
+   tutorId: number,
+   tutorNameSurname: string,
+   mentorId: number,
+   mentorNameSurname: string
 }

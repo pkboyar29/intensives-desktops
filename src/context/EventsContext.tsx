@@ -2,7 +2,6 @@ import { FC, ReactNode, createContext, useState } from 'react'
 import axios from 'axios'
 
 import { Event } from '../utils/types/Event'
-import { Intensive } from '../utils/types/Intensive'
 
 interface EventsContextType {
    events: Event[],
