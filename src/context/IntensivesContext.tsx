@@ -24,35 +24,35 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
    const { currentUser } = useContext(CurrentUserContext)
 
    const mapIntensives = async (items: any[]): Promise<Intensive[]> => {
-      const intensives = await Promise.all(items.map(async (item: any) => {
+      const mappedIntensives = await Promise.all(items.map(async (item: any) => {
          try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/flows/${item.flow[0]}/`)
-            const flowName = response.data.name
+            const flowResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/flows/${item.flow[0]}/`)
+            const flowName = flowResponse.data.name
 
             return {
                id: item.id,
                name: item.name,
                description: item.description,
                is_open: item.is_open,
-               open_dt: item.open_dt.split('T')[0],
-               close_dt: item.close_dt.split('T')[0],
+               open_dt: new Date(item.open_dt),
+               close_dt: new Date(item.close_dt),
                flow: flowName
-            };
+            }
          } catch (error) {
-            console.error(error);
+            console.error(error)
             return {
                id: item.id,
                name: item.name,
                description: item.description,
                is_open: item.is_open,
-               open_dt: item.open_dt.split('T')[0],
-               close_dt: item.close_dt.split('T')[0],
+               open_dt: new Date(),
+               close_dt: new Date(),
                flow: '' // или обработка ошибки по-другому
             }
          }
       }))
 
-      return intensives;
+      return mappedIntensives
    }
 
    const getIntensives = async (): Promise<void> => {

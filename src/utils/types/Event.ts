@@ -1,14 +1,18 @@
-import { Team } from "./Team"
 
 export type Event = {
    id: number,
    name: string,
-   descr: string,
-   stage: string,
+   description: string,
+   stageId: number,
+   stageName: string,
    startDate: Date,
    finishDate: Date,
-   auditory: string,
-   markStrategy: string | null,
-   criterias: string[] | null,
-   teams: Team[]
+   auditoryId: number,
+   auditoryName: string,
+   markStrategyId: number,
+   markStrategyName: string,
+   criterias: number[] | null,
+   criteriasNames: string[] | null,
+   teams: number[],
+   teachers_command: number[]
 }

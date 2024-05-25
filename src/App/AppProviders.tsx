@@ -1,7 +1,6 @@
 import { FC, ReactNode } from 'react'
 
 import { educationRequests } from '../data/educationRequests'
-import { events } from '../data/events'
 
 import IntensivesProvider from '../context/IntensivesContext'
 import EducationRequestsProvider from '../context/EducationRequestsContext'
@@ -18,7 +17,7 @@ const AppProviders: FC<AppProvidersProps> = ({ children }) => {
       <CurrentUserProvider>
          <IntensivesProvider>
             <EducationRequestsProvider educationRequests={educationRequests}>
-               <EventsProvider events={events}>
+               <EventsProvider>
                   {children}
                </EventsProvider>
             </EducationRequestsProvider>

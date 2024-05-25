@@ -27,6 +27,7 @@
    font-weight: 700;
    font-family: 'Open Sans', sans-serif;
    line-height: 21px;
+   padding: 10px;
 }
 
 .tbody {}
@@ -41,6 +42,7 @@
    font-weight: 400;
    font-family: 'Open Sans', sans-serif;
    line-height: 21px;
+   padding: 10px;
 }
 
 .tbody__btn {

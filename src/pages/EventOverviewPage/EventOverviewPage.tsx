@@ -8,7 +8,7 @@ import Title from '../../components/Title/Title'
 
 const EventOverviewPage: FC = () => {
 
-   const events: Event[] = useContext(EventsContext)
+   const { events } = useContext(EventsContext)
    const params = useParams()
 
    const currentEvent: Event | undefined = events.find((event: Event) => event.id === Number(params.eventId))
@@ -24,7 +24,11 @@ const EventOverviewPage: FC = () => {
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Описание мероприятия</h2>
-               <div className="overview__content">{currentEvent?.descr}</div>
+               <div className="overview__content">{currentEvent?.description}</div>
+            </div>
+            <div className="overview__item">
+               <h2 className='mini-title'>Этап</h2>
+               <div className="overview__content">{currentEvent?.stageName}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Дата начала мероприятия</h2>
@@ -35,15 +39,13 @@ const EventOverviewPage: FC = () => {
                <div className="overview__content">{currentEvent?.finishDate.toLocaleDateString()}</div>
             </div>
             <div className="overview__item">
-               <h2 className='mini-title'>Аудитория</h2>
-               <div className="overview__content">{currentEvent?.auditory}</div>
+               <h2 className='mini-title'>Номер аудитории</h2>
+               <div className="overview__content">{currentEvent?.auditoryName}</div>
             </div>
-            {currentEvent?.markStrategy && (
-               <div className="overview__item">
-                  <h2 className='mini-title'>Шкала оценивания</h2>
-                  <div className="overview__content">{currentEvent?.markStrategy}</div>
-               </div>
-            )}
+            <div className="overview__item">
+               <h2 className='mini-title'>Шкала оценивания</h2>
+               <div className="overview__content">{currentEvent?.markStrategyName}</div>
+            </div>
 
          </div>
       </>

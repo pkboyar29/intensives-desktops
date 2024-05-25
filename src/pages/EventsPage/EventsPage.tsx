@@ -1,5 +1,5 @@
-import { FC, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { FC, useContext, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { EventsContext } from '../../context/EventsContext'
@@ -12,8 +12,16 @@ import Table from '../../components/Table/Table'
 const EventsPage: FC = () => {
 
    const navigate = useNavigate()
+   const params = useParams()
 
-   const events: Event[] = useContext(EventsContext)
+   const { events, getEvents } = useContext(EventsContext)
+
+   useEffect(() => {
+      console.log('вызов getEvents')
+      if (params.intensiveId) {
+         getEvents(parseInt(params.intensiveId, 10))
+      }
+   }, [])
 
    const columnHelper = createColumnHelper<Event>()
    const columns = [
@@ -27,11 +35,11 @@ const EventsPage: FC = () => {
       }),
       columnHelper.accessor('startDate', {
          header: () => 'Начало мероприятия',
-         cell: (info) => info.getValue().toLocaleDateString()
+         cell: (info) => info.getValue().toLocaleString()
       }),
       columnHelper.accessor('finishDate', {
          header: () => 'Конец мероприятия',
-         cell: (info) => info.getValue().toLocaleDateString()
+         cell: (info) => info.getValue().toLocaleString()
       }),
    ]
 
