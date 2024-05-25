@@ -43,14 +43,6 @@ const IntensiveOverviewPage: FC = () => {
                <div className="overview__content"></div>
             </div> */}
             <div className="overview__item">
-               <h2 className='mini-title'>Команды</h2>
-               <div className="overview__content"></div>
-            </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Список ролей для студентов</h2>
-               <div className="overview__content"></div>
-            </div>
-            <div className="overview__item">
                <h2 className='mini-title'>Файлы</h2>
                <div className="overview__content"></div>
             </div>

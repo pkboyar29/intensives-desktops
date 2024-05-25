@@ -1,7 +1,10 @@
-import { FC, ReactNode, createContext, useState } from 'react'
+import { FC, ReactNode, createContext, useState, useContext } from 'react'
 import axios from 'axios'
 
+import { CurrentUserContext } from './CurrentUserContext'
+
 import { Event } from '../utils/types/Event'
+import { Team } from '../utils/types/Team'
 
 interface EventsContextType {
    events: Event[],
@@ -20,6 +23,8 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
    const [events, setEvents] = useState<Event[]>([])
 
+   const { currentUser } = useContext(CurrentUserContext)
+
    const mapEvents = async (items: any[]): Promise<Event[]> => {
       const mappedEvents = await Promise.all(items.map(async (item: any) => {
          try {
@@ -32,6 +37,28 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                return criteriaResponse.data.name
             })
             const criteriasNames: string[] = await Promise.all(criteriasNamesPromises)
+
+            const teams: Team[] = []
+            item.commands.forEach(async (teamId: number) => {
+               const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`)
+               const team: Team = {
+                  id: teamId,
+                  name: teamResponse.data.name,
+                  tutorId: teamResponse.data.teacher,
+                  mentorId: teamResponse.data.tutor,
+                  tutorNameSurname: null,
+                  mentorNameSurname: null
+               }
+               teams.push(team)
+            })
+
+            let isCurrentTeacherJury: boolean = false
+            await Promise.all(item.teachers_command.map(async (teacherId: number) => {
+               const teacherOnIntensiveResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/${teacherId}/`)
+               if (teacherOnIntensiveResponse.data.role[0] === 4 && teacherOnIntensiveResponse.data.teacher.user.id === currentUser?.id) {
+                  isCurrentTeacherJury = true
+               }
+            }))
 
 
             return {
@@ -48,8 +75,9 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                markStrategyName: markStrategyResponse.data.name,
                criterias: item.criteria,
                criteriasNames: criteriasNames,
-               teams: item.commands,
-               teachers_command: item.teachers_command
+               teams: teams,
+               teachers_command: item.teachers_command,
+               isCurrentTeacherJury: isCurrentTeacherJury
             }
          } catch (error) {
             console.log(error)
@@ -68,7 +96,8 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                criterias: [],
                criteriasNames: [],
                teams: [],
-               teachers_command: []
+               teachers_command: [],
+               isCurrentTeacherJury: false
             }
          }
       }))
@@ -92,7 +121,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
          const filteredOurIntensiveEvents = ourIntensiveEvents.filter((event: any) => event !== null)
          // console.log('незамапленные мероприятия: ', filteredOurIntensiveEvents)
          const mappedEvents: Event[] = await mapEvents(filteredOurIntensiveEvents)
-         // console.log('замаппленные мероприятия: ', mappedEvents)
+         console.log('замаппленные мероприятия: ', mappedEvents)
          setEvents(mappedEvents)
 
       } catch (error) {

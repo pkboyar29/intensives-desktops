@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { EventsContext } from '../../context/EventsContext'
+import { CurrentUserContext } from '../../context/CurrentUserContext'
 import { Event } from '../../utils/types/Event'
 
 import './EventsPage.css'
@@ -15,12 +16,13 @@ const EventsPage: FC = () => {
    const params = useParams()
 
    const { events, getEvents } = useContext(EventsContext)
+   const { currentUser } = useContext(CurrentUserContext)
 
    useEffect(() => {
-      if (params.intensiveId) {
+      if (params.intensiveId && currentUser) {
          getEvents(parseInt(params.intensiveId, 10))
       }
-   }, [])
+   }, [currentUser])
 
    const columnHelper = createColumnHelper<Event>()
    const columns = [
