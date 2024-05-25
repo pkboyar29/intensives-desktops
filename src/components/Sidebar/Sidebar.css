@@ -17,6 +17,16 @@
    color: #121217;
    font-family: 'Open Sans', sans-serif;
    font-size: 14px;
+   transition: all .5s;
+   font-weight: 600;
+}
+
+.sidebar__item a.active {
+   color: #1A5CE5;
+}
+
+.sidebar__item a:hover {
+   color: #1A5CE5;
 }
 
 .sidebar__title {

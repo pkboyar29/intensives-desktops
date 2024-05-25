@@ -35,13 +35,21 @@ const IntensivesPage: FC = () => {
       }),
       columnHelper.accessor('open_dt', {
          header: () => 'Начало интенсива',
-         cell: (info) => info.getValue()
+         cell: (info) => info.getValue().toLocaleDateString()
       }),
       columnHelper.accessor('close_dt', {
          header: () => 'Конец интенсива',
-         cell: (info) => info.getValue()
+         cell: (info) => info.getValue().toLocaleDateString()
       })
    ]
+
+   if (intensives.length === 0) {
+      return (
+         <div className='container'>
+            <Title text='Для вас пока нету открытых интенсивов' />
+         </div>
+      )
+   }
 
    return (
       <>

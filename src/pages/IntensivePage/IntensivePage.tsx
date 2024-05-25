@@ -1,5 +1,5 @@
 import { FC, useContext } from 'react'
-import { Outlet, Link, useParams } from 'react-router-dom'
+import { Outlet, NavLink, Link, useParams } from 'react-router-dom'
 
 import { Intensive } from '../../utils/types/Intensive'
 
@@ -20,11 +20,11 @@ const IntensivePage: FC = () => {
          <div className='main'>
             <Sidebar>
                <li className='sidebar__item sidebar__title'>{currentIntensive?.name}</li>
-               <li className='sidebar__item'><Link to="overview">Просмотр интенсива</Link></li>
-               <li className='sidebar__item'><Link to="teams">Команды</Link></li>
-               <li className='sidebar__item'><Link to="events">Мероприятия</Link></li>
-               <li className='sidebar__item'><Link to="education-requests">Образовательные запросы</Link></li>
-               <button className='sidebar__btn'><Link to="/intensives">Вернуться к списку интенсивов</Link></button>
+               <li className='sidebar__item'><NavLink to='overview'>Просмотр интенсива</NavLink></li>
+               <li className='sidebar__item'><NavLink to='teams'>Команды</NavLink></li>
+               <li className='sidebar__item'><NavLink to='events'>Мероприятия</NavLink></li>
+               <li className='sidebar__item'><NavLink to='education-requests'>Образовательные запросы</NavLink></li>
+               <button className='sidebar__btn'><Link to='/intensives'>Вернуться к списку интенсивов</Link></button>
             </Sidebar>
 
             <div className="content">

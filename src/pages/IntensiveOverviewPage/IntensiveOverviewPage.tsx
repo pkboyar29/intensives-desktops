@@ -28,11 +28,11 @@ const IntensiveOverviewPage: FC = () => {
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Начало интенсива</h2>
-               <div className="overview__content">{currentIntensive?.open_dt.toString()}</div>
+               <div className="overview__content">{currentIntensive?.open_dt.toLocaleDateString()}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Окончание интенсива</h2>
-               <div className="overview__content">{currentIntensive?.close_dt.toString()}</div>
+               <div className="overview__content">{currentIntensive?.close_dt.toLocaleDateString()}</div>
             </div>
             <div className="overview__item">
                <h2 className='mini-title'>Учебный поток</h2>
