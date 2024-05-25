@@ -17,7 +17,6 @@ const EventsPage: FC = () => {
    const { events, getEvents } = useContext(EventsContext)
 
    useEffect(() => {
-      console.log('вызов getEvents')
       if (params.intensiveId) {
          getEvents(parseInt(params.intensiveId, 10))
       }
@@ -46,7 +45,7 @@ const EventsPage: FC = () => {
 
    return (
       <>
-         <Title text='Мероприятия' />
+         <Title text='Все мероприятия' />
          <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => navigate(`${id}`)} />
       </>
    )
