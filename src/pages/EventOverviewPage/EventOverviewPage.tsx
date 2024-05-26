@@ -1,5 +1,5 @@
 import { FC, useContext, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
@@ -15,6 +15,7 @@ const EventOverviewPage: FC = () => {
    const { events, getEvents } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
    const params = useParams()
+   const navigate = useNavigate()
 
    useEffect(() => {
       if (params.intensiveId && currentUser) {
@@ -68,7 +69,7 @@ const EventOverviewPage: FC = () => {
                   {currentEvent?.teams.map((team: Team) => (
                      <div className='team'>
                         <div key={team.id} className='team__item'>{team.name}</div>
-                        {currentEvent?.isCurrentTeacherJury && <button className='team__button'>поставить оценку</button>}
+                        {currentEvent?.isCurrentTeacherJury && <button onClick={() => navigate(`/intensive/${params.intensiveId}/team-evaluation/${params.eventId}/${team.id}`)} className='team__button'>поставить оценку</button>}
                      </div>
                   ))}
                </div>
