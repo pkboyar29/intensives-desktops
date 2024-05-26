@@ -12,8 +12,8 @@ export type Event = {
    auditoryName: string,
    markStrategyId: number,
    markStrategyName: string,
-   criterias: number[] | null,
-   criteriasNames: string[] | null,
+   criterias: number[],
+   criteriasNames: string[],
    teams: Team[],
    teachers_command: number[],
    isCurrentTeacherJury: boolean

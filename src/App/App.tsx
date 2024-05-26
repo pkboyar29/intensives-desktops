@@ -14,7 +14,7 @@ import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverv
 import TeamsPage from '../pages/TeamsPage/TeamsPage'
 import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
-
+import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage'
 
 const App: FC = () => {
 
@@ -33,6 +33,7 @@ const App: FC = () => {
           <Route path='teams' element={<TeamsPage />} />
           <Route path='events' element={<EventsPage />} />
           <Route path='events/:eventId' element={<EventOverviewPage />} />
+          <Route path='team-evaluation/:eventId/:teamId' element={<TeamEvaluationPage />} />
           <Route path='education-requests' element={<EducationRequestsPage />} />
           <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} />
         </Route>

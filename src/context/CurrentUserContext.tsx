@@ -28,26 +28,36 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
 
    const [currentUser, setCurrentUser] = useState<User | null>(null)
 
-   const updateCurrentUser = (): void => {
+   const updateCurrentUser = async () => {
 
       const token = Cookies.get('access')
 
       if (token) {
-         const decodedJwt = jwtDecode<CustomJwtPayload>(token)
-         const currentUserId = decodedJwt.user_id
+         try {
+            const decodedJwt = jwtDecode<CustomJwtPayload>(token)
+            const currentUserId = decodedJwt.user_id
+            const userResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`)
+            
+            let teacher_id = null
+            if (userResponse.data.role.id === 3) {
+               const teachersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/`)
+               const allTeachers = teachersResponse.data.results
+               const ourTeacher = allTeachers.find((teacher: any) => teacher.user.id === userResponse.data.id)
+               teacher_id = ourTeacher.id
+            }
 
-         axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`)
-            .then(response => {
-               setCurrentUser({
-                  id: response.data.id,
-                  first_name: response.data.first_name,
-                  last_name: response.data.last_name,
-                  middle_name: response.data.middle_name,
-                  email: response.data.email,
-                  user_role_id: response.data.role.id
-               })
+            setCurrentUser({
+               id: userResponse.data.id,
+               teacher_id: teacher_id,
+               first_name: userResponse.data.first_name,
+               last_name: userResponse.data.last_name,
+               middle_name: userResponse.data.middle_name,
+               email: userResponse.data.email,
+               user_role_id: userResponse.data.role.id
             })
-            .catch(error => console.log(error.response.data))
+         } catch (error) {
+            console.log(error)
+         }
       }
    }
 
