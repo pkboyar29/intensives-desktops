@@ -15,6 +15,7 @@ import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverv
 import IntensiveTeamsPage from '../pages/IntensiveTeamsPage/IntensiveTeamsPage'
 import IntensiveEducationRequestOverviewPage from '../pages/IntensiveEducationRequestOverviewPage/IntensiveEducationRequestOverviewPage'
 import IntensiveEventOverviewPage from '../pages/IntensiveEventOverviewPage/IntensiveEventOverviewPage'
+import StudentTasksBoardPage from '../pages/StudentTasksBoardPage/StudentTasksBoardPage'
 import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage'
 
 const App: FC = () => {
@@ -32,6 +33,7 @@ const App: FC = () => {
             <Route path='education-requests' element={<IntensiveEducationRequestsPage />} />
             <Route path='education-requests/:requestId' element={<IntensiveEducationRequestOverviewPage />} />
           </Route>
+          <Route path='tasks-board' element={<StudentTasksBoardPage/>} />
           <Route path='tasks' element={<StudentTasksPage/>} />
           <Route path='/intensives' element={<IntensivesPage />} />
           <Route path='/sign-in' element={<SignInPage />} />
