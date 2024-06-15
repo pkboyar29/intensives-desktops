@@ -7,7 +7,6 @@ import { TeamsContext } from '../../context/TeamsContext'
 import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
-import './TeamEvaluationPage.css'
 import Title from '../../components/Title/Title'
 import { Team } from '../../utils/types/Team'
 import { Event } from '../../utils/types/Event'
@@ -18,7 +17,6 @@ type FormValues = {
 }
 
 const TeamEvaluationPage: FC = () => {
-
    const params = useParams()
    const navigate = useNavigate()
    const { teams, getTeams } = useContext(TeamsContext)
@@ -125,22 +123,22 @@ const TeamEvaluationPage: FC = () => {
 
    const renderMarkContent = (criteriaId: number, index: number) => {
       switch (currentEvent.markStrategyId) {
-         case 1:
+         case 2:
             return (
                <>
                   <input type='hidden' {...register(`marks.${index}.criteriaId`)} value={criteriaId} />
-                  <select {...register(`marks.${index}.mark`, { required: true })} className='evaluation__select'>
+                  <select {...register(`marks.${index}.mark`, { required: true })} className='border border-solid border-black rounded-xl'>
                      <option value=''>Выберите оценку</option>
                      <option value={1}>Зачет</option>
                      <option value={0}>Незачет</option>
                   </select>
                </>
             )
-         case 2:
+         case 3:
             return (
                <>
                   <input type='hidden' {...register(`marks.${index}.criteriaId`)} value={criteriaId} />
-                  <input className='evaluation__input' min={2} max={5} type='number'
+                  <input className='border border-solid border-black text-sm' min={2} max={5} type='number'
                      {...register(`marks.${index}.mark`,
                         {
                            required: true,
@@ -148,22 +146,6 @@ const TeamEvaluationPage: FC = () => {
                            max: 5
                         })}
                   />
-               </>
-            )
-         case 3:
-            return (
-               <>
-                  <>
-                     <input type='hidden' {...register(`marks.${index}.criteriaId`)} value={criteriaId} />
-                     <input className='evaluation__input' min={0} max={100} type='number'
-                        {...register(`marks.${index}.mark`,
-                           {
-                              required: true,
-                              min: 0,
-                              max: 100
-                           })}
-                     />
-                  </>
                </>
             )
          default:
@@ -179,45 +161,41 @@ const TeamEvaluationPage: FC = () => {
       <>
          <Title text={currentTeam.name} />
 
-         <div className='evaluation__subtitle'>Ответ команды</div>
-         {currentAnswer ? <div className='evaluation__text'>{currentAnswer.text}</div>
-            : (<div className='evaluation__text'>Команда не прислала ответа</div>)}
+         <div className='text-black text-xl font-bold font-sans my-5'>Ответ команды</div>
+         {currentAnswer ? <div className='text-black text-base font-normal font-inter mt-5'>{currentAnswer.text}</div>
+            : (<div className='text-black text-base font-normal font-inter mt-5'>Команда не прислала ответа</div>)}
 
          {currentAnswer && (
             <form onSubmit={handleSubmit(onSubmit)}>
                {currentEvent.criteriasNames.length === 0
                   ? (
                      <>
-                        <div className='evaluation__subtitle'>Общая оценка</div>
-                        <div className='criteria'>
-                           <div className='criteria__text'>Общая оценка</div>
-                           <div className='criteria__mark'>
-                              {renderMarkContent(0, 0)}
-                           </div>
+                        <div className='text-black text-xl font-bold font-sans my-5'>Общая оценка</div>
+                        <div className='flex justify-between items-center gap-16 w-96 mb-5'>
+                           <div className='font-normal font-inter text-base text-black'>Общая оценка</div>
+                           <div> {renderMarkContent(0, 0)} </div>
                         </div>
                      </>
                   )
                   : (
                      <>
-                        <div className='evaluation__subtitle'>Критерии</div>
+                        <div className='text-black text-xl font-bold font-sans my-5'>Критерии</div>
                         {currentEvent.criteriasNames.map((criteriaName, index) => (
-                           <div className='criteria' key={currentEvent.criterias && currentEvent.criterias[index]}>
-                              <div className='criteria__text'>{criteriaName}</div>
-                              <div className='criteria__mark'>
-                                 {renderMarkContent(currentEvent.criterias[index], index)}
-                              </div>
+                           <div className='flex justify-between items-center gap-16 w-96 mb-5' key={currentEvent.criterias && currentEvent.criterias[index]}>
+                              <div className='font-normal font-inter text-base text-black'>{criteriaName}</div>
+                              <div> {renderMarkContent(currentEvent.criterias[index], index)} </div>
                            </div>
                         ))}
                      </>
                   )
                }
 
-               <div className='evaluation__subtitle'>Комментарий</div>
-               <textarea className='evaluation__textarea' placeholder='Введите комментарий' {...register('comment')} />
+               <div className='text-black text-xl font-bold font-sans my-5'>Комментарий</div>
+               <textarea className='border border-solid border-gray rounded-xl h-36 w-96 p-3 font-sans text-sm' placeholder='Введите комментарий' {...register('comment')} />
 
-               <div className='evaluation__buttons'>
-                  <button type="button" onClick={() => navigate(-1)} className='evaluation__button evaluation__cancel'>Отмена</button>
-                  <button type="submit" className='evaluation__button evaluation__save'>Отправить ответ</button>
+               <div className='flex gap-3 mt-3'>
+                  <button type="button" onClick={() => navigate(-1)} className='font-bold font-inter py-3 px-5 rounded-xl text-black bg-another_white'>Отмена</button>
+                  <button type="submit" className='font-bold font-inter py-3 px-5 rounded-xl text-white bg-blue'>Отправить ответ</button>
                </div>
             </form>
          )}

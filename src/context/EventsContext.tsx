@@ -38,10 +38,9 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
             })
             const criteriasNames: string[] = await Promise.all(criteriasNamesPromises)
 
-            const teams: Team[] = []
-            item.commands.forEach(async (teamId: number) => {
+            const teams: Team[] = item.commands.map(async (teamId: number) => {
                const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`)
-               const team: Team = {
+               return {
                   id: teamId,
                   name: teamResponse.data.name,
                   tutorId: teamResponse.data.teacher,
@@ -49,8 +48,9 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                   tutorNameSurname: null,
                   mentorNameSurname: null
                }
-               teams.push(team)
             })
+
+            const resolvedTeams = await Promise.all(teams)
 
             let isCurrentTeacherJury: boolean = false
             await Promise.all(item.teachers_command.map(async (teacherId: number) => {
@@ -59,7 +59,6 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                   isCurrentTeacherJury = true
                }
             }))
-
 
             return {
                id: item.id,
@@ -75,7 +74,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
                markStrategyName: markStrategyResponse.data.name,
                criterias: item.criteria,
                criteriasNames: criteriasNames,
-               teams: teams,
+               teams: resolvedTeams,
                teachers_command: item.teachers_command,
                isCurrentTeacherJury: isCurrentTeacherJury
             }

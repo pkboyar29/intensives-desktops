@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-import './SignInPage.css'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
 interface SignInProps {
@@ -44,12 +43,12 @@ const SignInPage: FC = () => {
 
    return (
       <>
-         <div className='sign-in'>
-            <form onSubmit={handleSubmit(onSubmit)} className='sign-in__form'>
-               <div className="form__title">Войти в систему</div>
-               <input {...register('email')} className='sign-in__input' type='text' placeholder='Email' />
-               <input {...register('password')} className='sign-in__input' type='password' placeholder='Пароль' />
-               <button className='sign-in__button' type='submit'>ВОЙТИ</button>
+         <div className='mt-20 flex justify-center'>
+            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 w-[480px]'>
+               <div className='text-black font-sans text-[26px] font-bold'>Войти в систему</div>
+               <input {...register('email')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='text' placeholder='Email' />
+               <input {...register('password')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='password' placeholder='Пароль' />
+               <button className='bg-blue p-4 text-white rounded-lg text-left font-sans' type='submit'>ВОЙТИ</button>
             </form>
          </div>
       </>

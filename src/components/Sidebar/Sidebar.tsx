@@ -1,5 +1,4 @@
 import { FC, ReactNode } from 'react'
-import './Sidebar.css'
 
 interface SidebarProps {
    children: ReactNode
@@ -7,8 +6,8 @@ interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({ children }) => {
    return (
-      <div className='sidebar'>
-         <ul className='sidebar__links'>
+      <div className='w-80 h-full p-5 border-r border-r-gray border-solid'>
+         <ul className='flex flex-col gap-5 text-left'>
             {children}
          </ul>
       </div>

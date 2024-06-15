@@ -2,7 +2,6 @@ import { FC, useContext } from 'react'
 import { EducationRequestsContext } from '../../context/EducationRequestsContext'
 import { useParams } from 'react-router-dom'
 
-import './EducationRequestOverviewPage.css'
 import Title from '../../components/Title/Title'
 import { EducationRequest } from '../../utils/types/EducationRequest'
 
@@ -16,26 +15,26 @@ const EducationRequestOverviewPage: FC = () => {
       <>
          <Title text='Просмотр образовательного запроса' />
 
-         <div className="overview__container">
-            <div className="overview__item">
+         <div className='overview__container'>
+            <div className='overview__item'>
                <h2 className='mini-title'>Тема запроса</h2>
-               <div className="overview__content">{currentRequest?.subject}</div>
+               <div className='overview__content'>{currentRequest?.subject}</div>
             </div>
-            <div className="overview__item">
+            <div className='overview__item'>
                <h2 className='mini-title'>Описание запроса</h2>
-               <div className="overview__content">{currentRequest?.descr}</div>
+               <div className='overview__content'>{currentRequest?.descr}</div>
             </div>
-            <div className="overview__item">
+            <div className='overview__item'>
                <h2 className='mini-title'>Команда</h2>
-               <div className="overview__content">{currentRequest?.teamName}</div>
+               <div className='overview__content'>{currentRequest?.teamName}</div>
             </div>
-            <div className="overview__item">
+            <div className='overview__item'>
                <h2 className='mini-title'>Владелец запроса</h2>
-               <div className="overview__content">{currentRequest?.ownerName}</div>
+               <div className='overview__content'>{currentRequest?.ownerName}</div>
             </div>
-            <div className="overview__item">
+            <div className='overview__item'>
                <h2 className='mini-title'>Дата создания запроса</h2>
-               <div className="overview__content">{currentRequest?.createdDate.toLocaleDateString()}</div>
+               <div className='overview__content'>{currentRequest?.createdDate.toLocaleDateString()}</div>
             </div>
          </div>
       </>

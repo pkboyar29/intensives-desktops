@@ -6,12 +6,10 @@ import { EducationRequest } from '../../utils/types/EducationRequest'
 
 import { EducationRequestsContext } from '../../context/EducationRequestsContext'
 
-import './EducationRequestsPage.css'
 import Title from '../../components/Title/Title'
 import Table from '../../components/Table/Table'
 
 const EducationRequestsPage: FC = () => {
-
    const navigate = useNavigate()
 
    const educationRequests: EducationRequest[] = useContext(EducationRequestsContext)
@@ -38,7 +36,6 @@ const EducationRequestsPage: FC = () => {
    return (
       <>
          <Title text='Образовательные запросы' />
-
 
          <Table onButtonClick={(id: number) => navigate(`${id}`)} buttonText='Посмотреть' data={educationRequests} columns={columns} />
       </>

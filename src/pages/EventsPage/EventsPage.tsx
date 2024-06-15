@@ -6,12 +6,10 @@ import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 import { Event } from '../../utils/types/Event'
 
-import './EventsPage.css'
 import Title from '../../components/Title/Title'
 import Table from '../../components/Table/Table'
 
 const EventsPage: FC = () => {
-
    const navigate = useNavigate()
    const params = useParams()
 
@@ -48,6 +46,7 @@ const EventsPage: FC = () => {
    return (
       <>
          <Title text='Все мероприятия' />
+         
          <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => navigate(`${id}`)} />
       </>
    )

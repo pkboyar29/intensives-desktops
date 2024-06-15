@@ -1,3 +1,7 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 /* подключение шрифтов */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 /* font-family: 'Inter', sans-serif;
@@ -112,26 +116,41 @@ h6 {
   box-sizing: border-box;
 }
 
-/* обшие стили */
+/* Общие стили */
 
-.container {
+/* .container {
   max-width: 1366px;
   margin: 0 auto;
+} */
+
+/* TABLE */
+
+.table {
+  border-collapse: collapse;
+  border-top: solid transparent 24px;
+  border-bottom: solid transparent 24px;
+  border-right: solid transparent 16px;
+  border-left: solid transparent 16px;
 }
 
-.main {
-  height: 100%;
-  display: flex;
+.thead {
+  border-bottom: solid #fff 20px;
 }
 
-.content {
-  padding: 40px;
-  width: 100%;
+.thead__row {}
+
+.thead__cell {
+  border-right: solid #fff 20px;
 }
 
-.mini-title {
-  font-size: 20px;
-  color: #121217;
-  font-family: 'Open Sans', sans-serif;
-  font-weight: 700;
+.tbody {}
+
+.tbody__row {
+  border-bottom: solid #fff 20px;
+}
+
+/* SIDEBAR */
+
+.sidebar__link.active {
+  color: #1A5CE5;
 }
