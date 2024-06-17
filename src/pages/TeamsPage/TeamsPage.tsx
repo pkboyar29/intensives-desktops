@@ -5,7 +5,6 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { Team } from '../../utils/types/Team'
 
-import './TeamsPage.css'
 import Title from '../../components/Title/Title'
 import Table from '../../components/Table/Table'
 
@@ -43,7 +42,7 @@ const TeamsPage: FC = () => {
    return (
       <>
          <Title text='Команды в интенсиве' />
-
+         
          <Table data={teams} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => console.log(`id команды вот такой: ${id}`)} />
       </>
    )

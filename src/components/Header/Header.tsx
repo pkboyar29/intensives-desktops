@@ -1,7 +1,6 @@
 import { FC, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import './Header.css'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
 const Header: FC = () => {
@@ -16,16 +15,16 @@ const Header: FC = () => {
    }
 
    return (
-      <header className='header'>
+      <header className='px-10 py-4 border border-solid border-gray'>
          <div className="container">
-            <div className="header__container">
-               <div className='header__logo'>LOGO</div>
+            <div className=" flex justify-between items-center">
+               <div className='font-sans font-bold text-2xl'>LOGO</div>
                {currentUser && (
-                  <div className='header__right'>
-                     <div className="header__fio">
+                  <div className='flex gap-6 items-center text-lg font-sans'>
+                     <div>
                         {`${currentUser?.first_name}  ${currentUser?.last_name}`}
                      </div>
-                     <button onClick={onButtonClick} className='header__logout'>Выйти</button>
+                     <button onClick={onButtonClick} className='rounded-xl px-5 py-2 bg-blue text-white text-base font-bold'>Выйти</button>
                   </div>
                )}
             </div>

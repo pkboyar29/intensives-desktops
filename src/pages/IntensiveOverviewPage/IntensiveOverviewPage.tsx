@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom'
 import { Intensive } from '../../utils/types/Intensive'
 import { IntensivesContext } from '../../context/IntensivesContext'
 
-import './IntensiveOverviewPage.css'
 import Title from '../../components/Title/Title'
+import OverviewContent from '../../components/OverviewContent/OverviewContent'
 
 const IntensiveOverviewPage: FC = () => {
 
@@ -17,37 +17,36 @@ const IntensiveOverviewPage: FC = () => {
       <>
          <Title text='Просмотр интенсива' />
 
-         <div className="overview__container">
-            <div className="overview__item">
-               <h2 className='mini-title'>Название</h2>
-               <div className="overview__content">{currentIntensive?.name}</div>
+         <OverviewContent>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Название</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.name}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Описание</h2>
-               <div className="overview__content">{currentIntensive?.description}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Описание</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.description}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Начало интенсива</h2>
-               <div className="overview__content">{currentIntensive?.open_dt.toLocaleDateString()}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Начало интенсива</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.open_dt.toLocaleDateString()}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Окончание интенсива</h2>
-               <div className="overview__content">{currentIntensive?.close_dt.toLocaleDateString()}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Окончание интенсива</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.close_dt.toLocaleDateString()}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Учебный поток</h2>
-               <div className="overview__content">{currentIntensive?.flow}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Учебный поток</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.flow}</div>
             </div>
-            {/* <div className="overview__item">
+            {/* <div>
                <h2 className='mini-title'>Команда преподавателей</h2>
                <div className="overview__content"></div>
             </div> */}
-            <div className="overview__item">
+            {/* <div>
                <h2 className='mini-title'>Файлы</h2>
-               <div className="overview__content"></div>
-            </div>
-         </div>
-
+               <div className='overview__content'></div>
+            </div> */}
+         </OverviewContent>
       </>
    )
 }

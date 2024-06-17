@@ -6,10 +6,7 @@ import { Intensive } from '../../utils/types/Intensive'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import { IntensivesContext } from '../../context/IntensivesContext'
 
-import './IntensivePage'
-
 const IntensivePage: FC = () => {
-
    const params = useParams()
 
    const { intensives } = useContext(IntensivesContext)
@@ -17,20 +14,23 @@ const IntensivePage: FC = () => {
 
    return (
       <>
-         <div className='main'>
+         <div className='h-full flex'>
             <Sidebar>
-               <li className='sidebar__item sidebar__title'>{currentIntensive?.name}</li>
-               <li className='sidebar__item'><NavLink to='overview'>Просмотр интенсива</NavLink></li>
-               <li className='sidebar__item'><NavLink to='teams'>Команды</NavLink></li>
-               <li className='sidebar__item'><NavLink to='events'>Мероприятия</NavLink></li>
-               <li className='sidebar__item'><NavLink to='education-requests'>Образовательные запросы</NavLink></li>
-               <button className='sidebar__btn'><Link to='/intensives'>Вернуться к списку интенсивов</Link></button>
+               <li className='text-black text-base font-bold font-sans'>{currentIntensive?.name}</li>
+               <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
+                  to='overview'>Просмотр интенсива</NavLink></li>
+               <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
+                  to='teams'>Команды</NavLink></li>
+               <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
+                  to='events'>Мероприятия</NavLink></li>
+               {/* <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
+                  to='education-requests'>Образовательные запросы</NavLink></li> */}
+               <button className='bg-blue rounded-xl px-2 py-4'><Link className='text-white text-[14px] font-inter font-bold' to='/intensives'>Вернуться к списку интенсивов</Link></button>
             </Sidebar>
-
-            <div className="content">
+            <div className='w-full p-10'>
                <Outlet />
             </div>
-         </div>
+         </div >
       </>
    )
 }

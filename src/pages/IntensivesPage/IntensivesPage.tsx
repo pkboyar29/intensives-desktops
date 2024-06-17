@@ -6,12 +6,10 @@ import { Intensive } from '../../utils/types/Intensive'
 import { IntensivesContext } from '../../context/IntensivesContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
-import './IntensivesPage.css'
 import Table from '../../components/Table/Table'
 import Title from '../../components/Title/Title'
 
 const IntensivesPage: FC = () => {
-
    const navigate = useNavigate()
 
    const { intensives, getIntensives } = useContext(IntensivesContext)

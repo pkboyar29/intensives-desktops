@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
 import { EventsContext } from '../../context/EventsContext'
@@ -7,75 +7,82 @@ import { CurrentUserContext } from '../../context/CurrentUserContext'
 import { Event } from '../../utils/types/Event'
 import { Team } from '../../utils/types/Team'
 
-import './EventOverviewPage.css'
 import Title from '../../components/Title/Title'
+import OverviewContent from '../../components/OverviewContent/OverviewContent'
 
 const EventOverviewPage: FC = () => {
-
    const { events, getEvents } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
+
    const params = useParams()
    const navigate = useNavigate()
 
    useEffect(() => {
       if (params.intensiveId && currentUser) {
+         console.log('получаем events')
          getEvents(parseInt(params.intensiveId, 10))
       }
    }, [currentUser])
 
-   const currentEvent: Event | undefined = events.find((event: Event) => event.id === Number(params.eventId))
+   const [currentEvent, setCurrentEvent] = useState<Event | undefined>(undefined)
+
+   useEffect(() => {
+      setCurrentEvent(events.find((event: Event) => event.id === Number(params.eventId)))
+      console.log('устанавливаем current event')
+   }, [events, currentEvent])
 
    return (
       <>
          <Title text='Просмотр мероприятия' />
 
-         <div className="overview__container">
-            <div className="overview__item">
-               <h2 className='mini-title'>Название мероприятия</h2>
-               <div className="overview__content">{currentEvent?.name}</div>
+         <OverviewContent>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Название мероприятия</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.name}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Описание мероприятия</h2>
-               <div className="overview__content">{currentEvent?.description}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Описание мероприятия</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.description}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Этап</h2>
-               <div className="overview__content">{currentEvent?.stageName}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Этап</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.stageName}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Дата начала мероприятия</h2>
-               <div className="overview__content">{currentEvent?.startDate.toLocaleDateString()}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Дата начала мероприятия</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.startDate.toLocaleDateString()}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Дата окончания мероприятия</h2>
-               <div className="overview__content">{currentEvent?.finishDate.toLocaleDateString()}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Дата окончания мероприятия</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.finishDate.toLocaleDateString()}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Номер аудитории</h2>
-               <div className="overview__content">{currentEvent?.auditoryName}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Номер аудитории</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.auditoryName}</div>
             </div>
-            <div className="overview__item">
-               <h2 className='mini-title'>Шкала оценивания</h2>
-               <div className="overview__content">{currentEvent?.markStrategyName}</div>
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Шкала оценивания</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>{currentEvent?.markStrategyName}</div>
             </div>
             {currentEvent?.isCurrentTeacherJury && (
-               <div className="overview__item">
-                  <h2 className='mini-title'>Вы являетесь жюри в этом интенсиве!</h2>
+               <div>
+                  <h2 className='text-black text-xl font-bold font-sans'>Вы являетесь жюри в этом интенсиве!</h2>
                </div>
             )}
-            <div className="overview__item">
-               <h2 className='mini-title'>Прикрепленные команды</h2>
-               <div className="overview__content">
+            <div>
+               <h2 className='text-black text-xl font-bold font-sans'>Прикрепленные команды</h2>
+               <div className='text-bright_gray text-base font-sans mt-2'>
                   {currentEvent?.teams.map((team: Team) => (
-                     <div className='team'>
-                        <div key={team.id} className='team__item'>{team.name}</div>
-                        {currentEvent?.isCurrentTeacherJury && <button onClick={() => navigate(`/intensive/${params.intensiveId}/team-evaluation/${params.eventId}/${team.id}`)} className='team__button'>поставить оценку</button>}
+                     <div className='flex items-center gap-8 mb-5'>
+                        <div key={team.id}>{team.name}</div>
+                        {currentEvent?.isCurrentTeacherJury
+                           && <button onClick={() => navigate(`/intensive/${params.intensiveId}/team-evaluation/${params.eventId}/${team.id}`)}
+                              className='bg-blue rounded-xl px-5 py-2 font-bold font-sans text-white text-sm'>поставить оценку</button>}
                      </div>
                   ))}
                </div>
             </div>
-
-         </div>
+         </OverviewContent>
       </>
    )
 }

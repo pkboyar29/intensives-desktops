@@ -1,9 +1,8 @@
 import { FC } from 'react'
-import './NotFoundPage.css'
 
 const NotFoundPage: FC = () => {
    return (
-      <div className='not-found'>
+      <div className='text-red'>
          404 NOT FOUND
       </div>
    )

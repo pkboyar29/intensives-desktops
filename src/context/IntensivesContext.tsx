@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Intensive } from '../utils/types/Intensive'
 
 import { CurrentUserContext } from './CurrentUserContext'
+import Cookies from 'js-cookie'
 
 interface IntensiveContextType {
    intensives: Intensive[],
@@ -57,26 +58,30 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
 
    const getIntensives = async (): Promise<void> => {
       try {
-         // { headers: { 'Authorization': `Bearer ${Cookies.get('access')}` } } // Uncomment and adjust if needed
-         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/`)
+         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/`, {
+            headers: {
+               'Authorization': `Bearer ${Cookies.get('access')}`
+            }
+         })
          const openedIntensives = response.data.results.filter((item: any) => item.is_open)
 
          let userRoleIntensives = openedIntensives
          if (currentUser) {
-            if (currentUser.user_role_id === 3 || currentUser.user_role_id === 4) {
+            if (currentUser.user_role_id === 1) {
+               console.log('ты студент')
+               // code
+            }
+
+            if (currentUser.user_role_id === 3) {
                console.log('ты препод')
                userRoleIntensives = openedIntensives.filter((item: any) =>
                   item.teachers_command.some((teacherOnIntensive: any) => teacherOnIntensive.teacher.user.id === currentUser.id)
                );
             }
-
-            if (currentUser.user_role_id === 2) {
-               console.log('ты студент')
-               // code
-            }
          }
-
          const mappedIntensives: Intensive[] = await mapIntensives(userRoleIntensives);
+
+         // const mappedIntensives: Intensive[] = await mapIntensives(openedIntensives);
          console.log('замапленные интенсивы: ', mappedIntensives);
          setIntensives(mappedIntensives)
       } catch (error) {

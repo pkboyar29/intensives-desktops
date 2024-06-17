@@ -1,4 +1,3 @@
-import './App.css'
 import { FC, useEffect, useContext } from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import { CurrentUserContext } from '../context/CurrentUserContext'
@@ -8,16 +7,15 @@ import SignInPage from '../pages/SignInPage/SignInPage'
 import Header from '../components/Header/Header'
 import IntensivesPage from '../pages/IntensivesPage/IntensivesPage'
 import IntensivePage from '../pages/IntensivePage/IntensivePage'
-import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
+// import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
 import EventsPage from '../pages/EventsPage/EventsPage'
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage'
 import TeamsPage from '../pages/TeamsPage/TeamsPage'
-import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
+// import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage'
 
 const App: FC = () => {
-
   const { updateCurrentUser } = useContext(CurrentUserContext)
 
   useEffect(() => {
@@ -34,8 +32,8 @@ const App: FC = () => {
           <Route path='events' element={<EventsPage />} />
           <Route path='events/:eventId' element={<EventOverviewPage />} />
           <Route path='team-evaluation/:eventId/:teamId' element={<TeamEvaluationPage />} />
-          <Route path='education-requests' element={<EducationRequestsPage />} />
-          <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} />
+          {/* <Route path='education-requests' element={<EducationRequestsPage />} />
+          <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} /> */}
         </Route>
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
