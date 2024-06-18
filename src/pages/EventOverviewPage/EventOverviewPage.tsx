@@ -66,7 +66,7 @@ const EventOverviewPage: FC = () => {
             </div>
             {currentEvent?.isCurrentTeacherJury && (
                <div>
-                  <h2 className='text-black text-xl font-bold font-sans'>Вы являетесь жюри в этом интенсиве!</h2>
+                  <h2 className='text-black text-xl font-bold font-sans'>Вы являетесь жюри в этом интенсиве</h2>
                </div>
             )}
             <div>
@@ -75,8 +75,8 @@ const EventOverviewPage: FC = () => {
                   {currentEvent?.teams.map((team: Team) => (
                      <div className='flex items-center gap-8 mb-5'>
                         <div key={team.id}>{team.name}</div>
-                        {currentEvent?.isCurrentTeacherJury
-                           && <button onClick={() => navigate(`/intensive/${params.intensiveId}/team-evaluation/${params.eventId}/${team.id}`)}
+                        {(currentEvent?.isCurrentTeacherJury && currentEvent.markStrategyId !== 1)
+                           && <button onClick={() => navigate(`/teacher/${params.intensiveId}/team-evaluation/${params.eventId}/${team.id}`)}
                               className='bg-blue rounded-xl px-5 py-2 font-bold font-sans text-white text-sm'>поставить оценку</button>}
                      </div>
                   ))}

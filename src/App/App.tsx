@@ -6,7 +6,7 @@ import NotFoundPage from '../pages/NotFoundPage/NotFoundPage'
 import SignInPage from '../pages/SignInPage/SignInPage'
 import Header from '../components/Header/Header'
 import IntensivesPage from '../pages/IntensivesPage/IntensivesPage'
-import IntensivePage from '../pages/IntensivePage/IntensivePage'
+import TeacherMainPage from '../pages/TeacherMainPage/TeacherMainPage'
 // import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
 import EventsPage from '../pages/EventsPage/EventsPage'
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage'
@@ -26,7 +26,7 @@ const App: FC = () => {
     <div className='App'>
       <Header />
       <Routes>
-        <Route path='/intensive/:intensiveId' element={<IntensivePage />}>
+        <Route path='/teacher/:intensiveId' element={<TeacherMainPage />}>
           <Route path='overview' element={<IntensiveOverviewPage />} />
           <Route path='teams' element={<TeamsPage />} />
           <Route path='events' element={<EventsPage />} />

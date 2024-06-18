@@ -52,9 +52,9 @@ const IntensivesPage: FC = () => {
    return (
       <>
          <div className='container'>
-            <Title text='Открытые интенсивы' />
+            <Title text='Интенсивы' />
 
-            <Table onButtonClick={(id: number) => navigate(`/intensive/${id}/overview`)} buttonText='Посмотреть' columns={columns} data={intensives} />
+            <Table onButtonClick={(id: number) => navigate(`/teacher/${id}/overview`)} buttonText='Посмотреть' columns={columns} data={intensives} />
          </div>
       </>
    )

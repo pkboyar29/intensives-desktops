@@ -20,9 +20,7 @@ interface EventsContextProviderProps {
    children: ReactNode
 }
 const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
-
    const [events, setEvents] = useState<Event[]>([])
-
    const { currentUser } = useContext(CurrentUserContext)
 
    const mapEvents = async (items: any[]): Promise<Event[]> => {
@@ -55,7 +53,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
             let isCurrentTeacherJury: boolean = false
             await Promise.all(item.teachers_command.map(async (teacherId: number) => {
                const teacherOnIntensiveResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/${teacherId}/`)
-               if (teacherOnIntensiveResponse.data.role[0] === 4 && teacherOnIntensiveResponse.data.teacher.user.id === currentUser?.id) {
+               if (teacherOnIntensiveResponse.data.role === 4 && teacherOnIntensiveResponse.data.teacher.user.id === currentUser?.id) {
                   isCurrentTeacherJury = true
                }
             }))
@@ -106,21 +104,11 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
    const getEvents = async (intensiveId: number): Promise<void> => {
       try {
-         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/`)
-         const allEvents = response.data.results
-         const ourIntensiveEvents = await Promise.all(allEvents.map(async (event: any) => {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/${event.stage}/`)
-            const stageIntensive = response.data.intensive
-            if (stageIntensive === intensiveId) {
-               return event
-            } else {
-               return null
-            }
-         }))
-         const filteredOurIntensiveEvents = ourIntensiveEvents.filter((event: any) => event !== null)
-         // console.log('незамапленные мероприятия: ', filteredOurIntensiveEvents)
-         const mappedEvents: Event[] = await mapEvents(filteredOurIntensiveEvents)
-         console.log('замаппленные мероприятия: ', mappedEvents)
+         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${intensiveId}`)
+         const events = response.data.results
+
+         const mappedEvents: Event[] = await mapEvents(events)
+         // console.log('замаппленные мероприятия: ', mappedEvents)
          setEvents(mappedEvents)
 
       } catch (error) {
