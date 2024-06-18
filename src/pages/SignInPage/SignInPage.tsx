@@ -12,9 +12,7 @@ interface SignInProps {
 }
 
 const SignInPage: FC = () => {
-
    const { currentUser, updateCurrentUser } = useContext(CurrentUserContext)
-
    const navigate = useNavigate()
 
    useEffect(() => {
@@ -36,6 +34,7 @@ const SignInPage: FC = () => {
             Cookies.set('refresh', response.data.refresh)
             Cookies.set('access', response.data.access)
             updateCurrentUser()
+            // если это студент, то мы не сюда перенаправляем
             navigate('/intensives')
          })
          .catch(error => console.log(error.response.data))

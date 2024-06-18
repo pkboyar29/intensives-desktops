@@ -1,11 +1,12 @@
 import { FC, useEffect, useContext, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios, { all } from 'axios'
 import { useForm } from 'react-hook-form'
 
 import { TeamsContext } from '../../context/TeamsContext'
 import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
+import authHeader from '../../utils/getHeaders'
 
 import Title from '../../components/Title/Title'
 import { Team } from '../../utils/types/Team'
@@ -64,21 +65,14 @@ const TeamEvaluationPage: FC = () => {
    }
 
    const getCurrentAnswer = async () => {
-      const studentsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/role_of_students_on_intensives/`)
-      const allStudents = studentsResponse.data.results
-      const currentTeamStudents = allStudents.filter((student: any) => {
-         if (params.teamId) {
-            return student.command === parseInt(params.teamId, 10)
-         }
-      })
-      const answersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/answers/`)
+      const answersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/answers/`, { headers: await authHeader() })
       const allAnswers = answersResponse.data.results
       const currentEventAnswers = allAnswers.filter((answer: any) => {
          if (params.eventId) {
             return answer.event === parseInt(params.eventId, 10)
          }
       })
-      const currentTeamAnswer = currentEventAnswers.find((answer: any) => currentTeamStudents.some((student: any) => answer.student === student.id))
+      const currentTeamAnswer = currentEventAnswers.find((answer: any) => String(answer.command) === String(params.teamId))
       setCurrentAnswer(currentTeamAnswer)
    }
 

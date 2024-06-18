@@ -18,21 +18,19 @@ interface TeamsContextProviderProps {
 }
 
 const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
-
    const [teams, setTeams] = useState<Team[]>([])
 
    const mapTeams = async (items: any[]): Promise<Team[]> => {
-
       let tutorNameSurname = 'Нету'
       let mentorNameSurname = 'Нету'
 
       const mappedTeams = await Promise.all(items.map(async (item: any) => {
-         if (item.teacher) {
-            const tutorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/${item.teacher}`)
+         if (item.tutor) {
+            const tutorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/${item.tutor}`)
             tutorNameSurname = `${tutorResponse.data.user.last_name} ${tutorResponse.data.user.first_name.charAt(0)}.${tutorResponse.data.user.middle_name.charAt(0)}.`
          }
-         if (item.tutor) {
-            const mentorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/${item.tutor}`)
+         if (item.mentor) {
+            const mentorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/${item.mentor}`)
             mentorNameSurname = `${mentorResponse.data.user.last_name} ${mentorResponse.data.user.first_name.charAt(0)}.${mentorResponse.data.user.middle_name.charAt(0)}.`
          }
 
@@ -40,8 +38,8 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
             return {
                id: item.id,
                name: item.name,
-               tutorId: item.teacher,
-               mentorId: item.tutor,
+               tutorId: item.tutor,
+               mentorId: item.mentor,
                tutorNameSurname: tutorNameSurname,
                mentorNameSurname: mentorNameSurname
             }
@@ -64,6 +62,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    const getTeams = async (intensiveId: number) => {
       const responseTeams = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/`)
       const allTeams = responseTeams.data.results
+      console.log(allTeams)
       const ourIntensiveTeams = allTeams.filter((team: any) => team.intensive === intensiveId)
       const mappedTeams: Team[] = await mapTeams(ourIntensiveTeams)
       setTeams(mappedTeams)
