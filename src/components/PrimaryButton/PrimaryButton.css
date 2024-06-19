@@ -1,0 +1,9 @@
+.primary-button {
+   color: #fff;
+   background-color: #1A5CE5;
+   font-size: 14px;
+   padding: 4px 14px;
+   font-weight: 700;
+   font-family: 'Inter', sans-serif;
+   border-radius: 12px;
+}

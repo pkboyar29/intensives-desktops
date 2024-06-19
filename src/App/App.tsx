@@ -10,12 +10,18 @@ import TeacherMainPage from '../pages/TeacherMainPage/TeacherMainPage'
 // import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
 import EventsPage from '../pages/EventsPage/EventsPage'
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage'
+
 import TeamsPage from '../pages/TeamsPage/TeamsPage'
 // import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage'
 import StudentMainPage from '../pages/StudentMainPage/StudentMainPage'
 import TeamOverviewPage from '../pages/TeamOverviewPage/TeamOverviewPage'
+
+import StudentTasksBoardPage from '../pages/StudentTasksBoardPage/StudentTasksBoardPage'
+import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage'
+import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage/StudentTaskAnswerPage'
+
 
 const App: FC = () => {
   const { updateCurrentUser } = useContext(CurrentUserContext)
@@ -37,18 +43,22 @@ const App: FC = () => {
           {/* <Route path='education-requests' element={<EducationRequestsPage />} />
           <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} /> */}
         </Route>
+
         <Route path='/student/:teamId' element={<StudentMainPage />}>
           <Route path='overview' element={<TeamOverviewPage />} />
           <Route path='intensiv-overview' element={<IntensiveOverviewPage />} />
           <Route path='events' element={<EventsPage />} />
           <Route path='events/:eventId' element={<EventOverviewPage />} />
-          {/* роут с отправкой ответа на мероприятие */}
+          <Route path='tasks-board' element={<StudentTasksBoardPage/>} />
+          <Route path='tasks' element={<StudentTasksPage/>} />
+          <Route path='task/:taskId' element={<StudentTaskAnswerPage/>}/>
         </Route>
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
         <Route path='/' element={<Navigate to='/sign-in' />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
+
     </div>
   )
 }
