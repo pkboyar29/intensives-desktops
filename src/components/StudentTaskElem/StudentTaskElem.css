@@ -1,0 +1,14 @@
+.student-task-elem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.student-task-elem .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-task-elem .name {
+    font-size: large;
+}
