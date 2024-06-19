@@ -6,12 +6,14 @@ import authHeader from '../utils/getHeaders'
 
 interface IntensiveContextType {
    intensives: Intensive[],
-   getIntensives: () => void
+   getIntensives: () => void,
+   getIntensiveById: (intensiveId: number) => Promise<Intensive>
 }
 
 export const IntensivesContext = createContext<IntensiveContextType>({
    intensives: [],
-   getIntensives: () => { }
+   getIntensives: () => { },
+   getIntensiveById: async () => Promise.resolve({ id: 0, name: '', description: '', is_open: false, open_dt: new Date(0), close_dt: new Date(0), flow: '' })
 })
 
 interface IntensivesContextProviderProps {
@@ -21,42 +23,33 @@ interface IntensivesContextProviderProps {
 const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) => {
    const [intensives, setIntensives] = useState<Intensive[]>([])
 
-   const mapIntensives = async (items: any[]): Promise<Intensive[]> => {
-      const mappedIntensives = await Promise.all(items.map(async (item: any) => {
-         try {
-            console.log(item.flow[0])
-
-            return {
-               id: item.id,
-               name: item.name,
-               description: item.description,
-               is_open: item.is_open,
-               open_dt: new Date(item.open_dt),
-               close_dt: new Date(item.close_dt),
-               flow: item.flow[0]
-            }
-         } catch (error) {
-            console.log(error)
-            return {
-               id: item.id,
-               name: item.name,
-               description: item.description,
-               is_open: item.is_open,
-               open_dt: new Date(),
-               close_dt: new Date(),
-               flow: '' // или обработка ошибки по-другому
-            }
-         }
-      }))
-
+   const mapIntensivs = async (unmappedIntensivs: any[]): Promise<Intensive[]> => {
+      const mappedIntensives = await Promise.all(unmappedIntensivs.map(async (unmappedIntensiv: any) => mapIntensiv(unmappedIntensiv)))
       return mappedIntensives
+   }
+
+   const mapIntensiv = async (unmappedIntensiv: any): Promise<Intensive> => {
+      try {
+         return {
+            id: unmappedIntensiv.id,
+            name: unmappedIntensiv.name,
+            description: unmappedIntensiv.description,
+            is_open: unmappedIntensiv.is_open,
+            open_dt: new Date(unmappedIntensiv.open_dt),
+            close_dt: new Date(unmappedIntensiv.close_dt),
+            flow: unmappedIntensiv.flow[0]
+         }
+      } catch (error) {
+         console.log(error)
+         return { id: 0, name: '', description: '', is_open: false, open_dt: new Date(), close_dt: new Date(), flow: '' }
+      }
    }
 
    const getIntensives = async (): Promise<void> => {
       try {
          const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/`, { headers: await authHeader() })
 
-         const mappedIntensives: Intensive[] = await mapIntensives(response.data.results);
+         const mappedIntensives: Intensive[] = await mapIntensivs(response.data.results);
          console.log('замапленные интенсивы: ', mappedIntensives);
          setIntensives(mappedIntensives)
       } catch (error) {
@@ -64,8 +57,14 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
       }
    }
 
+   const getIntensiveById = async (intensiveId: number): Promise<Intensive> => {
+      const intensivResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/${intensiveId}/`, { headers: await authHeader() })
+      const mappedIntensiv = mapIntensiv(intensivResponse.data)
+      return mappedIntensiv
+   }
+
    return (
-      <IntensivesContext.Provider value={{ intensives, getIntensives }}> {children} </IntensivesContext.Provider>
+      <IntensivesContext.Provider value={{ intensives, getIntensives, getIntensiveById }}> {children} </IntensivesContext.Provider>
    )
 }
 

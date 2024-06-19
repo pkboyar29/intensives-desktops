@@ -1,51 +1,52 @@
-import { FC, useContext } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Intensive } from '../../utils/types/Intensive'
 import { IntensivesContext } from '../../context/IntensivesContext'
+import { TeamsContext } from '../../context/TeamsContext'
 
 import Title from '../../components/Title/Title'
 import OverviewContent from '../../components/OverviewContent/OverviewContent'
+import OverviewItem from '../../components/OverviewItem/OverviewItem'
 
 const IntensiveOverviewPage: FC = () => {
-
-   const { intensives } = useContext(IntensivesContext)
    const params = useParams()
-   const currentIntensive: Intensive | undefined = intensives.find((intensive: Intensive) => intensive.id === Number(params.intensiveId))
+   const [currentIntensiv, setCurrentIntensiv] = useState<Intensive | undefined>(undefined)
+   const { getIntensiveById } = useContext(IntensivesContext)
+   const { currentTeam } = useContext(TeamsContext)
+
+   useEffect(() => {
+      const setCurrentIntensivForTeacher = async () => {
+         if (params.intensiveId) {
+            const currentIntensiv: Intensive = await getIntensiveById(parseInt(params.intensiveId, 10))
+            setCurrentIntensiv(currentIntensiv)
+         }
+      }
+      setCurrentIntensivForTeacher()
+   }, [params.intensiveId])
+
+   useEffect(() => {
+      const setCurrentIntensivForStudent = async () => {
+         if (params.teamId) {
+            const currentIntensiv: Intensive = await getIntensiveById(currentTeam.intensiveId)
+            setCurrentIntensiv(currentIntensiv)
+         }
+      }
+      setCurrentIntensivForStudent()
+   }, [params.teamId])
 
    return (
       <>
          <Title text='Просмотр интенсива' />
 
          <OverviewContent>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Название</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.name}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Описание</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.description}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Начало интенсива</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.open_dt.toLocaleDateString()}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Окончание интенсива</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.close_dt.toLocaleDateString()}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Учебный поток</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensive?.flow}</div>
-            </div>
-            {/* <div>
-               <h2 className='mini-title'>Команда преподавателей</h2>
-               <div className="overview__content"></div>
-            </div> */}
-            {/* <div>
-               <h2 className='mini-title'>Файлы</h2>
-               <div className='overview__content'></div>
-            </div> */}
+            <OverviewItem title='Название интенсива' value={currentIntensiv?.name} />
+            <OverviewItem title='Описание' value={currentIntensiv?.description} />
+            <OverviewItem title='Начало интенсива' value={currentIntensiv?.open_dt.toLocaleDateString()} />
+            <OverviewItem title='Окончание интенсива' value={currentIntensiv?.close_dt.toLocaleDateString()} />
+            <OverviewItem title='Учебный поток' value={currentIntensiv?.flow} />
+            {/* <OverviewItem title='Команда преподавателей' value={} /> */}
+            {/* <OverviewItem title='Файлы' value={} /> */}
          </OverviewContent>
       </>
    )
