@@ -10,19 +10,16 @@ import TeacherMainPage from '../pages/TeacherMainPage/TeacherMainPage'
 // import EducationRequestsPage from '../pages/EducationRequestsPage/EducationRequestsPage'
 import EventsPage from '../pages/EventsPage/EventsPage'
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage'
-<<<<<<< HEAD
+
 import TeamsPage from '../pages/TeamsPage/TeamsPage'
 // import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage'
-=======
-import IntensiveTeamsPage from '../pages/IntensiveTeamsPage/IntensiveTeamsPage'
-import IntensiveEducationRequestOverviewPage from '../pages/IntensiveEducationRequestOverviewPage/IntensiveEducationRequestOverviewPage'
-import IntensiveEventOverviewPage from '../pages/IntensiveEventOverviewPage/IntensiveEventOverviewPage'
+
 import StudentTasksBoardPage from '../pages/StudentTasksBoardPage/StudentTasksBoardPage'
 import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage'
 import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage/StudentTaskAnswerPage'
->>>>>>> student-desktops
+
 
 const App: FC = () => {
   const { updateCurrentUser } = useContext(CurrentUserContext)
@@ -33,7 +30,6 @@ const App: FC = () => {
 
   return (
     <div className='App'>
-<<<<<<< HEAD
       <Header />
       <Routes>
         <Route path='/teacher/:intensiveId' element={<TeacherMainPage />}>
@@ -45,33 +41,14 @@ const App: FC = () => {
           {/* <Route path='education-requests' element={<EducationRequestsPage />} />
           <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} /> */}
         </Route>
+        <Route path='tasks-board' element={<StudentTasksBoardPage/>} />
+        <Route path='tasks' element={<StudentTasksPage/>} />
+        <Route path='task/:taskId' element={<StudentTaskAnswerPage/>}/>
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
         <Route path='/' element={<Navigate to='/sign-in' />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
-=======
-      <AppProviders>
-        <Header />
-        <Routes>
-          <Route path='/intensive/:intensiveId' element={<IntensivePage />}>
-            <Route path='overview' element={<IntensiveOverviewPage />} />
-            <Route path='teams' element={<IntensiveTeamsPage />} />
-            <Route path='events' element={<IntensiveEventsPage />} />
-            <Route path='events/:eventId' element={<IntensiveEventOverviewPage />} />
-            <Route path='education-requests' element={<IntensiveEducationRequestsPage />} />
-            <Route path='education-requests/:requestId' element={<IntensiveEducationRequestOverviewPage />} />
-          </Route>
-          <Route path='tasks-board' element={<StudentTasksBoardPage/>} />
-          <Route path='tasks' element={<StudentTasksPage/>} />
-          <Route path='task/:taskId' element={<StudentTaskAnswerPage/>}/>
-          <Route path='/intensives' element={<IntensivesPage />} />
-          <Route path='/sign-in' element={<SignInPage />} />
-          <Route path='/' element={<Navigate to='/sign-in' />} />
-          <Route path='*' element={<NotFoundPage />} />
-        </Routes>
-      </AppProviders>
->>>>>>> student-desktops
     </div>
   )
 }
