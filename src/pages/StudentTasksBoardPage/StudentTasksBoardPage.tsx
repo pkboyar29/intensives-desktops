@@ -1,5 +1,4 @@
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture';
-import './StudentTasksBoardPage.css'
 import { FC } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { TaskTableRow } from '../../utils/types/Task';
@@ -51,12 +50,14 @@ const StudentTasksBoardPage: FC = () => {
    return(
    <div className='student-tasks-page'>
       <div className='container'>
-         <div className='above-table'>
-            <Title text='Доска задач' />
-            <PrimaryButton text="Добавить задачу" onClick={clickAddTask}/>
+         <div className='flex flex-col'>
+            <div className='flex justify-between items-center'>
+               <Title text='Доска задач' />
+               <PrimaryButton text="Добавить задачу" onClick={clickAddTask}/>
+            </div>
+            <TasksTab onTabChange={handleTab}/>
+            <Table onButtonClick={(id: number) => navigate(`/tasks/${id}/`)} buttonText='Редактировать' columns={columns} data={intensives} />
          </div>
-         <TasksTab onTabChange={handleTab}/>
-         <Table onButtonClick={(id: number) => navigate(`/tasks/${id}/`)} buttonText='Редактировать' columns={columns} data={intensives} />
       </div>
    </div>
    )
