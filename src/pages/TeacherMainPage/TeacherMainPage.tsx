@@ -6,7 +6,7 @@ import { Intensive } from '../../utils/types/Intensive'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import { IntensivesContext } from '../../context/IntensivesContext'
 
-const IntensivePage: FC = () => {
+const TeacherMainPage: FC = () => {
    const params = useParams()
 
    const { intensives } = useContext(IntensivesContext)
@@ -35,4 +35,4 @@ const IntensivePage: FC = () => {
    )
 }
 
-export default IntensivePage
+export default TeacherMainPage

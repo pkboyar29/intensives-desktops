@@ -13,14 +13,20 @@ const EventsPage: FC = () => {
    const navigate = useNavigate()
    const params = useParams()
 
-   const { events, getEvents } = useContext(EventsContext)
+   const { events, setEventsForIntensiv, setEventsForTeam } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
 
    useEffect(() => {
       if (params.intensiveId && currentUser) {
-         getEvents(parseInt(params.intensiveId, 10))
+         setEventsForIntensiv(parseInt(params.intensiveId, 10))
       }
-   }, [currentUser])
+   }, [currentUser, params.intensiveId])
+
+   useEffect(() => {
+      if (params.teamId && currentUser) {
+         setEventsForTeam(parseInt(params.teamId))
+      }
+   }, [currentUser, params.teamId])
 
    const columnHelper = createColumnHelper<Event>()
    const columns = [
@@ -46,7 +52,7 @@ const EventsPage: FC = () => {
    return (
       <>
          <Title text='Все мероприятия' />
-         
+
          <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => navigate(`${id}`)} />
       </>
    )

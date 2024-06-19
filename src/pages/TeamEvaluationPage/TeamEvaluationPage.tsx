@@ -21,7 +21,7 @@ const TeamEvaluationPage: FC = () => {
    const params = useParams()
    const navigate = useNavigate()
    const { teams, getTeams } = useContext(TeamsContext)
-   const { events, getEvents } = useContext(EventsContext)
+   const { events, setEventsForIntensiv } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
    const [currentAnswer, setCurrentAnswer] = useState<any>()
 
@@ -53,7 +53,7 @@ const TeamEvaluationPage: FC = () => {
       try {
          if (params.intensiveId && params.eventId) {
             await getTeams(parseInt(params.intensiveId, 10))
-            await getEvents(parseInt(params.intensiveId, 10))
+            await setEventsForIntensiv(parseInt(params.intensiveId, 10))
          }
          // вызвать все get методы или вызвать их в компоненте App?
 

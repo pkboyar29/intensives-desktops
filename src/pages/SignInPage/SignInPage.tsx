@@ -5,6 +5,9 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 
 import { CurrentUserContext } from '../../context/CurrentUserContext'
+import { TeamsContext } from '../../context/TeamsContext'
+import { User } from '../../utils/types/User'
+import { Team } from '../../utils/types/Team'
 
 interface SignInProps {
    email: string,
@@ -13,31 +16,44 @@ interface SignInProps {
 
 const SignInPage: FC = () => {
    const { currentUser, updateCurrentUser } = useContext(CurrentUserContext)
+   const { getCurrentTeamForStudent } = useContext(TeamsContext)
    const navigate = useNavigate()
-
-   useEffect(() => {
-      console.log('монтирование SignInPage')
-      if (currentUser) {
-         navigate('/intensives')
-      }
-   }, [])
 
    const { handleSubmit, register } = useForm<SignInProps>({
       mode: "onBlur"
    })
 
-   const onSubmit = (data: SignInProps) => {
+   useEffect(() => {
+      if (currentUser) {
+         redirect(currentUser)
+      }
+   }, [currentUser])
+
+   const onSubmit = async (data: SignInProps) => {
       console.log(data)
-      axios.post(`${process.env.REACT_APP_BACKEND_URL}/token/`, data)
-         .then(response => {
-            console.log(response.data)
-            Cookies.set('refresh', response.data.refresh)
-            Cookies.set('access', response.data.access)
-            updateCurrentUser()
-            // если это студент, то мы не сюда перенаправляем
-            navigate('/intensives')
-         })
-         .catch(error => console.log(error.response.data))
+      try {
+         const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/token/`, data)
+         console.log(response.data)
+         Cookies.set('refresh', response.data.refresh)
+         Cookies.set('access', response.data.access)
+
+         const currentUserInfo: User = await updateCurrentUser()
+         redirect(currentUserInfo)
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
+   const redirect = async (currentUser: User) => {
+      if (currentUser.user_role_id === 1) {
+         if (currentUser.student_id) {
+            const currentTeam: Promise<Team> = getCurrentTeamForStudent(currentUser.student_id)
+            const currentTeamId = (await currentTeam).id
+            navigate(`/student/${currentTeamId}/overview`)
+         }
+      } else if (currentUser.user_role_id === 3) {
+         navigate('/intensives')
+      }
    }
 
    return (
