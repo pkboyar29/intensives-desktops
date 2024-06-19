@@ -12,6 +12,7 @@ export type Event = {
    auditoryName: string,
    markStrategyId: number,
    markStrategyName: string,
+   resultTypeId: number,
    criterias: number[],
    criteriasNames: string[],
    teams: Team[],

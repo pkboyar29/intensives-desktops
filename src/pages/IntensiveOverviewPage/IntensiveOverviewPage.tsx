@@ -7,6 +7,7 @@ import { TeamsContext } from '../../context/TeamsContext'
 
 import Title from '../../components/Title/Title'
 import OverviewContent from '../../components/OverviewContent/OverviewContent'
+import OverviewItem from '../../components/OverviewItem/OverviewItem'
 
 const IntensiveOverviewPage: FC = () => {
    const params = useParams()
@@ -39,34 +40,13 @@ const IntensiveOverviewPage: FC = () => {
          <Title text='Просмотр интенсива' />
 
          <OverviewContent>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Название</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensiv?.name}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Описание</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensiv?.description}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Начало интенсива</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensiv?.open_dt.toLocaleDateString()}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Окончание интенсива</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensiv?.close_dt.toLocaleDateString()}</div>
-            </div>
-            <div>
-               <h2 className='text-black text-xl font-bold font-sans'>Учебный поток</h2>
-               <div className='text-bright_gray text-base font-sans mt-2'>{currentIntensiv?.flow}</div>
-            </div>
-            {/* <div>
-               <h2 className='mini-title'>Команда преподавателей</h2>
-               <div className="overview__content"></div>
-            </div> */}
-            {/* <div>
-               <h2 className='mini-title'>Файлы</h2>
-               <div className='overview__content'></div>
-            </div> */}
+            <OverviewItem title='Название интенсива' value={currentIntensiv?.name} />
+            <OverviewItem title='Описание' value={currentIntensiv?.description} />
+            <OverviewItem title='Начало интенсива' value={currentIntensiv?.open_dt.toLocaleDateString()} />
+            <OverviewItem title='Окончание интенсива' value={currentIntensiv?.close_dt.toLocaleDateString()} />
+            <OverviewItem title='Учебный поток' value={currentIntensiv?.flow} />
+            {/* <OverviewItem title='Команда преподавателей' value={} /> */}
+            {/* <OverviewItem title='Файлы' value={} /> */}
          </OverviewContent>
       </>
    )

@@ -1,5 +1,5 @@
 import { FC, ReactNode, createContext, useState, useContext } from 'react'
-import axios, { all } from 'axios'
+import axios from 'axios'
 
 import { CurrentUserContext } from './CurrentUserContext'
 
@@ -9,14 +9,21 @@ import { TeamsContext } from './TeamsContext'
 
 interface EventsContextType {
    events: Event[],
+   currentEvent: Event | undefined,
    setEventsForIntensiv: (intensiveId: number) => Promise<Event[]>,
-   setEventsForTeam: (teamId: number) => void
+   setEventsForTeam: (teamId: number) => void,
+   setCurrentEventById: (eventId: number) => void
 }
 
 export const EventsContext = createContext<EventsContextType>({
    events: [],
+   currentEvent: {
+      id: 0, name: '', description: '', stageId: 0, stageName: '', startDate: new Date(), finishDate: new Date(), auditoryId: 0, auditoryName: '',
+      markStrategyId: 0, markStrategyName: '', resultTypeId: 0, criterias: [0], criteriasNames: [], teams: [], teachers_command: [0], isCurrentTeacherJury: false
+   },
    setEventsForIntensiv: async () => [],
-   setEventsForTeam: () => { }
+   setEventsForTeam: () => { },
+   setCurrentEventById: () => { }
 })
 
 interface EventsContextProviderProps {
@@ -24,6 +31,7 @@ interface EventsContextProviderProps {
 }
 const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
    const [events, setEvents] = useState<Event[]>([])
+   const [currentEvent, setCurrentEvent] = useState<Event | undefined>()
    const { currentUser } = useContext(CurrentUserContext)
    const { getTeamById } = useContext(TeamsContext)
 
@@ -77,6 +85,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
             auditoryName: auditoryResponse.data.name,
             markStrategyId: unmappedEvent.mark_strategy,
             markStrategyName: markStrategyResponse.data.name,
+            resultTypeId: unmappedEvent.result_type,
             criterias: unmappedEvent.criteria,
             criteriasNames: criteriasNames,
             teams: resolvedTeams,
@@ -87,7 +96,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
          console.log(error)
          return {
             id: 0, name: 'Unknown', description: 'Unknown', stageId: 0, stageName: 'Unknown', startDate: new Date(), finishDate: new Date(), auditoryId: 0,
-            auditoryName: 'Unknown', markStrategyId: 0, markStrategyName: 'Unknown', criterias: [], criteriasNames: [], teams: [], teachers_command: [], isCurrentTeacherJury: false
+            auditoryName: 'Unknown', markStrategyId: 0, markStrategyName: 'Unknown', resultTypeId: 0, criterias: [], criteriasNames: [], teams: [], teachers_command: [], isCurrentTeacherJury: false
          }
       }
    }
@@ -113,11 +122,8 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
          const eventsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${(await team).intensiveId}`)
          const unmappedEvents = eventsResponse.data.results
-         console.log('все события это ', unmappedEvents)
-         console.log('наша команда с id ', teamId)
          const ourTeamEvents = unmappedEvents.filter((unmappedEvent: any) => {
             const eventTeams: any[] = unmappedEvent.commands
-            console.log('все команды из массива это ', eventTeams)
             const isOurTeamInEvent = eventTeams.some((eventTeam: any) => eventTeam === teamId)
             return isOurTeamInEvent
          })
@@ -129,8 +135,19 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
       }
    }
 
+   const setCurrentEventById = async (eventId: number): Promise<void> => {
+      try {
+         const eventResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`)
+         const unmappedEvent = eventResponse.data
+         const mappedEvent: Event = await mapEvent(unmappedEvent)
+         setCurrentEvent(mappedEvent)
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
    return (
-      <EventsContext.Provider value={{ events, setEventsForIntensiv: setAndGetEventsForIntensiv, setEventsForTeam }}> {children} </EventsContext.Provider>
+      <EventsContext.Provider value={{ events, currentEvent, setEventsForIntensiv: setAndGetEventsForIntensiv, setEventsForTeam, setCurrentEventById }}> {children} </EventsContext.Provider>
    )
 }
 

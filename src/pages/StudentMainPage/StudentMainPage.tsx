@@ -20,7 +20,7 @@ const StudentMainPage: FC = () => {
                <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
                   to='education-requests'>Образовательные запросы</NavLink></li> */}
             </Sidebar>
-            <div className='w-full p-10'>
+            <div className='w-full ml-10 mt-10'>
                <Outlet />
             </div>
          </div >
