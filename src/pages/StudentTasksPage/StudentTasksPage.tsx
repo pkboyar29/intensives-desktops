@@ -10,8 +10,10 @@ const StudentTasksPage: FC = () => {
     <div className='student-tasks-page'>
         <div className='container'>
             <Title text='Мои задачи' />
-            <span>Две задачи, одна в процессе</span>
-            <StudentTaskElem name="Задача 1" desc="описание задачи" finish_dt={new Date('2024-07-01')}/>
+            <span>2 задачи, 1 в процессе</span>
+            <div>
+                <StudentTaskElem name="Задача 1" desc="описание задачи" finish_dt={new Date('2024-07-01')}/>
+            </div>
         </div>
     </div>
     )
