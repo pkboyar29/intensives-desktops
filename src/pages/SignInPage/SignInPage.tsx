@@ -5,6 +5,9 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 
 import { CurrentUserContext } from '../../context/CurrentUserContext'
+import { TeamsContext } from '../../context/TeamsContext'
+import { User } from '../../utils/types/User'
+import { Team } from '../../utils/types/Team'
 
 interface SignInProps {
    email: string,
@@ -13,6 +16,7 @@ interface SignInProps {
 
 const SignInPage: FC = () => {
    const { currentUser, updateCurrentUser } = useContext(CurrentUserContext)
+   const { getCurrentTeamForStudent } = useContext(TeamsContext)
    const navigate = useNavigate()
 
    useEffect(() => {
@@ -26,18 +30,27 @@ const SignInPage: FC = () => {
       mode: "onBlur"
    })
 
-   const onSubmit = (data: SignInProps) => {
+   const onSubmit = async (data: SignInProps) => {
       console.log(data)
-      axios.post(`${process.env.REACT_APP_BACKEND_URL}/token/`, data)
-         .then(response => {
-            console.log(response.data)
-            Cookies.set('refresh', response.data.refresh)
-            Cookies.set('access', response.data.access)
-            updateCurrentUser()
-            // если это студент, то мы не сюда перенаправляем
+      try {
+         const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/token/`, data)
+         console.log(response.data)
+         Cookies.set('refresh', response.data.refresh)
+         Cookies.set('access', response.data.access)
+
+         const currentUserInfo: User = await updateCurrentUser()
+         if (currentUserInfo.user_role_id === 1) {
+            if (currentUserInfo.student_id) {
+               const currentTeam: Promise<Team> = getCurrentTeamForStudent(currentUserInfo.student_id)
+               const currentTeamId = (await currentTeam).id
+               navigate(`/student/${currentTeamId}/overview`)
+            }
+         } else if (currentUserInfo.user_role_id === 3) {
             navigate('/intensives')
-         })
-         .catch(error => console.log(error.response.data))
+         }
+      } catch (error) {
+         console.log(error)
+      }
    }
 
    return (

@@ -14,6 +14,8 @@ import TeamsPage from '../pages/TeamsPage/TeamsPage'
 // import EducationRequestOverviewPage from '../pages/EducationRequestOverviewPage/EducationRequestOverviewPage'
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage'
 import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage'
+import StudentMainPage from '../pages/StudentMainPage/StudentMainPage'
+import TeamOverviewPage from '../pages/TeamOverviewPage/TeamOverviewPage'
 
 const App: FC = () => {
   const { updateCurrentUser } = useContext(CurrentUserContext)
@@ -34,6 +36,12 @@ const App: FC = () => {
           <Route path='team-evaluation/:eventId/:teamId' element={<TeamEvaluationPage />} />
           {/* <Route path='education-requests' element={<EducationRequestsPage />} />
           <Route path='education-requests/:requestId' element={<EducationRequestOverviewPage />} /> */}
+        </Route>
+        <Route path='/student/:teamId' element={<StudentMainPage />}>
+          <Route path='overview' element={<TeamOverviewPage />} />
+          <Route path='events' element={<EventsPage />} />
+          <Route path='events/:eventId' element={<EventOverviewPage />} />
+          {/* роут с отправкой ответа на мероприятие */}
         </Route>
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
