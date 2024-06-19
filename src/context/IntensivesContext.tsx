@@ -41,15 +41,7 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
          }
       } catch (error) {
          console.log(error)
-         return {
-            id: unmappedIntensiv.id,
-            name: unmappedIntensiv.name,
-            description: unmappedIntensiv.description,
-            is_open: unmappedIntensiv.is_open,
-            open_dt: new Date(),
-            close_dt: new Date(),
-            flow: '' // или обработка ошибки по-другому
-         }
+         return { id: 0, name: '', description: '', is_open: false, open_dt: new Date(), close_dt: new Date(), flow: '' }
       }
    }
 
@@ -70,10 +62,6 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({ children }) =>
       const mappedIntensiv = mapIntensiv(intensivResponse.data)
       return mappedIntensiv
    }
-
-   // const getIntensiveByTeamId = async (teamId: number): Promise<Intensive> => {
-   //    // узнать по teamId team
-   // }
 
    return (
       <IntensivesContext.Provider value={{ intensives, getIntensives, getIntensiveById }}> {children} </IntensivesContext.Provider>

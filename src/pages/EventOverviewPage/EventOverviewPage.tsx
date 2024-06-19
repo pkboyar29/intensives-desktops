@@ -11,7 +11,7 @@ import Title from '../../components/Title/Title'
 import OverviewContent from '../../components/OverviewContent/OverviewContent'
 
 const EventOverviewPage: FC = () => {
-   const { events, getEvents } = useContext(EventsContext)
+   const { events, setEventsForIntensiv } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
 
    const params = useParams()
@@ -19,8 +19,7 @@ const EventOverviewPage: FC = () => {
 
    useEffect(() => {
       if (params.intensiveId && currentUser) {
-         console.log('получаем events')
-         getEvents(parseInt(params.intensiveId, 10))
+         setEventsForIntensiv(parseInt(params.intensiveId, 10))
       }
    }, [currentUser])
 

@@ -8,7 +8,8 @@ interface TeamsContextType {
    getTeams: (intensiveId: number) => void,
    getCurrentTeamForStudent: (studentId: number) => Promise<Team>,
    currentTeam: Team,
-   setCurrentTeamForStudent: (teamId: number) => void
+   setCurrentTeamForStudent: (teamId: number) => void,
+   getTeamById: (teamId: number) => Promise<Team>
 }
 
 export const TeamsContext = createContext<TeamsContextType>({
@@ -16,7 +17,8 @@ export const TeamsContext = createContext<TeamsContextType>({
    getTeams: () => { },
    getCurrentTeamForStudent: async () => Promise.resolve({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 }),
    currentTeam: { id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 },
-   setCurrentTeamForStudent: () => { }
+   setCurrentTeamForStudent: () => { },
+   getTeamById: async () => Promise.resolve({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 })
 })
 
 interface TeamsContextProviderProps {
@@ -106,7 +108,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    }
 
    return (
-      <TeamsContext.Provider value={{ teams, getTeams, getCurrentTeamForStudent, currentTeam, setCurrentTeamForStudent }}>
+      <TeamsContext.Provider value={{ teams, getTeams, getCurrentTeamForStudent, currentTeam, setCurrentTeamForStudent, getTeamById }}>
          {children}
       </TeamsContext.Provider>
    )

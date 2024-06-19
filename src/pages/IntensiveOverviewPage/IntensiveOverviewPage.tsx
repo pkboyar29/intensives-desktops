@@ -9,9 +9,9 @@ import Title from '../../components/Title/Title'
 import OverviewContent from '../../components/OverviewContent/OverviewContent'
 
 const IntensiveOverviewPage: FC = () => {
-   const { getIntensiveById } = useContext(IntensivesContext)
    const params = useParams()
    const [currentIntensiv, setCurrentIntensiv] = useState<Intensive | undefined>(undefined)
+   const { getIntensiveById } = useContext(IntensivesContext)
    const { currentTeam } = useContext(TeamsContext)
 
    useEffect(() => {

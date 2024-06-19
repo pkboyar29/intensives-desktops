@@ -19,16 +19,15 @@ const SignInPage: FC = () => {
    const { getCurrentTeamForStudent } = useContext(TeamsContext)
    const navigate = useNavigate()
 
-   useEffect(() => {
-      console.log('монтирование SignInPage')
-      if (currentUser) {
-         navigate('/intensives')
-      }
-   }, [])
-
    const { handleSubmit, register } = useForm<SignInProps>({
       mode: "onBlur"
    })
+
+   useEffect(() => {
+      if (currentUser) {
+         redirect(currentUser)
+      }
+   }, [currentUser])
 
    const onSubmit = async (data: SignInProps) => {
       console.log(data)
@@ -39,17 +38,21 @@ const SignInPage: FC = () => {
          Cookies.set('access', response.data.access)
 
          const currentUserInfo: User = await updateCurrentUser()
-         if (currentUserInfo.user_role_id === 1) {
-            if (currentUserInfo.student_id) {
-               const currentTeam: Promise<Team> = getCurrentTeamForStudent(currentUserInfo.student_id)
-               const currentTeamId = (await currentTeam).id
-               navigate(`/student/${currentTeamId}/overview`)
-            }
-         } else if (currentUserInfo.user_role_id === 3) {
-            navigate('/intensives')
-         }
+         redirect(currentUserInfo)
       } catch (error) {
          console.log(error)
+      }
+   }
+
+   const redirect = async (currentUser: User) => {
+      if (currentUser.user_role_id === 1) {
+         if (currentUser.student_id) {
+            const currentTeam: Promise<Team> = getCurrentTeamForStudent(currentUser.student_id)
+            const currentTeamId = (await currentTeam).id
+            navigate(`/student/${currentTeamId}/overview`)
+         }
+      } else if (currentUser.user_role_id === 3) {
+         navigate('/intensives')
       }
    }
 
