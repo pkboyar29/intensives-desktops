@@ -39,6 +39,7 @@ const App: FC = () => {
         </Route>
         <Route path='/student/:teamId' element={<StudentMainPage />}>
           <Route path='overview' element={<TeamOverviewPage />} />
+          <Route path='intensiv-overview' element={<IntensiveOverviewPage />} />
           <Route path='events' element={<EventsPage />} />
           <Route path='events/:eventId' element={<EventOverviewPage />} />
           {/* роут с отправкой ответа на мероприятие */}

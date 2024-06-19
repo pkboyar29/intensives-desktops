@@ -4,5 +4,6 @@ export type Team = {
    tutorId: number | null,
    tutorNameSurname: string | null,
    mentorId: number | null,
-   mentorNameSurname: string | null
+   mentorNameSurname: string | null,
+   intensiveId: number
 }

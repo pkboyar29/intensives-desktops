@@ -14,8 +14,8 @@ interface TeamsContextType {
 export const TeamsContext = createContext<TeamsContextType>({
    teams: [],
    getTeams: () => { },
-   getCurrentTeamForStudent: async () => Promise.resolve({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null }),
-   currentTeam: { id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null },
+   getCurrentTeamForStudent: async () => Promise.resolve({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 }),
+   currentTeam: { id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 },
    setCurrentTeamForStudent: () => { }
 })
 
@@ -25,7 +25,7 @@ interface TeamsContextProviderProps {
 
 const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    const [teams, setTeams] = useState<Team[]>([])
-   const [currentTeam, setCurrentTeam] = useState<Team>({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null })
+   const [currentTeam, setCurrentTeam] = useState<Team>({ id: 0, name: '', tutorId: null, tutorNameSurname: null, mentorId: null, mentorNameSurname: null, intensiveId: 0 })
 
    const mapTeams = async (unmappedTeams: any[]): Promise<Team[]> => {
       const mappedTeams = await Promise.all(unmappedTeams.map(async (unmappedTeam: any) => mapTeam(unmappedTeam)))
@@ -53,7 +53,8 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
             tutorId: unmappedTeam.tutor,
             mentorId: unmappedTeam.mentor,
             tutorNameSurname: tutorNameSurname,
-            mentorNameSurname: mentorNameSurname
+            mentorNameSurname: mentorNameSurname,
+            intensiveId: unmappedTeam.intensive
          }
       } catch (error) {
          console.log(error)
@@ -63,7 +64,8 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
             tutorId: 0,
             mentorId: 0,
             tutorNameSurname: 'Unknown',
-            mentorNameSurname: 'Unknown'
+            mentorNameSurname: 'Unknown',
+            intensiveId: 0
          }
       }
    }
