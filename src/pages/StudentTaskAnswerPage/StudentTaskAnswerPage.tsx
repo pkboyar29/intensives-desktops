@@ -1,4 +1,3 @@
-import './StudentTaskAnswerPage.css'
 import { FC, useState, useEffect } from 'react'
 import Title from '../../components/Title/Title';
 import { Task } from '../../utils/types/Task'

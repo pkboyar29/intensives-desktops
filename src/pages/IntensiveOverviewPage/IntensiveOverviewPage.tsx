@@ -14,26 +14,35 @@ const IntensiveOverviewPage: FC = () => {
    const [currentIntensiv, setCurrentIntensiv] = useState<Intensive | undefined>(undefined)
    const { getIntensiveById } = useContext(IntensivesContext)
    const { currentTeam } = useContext(TeamsContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    useEffect(() => {
-      const setCurrentIntensivForTeacher = async () => {
+      const fetchDataForTeacher = async () => {
          if (params.intensiveId) {
             const currentIntensiv: Intensive = await getIntensiveById(parseInt(params.intensiveId, 10))
-            setCurrentIntensiv(currentIntensiv)
+            await setCurrentIntensiv(currentIntensiv)
+            setIsLoading(false)
          }
       }
-      setCurrentIntensivForTeacher()
+      fetchDataForTeacher()
    }, [params.intensiveId])
 
    useEffect(() => {
-      const setCurrentIntensivForStudent = async () => {
+      const fetchDataForStudent = async () => {
          if (params.teamId) {
             const currentIntensiv: Intensive = await getIntensiveById(currentTeam.intensiveId)
-            setCurrentIntensiv(currentIntensiv)
+            await setCurrentIntensiv(currentIntensiv)
+            setIsLoading(false)
          }
       }
-      setCurrentIntensivForStudent()
+      fetchDataForStudent()
    }, [params.teamId])
+
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
 
    return (
       <>

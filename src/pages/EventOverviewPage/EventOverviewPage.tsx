@@ -8,7 +8,6 @@ import authHeader from '../../utils/getHeaders'
 import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
-import { Event } from '../../utils/types/Event'
 import { Team } from '../../utils/types/Team'
 
 import Title from '../../components/Title/Title'
@@ -22,6 +21,7 @@ type AnswerSubmitValues = {
 const EventOverviewPage: FC = () => {
    const { currentEvent, setCurrentEventById } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    const params = useParams()
    const navigate = useNavigate()
@@ -48,10 +48,20 @@ const EventOverviewPage: FC = () => {
    }
 
    useEffect(() => {
-      if (params.eventId) {
-         setCurrentEventById(parseInt(params.eventId))
+      const fetchData = async () => {
+         if (params.eventId) {
+            await setCurrentEventById(parseInt(params.eventId))
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [params.eventId, currentUser])
+
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
 
    return (
       <>

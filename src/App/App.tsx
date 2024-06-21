@@ -49,16 +49,15 @@ const App: FC = () => {
           <Route path='intensiv-overview' element={<IntensiveOverviewPage />} />
           <Route path='events' element={<EventsPage />} />
           <Route path='events/:eventId' element={<EventOverviewPage />} />
-          <Route path='tasks-board' element={<StudentTasksBoardPage/>} />
-          <Route path='tasks' element={<StudentTasksPage/>} />
-          <Route path='task/:taskId' element={<StudentTaskAnswerPage/>}/>
+          <Route path='tasks-board' element={<StudentTasksBoardPage />} />
+          <Route path='tasks' element={<StudentTasksPage />} />
+          <Route path='task/:taskId' element={<StudentTaskAnswerPage />} />
         </Route>
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
         <Route path='/' element={<Navigate to='/sign-in' />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
-
     </div>
   )
 }

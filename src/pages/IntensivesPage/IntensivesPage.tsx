@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useNavigate } from 'react-router-dom'
 
@@ -14,11 +14,16 @@ const IntensivesPage: FC = () => {
 
    const { intensives, getIntensives } = useContext(IntensivesContext)
    const { currentUser } = useContext(CurrentUserContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    useEffect(() => {
-      if (currentUser != null) {
-         getIntensives()
+      const fetchData = async () => {
+         if (currentUser != null) {
+            await getIntensives()
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [currentUser])
 
    const columnHelper = createColumnHelper<Intensive>()
@@ -41,7 +46,15 @@ const IntensivesPage: FC = () => {
       })
    ]
 
-   if (intensives.length === 0) {
+   if (isLoading) {
+      return (
+         <div className='container'>
+            <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+         </div>
+      )
+   }
+
+   if (intensives.length === 0 && !isLoading) {
       return (
          <div className='container'>
             <Title text='Для вас пока нету открытых интенсивов' />

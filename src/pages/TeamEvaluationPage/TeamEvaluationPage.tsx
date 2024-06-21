@@ -1,6 +1,6 @@
 import { FC, useEffect, useContext, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import axios, { all } from 'axios'
+import axios from 'axios'
 import { useForm } from 'react-hook-form'
 
 import { TeamsContext } from '../../context/TeamsContext'
@@ -24,6 +24,7 @@ const TeamEvaluationPage: FC = () => {
    const { events, setEventsForIntensiv } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
    const [currentAnswer, setCurrentAnswer] = useState<any>()
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    const { register, handleSubmit } = useForm<FormValues>({
       'mode': 'onBlur',
@@ -46,23 +47,16 @@ const TeamEvaluationPage: FC = () => {
    })
 
    useEffect(() => {
-      fetchInitialData()
-   }, [])
-
-   const fetchInitialData = async () => {
-      try {
+      const fetchData = async () => {
          if (params.intensiveId && params.eventId) {
             await getTeams(parseInt(params.intensiveId, 10))
             await setEventsForIntensiv(parseInt(params.intensiveId, 10))
          }
-         // вызвать все get методы или вызвать их в компоненте App?
-
-         getCurrentAnswer()
-
-      } catch (error) {
-         console.log(error)
+         await getCurrentAnswer()
+         setIsLoading(false)
       }
-   }
+      fetchData()
+   }, [])
 
    const getCurrentAnswer = async () => {
       const answersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/answers/`, { headers: await authHeader() })
@@ -100,7 +94,7 @@ const TeamEvaluationPage: FC = () => {
             }
             console.log(requestBody)
 
-            const markResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/marks/`, requestBody)
+            const markResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/marks/`, requestBody, { headers: await authHeader() })
             console.log(markResponse.data)
          } catch (error) {
             console.log(error)
@@ -108,15 +102,8 @@ const TeamEvaluationPage: FC = () => {
       })
    }
 
-   if (!currentTeam) {
-      return <>Loading...</>
-   }
-   if (!currentEvent) {
-      return <>Loading...</>
-   }
-
    const renderMarkContent = (criteriaId: number, index: number) => {
-      switch (currentEvent.markStrategyId) {
+      switch (currentEvent?.markStrategyId) {
          case 2:
             return (
                <>
@@ -151,9 +138,15 @@ const TeamEvaluationPage: FC = () => {
       }
    }
 
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
+
    return (
       <>
-         <Title text={currentTeam.name} />
+         <Title text={currentTeam?.name || ''} />
 
          <div className='text-black text-xl font-bold font-sans my-5'>Ответ команды</div>
          {currentAnswer ? <div className='text-black text-base font-normal font-inter mt-5'>{currentAnswer.text}</div>
@@ -161,7 +154,7 @@ const TeamEvaluationPage: FC = () => {
 
          {currentAnswer && (
             <form onSubmit={handleSubmit(onSubmit)}>
-               {currentEvent.criteriasNames.length === 0
+               {currentEvent?.criteriasNames.length === 0
                   ? (
                      <>
                         <div className='text-black text-xl font-bold font-sans my-5'>Общая оценка</div>
@@ -174,7 +167,7 @@ const TeamEvaluationPage: FC = () => {
                   : (
                      <>
                         <div className='text-black text-xl font-bold font-sans my-5'>Критерии</div>
-                        {currentEvent.criteriasNames.map((criteriaName, index) => (
+                        {currentEvent?.criteriasNames.map((criteriaName, index) => (
                            <div className='flex justify-between items-center gap-16 w-96 mb-5' key={currentEvent.criterias && currentEvent.criterias[index]}>
                               <div className='font-normal font-inter text-base text-black'>{criteriaName}</div>
                               <div> {renderMarkContent(currentEvent.criterias[index], index)} </div>

@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { TeamsContext } from '../../context/TeamsContext'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -11,12 +11,16 @@ import Table from '../../components/Table/Table'
 const TeamsPage: FC = () => {
    const params = useParams()
    const { teams, getTeams } = useContext(TeamsContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    useEffect(() => {
-      console.log('вызов getTeams')
-      if (params.intensiveId) {
-         getTeams(parseInt(params.intensiveId, 10))
+      const fetchData = async () => {
+         if (params.intensiveId) {
+            await getTeams(parseInt(params.intensiveId, 10))
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [])
 
    const columnHelper = createColumnHelper<Team>()
@@ -39,10 +43,16 @@ const TeamsPage: FC = () => {
       })
    ]
 
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
+
    return (
       <>
          <Title text='Команды в интенсиве' />
-         
+
          <Table data={teams} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => console.log(`id команды вот такой: ${id}`)} />
       </>
    )
