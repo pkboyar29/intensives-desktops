@@ -1,9 +1,8 @@
-import { FC, useContext, useEffect } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { TeamsContext } from '../../context/TeamsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
-import { Team } from '../../utils/types/Team'
 
 import Title from '../../components/Title/Title'
 import OverviewContent from '../../components/OverviewContent/OverviewContent'
@@ -12,12 +11,23 @@ const TeamOverviewPage: FC = () => {
    const params = useParams()
    const { currentTeam, setCurrentTeamForStudent } = useContext(TeamsContext)
    const { currentUser } = useContext(CurrentUserContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    useEffect(() => {
-      if (params.teamId && currentUser) {
-         setCurrentTeamForStudent(parseInt(params.teamId, 10))
+      const fetchData = async () => {
+         if (params.teamId && currentUser) {
+            await setCurrentTeamForStudent(parseInt(params.teamId, 10))
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [currentUser])
+
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
 
    return (
       <>

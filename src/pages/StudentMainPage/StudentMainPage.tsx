@@ -15,9 +15,9 @@ const StudentMainPage: FC = () => {
                   to='overview'>Просмотр команды</NavLink></li>
                <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
                   to='events'>Мероприятия</NavLink></li>
-               {/* <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
-                  to='tasks'>Задачи</NavLink></li>
                <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
+                  to='tasks-board'>Задачи</NavLink></li>
+               {/* <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
                   to='education-requests'>Образовательные запросы</NavLink></li> */}
             </Sidebar>
             <div className='w-full ml-10 mt-10'>

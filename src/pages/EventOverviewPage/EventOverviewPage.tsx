@@ -8,7 +8,6 @@ import authHeader from '../../utils/getHeaders'
 import { EventsContext } from '../../context/EventsContext'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
-import { Event } from '../../utils/types/Event'
 import { Team } from '../../utils/types/Team'
 
 import Title from '../../components/Title/Title'
@@ -22,12 +21,15 @@ type AnswerSubmitValues = {
 const EventOverviewPage: FC = () => {
    const { currentEvent, setCurrentEventById } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
+   const [currentAnswer, setCurrentAnswer] = useState<any>() // currentAnswer.text
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    const params = useParams()
    const navigate = useNavigate()
 
-   const { register, handleSubmit } = useForm<AnswerSubmitValues>({
+   const { register, handleSubmit, reset } = useForm<AnswerSubmitValues>({
       'mode': 'onBlur'
+
    })
 
    const onSubmit = async (data: AnswerSubmitValues) => {
@@ -39,19 +41,60 @@ const EventOverviewPage: FC = () => {
             command: parseInt(params.teamId, 10)
          }
          try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/answers/`, requestData, { headers: await authHeader() })
-            console.log(response.data)
+            if (currentAnswer) {
+               const updateResponse = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/answers/${currentAnswer.id}/`, requestData, { headers: await authHeader() })
+               console.log(updateResponse.data)
+               setCurrentAnswer(updateResponse.data)
+            } else {
+               const postResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/answers/`, requestData, { headers: await authHeader() })
+               console.log(postResponse.data)
+               setCurrentAnswer(postResponse.data)
+            }
          } catch (error) {
             console.log(error)
          }
       }
    }
 
-   useEffect(() => {
-      if (params.eventId) {
-         setCurrentEventById(parseInt(params.eventId))
+   const deleteAnswer = async () => {
+      try {
+         const deleteResponse = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/answers/${currentAnswer.id}/`, { headers: await authHeader() })
+         console.log(deleteResponse.data)
+         reset({ textAnswer: "" })
+         setCurrentAnswer(undefined)
+      } catch (e) {
+         console.log(e)
       }
-   }, [params.eventId, currentUser])
+   }
+
+   useEffect(() => {
+      const fetchData = async () => {
+         if (params.eventId) {
+            await setCurrentEventById(parseInt(params.eventId))
+
+            if (params.teamId) {
+               const allAnswersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/answers/`, { headers: await authHeader() })
+               const allAnswers = allAnswersResponse.data.results
+               // console.log('все ответы это ', allAnswers)
+               const currentAnswer = allAnswers.find((answer: any) => answer.event == params.eventId && answer.command == params.teamId)
+               if (currentAnswer) {
+                  reset({ textAnswer: currentAnswer.text })
+                  await setCurrentAnswer(currentAnswer)
+               }
+               // console.log('текущий ответ это ', currentAnswer)
+            }
+
+            setIsLoading(false)
+         }
+      }
+      fetchData()
+   }, [params.eventId])
+
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
 
    return (
       <>
@@ -90,7 +133,10 @@ const EventOverviewPage: FC = () => {
                   <h2 className='text-black text-xl font-bold font-sans'>Отправка ответа</h2>
                   <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-3 w-[500px]'>
                      <textarea className='border border-solid border-gray rounded-xl h-36 p-3 font-sans text-base' placeholder='Введите текстовый ответ' {...register('textAnswer')} />
-                     <button type='submit' className='font-bold font-inter py-3 px-5 rounded-xl text-white bg-blue w-36 self-end mb-10'>Отправить</button>
+                     <div className='flex gap-4 self-end'>
+                        {currentAnswer && <button type='button' onClick={deleteAnswer} className='font-bold font-inter py-3 px-5 rounded-xl text-white bg-red w-36 self-end mb-10'>Удалить</button>}
+                        <button type='submit' className='font-bold font-inter py-3 px-5 rounded-xl text-white bg-blue w-36 self-end mb-10'>{currentAnswer ? 'Обновить' : 'Отправить'}</button>
+                     </div>
                   </form>
                </>
             }

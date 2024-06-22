@@ -3,6 +3,7 @@ import { User } from '../utils/types/User'
 import { jwtDecode } from 'jwt-decode'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import authHeader from '../utils/getHeaders'
 
 interface CustomJwtPayload {
    user_id: number
@@ -34,11 +35,11 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
          try {
             const decodedJwt = jwtDecode<CustomJwtPayload>(token)
             const currentUserId = decodedJwt.user_id
-            const userResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`)
+            const userResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`, { headers: await authHeader() })
 
             let student_id = null
             if (userResponse.data.role.id === 1) {
-               const studentResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/`)
+               const studentResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/`, { headers: await authHeader() })
                const allStudents = studentResponse.data.results
                const ourStudent = allStudents.find((student: any) => student.user.id === userResponse.data.id)
                student_id = ourStudent.id
@@ -46,7 +47,7 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
 
             let teacher_id = null
             if (userResponse.data.role.id === 3) {
-               const teachersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/`)
+               const teachersResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/`, { headers: await authHeader() })
                const allTeachers = teachersResponse.data.results
                const ourTeacher = allTeachers.find((teacher: any) => teacher.user.id === userResponse.data.id)
                teacher_id = ourTeacher.id

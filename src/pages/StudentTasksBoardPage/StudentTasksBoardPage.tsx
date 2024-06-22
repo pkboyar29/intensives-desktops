@@ -1,16 +1,16 @@
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture';
-import './StudentTasksBoardPage.css'
 import { FC } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { TaskTableRow } from '../../utils/types/Task';
 import Title from '../../components/Title/Title';
 import Table from '../../components/Table/Table';
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import TasksTab from '../../components/TasksTab/TasksTab';
 
 
 const StudentTasksBoardPage: FC = () => {
+   const params = useParams()
    const navigate = useNavigate()
    const intensives: TaskTableRow[] = [
       {
@@ -28,7 +28,7 @@ const StudentTasksBoardPage: FC = () => {
       }),
       columnHelper.accessor('assignee', {
          header: () => 'Ответственные',
-         cell: (info) => <ProfilePicture size={45}/> //скорее всего надо отдельный компонент куда передается number[] и там запрос для получения аватарок для каждого id и адаптивное отображение
+         cell: (info) => <ProfilePicture size={45} /> //скорее всего надо отдельный компонент куда передается number[] и там запрос для получения аватарок для каждого id и адаптивное отображение
       }),
       columnHelper.accessor('finish_dt', {
          header: () => 'Срок сдачи',
@@ -45,20 +45,20 @@ const StudentTasksBoardPage: FC = () => {
    }
 
    function handleTab(tabId: number) {
-      console.log("Tab " +tabId)
+      console.log("Tab " + tabId)
    }
 
-   return(
-   <div className='student-tasks-page'>
-      <div className='container'>
-         <div className='above-table'>
-            <Title text='Доска задач' />
-            <PrimaryButton text="Добавить задачу" onClick={clickAddTask}/>
+   return (
+      <div className='student-tasks-page'>
+         <div className='container'>
+            <div className='above-table'>
+               <Title text='Доска задач' />
+               <PrimaryButton text="Добавить задачу" onClick={clickAddTask} />
+            </div>
+            <TasksTab onTabChange={handleTab} />
+            <Table onButtonClick={(id: number) => navigate(`/student/${params.teamId}/tasks/${id}`)} buttonText='Редактировать' columns={columns} data={intensives} />
          </div>
-         <TasksTab onTabChange={handleTab}/>
-         <Table onButtonClick={(id: number) => navigate(`/tasks/${id}/`)} buttonText='Редактировать' columns={columns} data={intensives} />
       </div>
-   </div>
    )
 }
 

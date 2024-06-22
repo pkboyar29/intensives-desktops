@@ -2,6 +2,7 @@ import { FC, ReactNode, createContext, useState } from 'react'
 import axios from 'axios'
 
 import { Team } from '../utils/types/Team'
+import authHeader from '../utils/getHeaders'
 
 interface TeamsContextType {
    teams: Team[],
@@ -40,11 +41,11 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
       let mentorNameSurname = 'Нету'
 
       if (unmappedTeam.tutor) {
-         const tutorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/${unmappedTeam.tutor}`)
+         const tutorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/${unmappedTeam.tutor}`, { headers: await authHeader() })
          tutorNameSurname = `${tutorResponse.data.user.last_name} ${tutorResponse.data.user.first_name.charAt(0)}.${tutorResponse.data.user.middle_name.charAt(0)}.`
       }
       if (unmappedTeam.mentor) {
-         const mentorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/${unmappedTeam.mentor}`)
+         const mentorResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/students/${unmappedTeam.mentor}`, { headers: await authHeader() })
          mentorNameSurname = `${mentorResponse.data.user.last_name} ${mentorResponse.data.user.first_name.charAt(0)}.${mentorResponse.data.user.middle_name.charAt(0)}.`
       }
 
@@ -73,7 +74,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    }
 
    const getTeams = async (intensiveId: number) => {
-      const allTeamsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/`)
+      const allTeamsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/`, { headers: await authHeader() })
       const allTeams = allTeamsResponse.data.results
       const ourIntensiveTeams = allTeams.filter((team: any) => team.intensive === intensiveId)
       const mappedTeams: Team[] = await mapTeams(ourIntensiveTeams)
@@ -81,7 +82,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    }
 
    const getTeamById = async (teamId: number): Promise<Team> => {
-      const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`)
+      const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`, { headers: await authHeader() })
       const unmappedTeam = teamResponse.data
 
       const mappedTeam: Promise<Team> = mapTeam(unmappedTeam)
@@ -91,7 +92,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
    // что возвращать, если текущей команды для студента нет, надо тут что-то возвращать и сообщать о том, что на данный момент нет никаких открытых интенсивов
    // например возвращать 0
    const getCurrentTeamForStudent = async (studentId: number): Promise<Team> => {
-      const studentsWithRolesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/role_of_students_on_intensives`)
+      const studentsWithRolesResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/role_of_students_on_intensives`, { headers: await authHeader() })
       const allStudentsWithRoles = studentsWithRolesResponse.data.results
 
       // тут конечно надо отфильтровать эти записи по тем, где команды в открытых интенсивах, ну вообще это на беке должно быть

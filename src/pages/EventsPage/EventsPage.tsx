@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createColumnHelper } from '@tanstack/react-table'
 
@@ -15,17 +15,26 @@ const EventsPage: FC = () => {
 
    const { events, setEventsForIntensiv, setEventsForTeam } = useContext(EventsContext)
    const { currentUser } = useContext(CurrentUserContext)
+   const [isLoading, setIsLoading] = useState<boolean>(true)
 
    useEffect(() => {
-      if (params.intensiveId && currentUser) {
-         setEventsForIntensiv(parseInt(params.intensiveId, 10))
+      const fetchData = async () => {
+         if (params.intensiveId && currentUser) {
+            await setEventsForIntensiv(parseInt(params.intensiveId, 10))
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [currentUser, params.intensiveId])
 
    useEffect(() => {
-      if (params.teamId && currentUser) {
-         setEventsForTeam(parseInt(params.teamId))
+      const fetchData = async () => {
+         if (params.teamId && currentUser) {
+            await setEventsForTeam(parseInt(params.teamId))
+            setIsLoading(false)
+         }
       }
+      fetchData()
    }, [currentUser, params.teamId])
 
    const columnHelper = createColumnHelper<Event>()
@@ -48,6 +57,11 @@ const EventsPage: FC = () => {
       }),
    ]
 
+   if (isLoading) {
+      return (
+         <div className='font-bold font-sans text-2xl mt-3'>Загрузка...</div>
+      )
+   }
 
    return (
       <>

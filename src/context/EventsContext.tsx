@@ -6,6 +6,7 @@ import { CurrentUserContext } from './CurrentUserContext'
 import { Event } from '../utils/types/Event'
 import { Team } from '../utils/types/Team'
 import { TeamsContext } from './TeamsContext'
+import authHeader from '../utils/getHeaders'
 
 interface EventsContextType {
    events: Event[],
@@ -42,17 +43,17 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
    const mapEvent = async (unmappedEvent: any) => {
       try {
-         const auditoryResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/auditories/${unmappedEvent.auditory}`) // получить auditoryName
-         const stageResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/${unmappedEvent.stage}`)
-         const markStrategyResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/mark_strategy/${unmappedEvent.mark_strategy}`) // получить markStrategyName
+         const auditoryResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/auditories/${unmappedEvent.auditory}`, { headers: await authHeader() }) // получить auditoryName
+         const stageResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/${unmappedEvent.stage}`, { headers: await authHeader() })
+         const markStrategyResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/mark_strategy/${unmappedEvent.mark_strategy}`, { headers: await authHeader() }) // получить markStrategyName
          const criteriasNamesPromises = unmappedEvent.criteria.map(async (criteria: number) => {
-            const criteriaResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/criteria/${criteria}`)
+            const criteriaResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/criteria/${criteria}`, { headers: await authHeader() })
             return criteriaResponse.data.name
          })
          const criteriasNames: string[] = await Promise.all(criteriasNamesPromises)
 
          const teams: Team[] = unmappedEvent.commands.map(async (teamId: number) => {
-            const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`)
+            const teamResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`, { headers: await authHeader() })
             return {
                id: teamId,
                name: teamResponse.data.name,
@@ -67,7 +68,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
          let isCurrentTeacherJury: boolean = false
          await Promise.all(unmappedEvent.teachers_command.map(async (teacherId: number) => {
-            const teacherOnIntensiveResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/${teacherId}/`)
+            const teacherOnIntensiveResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/${teacherId}/`, { headers: await authHeader() })
             if (teacherOnIntensiveResponse.data.role === 4 && teacherOnIntensiveResponse.data.teacher.user.id === currentUser?.id) {
                isCurrentTeacherJury = true
             }
@@ -103,7 +104,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
    const setAndGetEventsForIntensiv = async (intensiveId: number): Promise<Event[]> => {
       try {
-         const eventsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${intensiveId}`)
+         const eventsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${intensiveId}`, { headers: await authHeader() })
          const unmappedEvents = eventsResponse.data.results
 
          const mappedEvents: Event[] = await mapEvents(unmappedEvents)
@@ -120,7 +121,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
       try {
          const team: Promise<Team> = getTeamById(teamId)
 
-         const eventsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${(await team).intensiveId}`)
+         const eventsResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${(await team).intensiveId}`, { headers: await authHeader() })
          const unmappedEvents = eventsResponse.data.results
          const ourTeamEvents = unmappedEvents.filter((unmappedEvent: any) => {
             const eventTeams: any[] = unmappedEvent.commands
@@ -137,7 +138,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
    const setCurrentEventById = async (eventId: number): Promise<void> => {
       try {
-         const eventResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`)
+         const eventResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`, { headers: await authHeader() })
          const unmappedEvent = eventResponse.data
          const mappedEvent: Event = await mapEvent(unmappedEvent)
          setCurrentEvent(mappedEvent)
