@@ -21,6 +21,7 @@ import TeamOverviewPage from '../pages/TeamOverviewPage/TeamOverviewPage'
 import StudentTasksBoardPage from '../pages/StudentTasksBoardPage/StudentTasksBoardPage'
 import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage'
 import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage/StudentTaskAnswerPage'
+import EvaluationIntensivePage from '../pages/EvaluationIntensivePage/EvaluationIntensivePage'
 
 
 const App: FC = () => {
@@ -53,6 +54,8 @@ const App: FC = () => {
           <Route path='tasks' element={<StudentTasksPage/>} />
           <Route path='task/:taskId' element={<StudentTaskAnswerPage/>}/>
         </Route>
+
+        <Route path='/evaluation' element={<EvaluationIntensivePage />} />
         <Route path='/intensives' element={<IntensivesPage />} />
         <Route path='/sign-in' element={<SignInPage />} />
         <Route path='/' element={<Navigate to='/sign-in' />} />

@@ -40,8 +40,10 @@ const StudentTaskAnswerPage: FC = () => {
         </div>
         <div className='mt-8'>
             <p className='font-bold text-xl'>Выполнение</p>
-            <div className='flex flex-col mt-2 space-y-3'>
-                <input type="text" className='w-96 border border-black p-2' placeholder='Оставьте комментарий к выполнению'/>
+            <div className='mb-5 mt-5'>
+                <textarea id="textarea" rows={10} className='w-full h-32 p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow-md' placeholder='Оставьте комментарий к выполнению'/>
+            </div>
+            <div className='flex flex-col items-end w-[100%] mt-5'>
                 <PrimaryButton onClick={sendTask} text='Отправить'/>
             </div>
         </div>
