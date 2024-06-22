@@ -48,17 +48,20 @@ const StudentTasksBoardPage: FC = () => {
       console.log("Tab " + tabId)
    }
 
-   return (
-      <div className='student-tasks-page'>
-         <div className='container'>
-            <div className='above-table'>
+
+   return(
+   <div className='student-tasks-page'>
+      <div className='container'>
+         <div className='flex flex-col'>
+            <div className='flex justify-between items-center'>
                <Title text='Доска задач' />
-               <PrimaryButton text="Добавить задачу" onClick={clickAddTask} />
+               <PrimaryButton text="Добавить задачу" onClick={clickAddTask}/>
             </div>
-            <TasksTab onTabChange={handleTab} />
-            <Table onButtonClick={(id: number) => navigate(`/student/${params.teamId}/tasks/${id}`)} buttonText='Редактировать' columns={columns} data={intensives} />
+            <TasksTab onTabChange={handleTab}/>
+            <Table onButtonClick={(id: number) => navigate(`/tasks/${id}/`)} buttonText='Редактировать' columns={columns} data={intensives} />
          </div>
       </div>
+   </div>
    )
 }
 

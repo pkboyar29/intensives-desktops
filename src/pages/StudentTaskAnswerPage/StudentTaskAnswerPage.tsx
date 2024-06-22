@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import Title from '../../components/Title/Title';
 import { Task } from '../../utils/types/Task'
 import { useParams } from 'react-router-dom';
+import PrimaryButton from '../../components/PrimaryButton/PrimaryButton';
 
 const StudentTaskAnswerPage: FC = () => {
     const { taskId } = useParams();
@@ -23,15 +24,28 @@ const StudentTaskAnswerPage: FC = () => {
         setTaskInfo(data)
     }
 
+    function sendTask() {
+        console.log("task send");
+    }
+
     if(!setTaskInfo) {
-        return(<div></div>)
+        return(<></>)
     }
 
     return(
-    <div className='student-task-answer-page'>
-        <div className='container'>
+    <div className=''>
+        <div className='flex flex-col space-y-5'>
             {taskInfo?.name && <Title text={taskInfo.name} />}
-            {taskInfo?.desc && <span>{taskInfo.desc}</span>}
+            {taskInfo?.desc && <p>{taskInfo.desc}</p>}
+        </div>
+        <div className='mt-8'>
+            <p className='font-bold text-xl'>Выполнение</p>
+            <div className='mb-5 mt-5'>
+                <textarea id="textarea" rows={10} className='w-full h-32 p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow-md' placeholder='Оставьте комментарий к выполнению'/>
+            </div>
+            <div className='flex flex-col items-end w-[100%] mt-5'>
+                <PrimaryButton onClick={sendTask} text='Отправить'/>
+            </div>
         </div>
     </div>
     )

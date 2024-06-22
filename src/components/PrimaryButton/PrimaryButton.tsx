@@ -1,4 +1,4 @@
-import './PrimaryButton.css'
+
 import { FC } from 'react'
 
 type PrimaryButtonProps = {
@@ -12,7 +12,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({ text, width, height, onClick })
     
     return (
        <>
-        <button className='primary-button' onClick={onClick}>{text}</button>      
+        <button className='text-white bg-blue font-l py-3 px-5  rounded-xl' onClick={onClick}>{text}</button>      
        </>
     )
  }
