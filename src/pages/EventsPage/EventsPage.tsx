@@ -67,7 +67,7 @@ const EventsPage: FC = () => {
       <>
          <Title text='Все мероприятия' />
 
-         <Table data={events} columns={columns} buttonText='посмотреть' onButtonClick={(id: number) => navigate(`${id}`)} />
+         <Table data={events} columns={columns} buttonText='войти' onButtonClick={(id: number) => navigate(`${id}`)} />
       </>
    )
 }

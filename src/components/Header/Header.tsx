@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { CurrentUserContext } from '../../context/CurrentUserContext'
 
 const Header: FC = () => {
-
    const navigate = useNavigate()
 
    const { currentUser, logOut } = useContext(CurrentUserContext)
@@ -18,7 +17,10 @@ const Header: FC = () => {
       <header className='px-10 py-4 border border-solid border-gray'>
          <div className="container">
             <div className=" flex justify-between items-center">
-               <div className='font-sans font-bold text-2xl'>LOGO</div>
+               <div className='flex gap-2 items-center'>
+                  <div className='font-sans font-bold text-2xl'>LOGO</div>
+                  <div className='font-sans text-base'>Костромской государственный университет</div>
+               </div>
                {currentUser && (
                   <div className='flex gap-6 items-center text-lg font-sans'>
                      <div>

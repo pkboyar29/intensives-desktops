@@ -1,4 +1,4 @@
-import { FC, ReactNode, createContext, useState, useContext } from 'react'
+import { FC, ReactNode, createContext, useState } from 'react'
 import axios from 'axios'
 import { Intensive } from '../utils/types/Intensive'
 
