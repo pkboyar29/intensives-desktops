@@ -52,6 +52,9 @@ const SignInPage: FC = () => {
             navigate(`/student/${currentTeamId}/overview`)
          }
       } else if (currentUser.user_role_id === 3) {
+         navigate('/intensives1')
+      } else if (currentUser.user_role_id === 2 || currentUser.user_role_id === 4) {
+         console.log('ты организатор или суперадмин')
          navigate('/intensives')
       }
    }
@@ -59,12 +62,14 @@ const SignInPage: FC = () => {
    return (
       <>
          <div className='mt-20 flex justify-center'>
-            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 w-[480px]'>
-               <div className='text-black font-sans text-[26px] font-bold'>Войти в систему</div>
-               <input {...register('email')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='text' placeholder='Email' />
-               <input {...register('password')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='password' placeholder='Пароль' />
-               <button className='bg-blue p-4 text-white rounded-lg text-left font-sans' type='submit'>ВОЙТИ</button>
-            </form>
+            <div className='flex flex-col'>
+               <div className='py-3 text-[28px] font-bold'>Авторизация</div>
+               <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 w-[480px]'>
+                  <input {...register('email')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='text' placeholder='Email' />
+                  <input {...register('password')} className='p-4 rounded-lg text-base font-sans border border-black border-solid' type='password' placeholder='Пароль' />
+                  <button className='bg-blue p-4 text-white rounded-lg text-left font-sans' type='submit'>ВОЙТИ</button>
+               </form>
+            </div>
          </div>
       </>
    )

@@ -24,7 +24,7 @@ const authHeader = async () => {
    try {
       const token = await waitForCookie('access')
       return {
-         'Authorization': `Bearer ${Cookies.get('access')}`
+         'Authorization': `Bearer ${token}`
       }
    } catch (error) {
       console.log('Error getting cookie ', error)

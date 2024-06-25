@@ -25,7 +25,7 @@ const TeacherMainPage: FC = () => {
                   to='events'>Мероприятия</NavLink></li>
                {/* <li><NavLink className='sidebar__link text-black hover:text-blue transition-all text-base font-semibold font-sans'
                   to='education-requests'>Образовательные запросы</NavLink></li> */}
-               <button className='bg-blue rounded-xl px-2 py-4'><Link className='text-white text-[14px] font-inter font-bold' to='/intensives'>Вернуться к списку интенсивов</Link></button>
+               <button className='bg-blue rounded-xl px-2 py-4'><Link className='text-white text-[14px] font-inter font-bold' to='/intensives1'>Вернуться к списку интенсивов</Link></button>
             </Sidebar>
             <div className='w-full p-10'>
                <Outlet />
