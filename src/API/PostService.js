@@ -1,39 +1,66 @@
-import axios from 'axios'
-import authHeader from '../utils/getHeaders'
+import axios from 'axios';
+import authHeader from '../utils/getHeaders';
 
 export default class PostService {
   static async getStudenRoles() {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`, { headers: await authHeader() })
-    return response
+    const response = axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getCommandsOnIntensive(id) {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/?intensive=${id}`, { headers: await authHeader() })
-    return response
+    const response = axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/?intensive=${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getTeachersOnIntensive(id) {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/?intensive=${id}`, { headers: await authHeader() })
-    return response
+    const response = axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/?intensive=${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getAuditorii() {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/auditories/`, { headers: await authHeader() })
-    return response
+    const response = axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/auditories/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getStage() {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/`, { headers: await authHeader() })
-    return response
+    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/`, {
+      headers: await authHeader(),
+    });
+    return response;
   }
 
   static async getTeachers() {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/teachers/`, { headers: await authHeader() })
-    return response
+    const response = axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/teachers/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
-  static async postIntensives(name, description, startDate, endDate, flows, teachers, rolesStudent, files) {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/intensives/`,
+  static async postIntensives(
+    name,
+    description,
+    startDate,
+    endDate,
+    flows,
+    teachers,
+    rolesStudent,
+    files
+  ) {
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/`,
       {
         university: 1,
         name: name,
@@ -48,12 +75,24 @@ export default class PostService {
         stages: [],
       },
       { headers: await authHeader() }
-    )
-    return response
+    );
+    return response;
   }
-  static async patchIntensives(name, description, startDate, endDate, flows, teachers, rolesStudent, files) {
-    console.log('id', localStorage.getItem('id'))
-    const response = await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/intensives/${localStorage.getItem('id')}/`,
+  static async patchIntensives(
+    name,
+    description,
+    startDate,
+    endDate,
+    flows,
+    teachers,
+    rolesStudent,
+    files
+  ) {
+    console.log('id', localStorage.getItem('id'));
+    const response = await axios.patch(
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/${localStorage.getItem(
+        'id'
+      )}/`,
       {
         name: name,
         description: description,
@@ -67,13 +106,23 @@ export default class PostService {
         stages: [],
       },
       { headers: await authHeader() }
-    )
-    return response
+    );
+    return response;
   }
 
-  static async postEvent(name, description, startDate, endDate, teachers, commands, stage, auditory) {
-    const idInt = localStorage.getItem('id')
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/events/`,
+  static async postEvent(
+    name,
+    description,
+    startDate,
+    endDate,
+    teachers,
+    commands,
+    stage,
+    auditory
+  ) {
+    const idInt = localStorage.getItem('id');
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/events/`,
       {
         name: name,
         description: description,
@@ -88,14 +137,26 @@ export default class PostService {
         teachers_command: teachers || [],
       },
       { headers: await authHeader() }
-    )
-    return response
+    );
+    return response;
   }
 
-  static async patchEvent(name, description, startDate, endDate, teachers, commands, stage, auditory, typeScore, typeResult) {
-    const idInt = localStorage.getItem('id')
-    const idEvent = localStorage.getItem('idEvent')
-    const response = await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/events/${idEvent}/`,
+  static async patchEvent(
+    name,
+    description,
+    startDate,
+    endDate,
+    teachers,
+    commands,
+    stage,
+    auditory,
+    typeScore,
+    typeResult
+  ) {
+    const idInt = localStorage.getItem('id');
+    const idEvent = localStorage.getItem('idEvent');
+    const response = await axios.patch(
+      `${process.env.REACT_APP_BACKEND_URL}/events/${idEvent}/`,
       {
         name: name,
         description: description,
@@ -110,86 +171,132 @@ export default class PostService {
         teachers_command: teachers || [],
       },
       { headers: await authHeader() }
-    )
-    return response
+    );
+    return response;
   }
 
   static async postStudentsRole(name) {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`, { name: name }, { headers: await authHeader() })
-    return response
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`,
+      { name: name },
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async deleteStudentsRole(id) {
-    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/${id}/`, { headers: await authHeader() })
-    return response
+    const response = await axios.delete(
+      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/${id}/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getIntensiv(id) {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/${id}`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async deleteIntensiv(id) {
-    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/intensives/${id}`, { headers: await authHeader() })
-    return response
+    const response = await axios.delete(
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getIntensives() {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/intensives/`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getEvents(id) {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${id}`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getEvent(id) {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/events/${id}/`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/events/${id}/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getProfiles() {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/profiles/`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/profiles/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async postProfiles(name) {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/profiles/`, { name: name }, { headers: await authHeader() })
-    return response
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/profiles/`,
+      { name: name },
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async deleteProfiles(id) {
-    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/profiles/${id}/`, { headers: await authHeader() })
-    return response
+    const response = await axios.delete(
+      `${process.env.REACT_APP_BACKEND_URL}/profiles/${id}/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getFlows() {
-    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/flows/`, { headers: await authHeader() })
-    return response
+    const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/flows/`, {
+      headers: await authHeader(),
+    });
+    return response;
   }
 
   //Страница редактирования профилей
 
   static async postProfiles(name) {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/profiles/`, { headers: await authHeader() })
-    return response
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/profiles/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async deleteProfiles(id) {
-    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/profiles/${id}/`, { headers: await authHeader() })
-    return response
+    const response = await axios.delete(
+      `${process.env.REACT_APP_BACKEND_URL}/profiles/${id}/`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   //Страница статистики
 
   static async getStatisticsIntensiv(id) {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/statistics/intensiv/${id}`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/statistics/intensiv/${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 
   static async getStatisticsCommand(id) {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/statistics/command/${id}`, { headers: await authHeader() })
-    return response
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/statistics/command/${id}`,
+      { headers: await authHeader() }
+    );
+    return response;
   }
 }

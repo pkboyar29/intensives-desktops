@@ -1,13 +1,11 @@
-import { FC } from 'react'
+import { FC } from 'react';
 
 interface TitleProps {
-   text: string
+  text: string;
 }
 
 const Title: FC<TitleProps> = ({ text }) => {
-   return (
-      <h1 className='font-bold font-sans text-3xl mt-3'>{text}</h1>
-   )
-}
+  return <h1 className="mt-3 font-sans text-3xl font-bold">{text}</h1>;
+};
 
-export default Title
+export default Title;

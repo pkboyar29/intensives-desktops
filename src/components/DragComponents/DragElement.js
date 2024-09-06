@@ -1,17 +1,16 @@
-import { useDrag } from "react-dnd"
+import { useDrag } from 'react-dnd';
 
 const DragElement = ({ data, setSelectedMembers, selectedMembers }) => {
   const [{ isDragStart, canDrag }, dragRef] = useDrag({
-    type: "ball",
+    type: 'ball',
     item: data,
     collect: (monitor) => ({
       isDragStart: monitor.isDragging(),
       canDrag: monitor.canDrag(),
     }),
-  })
+  });
 
-  const handleClick = (data) => {
-  }
+  const handleClick = (data) => {};
 
   return (
     <div
@@ -19,10 +18,11 @@ const DragElement = ({ data, setSelectedMembers, selectedMembers }) => {
       onClick={handleClick()}
       className={
         isDragStart ? 'dragged flex items-center' : 'flex items-center'
-      } >
-      <span className='ml-4 text-sm element-st'>{data.content}</span>
+      }
+    >
+      <span className="ml-4 text-sm element-st">{data.content}</span>
     </div>
-  )
-}
+  );
+};
 
-export default DragElement
+export default DragElement;

@@ -1,19 +1,19 @@
-import { useState } from 'react'
-import { InputRadio } from './InputRadio'
+import { useState } from 'react';
+import { InputRadio } from './InputRadio';
 
 const InputRadioDescription = (props) => {
-  const [activeRadio, setActiveRadio] = useState('')
+  const [activeRadio, setActiveRadio] = useState('');
 
   const handleRadioChange = (radioValue, valueType) => {
-    setActiveRadio(radioValue)
+    setActiveRadio(radioValue);
     if (valueType === 'number') {
-      props.setTypeProp(radioValue)
+      props.setTypeProp(radioValue);
     }
-  }
+  };
 
   return (
-    <div className='element-list-input column-container'>
-      <div className=''>{props.descriptionProp}</div>
+    <div className="element-list-input column-container">
+      <div className="">{props.descriptionProp}</div>
       <InputRadio
         nameProp={'name'}
         activeProp={activeRadio}
@@ -86,9 +86,10 @@ const InputRadioDescription = (props) => {
               funcProp={(value) => handleRadioChange(value, 'number')}
             />
           </>
-        } />
+        }
+      />
     </div>
-  )
-}
+  );
+};
 
-export { InputRadioDescription }
+export { InputRadioDescription };

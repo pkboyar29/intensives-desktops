@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { InputDelete } from './InputDelete'
+import { useState } from 'react';
+import { InputDelete } from './InputDelete';
 
 const InputDeleteConteiner = (props) => {
   const [values, setValues] = useState([{ id: '1' }]);
@@ -16,15 +16,24 @@ const InputDeleteConteiner = (props) => {
 
   return (
     <>
-      <div className='element-list-input'>
-        <div className='font-18 bold-font'>Список критериев</div>
+      <div className="element-list-input">
+        <div className="font-18 bold-font">Список критериев</div>
       </div>
       <div>
-        {values.map((elem, index) => (<InputDelete key={elem.id} nameProp={elem.id} placeholderProp={'Критерий ' + (index + 1)} deleteProp={handlerDeleteValues}></InputDelete>))}
+        {values.map((elem, index) => (
+          <InputDelete
+            key={elem.id}
+            nameProp={elem.id}
+            placeholderProp={'Критерий ' + (index + 1)}
+            deleteProp={handlerDeleteValues}
+          ></InputDelete>
+        ))}
       </div>
-      <button className='button-classic' onClick={handlerAddValues}>Добавить</button>
+      <button className="button-classic" onClick={handlerAddValues}>
+        Добавить
+      </button>
     </>
-  )
-}
+  );
+};
 
-export { InputDeleteConteiner }
+export { InputDeleteConteiner };

@@ -1,15 +1,11 @@
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode } from 'react';
 
 interface OverviewContentProps {
-   children: ReactNode
+  children: ReactNode;
 }
 
 const OverviewContent: FC<OverviewContentProps> = ({ children }) => {
-   return (
-      <div className='flex flex-col gap-5 mt-1'>
-         {children}
-      </div>
-   )
-}
+  return <div className="flex flex-col gap-5 mt-1">{children}</div>;
+};
 
-export default OverviewContent
+export default OverviewContent;
