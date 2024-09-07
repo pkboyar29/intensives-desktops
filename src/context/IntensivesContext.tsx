@@ -57,7 +57,6 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
         flow: unmappedIntensiv.flow[0],
       };
     } catch (error) {
-      console.log(error);
       return {
         id: 0,
         name: '',
@@ -80,11 +79,8 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
       const mappedIntensives: Intensive[] = await mapIntensivs(
         response.data.results
       );
-      console.log('замапленные интенсивы: ', mappedIntensives);
       setIntensives(mappedIntensives);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const getIntensiveById = async (intensiveId: number): Promise<Intensive> => {

@@ -54,10 +54,7 @@ const TeamsPage: FC = () => {
       <Table
         data={teams}
         columns={columns}
-        buttonText="войти"
-        onButtonClick={(id: number) =>
-          console.log(`id команды вот такой: ${id}`)
-        }
+        onClick={(id: number) => console.log(`id команды вот такой: ${id}`)}
       />
     </>
   );

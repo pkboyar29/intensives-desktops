@@ -2,7 +2,6 @@ import { RouteObject, Navigate } from 'react-router-dom';
 
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 import SignInPage from '../pages/SignInPage/SignInPage';
-import Header from '../components/Header/Header';
 import IntensivesPage from '../pages/IntensivesPage/IntensivesPage';
 import TeacherMainPage from '../pages/TeacherMainPage/TeacherMainPage';
 import EventsPage from '../pages/EventsPage/EventsPage';
@@ -24,7 +23,6 @@ import ManageRoles from '../pages/ManageLists/ManageRole';
 import Commands from '../components/Commands';
 import { Intensiv } from '../pages/Intensive';
 import Plan from '../pages/Plan';
-import Intensives from '../pages/Intensives';
 import ManageMenu from '../pages/ManageMenu';
 import CreateCommand from '../pages/CreateCommand';
 import ListCreateIntensiv from '../components/ListCreateIntensiv';
@@ -105,7 +103,7 @@ const routeConfig: RouteType[] = [
     requiredAuth: false,
   },
   {
-    path: '/intensives1',
+    path: '/intensives',
     element: <IntensivesPage />,
     requiredAuth: false,
   },
@@ -122,11 +120,6 @@ const routeConfig: RouteType[] = [
   {
     path: '*',
     element: <NotFoundPage />,
-    requiredAuth: false,
-  },
-  {
-    path: '/intensives',
-    element: <Intensives />,
     requiredAuth: false,
   },
   {

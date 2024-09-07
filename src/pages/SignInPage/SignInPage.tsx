@@ -56,13 +56,8 @@ const SignInPage: FC = () => {
         const currentTeamId = (await currentTeam).id;
         navigate(`/student/${currentTeamId}/overview`);
       }
-    } else if (currentUser.user_role_id === 3) {
-      navigate('/intensives1');
-    } else if (
-      currentUser.user_role_id === 2 ||
-      currentUser.user_role_id === 4
-    ) {
-      console.log('ты организатор или суперадмин');
+    } else {
+      // if user_role_id == 2 or 3 or 4
       navigate('/intensives');
     }
   };

@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { Intensive } from '../../utils/types/Intensive';
 import { IntensivesContext } from '../../context/IntensivesContext';
@@ -19,7 +19,8 @@ const IntensivesPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (currentUser != null) {
-        await getIntensives();
+        console.log(currentUser.user_role_id);
+        getIntensives();
         setIsLoading(false);
       }
     };
@@ -44,11 +45,25 @@ const IntensivesPage: FC = () => {
       header: () => 'Конец интенсива',
       cell: (info) => info.getValue().toLocaleDateString(),
     }),
+    columnHelper.accessor('flow', {
+      header: () => 'Участники',
+      cell: (info) => info.getValue(),
+    }),
   ];
+
+  const intensiveClickHandler = (id: number) => {
+    if (currentUser?.user_role_id === 2) {
+      navigate('/intensiv');
+    }
+    if (currentUser?.user_role_id === 3) {
+      localStorage.setItem('id', id.toString());
+      navigate(`/teacher/${id}/overview`);
+    }
+  };
 
   if (isLoading) {
     return (
-      <div className="container">
+      <div className="max-w-[1280px]">
         <div className="mt-3 font-sans text-2xl font-bold">Загрузка...</div>
       </div>
     );
@@ -56,25 +71,45 @@ const IntensivesPage: FC = () => {
 
   if (intensives.length === 0 && !isLoading) {
     return (
-      <div className="container">
+      <div className="max-w-[1280px]">
         <Title text="Для вас пока нету открытых интенсивов" />
       </div>
     );
   }
 
   return (
-    <>
-      <div className="container">
-        <Title text="Интенсивы" />
+    <div className="max-w-[1280px] mx-auto">
+      <div className="mt-10">
+        <div className="">
+          <Title text="Интенсивы" />
+        </div>
 
-        <Table
-          onButtonClick={(id: number) => navigate(`/teacher/${id}/overview`)}
-          buttonText="войти"
-          columns={columns}
-          data={intensives}
-        />
+        {currentUser?.user_role_id === 2 && (
+          <div className="flex justify-end mt-10">
+            <button className="ml-auto button-classic">
+              <Link to={{ pathname: '/createIntensive' }}>
+                Создать интенсив
+              </Link>
+            </button>
+          </div>
+        )}
+
+        <div className="mt-3">
+          <input
+            className="w-full py-3 px-4 bg-[#f0f2f5] rounded-xl"
+            placeholder="Поиск"
+          />
+        </div>
+
+        <div className="mt-10">
+          <Table
+            onClick={intensiveClickHandler}
+            columns={columns}
+            data={intensives}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

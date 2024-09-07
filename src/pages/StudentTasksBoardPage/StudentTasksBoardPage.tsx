@@ -57,8 +57,7 @@ const StudentTasksBoardPage: FC = () => {
           </div>
           <TasksTab onTabChange={handleTab} />
           <Table
-            onButtonClick={(id: number) => navigate(`/tasks/${id}/`)}
-            buttonText="Редактировать"
+            onClick={(id: number) => navigate(`/tasks/${id}/`)}
             columns={columns}
             data={intensives}
           />

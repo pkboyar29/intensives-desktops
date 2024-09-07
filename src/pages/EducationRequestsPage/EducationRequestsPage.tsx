@@ -40,8 +40,7 @@ const EducationRequestsPage: FC = () => {
       <Title text="Образовательные запросы" />
 
       <Table
-        onButtonClick={(id: number) => navigate(`${id}`)}
-        buttonText="Посмотреть"
+        onClick={(id: number) => navigate(`${id}`)}
         data={educationRequests}
         columns={columns}
       />
