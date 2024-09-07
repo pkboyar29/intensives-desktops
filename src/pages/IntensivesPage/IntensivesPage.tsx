@@ -19,7 +19,6 @@ const IntensivesPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (currentUser != null) {
-        console.log(currentUser.user_role_id);
         getIntensives();
         setIsLoading(false);
       }
@@ -53,7 +52,7 @@ const IntensivesPage: FC = () => {
 
   const intensiveClickHandler = (id: number) => {
     if (currentUser?.user_role_id === 2) {
-      navigate('/intensiv');
+      navigate(`/manager/${id}/overview`);
     }
     if (currentUser?.user_role_id === 3) {
       localStorage.setItem('id', id.toString());
@@ -86,7 +85,7 @@ const IntensivesPage: FC = () => {
 
         {currentUser?.user_role_id === 2 && (
           <div className="flex justify-end mt-10">
-            <button className="ml-auto button-classic">
+            <button className="ml-auto text-white bg-[#1a5ce5] py-2 px-4 rounded-xl">
               <Link to={{ pathname: '/createIntensive' }}>
                 Создать интенсив
               </Link>

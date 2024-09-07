@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SideMenu from './SideMenu';
 import { InputDescription } from './InputDescription';
 import { ChooseModal } from './ChooseModal';

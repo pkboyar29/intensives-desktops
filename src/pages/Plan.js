@@ -106,24 +106,12 @@ const Plan = () => {
                 <Stage key={elem.id} steps={elem.data} />
               ))
             ) : (
-              <div
-                className="gap_25"
-                style={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                }}
-              >
+              <div className="flex flex-col justify-center h-full gap_25">
                 <div className="flex justify-center">
                   Пока расписание пусто, добавьте мероприятия
                 </div>
                 <Link
-                  className="text-blue-500"
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
+                  className="flex justify-center text-blue-500"
                   to={'/editEvent'}
                   onClick={() => {
                     localStorage.removeItem('idEvent');
@@ -133,12 +121,6 @@ const Plan = () => {
                 </Link>
               </div>
             )}
-            {/* <Link className='text-blue-500'
-							style={{
-								display: 'flex',
-								justifyContent: 'center'
-							}} to={'/editEvent'} onClick={() => { localStorage.removeItem('idEvent') }}>Добавить</Link>
- */}
           </div>
         </div>
       </div>

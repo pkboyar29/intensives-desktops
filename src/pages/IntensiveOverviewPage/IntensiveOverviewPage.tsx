@@ -11,9 +11,9 @@ import OverviewItem from '../../components/OverviewItem/OverviewItem';
 
 const IntensiveOverviewPage: FC = () => {
   const params = useParams();
-  const [currentIntensiv, setCurrentIntensiv] = useState<Intensive | undefined>(
-    undefined
-  );
+  const [currentIntensive, setCurrentIntensive] = useState<
+    Intensive | undefined
+  >(undefined);
   const { getIntensiveById } = useContext(IntensivesContext);
   const { currentTeam } = useContext(TeamsContext);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -21,10 +21,10 @@ const IntensiveOverviewPage: FC = () => {
   useEffect(() => {
     const fetchDataForTeacher = async () => {
       if (params.intensiveId) {
-        const currentIntensiv: Intensive = await getIntensiveById(
+        const currentIntensive: Intensive = await getIntensiveById(
           parseInt(params.intensiveId, 10)
         );
-        await setCurrentIntensiv(currentIntensiv);
+        setCurrentIntensive(currentIntensive);
         setIsLoading(false);
       }
     };
@@ -34,10 +34,10 @@ const IntensiveOverviewPage: FC = () => {
   useEffect(() => {
     const fetchDataForStudent = async () => {
       if (params.teamId) {
-        const currentIntensiv: Intensive = await getIntensiveById(
+        const currentIntensive: Intensive = await getIntensiveById(
           currentTeam.intensiveId
         );
-        setCurrentIntensiv(currentIntensiv);
+        setCurrentIntensive(currentIntensive);
         setIsLoading(false);
       }
     };
@@ -50,26 +50,31 @@ const IntensiveOverviewPage: FC = () => {
 
   return (
     <>
-      <Title text="Просмотр интенсива" />
+      {currentIntensive && <Title text={currentIntensive.name} />}
 
-      <OverviewContent>
-        <OverviewItem
-          title="Название интенсива"
-          value={currentIntensiv?.name}
-        />
-        <OverviewItem title="Описание" value={currentIntensiv?.description} />
-        <OverviewItem
-          title="Начало интенсива"
-          value={currentIntensiv?.open_dt.toLocaleDateString()}
-        />
-        <OverviewItem
-          title="Окончание интенсива"
-          value={currentIntensiv?.close_dt.toLocaleDateString()}
-        />
-        <OverviewItem title="Учебный поток" value={currentIntensiv?.flow} />
-        {/* <OverviewItem title='Команда преподавателей' value={} /> */}
-        {/* <OverviewItem title='Файлы' value={} /> */}
-      </OverviewContent>
+      <div className="mt-5 text-lg font-bold">
+        {currentIntensive?.open_dt.toLocaleDateString() +
+          ' - ' +
+          currentIntensive?.close_dt.toLocaleDateString()}
+      </div>
+
+      <div className="mt-5">
+        <OverviewContent>
+          <OverviewItem
+            title="Описание"
+            value={currentIntensive?.description}
+          />
+          <OverviewItem
+            title="Начало интенсива"
+            value={currentIntensive?.open_dt.toLocaleDateString()}
+          />
+          <OverviewItem
+            title="Окончание интенсива"
+            value={currentIntensive?.close_dt.toLocaleDateString()}
+          />
+          <OverviewItem title="Учебный поток" value={currentIntensive?.flow} />
+        </OverviewContent>
+      </div>
     </>
   );
 };

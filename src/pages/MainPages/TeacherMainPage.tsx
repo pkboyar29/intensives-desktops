@@ -45,12 +45,10 @@ const TeacherMainPage: FC = () => {
               Мероприятия
             </NavLink>
           </li>
-          {/* <li><NavLink className='font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue'
-                  to='education-requests'>Образовательные запросы</NavLink></li> */}
           <button className="px-2 py-4 bg-blue rounded-xl">
             <Link
               className="text-white text-[14px] font-inter font-bold"
-              to="/intensives1"
+              to="/intensives"
             >
               Вернуться к списку интенсивов
             </Link>

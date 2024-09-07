@@ -1,15 +1,17 @@
 import { RouteObject, Navigate } from 'react-router-dom';
 
+import TeacherMainPage from '../pages/MainPages/TeacherMainPage';
+import StudentMainPage from '../pages/MainPages/StudentMainPage';
+import ManagerMainPage from '../pages/MainPages/ManagerMainPage';
+
 import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
 import SignInPage from '../pages/SignInPage/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage/IntensivesPage';
-import TeacherMainPage from '../pages/TeacherMainPage/TeacherMainPage';
 import EventsPage from '../pages/EventsPage/EventsPage';
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage/TeamsPage';
 import EventOverviewPage from '../pages/EventOverviewPage/EventOverviewPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage/TeamEvaluationPage';
-import StudentMainPage from '../pages/StudentMainPage/StudentMainPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage/TeamOverviewPage';
 import StudentTasksBoardPage from '../pages/StudentTasksBoardPage/StudentTasksBoardPage';
 import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage';
@@ -21,7 +23,7 @@ import CreateEvent from '../pages/CreateEvent';
 import ManageProfile from '../pages/ManageLists/ManageProfile';
 import ManageRoles from '../pages/ManageLists/ManageRole';
 import Commands from '../components/Commands';
-import { Intensiv } from '../pages/Intensive';
+import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
 import Plan from '../pages/Plan';
 import ManageMenu from '../pages/ManageMenu';
 import CreateCommand from '../pages/CreateCommand';
@@ -98,6 +100,17 @@ const routeConfig: RouteType[] = [
     requiredAuth: false,
   },
   {
+    path: '/manager/:intensiveId',
+    element: <ManagerMainPage />,
+    children: [
+      {
+        path: 'overview',
+        element: <ManagerIntensiveOverviewPage />,
+      },
+    ],
+    requiredAuth: false,
+  },
+  {
     path: '/evaluation',
     element: <EvaluationIntensivePage />,
     requiredAuth: false,
@@ -139,7 +152,7 @@ const routeConfig: RouteType[] = [
   },
   {
     path: '/intensiv',
-    element: <Intensiv />,
+    element: <ManagerIntensiveOverviewPage />,
     requiredAuth: false,
   },
   {
