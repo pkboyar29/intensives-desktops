@@ -26,11 +26,8 @@ import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
 import Plan from '../pages/Plan';
 import ManageMenu from '../pages/ManageMenu';
-import CreateCommand from '../pages/CreateCommand';
+import CreateTeamsPage from '../pages/CreateTeamsPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
-
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DndProvider } from 'react-dnd';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -115,6 +112,10 @@ const routeConfig: RouteType[] = [
         path: 'teams',
         element: <ManagerTeamsPage />,
       },
+      {
+        path: 'createTeam',
+        element: <CreateTeamsPage />,
+      },
     ],
     requiredAuth: false,
   },
@@ -156,20 +157,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/plan',
     element: <Plan />,
-    requiredAuth: false,
-  },
-  // {
-  //   path: '/intensiv',
-  //   element: <ManagerIntensiveOverviewPage />,
-  //   requiredAuth: false,
-  // },
-  {
-    path: '/createTeam',
-    element: (
-      <DndProvider backend={HTML5Backend}>
-        <CreateCommand />
-      </DndProvider>
-    ),
     requiredAuth: false,
   },
   {

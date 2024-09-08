@@ -1,6 +1,6 @@
 import { useDrag } from 'react-dnd';
 
-const DragElement = ({ data, setSelectedMembers, selectedMembers }) => {
+const DragElement = ({ data }) => {
   const [{ isDragStart, canDrag }, dragRef] = useDrag({
     type: 'ball',
     item: data,
@@ -10,16 +10,8 @@ const DragElement = ({ data, setSelectedMembers, selectedMembers }) => {
     }),
   });
 
-  const handleClick = (data) => {};
-
   return (
-    <div
-      ref={dragRef}
-      onClick={handleClick()}
-      className={
-        isDragStart ? 'dragged flex items-center' : 'flex items-center'
-      }
-    >
+    <div ref={dragRef} className="flex items-center max-w-[200px]">
       <span className="ml-4 text-sm element-st">{data.content}</span>
     </div>
   );

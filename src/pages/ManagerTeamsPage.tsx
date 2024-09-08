@@ -1,8 +1,12 @@
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title/Title';
 
-const ManagerTeamsPage = () => {
+const ManagerTeamsPage: FC = () => {
+  const { intensiveId } = useParams();
+
   return (
     <div>
       <Title text="Команды" />
@@ -49,13 +53,13 @@ const ManagerTeamsPage = () => {
       <div className="flex gap-5 mt-5">
         <Link
           className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to={`/createTeam`}
+          to={`/manager/${intensiveId}/createTeam`}
         >
           Изменить состав команд
         </Link>
         <Link
           className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to={`/createTeam`}
+          to="/createTeam"
         >
           Изменить команды сопровождения
         </Link>

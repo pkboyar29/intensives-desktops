@@ -8,6 +8,9 @@ import EventsProvider from '../context/EventsContext';
 import CurrentUserProvider from '../context/CurrentUserContext';
 import TeamsProvider from '../context/TeamsContext';
 
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 interface AppProvidersProps {
   children: ReactNode;
 }
@@ -18,7 +21,9 @@ const AppProviders: FC<AppProvidersProps> = ({ children }) => {
       <IntensivesProvider>
         <TeamsProvider>
           <EducationRequestsProvider educationRequests={educationRequests}>
-            <EventsProvider>{children}</EventsProvider>
+            <EventsProvider>
+              <DndProvider backend={HTML5Backend}>{children}</DndProvider>/
+            </EventsProvider>
           </EducationRequestsProvider>
         </TeamsProvider>
       </IntensivesProvider>
