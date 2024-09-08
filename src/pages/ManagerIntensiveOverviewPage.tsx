@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import PostService from '../API/PostService';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { IntensivesContext } from '../context/IntensivesContext';
 import Skeleton from 'react-loading-skeleton';
@@ -11,7 +11,9 @@ import Title from '../components/Title/Title';
 import { Intensive } from '../utils/types/Intensive';
 
 const ManagerIntensiveOverviewPage = () => {
-  const params = useParams();
+  const { intensiveId } = useParams();
+  const navigate = useNavigate();
+
   const [currentIntensive, setCurrentIntensive] = useState<
     Intensive | undefined
   >(undefined);
@@ -20,20 +22,20 @@ const ManagerIntensiveOverviewPage = () => {
 
   useEffect(() => {
     const fetchDataForManager = async () => {
-      if (params.intensiveId) {
+      if (intensiveId) {
         const currentIntensive: Intensive = await getIntensiveById(
-          parseInt(params.intensiveId, 10)
+          parseInt(intensiveId, 10)
         );
         setCurrentIntensive(currentIntensive);
         setIsLoading(false);
       }
     };
     fetchDataForManager();
-  }, [params.intensiveId]);
+  }, [intensiveId]);
 
   const deleteIntensivButtonHandler = () => {
-    PostService.deleteIntensiv(localStorage.getItem('id'));
-    window.location.href = '/intensives';
+    PostService.deleteIntensive(intensiveId);
+    navigate('/intensives');
   };
 
   if (isLoading) {
@@ -111,9 +113,13 @@ const ManagerIntensiveOverviewPage = () => {
               </div>
             </div> */}
             <div className="flex gap-2 mt-3 text-lg font-bold">
-              <button className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-100">
-                <Link to="/createIntensive">Редактировать</Link>
-              </button>
+              <Link
+                className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-full flex justify-center"
+                to={`/manager/${intensiveId}/editIntensive`}
+              >
+                Редактировать
+              </Link>
+
               <button
                 className="px-2 py-2.5 rounded-[10px] bg-[#f0f2f5] flex justify-center items-center cursor-pointer"
                 onClick={deleteIntensivButtonHandler}

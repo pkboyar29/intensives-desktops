@@ -45,14 +45,12 @@ const TeacherMainPage: FC = () => {
               Мероприятия
             </NavLink>
           </li>
-          <button className="px-2 py-4 bg-blue rounded-xl">
-            <Link
-              className="text-white text-[14px] font-inter font-bold"
-              to="/intensives"
-            >
-              Вернуться к списку интенсивов
-            </Link>
-          </button>
+          <Link
+            className="block text-center mt-2 px-2 py-4 bg-blue rounded-xl text-white text-[14px] font-inter font-bold"
+            to="/intensives"
+          >
+            Вернуться к списку интенсивов
+          </Link>
         </Sidebar>
         <div className="w-full p-10">
           <Outlet />

@@ -3,7 +3,7 @@ import PostService from '../../API/PostService';
 import SideMenu from '../../components/SideMenu';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton from 'react-loading-skeleton';
-import { InputDescription } from '../../components/InputDescription';
+import InputDescription from '../../components/InputDescription';
 import ElementWithButtKrest from '../../components/ElementWithButtKrest';
 
 const ManageProfile = () => {

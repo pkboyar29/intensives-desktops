@@ -49,60 +49,39 @@ export default class PostService {
     return response;
   }
 
-  static async postIntensives(
-    name,
-    description,
-    startDate,
-    endDate,
-    flows,
-    teachers,
-    rolesStudent,
-    files
-  ) {
+  static async createIntensive(name, description, open_dt, close_dt) {
     const response = await axios.post(
       `${process.env.REACT_APP_BACKEND_URL}/intensives/`,
       {
         university: 1,
-        name: name,
-        description: description,
+        name,
+        description,
         is_open: true,
-        open_dt: startDate,
-        close_dt: endDate,
-        roles: rolesStudent,
-        flow: flows || [],
-        teachers_command: teachers || [],
-        files: files || [],
+        open_dt,
+        close_dt,
+        roles: [],
+        flow: [],
+        teachers_command: [],
+        files: [],
         stages: [],
       },
       { headers: await authHeader() }
     );
     return response;
   }
-  static async patchIntensives(
-    name,
-    description,
-    startDate,
-    endDate,
-    flows,
-    teachers,
-    rolesStudent,
-    files
-  ) {
-    console.log('id', localStorage.getItem('id'));
+  static async updateIntensive(id, name, description, open_dt, close_dt) {
     const response = await axios.patch(
-      `${process.env.REACT_APP_BACKEND_URL}/intensives/${localStorage.getItem(
-        'id'
-      )}/`,
+      `${process.env.REACT_APP_BACKEND_URL}/intensives/${id}/`,
       {
-        name: name,
-        description: description,
+        name,
+        description,
         is_open: true,
-        open_dt: startDate,
-        close_dt: endDate,
-        roles: rolesStudent,
-        flow: flows || [],
-        teachers_command: teachers || [],
-        files: files || [],
+        open_dt,
+        close_dt,
+        roles: [],
+        flow: [],
+        teachers_command: [],
+        files: [],
         stages: [],
       },
       { headers: await authHeader() }
@@ -110,7 +89,7 @@ export default class PostService {
     return response;
   }
 
-  static async postEvent(
+  static async createEvent(
     name,
     description,
     startDate,
@@ -200,7 +179,7 @@ export default class PostService {
     return response;
   }
 
-  static async deleteIntensiv(id) {
+  static async deleteIntensive(id) {
     const response = await axios.delete(
       `${process.env.REACT_APP_BACKEND_URL}/intensives/${id}`,
       { headers: await authHeader() }

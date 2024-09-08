@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { InputDescription } from '../components/InputDescription';
-import { ChooseModal } from '../components/ChooseModal';
+import InputDescription from '../components/InputDescription';
+import ChooseModal from '../components/ChooseModal';
 import SideMenu from '../components/SideMenu';
 import PostService from '../API/PostService';
 import { Link } from 'react-router-dom';
@@ -151,7 +151,7 @@ const CreateEvent = () => {
             typeScore,
             typeResult
           )
-        : await PostService.postEvent(
+        : await PostService.createEvent(
             eventName,
             eventDescription,
             convertDateFormat(dateStart),

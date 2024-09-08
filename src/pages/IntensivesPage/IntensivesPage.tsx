@@ -86,9 +86,7 @@ const IntensivesPage: FC = () => {
         {currentUser?.user_role_id === 2 && (
           <div className="flex justify-end mt-10">
             <button className="ml-auto text-white bg-[#1a5ce5] py-2 px-4 rounded-xl">
-              <Link to={{ pathname: '/createIntensive' }}>
-                Создать интенсив
-              </Link>
+              <Link to="/createIntensive">Создать интенсив</Link>
             </button>
           </div>
         )}

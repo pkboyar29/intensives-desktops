@@ -27,7 +27,7 @@ import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage'
 import Plan from '../pages/Plan';
 import ManageMenu from '../pages/ManageMenu';
 import CreateCommand from '../pages/CreateCommand';
-import ListCreateIntensiv from '../components/ListCreateIntensiv';
+import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
@@ -107,7 +107,16 @@ const routeConfig: RouteType[] = [
         path: 'overview',
         element: <ManagerIntensiveOverviewPage />,
       },
+      {
+        path: 'editIntensive',
+        element: <ManageIntensiveForm />,
+      },
     ],
+    requiredAuth: false,
+  },
+  {
+    path: '/createIntensive',
+    element: <ManageIntensiveForm />,
     requiredAuth: false,
   },
   {
@@ -145,16 +154,11 @@ const routeConfig: RouteType[] = [
     element: <Plan />,
     requiredAuth: false,
   },
-  {
-    path: '/createIntensive',
-    element: <ListCreateIntensiv />,
-    requiredAuth: false,
-  },
-  {
-    path: '/intensiv',
-    element: <ManagerIntensiveOverviewPage />,
-    requiredAuth: false,
-  },
+  // {
+  //   path: '/intensiv',
+  //   element: <ManagerIntensiveOverviewPage />,
+  //   requiredAuth: false,
+  // },
   {
     path: '/commands',
     element: <Commands />,

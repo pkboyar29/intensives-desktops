@@ -737,3 +737,9 @@ code {
   white-space: nowrap;
   overflow: hidden;
 }
+
+.list-content {
+  max-width: 765px;
+  width: 100%;
+  padding: 15px;
+}
