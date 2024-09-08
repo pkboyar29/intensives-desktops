@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import ChooseModal from '../ChooseModal';
 import PostService from '../../API/PostService';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ interface ManageIntensiveFields {
   close_dt: string;
 }
 
-const ManageIntensiveForm = () => {
+const ManageIntensiveForm: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
@@ -33,18 +33,6 @@ const ManageIntensiveForm = () => {
   const { register, handleSubmit, setValue } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
-
-  // useEffect(() => {
-  //   setIsOpen(windowTeachers || windowFlows || windowStudRoles);
-
-  //   windowTeachers
-  //     ? setItemsWindow([...responseTeachers])
-  //     : windowFlows
-  //     ? setItemsWindow([...responseFlows])
-  //     : windowStudRoles
-  //     ? setItemsWindow([...responseStudentRoles])
-  //     : setItemsWindow([]);
-  // }, [windowTeachers, windowFlows, windowStudRoles]);
 
   useEffect(() => {
     const setInitialData = async () => {

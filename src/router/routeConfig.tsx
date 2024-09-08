@@ -22,7 +22,7 @@ import StatisticsIntensive from '../pages/StatisticsIntensive';
 import CreateEvent from '../pages/CreateEvent';
 import ManageProfile from '../pages/ManageLists/ManageProfile';
 import ManageRoles from '../pages/ManageLists/ManageRole';
-import Commands from '../components/Commands';
+import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
 import Plan from '../pages/Plan';
 import ManageMenu from '../pages/ManageMenu';
@@ -111,6 +111,10 @@ const routeConfig: RouteType[] = [
         path: 'editIntensive',
         element: <ManageIntensiveForm />,
       },
+      {
+        path: 'teams',
+        element: <ManagerTeamsPage />,
+      },
     ],
     requiredAuth: false,
   },
@@ -160,12 +164,7 @@ const routeConfig: RouteType[] = [
   //   requiredAuth: false,
   // },
   {
-    path: '/commands',
-    element: <Commands />,
-    requiredAuth: false,
-  },
-  {
-    path: '/createCom',
+    path: '/createTeam',
     element: (
       <DndProvider backend={HTML5Backend}>
         <CreateCommand />
