@@ -33,7 +33,7 @@ const ManagerMainPage: FC = () => {
                 Настройки интенсива
               </Link>
               <Link
-                to="/statisticsIntensive"
+                to="statistics"
                 className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
               >
                 Статистика

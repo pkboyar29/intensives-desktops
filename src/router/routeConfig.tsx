@@ -18,16 +18,17 @@ import StudentTasksPage from '../pages/StudentTasksPage/StudentTasksPage';
 import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage/StudentTaskAnswerPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage/EvaluationIntensivePage';
 
-import StatisticsIntensive from '../pages/StatisticsIntensive';
+import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
+import ManagerTeamsPage from '../pages/ManagerTeamsPage';
+import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
+import CreateTeamsPage from '../pages/CreateTeamsPage';
+import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
+
 import CreateEvent from '../pages/CreateEvent';
 import ManageProfile from '../pages/ManageLists/ManageProfile';
 import ManageRoles from '../pages/ManageLists/ManageRole';
-import ManagerTeamsPage from '../pages/ManagerTeamsPage';
-import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
 import Plan from '../pages/Plan';
 import ManageMenu from '../pages/ManageMenu';
-import CreateTeamsPage from '../pages/CreateTeamsPage';
-import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -116,6 +117,10 @@ const routeConfig: RouteType[] = [
         path: 'createTeam',
         element: <CreateTeamsPage />,
       },
+      {
+        path: 'statistics',
+        element: <IntensiveStatisticsPage />,
+      },
     ],
     requiredAuth: false,
   },
@@ -172,11 +177,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/editEvent',
     element: <CreateEvent />,
-    requiredAuth: false,
-  },
-  {
-    path: '/statisticsIntensive',
-    element: <StatisticsIntensive />,
     requiredAuth: false,
   },
 ];
