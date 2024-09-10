@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 
 import DragElement from '../components/DragComponents/DragElement';
 import DragContainer from '../components/DragComponents/DragContainer';
@@ -23,7 +23,7 @@ const teamData = [
   { id: 'Команда2', name: 'Команда 2' },
 ];
 
-const CreateTeamsPage = () => {
+const CreateTeamsPage: FC = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [countTeams, setCountTeams] = useState<number>(2);
   const [teams, setTeams] = useState<any[]>([]);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import PostService from '../API/PostService';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
@@ -10,7 +10,7 @@ import Title from '../components/Title/Title';
 
 import { Intensive } from '../utils/types/Intensive';
 
-const ManagerIntensiveOverviewPage = () => {
+const ManagerIntensiveOverviewPage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 

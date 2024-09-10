@@ -45,10 +45,10 @@ const ManagerMainPage: FC = () => {
                 План интенсива
               </Link>
               <Link
-                to="/manageMenu"
+                to="manageRoles"
                 className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
               >
-                Управление системой
+                Управление ролями
               </Link>
             </div>
             <Link

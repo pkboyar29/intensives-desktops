@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title/Title';
 
-const SchedulePage = () => {
+const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
 
   const [events, setEvents] = useState<any[]>([]);

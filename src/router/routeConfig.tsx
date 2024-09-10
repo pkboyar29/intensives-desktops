@@ -25,10 +25,8 @@ import CreateTeamsPage from '../pages/CreateTeamsPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 
 import CreateEvent from '../pages/CreateEvent';
-import ManageProfile from '../pages/ManageLists/ManageProfile';
-import ManageRoles from '../pages/ManageLists/ManageRole';
+import ManageRolesPage from '../pages/ManageRolesPage';
 import SchedulePage from '../pages/SchedulePage';
-import ManageMenu from '../pages/ManageMenu';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -125,6 +123,10 @@ const routeConfig: RouteType[] = [
         path: 'plan',
         element: <SchedulePage />,
       },
+      {
+        path: 'manageRoles',
+        element: <ManageRolesPage />,
+      },
     ],
     requiredAuth: false,
   },
@@ -156,21 +158,6 @@ const routeConfig: RouteType[] = [
   {
     path: '*',
     element: <NotFoundPage />,
-    requiredAuth: false,
-  },
-  {
-    path: '/manageMenu',
-    element: <ManageMenu />,
-    requiredAuth: false,
-  },
-  {
-    path: '/editRoles',
-    element: <ManageRoles />,
-    requiredAuth: false,
-  },
-  {
-    path: '/editProfile',
-    element: <ManageProfile />,
     requiredAuth: false,
   },
   {
