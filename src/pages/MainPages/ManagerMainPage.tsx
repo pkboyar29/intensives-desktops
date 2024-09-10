@@ -41,7 +41,7 @@ const ManagerMainPage: FC = () => {
               <Link to="teams" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
                 Управление командами
               </Link>
-              <Link to="/plan" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link to="plan" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
                 План интенсива
               </Link>
               <Link

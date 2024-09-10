@@ -200,7 +200,7 @@ export default class PostService {
       `${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${id}`,
       { headers: await authHeader() }
     );
-    return response;
+    return response.data;
   }
 
   static async getEvent(id) {

@@ -27,7 +27,7 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import CreateEvent from '../pages/CreateEvent';
 import ManageProfile from '../pages/ManageLists/ManageProfile';
 import ManageRoles from '../pages/ManageLists/ManageRole';
-import Plan from '../pages/Plan';
+import SchedulePage from '../pages/SchedulePage';
 import ManageMenu from '../pages/ManageMenu';
 
 type RouteType = RouteObject & {
@@ -121,6 +121,10 @@ const routeConfig: RouteType[] = [
         path: 'statistics',
         element: <IntensiveStatisticsPage />,
       },
+      {
+        path: 'plan',
+        element: <SchedulePage />,
+      },
     ],
     requiredAuth: false,
   },
@@ -157,11 +161,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/manageMenu',
     element: <ManageMenu />,
-    requiredAuth: false,
-  },
-  {
-    path: '/plan',
-    element: <Plan />,
     requiredAuth: false,
   },
   {
