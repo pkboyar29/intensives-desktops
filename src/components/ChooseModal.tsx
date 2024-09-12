@@ -1,43 +1,39 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 
 interface ChooseModalProps {
   itemsProp: any[];
-  itemsForResults: any[];
+  selectedItemsProp: any[];
   onClose: () => void;
-  onSave: () => void;
+  onSave: (newSelectedItems: any[], newItemsToChoose: any[]) => void;
 }
 
 const ChooseModal: FC<ChooseModalProps> = ({
   itemsProp,
-  itemsForResults,
+  selectedItemsProp,
   onClose,
   onSave,
 }) => {
   const [items, setitems] = useState(itemsProp);
-  const [selectedItem, setSelectedItem] = useState(itemsForResults);
+  const [selectedItems, setSelectedItems] = useState(selectedItemsProp);
 
-  const addItem = (elem: any) => {
-    setSelectedItem([...selectedItem, elem]);
-    setitems(items.filter((item) => item.id != elem.id));
+  const addItem = (newItem: any) => {
+    setSelectedItems([...selectedItems, newItem]);
+    setitems(items.filter((item) => item.id != newItem.id));
   };
 
-  const deleteItem = (elem: any) => {
-    setSelectedItem(selectedItem.filter((item: any) => item.id != elem.id));
-    setitems([...items, elem]);
+  const deleteItem = (itemToDelete: any) => {
+    setSelectedItems(
+      selectedItems.filter((item: any) => item.id != itemToDelete.id)
+    );
+    setitems([...items, itemToDelete]);
   };
-
-  useEffect(() => {
-    setSelectedItem(itemsForResults);
-    const ids = selectedItem?.map((item: any) => item.id);
-    setitems(items.filter((elem) => !ids.includes(elem.id)));
-  }, [items, itemsForResults]);
 
   const closeButtonClickHandler = () => {
     onClose();
   };
 
   const saveButtonClickHandler = () => {
-    onSave();
+    onSave(selectedItems, items);
     onClose();
   };
 
@@ -55,18 +51,10 @@ const ChooseModal: FC<ChooseModalProps> = ({
           className="w-full py-3 px-4 mt-3 bg-[#f0f2f5] rounded-xl"
         />
 
-        <div
-          className="mt-3 w-full h-full rounded-lg overflow-y-auto overflow-x-clip gap-1.5 flex flex-wrap p-2.5 border border-dashed border-[#637087]"
-          style={
-            items.length > 0
-              ? {}
-              : {
-                  height: '20vh',
-                }
-          }
-        >
-          {items.map((elem) => (
+        <div className="mt-3 w-full h-full rounded-lg overflow-y-auto overflow-x-clip gap-1.5 flex flex-wrap p-2.5 border border-dashed border-[#637087]">
+          {items.map((elem, index: number) => (
             <div
+              key={index}
               onClick={() => addItem(elem)}
               className="ml-4 text-sm selectedInList"
             >
@@ -75,22 +63,15 @@ const ChooseModal: FC<ChooseModalProps> = ({
           ))}
         </div>
 
-        <div
-          className="flex flex-wrap w-full"
-          style={{
-            height: 'max-content',
-            minHeight: '5vh',
-          }}
-        >
-          {selectedItem?.map((elem) => (
-            <div
-              style={{ marginRight: '10px' }}
-              className="flex items-center flex-nowrap"
-            >
-              <span className="ml-4 text-sm selectedInList">{elem.name}</span>
+        <div className="flex flex-wrap w-full gap-2.5 mt-5">
+          {selectedItems?.map((selectedItem, index: number) => (
+            <div key={index} className="flex items-center flex-nowrap">
+              <span className="ml-4 text-sm selectedInList">
+                {selectedItem.name}
+              </span>
               <button
                 onClick={() => {
-                  deleteItem(elem);
+                  deleteItem(selectedItem);
                 }}
               >
                 X
@@ -101,7 +82,7 @@ const ChooseModal: FC<ChooseModalProps> = ({
 
         <button
           onClick={saveButtonClickHandler}
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] text-lg"
+          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] text-lg mt-5"
         >
           Сохранить
         </button>

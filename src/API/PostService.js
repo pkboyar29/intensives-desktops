@@ -26,7 +26,7 @@ export default class PostService {
     return response;
   }
 
-  static async getAuditorii() {
+  static async getAudiences() {
     const response = axios.get(
       `${process.env.REACT_APP_BACKEND_URL}/auditories/`,
       { headers: await authHeader() }
@@ -34,7 +34,7 @@ export default class PostService {
     return response;
   }
 
-  static async getStage() {
+  static async getStages() {
     const response = axios.get(`${process.env.REACT_APP_BACKEND_URL}/stages/`, {
       headers: await authHeader(),
     });
@@ -94,10 +94,10 @@ export default class PostService {
     description,
     startDate,
     endDate,
-    teachers,
-    commands,
     stage,
-    auditory
+    auditory,
+    teachers,
+    commands
   ) {
     const idInt = localStorage.getItem('id');
     const response = await axios.post(
@@ -121,21 +121,21 @@ export default class PostService {
   }
 
   static async patchEvent(
+    eventId,
     name,
     description,
     startDate,
     endDate,
-    teachers,
-    commands,
     stage,
     auditory,
+    teachers,
+    commands,
     typeScore,
     typeResult
   ) {
     const idInt = localStorage.getItem('id');
-    const idEvent = localStorage.getItem('idEvent');
     const response = await axios.patch(
-      `${process.env.REACT_APP_BACKEND_URL}/events/${idEvent}/`,
+      `${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`,
       {
         name: name,
         description: description,
@@ -205,7 +205,7 @@ export default class PostService {
 
   static async getEvent(id) {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/events/${id}/`,
+      `${process.env.REACT_APP_BACKEND_URL}/events/${id}`,
       { headers: await authHeader() }
     );
     return response;

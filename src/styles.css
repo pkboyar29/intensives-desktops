@@ -702,10 +702,6 @@ table tr:last-child td:last-child {
   align-items: center;
 }
 
-/* table {
-  border-collapse: unset !important;
-} */
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -722,6 +718,10 @@ code {
 }
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+/* table {
+  border-collapse: unset !important;
+} */
 
 .selectedInList {
   background-color: #e8edf2;

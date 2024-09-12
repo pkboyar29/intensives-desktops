@@ -85,7 +85,7 @@ const ManageIntensiveForm: FC = () => {
       {modalFlows && (
         <ChooseModal
           itemsProp={[]}
-          itemsForResults={[]}
+          selectedItemsProp={[]}
           onClose={() => setModalFlows(false)}
           onSave={() => {}}
         />
@@ -94,7 +94,7 @@ const ManageIntensiveForm: FC = () => {
       {modalTeachers && (
         <ChooseModal
           itemsProp={[]}
-          itemsForResults={[]}
+          selectedItemsProp={[]}
           onClose={() => setModalTeachers(false)}
           onSave={() => {}}
         />
@@ -103,7 +103,7 @@ const ManageIntensiveForm: FC = () => {
       {modalStudRoles && (
         <ChooseModal
           itemsProp={[]}
-          itemsForResults={[]}
+          selectedItemsProp={[]}
           onClose={() => setModalStudRoles(false)}
           onSave={() => {}}
         />

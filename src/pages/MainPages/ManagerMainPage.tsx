@@ -1,5 +1,5 @@
 import { FC, useContext } from 'react';
-import { Outlet, NavLink, Link, useParams } from 'react-router-dom';
+import { Outlet, Link, useParams } from 'react-router-dom';
 
 import { Intensive } from '../../utils/types/Intensive';
 
