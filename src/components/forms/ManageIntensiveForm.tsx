@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { IntensivesContext } from '../../context/IntensivesContext';
 import { useForm } from 'react-hook-form';
 
-import Title from '../Title/Title';
+import Title from '../Title';
 
 interface ManageIntensiveFields {
   name: string;

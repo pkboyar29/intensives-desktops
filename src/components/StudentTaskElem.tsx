@@ -1,4 +1,4 @@
-import { Task } from '../../utils/types/Task';
+import { Task } from '../utils/types/Task';
 
 export default function StudentTaskElem(props: Task) {
   return (

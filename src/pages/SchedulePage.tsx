@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import PostService from '../API/PostService';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 
-import Title from '../components/Title/Title';
+import Title from '../components/Title';
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
 
 const SchedulePage: FC = () => {

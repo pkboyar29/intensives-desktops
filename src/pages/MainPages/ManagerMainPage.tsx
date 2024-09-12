@@ -3,7 +3,7 @@ import { Outlet, Link, useParams } from 'react-router-dom';
 
 import { Intensive } from '../../utils/types/Intensive';
 
-import Sidebar from '../../components/Sidebar/Sidebar';
+import Sidebar from '../../components/Sidebar';
 import { IntensivesContext } from '../../context/IntensivesContext';
 
 const ManagerMainPage: FC = () => {

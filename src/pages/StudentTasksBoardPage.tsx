@@ -1,12 +1,12 @@
-import ProfilePicture from '../../components/ProfilePicture/ProfilePicture';
+import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
 import { FC } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { TaskTableRow } from '../../utils/types/Task';
-import Title from '../../components/Title/Title';
-import Table from '../../components/Table/Table';
-import PrimaryButton from '../../components/PrimaryButton/PrimaryButton';
+import { TaskTableRow } from '../utils/types/Task';
+import Title from '../components/Title';
+import Table from '../components/Table';
+import PrimaryButton from '../components/PrimaryButton';
 import { useNavigate, useParams } from 'react-router-dom';
-import TasksTab from '../../components/TasksTab/TasksTab';
+import TasksTab from '../components/TasksTab/TasksTab';
 
 const StudentTasksBoardPage: FC = () => {
   const params = useParams();

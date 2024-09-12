@@ -2,7 +2,7 @@ import { FC, useEffect, useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import Header from '../components/Header/Header';
+import Header from '../components/Header';
 import routeConfig from '../router/routeConfig';
 
 const App: FC = () => {

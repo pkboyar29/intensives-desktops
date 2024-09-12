@@ -1,9 +1,9 @@
 import { FC, useContext } from 'react';
-import { EducationRequestsContext } from '../../context/EducationRequestsContext';
+import { EducationRequestsContext } from '../context/EducationRequestsContext';
 import { useParams } from 'react-router-dom';
 
-import Title from '../../components/Title/Title';
-import { EducationRequest } from '../../utils/types/EducationRequest';
+import Title from '../components/Title';
+import { EducationRequest } from '../utils/types/EducationRequest';
 
 const EducationRequestOverviewPage: FC = () => {
   const educationRequests: EducationRequest[] = useContext(

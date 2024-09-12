@@ -1,13 +1,13 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Intensive } from '../../utils/types/Intensive';
-import { IntensivesContext } from '../../context/IntensivesContext';
-import { TeamsContext } from '../../context/TeamsContext';
+import { Intensive } from '../utils/types/Intensive';
+import { IntensivesContext } from '../context/IntensivesContext';
+import { TeamsContext } from '../context/TeamsContext';
 
-import Title from '../../components/Title/Title';
-import OverviewContent from '../../components/OverviewContent/OverviewContent';
-import OverviewItem from '../../components/OverviewItem/OverviewItem';
+import Title from '../components/Title';
+import OverviewContent from '../components/OverviewContent';
+import OverviewItem from '../components/OverviewItem';
 
 const IntensiveOverviewPage: FC = () => {
   const params = useParams();

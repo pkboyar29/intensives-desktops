@@ -16,7 +16,7 @@ import InputRadio from '../InputRadio';
 import InputDescription from '../InputDescription';
 import ChooseModal from '../ChooseModal';
 
-import Title from '../Title/Title';
+import Title from '../Title';
 
 interface ManageEventFormFields {
   name: string;

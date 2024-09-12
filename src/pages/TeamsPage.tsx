@@ -1,12 +1,12 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TeamsContext } from '../../context/TeamsContext';
+import { TeamsContext } from '../context/TeamsContext';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Team } from '../../utils/types/Team';
+import { Team } from '../utils/types/Team';
 
-import Title from '../../components/Title/Title';
-import Table from '../../components/Table/Table';
+import Title from '../components/Title';
+import Table from '../components/Table';
 
 const TeamsPage: FC = () => {
   const params = useParams();

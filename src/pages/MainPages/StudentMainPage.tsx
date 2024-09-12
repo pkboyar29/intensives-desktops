@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
-import Sidebar from '../../components/Sidebar/Sidebar';
+import Sidebar from '../../components/Sidebar';
 
 const StudentMainPage: FC = () => {
   return (

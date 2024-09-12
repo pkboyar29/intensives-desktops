@@ -6,7 +6,7 @@ import { IntensivesContext } from '../context/IntensivesContext';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import Title from '../components/Title/Title';
+import Title from '../components/Title';
 
 import { Intensive } from '../utils/types/Intensive';
 

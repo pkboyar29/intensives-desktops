@@ -2,12 +2,12 @@ import { FC, useContext } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
-import { EducationRequest } from '../../utils/types/EducationRequest';
+import { EducationRequest } from '../utils/types/EducationRequest';
 
-import { EducationRequestsContext } from '../../context/EducationRequestsContext';
+import { EducationRequestsContext } from '../context/EducationRequestsContext';
 
-import Title from '../../components/Title/Title';
-import Table from '../../components/Table/Table';
+import Title from '../components/Title';
+import Table from '../components/Table';
 
 const EducationRequestsPage: FC = () => {
   const navigate = useNavigate();

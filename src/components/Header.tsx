@@ -1,7 +1,7 @@
 import { FC, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { CurrentUserContext } from '../../context/CurrentUserContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
 
 const Header: FC = () => {
   const navigate = useNavigate();

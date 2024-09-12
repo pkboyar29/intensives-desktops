@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import StudentTaskElem from '../../components/StudentTaskElem/StudentTaskElem';
-import Title from '../../components/Title/Title';
+import StudentTaskElem from '../components/StudentTaskElem';
+import Title from '../components/Title';
 
 const StudentTasksPage: FC = () => {
   return (

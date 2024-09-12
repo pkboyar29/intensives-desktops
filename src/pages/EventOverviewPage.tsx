@@ -3,16 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
-import authHeader from '../../utils/getHeaders';
+import authHeader from '../utils/getHeaders';
 
-import { EventsContext } from '../../context/EventsContext';
-import { CurrentUserContext } from '../../context/CurrentUserContext';
+import { EventsContext } from '../context/EventsContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import { Team } from '../../utils/types/Team';
+import { Team } from '../utils/types/Team';
 
-import Title from '../../components/Title/Title';
-import OverviewContent from '../../components/OverviewContent/OverviewContent';
-import OverviewItem from '../../components/OverviewItem/OverviewItem';
+import Title from '../components/Title';
+import OverviewContent from '../components/OverviewContent';
+import OverviewItem from '../components/OverviewItem';
 
 type AnswerSubmitValues = {
   textAnswer: string;

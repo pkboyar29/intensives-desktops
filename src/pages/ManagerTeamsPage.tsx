@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
-import Title from '../components/Title/Title';
+import Title from '../components/Title';
 
 const ManagerTeamsPage: FC = () => {
   const { intensiveId } = useParams();

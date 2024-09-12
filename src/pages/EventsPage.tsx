@@ -2,12 +2,12 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { EventsContext } from '../../context/EventsContext';
-import { CurrentUserContext } from '../../context/CurrentUserContext';
-import { Event } from '../../utils/types/Event';
+import { EventsContext } from '../context/EventsContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
+import { Event } from '../utils/types/Event';
 
-import Title from '../../components/Title/Title';
-import Table from '../../components/Table/Table';
+import Title from '../components/Title';
+import Table from '../components/Table';
 
 const EventsPage: FC = () => {
   const navigate = useNavigate();

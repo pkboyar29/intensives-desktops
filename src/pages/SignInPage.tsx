@@ -4,10 +4,10 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { CurrentUserContext } from '../../context/CurrentUserContext';
-import { TeamsContext } from '../../context/TeamsContext';
-import { User } from '../../utils/types/User';
-import { Team } from '../../utils/types/Team';
+import { CurrentUserContext } from '../context/CurrentUserContext';
+import { TeamsContext } from '../context/TeamsContext';
+import { User } from '../utils/types/User';
+import { Team } from '../utils/types/Team';
 
 interface SignInProps {
   email: string;

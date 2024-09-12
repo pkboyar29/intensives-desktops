@@ -11,7 +11,7 @@ import {
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import Title from '../components/Title/Title';
+import Title from '../components/Title';
 
 const IntensiveStatisticsPage = () => {
   const [statisticsData, setStatisticsData] = useState<any[]>([]);

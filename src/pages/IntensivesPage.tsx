@@ -2,12 +2,12 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate, Link } from 'react-router-dom';
 
-import { Intensive } from '../../utils/types/Intensive';
-import { IntensivesContext } from '../../context/IntensivesContext';
-import { CurrentUserContext } from '../../context/CurrentUserContext';
+import { Intensive } from '../utils/types/Intensive';
+import { IntensivesContext } from '../context/IntensivesContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import Table from '../../components/Table/Table';
-import Title from '../../components/Title/Title';
+import Table from '../components/Table';
+import Title from '../components/Title';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();

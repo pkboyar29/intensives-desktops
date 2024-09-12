@@ -3,14 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 
-import { TeamsContext } from '../../context/TeamsContext';
-import { EventsContext } from '../../context/EventsContext';
-import { CurrentUserContext } from '../../context/CurrentUserContext';
-import authHeader from '../../utils/getHeaders';
+import { TeamsContext } from '../context/TeamsContext';
+import { EventsContext } from '../context/EventsContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
+import authHeader from '../utils/getHeaders';
 
-import Title from '../../components/Title/Title';
-import { Team } from '../../utils/types/Team';
-import { Event } from '../../utils/types/Event';
+import Title from '../components/Title';
+import { Team } from '../utils/types/Team';
+import { Event } from '../utils/types/Event';
 
 type FormValues = {
   marks: { criteriaId: number; mark: number }[];

@@ -2,7 +2,7 @@ import { useState, useEffect, FC } from 'react';
 
 import DragElement from '../components/DragComponents/DragElement';
 import DragContainer from '../components/DragComponents/DragContainer';
-import Title from '../components/Title/Title';
+import Title from '../components/Title';
 
 const base = [
   { index: 0, content: 'Мындрила М.А,' },

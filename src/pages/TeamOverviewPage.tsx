@@ -1,11 +1,11 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { TeamsContext } from '../../context/TeamsContext';
-import { CurrentUserContext } from '../../context/CurrentUserContext';
+import { TeamsContext } from '../context/TeamsContext';
+import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import Title from '../../components/Title/Title';
-import OverviewContent from '../../components/OverviewContent/OverviewContent';
+import Title from '../components/Title';
+import OverviewContent from '../components/OverviewContent';
 
 const TeamOverviewPage: FC = () => {
   const params = useParams();
