@@ -55,7 +55,6 @@ const IntensivesPage: FC = () => {
       navigate(`/manager/${id}/overview`);
     }
     if (currentUser?.user_role_id === 3) {
-      localStorage.setItem('id', id.toString());
       navigate(`/teacher/${id}/overview`);
     }
   };

@@ -10,11 +10,13 @@ import {
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title';
 
 const IntensiveStatisticsPage = () => {
   const [statisticsData, setStatisticsData] = useState<any[]>([]);
+  const { intensiveId } = useParams();
 
   const transformDataResponse = (response: any) => {
     setStatisticsData(
@@ -31,11 +33,11 @@ const IntensiveStatisticsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await PostService.getStatisticsIntensiv(
-          localStorage.getItem('id')
-        ).then((response) => {
-          transformDataResponse(response.data);
-        });
+        await PostService.getStatisticsIntensiv(intensiveId).then(
+          (response) => {
+            transformDataResponse(response.data);
+          }
+        );
       } catch (e) {
         console.log(e);
       }

@@ -90,6 +90,7 @@ export default class PostService {
   }
 
   static async createEvent(
+    intensiveId,
     name,
     description,
     startDate,
@@ -99,7 +100,6 @@ export default class PostService {
     teachers,
     commands
   ) {
-    const idInt = localStorage.getItem('id');
     const response = await axios.post(
       `${process.env.REACT_APP_BACKEND_URL}/events/`,
       {
@@ -111,7 +111,7 @@ export default class PostService {
         auditory: auditory,
         mark_strategy: 1,
         result_type: 1,
-        intensiv: idInt,
+        intensiv: intensiveId,
         commands: commands || [],
         teachers_command: teachers || [],
       },
@@ -121,6 +121,7 @@ export default class PostService {
   }
 
   static async patchEvent(
+    intensiveId,
     eventId,
     name,
     description,
@@ -133,7 +134,6 @@ export default class PostService {
     typeScore,
     typeResult
   ) {
-    const idInt = localStorage.getItem('id');
     const response = await axios.patch(
       `${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`,
       {
@@ -145,7 +145,7 @@ export default class PostService {
         auditory: auditory,
         mark_strategy: typeScore || 1,
         result_type: typeResult || 1,
-        intensiv: idInt,
+        intensiv: intensiveId,
         commands: commands || [],
         teachers_command: teachers || [],
       },

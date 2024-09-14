@@ -16,7 +16,7 @@ const TeamsPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (params.intensiveId) {
-        await getTeams(parseInt(params.intensiveId, 10));
+        getTeams(parseInt(params.intensiveId, 10));
         setIsLoading(false);
       }
     };

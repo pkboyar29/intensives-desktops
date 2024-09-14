@@ -136,6 +136,7 @@ const ManageEventForm: FC = () => {
 
       if (hasEvent) {
         await PostService.patchEvent(
+          intensiveId,
           searchParams.get('eventId'),
           data.name,
           data.description,
@@ -150,6 +151,7 @@ const ManageEventForm: FC = () => {
         );
       } else {
         await PostService.createEvent(
+          intensiveId,
           data.name,
           data.description,
           transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
