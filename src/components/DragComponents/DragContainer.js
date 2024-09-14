@@ -36,8 +36,8 @@ const DragContainer = ({ teamName, func, team }) => {
       ref={dropRef}
       className={
         isDragging
-          ? 'flex flex-col column-command-create border-drag-and-drop'
-          : 'flex flex-col column-command-create'
+          ? 'flex flex-col gap-1 p-2.5 outline outline-[3px] outline-[#e8edf2] rounded-lg'
+          : 'flex flex-col gap-1 p-2.5'
       }
       onDragOver={(evt) => evt.preventDefault()}
     >
@@ -60,7 +60,7 @@ const DragContainer = ({ teamName, func, team }) => {
           deleteI={deleteItemFromCont}
         />
       ))}
-      <select className="mini-element-input-style">
+      <select className="px-4 py-1.5 text-sm rounded-lg border-none outline-none bg-[#f0f2f5] w-min appearance-none">
         <option>Добавить участника</option>
       </select>
     </div>
