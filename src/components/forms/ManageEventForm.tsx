@@ -14,7 +14,6 @@ import InputRadioDescription from '../InputRadioDescription';
 import InputRadio from '../InputRadio';
 import InputDescription from '../InputDescription';
 import ChooseModal from '../ChooseModal';
-
 import Title from '../Title';
 
 interface ManageEventFormFields {
@@ -55,71 +54,73 @@ const ManageEventForm: FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: teams } = await PostService.getCommandsOnIntensive(
-        intensiveId
-      );
-      const { data: teachers } = await PostService.getTeachersOnIntensive(
-        intensiveId
-      );
-      const { data: audiencies } = await PostService.getAudiences();
-      const { data: stages } = await PostService.getStages();
+      if (intensiveId) {
+        const { data: teams } = await PostService.getCommandsOnIntensive(
+          intensiveId
+        );
+        const { data: teachers } = await PostService.getTeachersOnIntensive(
+          intensiveId
+        );
+        const { data: audiencies } = await PostService.getAudiences();
+        const { data: stages } = await PostService.getStages();
 
-      setTeamsToChoose(
-        teams.results.map((team: any) => {
-          return { id: team.id, name: team.name };
-        })
-      );
-
-      setTeachersToChoose(
-        teachers.results.map((teacher: any) => {
-          return { id: teacher.id, name: teacher.teacher.user.last_name };
-        })
-      );
-
-      // setCommands(filterIncludeObjectsByNames(teams, event.commands));
-      // setResponseCommands(filterIncludeObjectsByNames(teams, event.commands));
-      // setTeachers(
-      //   event.teachers_command.map((teacher) => {
-      //     return { id: teacher };
-      //   })
-      // );
-
-      setAudiencesToChoose(
-        audiencies.results.map((audience: any) => {
-          return {
-            id: audience.id,
-            name:
-              audience.building.address +
-              ' Корпус ' +
-              audience.building.name +
-              ' Аудитория ' +
-              audience.name,
-          };
-        })
-      );
-
-      setStagesToChoose(
-        stages.results.map((stage: any) => {
-          return {
-            id: stage.id,
-            name: stage.name,
-          };
-        })
-      );
-
-      if (hasEvent) {
-        const { data: event } = await PostService.getEvent(
-          searchParams.get('eventId')
+        setTeamsToChoose(
+          teams.results.map((team: any) => {
+            return { id: team.id, name: team.name };
+          })
         );
 
-        setValue('name', event.name);
-        setValue('description', event.description);
-        setValue('dateStart', event.start_dt.split('T')[0]);
-        setValue('dateEnd', event.finish_dt.split('T')[0]);
-        setValue('timeStart', transformISODateToTime(event.start_dt));
-        setValue('timeEnd', transformISODateToTime(event.finish_dt));
-        setValue('audience', event.auditory);
-        setValue('stage', event.stage);
+        setTeachersToChoose(
+          teachers.results.map((teacher: any) => {
+            return { id: teacher.id, name: teacher.teacher.user.last_name };
+          })
+        );
+
+        // setCommands(filterIncludeObjectsByNames(teams, event.commands));
+        // setResponseCommands(filterIncludeObjectsByNames(teams, event.commands));
+        // setTeachers(
+        //   event.teachers_command.map((teacher) => {
+        //     return { id: teacher };
+        //   })
+        // );
+
+        setAudiencesToChoose(
+          audiencies.results.map((audience: any) => {
+            return {
+              id: audience.id,
+              name:
+                audience.building.address +
+                ' Корпус ' +
+                audience.building.name +
+                ' Аудитория ' +
+                audience.name,
+            };
+          })
+        );
+
+        setStagesToChoose(
+          stages.results.map((stage: any) => {
+            return {
+              id: stage.id,
+              name: stage.name,
+            };
+          })
+        );
+
+        const eventId: string | null = searchParams.get('eventId');
+
+        if (hasEvent && eventId) {
+          const { data: event } = await PostService.getEvent(eventId);
+
+          setValue('name', event.name);
+          setValue('description', event.description);
+          setValue('dateStart', event.start_dt.split('T')[0]);
+          setValue('dateEnd', event.finish_dt.split('T')[0]);
+          setValue('timeStart', transformISODateToTime(event.start_dt));
+          setValue('timeEnd', transformISODateToTime(event.finish_dt));
+          setValue('audience', event.auditory);
+          setValue('stage', event.stage);
+        }
       }
     };
 
@@ -133,33 +134,39 @@ const ManageEventForm: FC = () => {
       const ids_teachers = teachers?.map((item) => item.id);
       const ids_commands = teams?.map((item) => item.id);
 
-      if (hasEvent) {
-        await PostService.patchEvent(
-          intensiveId,
-          searchParams.get('eventId'),
-          data.name,
-          data.description,
-          transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
-          transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
-          data.stage,
-          data.audience,
-          ids_teachers,
-          ids_commands,
-          typeScore,
-          typeResult
-        );
-      } else {
-        await PostService.createEvent(
-          intensiveId,
-          data.name,
-          data.description,
-          transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
-          transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
-          data.stage,
-          data.audience,
-          ids_teachers,
-          ids_commands
-        );
+      const eventId: string | null = searchParams.get('eventId');
+
+      if (intensiveId) {
+        if (hasEvent) {
+          if (eventId) {
+            await PostService.patchEvent(
+              intensiveId,
+              eventId,
+              data.name,
+              data.description,
+              transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
+              transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
+              data.stage,
+              data.audience,
+              ids_teachers,
+              ids_commands,
+              typeScore,
+              typeResult
+            );
+          }
+        } else {
+          await PostService.createEvent(
+            intensiveId,
+            data.name,
+            data.description,
+            transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
+            transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
+            data.stage,
+            data.audience,
+            ids_teachers,
+            ids_commands
+          );
+        }
       }
 
       navigate(replaceLastURLSegment('plan'));

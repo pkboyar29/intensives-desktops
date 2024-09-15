@@ -63,16 +63,16 @@ const ManageIntensiveForm: FC = () => {
           intensiveId,
           data.name,
           data.description,
-          new Date(data.open_dt),
-          new Date(data.close_dt)
+          data.open_dt,
+          data.close_dt
         );
         navigate(`/manager/${intensiveId}/overview`);
       } else {
         const { data: responseData } = await PostService.createIntensive(
           data.name,
           data.description,
-          new Date(data.open_dt),
-          new Date(data.close_dt)
+          data.open_dt,
+          data.close_dt
         );
         navigate(`/manager/${responseData.id}/overview`);
       }

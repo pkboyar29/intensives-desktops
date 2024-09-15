@@ -33,11 +33,11 @@ const IntensiveStatisticsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await PostService.getStatisticsIntensiv(intensiveId).then(
-          (response) => {
-            transformDataResponse(response.data);
-          }
-        );
+        if (intensiveId) {
+          const { data } = await PostService.getStatisticsIntensiv(intensiveId);
+
+          transformDataResponse(data);
+        }
       } catch (e) {
         console.log(e);
       }

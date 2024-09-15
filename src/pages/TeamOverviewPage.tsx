@@ -16,7 +16,7 @@ const TeamOverviewPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (params.teamId && currentUser) {
-        await setCurrentTeamForStudent(parseInt(params.teamId, 10));
+        setCurrentTeamForStudent(parseInt(params.teamId, 10));
         setIsLoading(false);
       }
     };

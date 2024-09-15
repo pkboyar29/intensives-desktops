@@ -34,8 +34,10 @@ const ManagerIntensiveOverviewPage: FC = () => {
   }, [intensiveId]);
 
   const deleteIntensivButtonHandler = () => {
-    PostService.deleteIntensive(intensiveId);
-    navigate('/intensives');
+    if (intensiveId) {
+      PostService.deleteIntensive(intensiveId);
+      navigate('/intensives');
+    }
   };
 
   if (isLoading) {
