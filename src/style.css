@@ -1,0 +1,230 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* подключение шрифтов */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+/* font-family: 'Inter', sans-serif;
+font-family: 'Open Sans', sans-serif; */
+
+/* обнуляющие стили */
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:focus,
+:active {
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+nav,
+footer,
+header,
+aside {
+  display: block;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+input,
+button,
+textarea {
+  font-family: inherit;
+}
+
+textarea {
+  resize: none;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a,
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Общие стили */
+
+/* .container {
+  max-width: 1366px;
+  margin: 0 auto;
+} */
+
+/* TABLE */
+
+.table {
+  border-collapse: collapse;
+  border-top: solid transparent 24px;
+  border-bottom: solid transparent 24px;
+  border-right: solid transparent 16px;
+  border-left: solid transparent 16px;
+}
+
+/* SIDEBAR */
+
+.sidebar__link.active {
+  color: #1a5ce5;
+}
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  /* 1 */
+  border-width: 0;
+  /* 2 */
+  border-style: solid;
+  /* 2 */
+  border-color: #e5e7eb;
+  /* 2 */
+}
+
+::before,
+::after {
+  --tw-content: '';
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+*/ table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+table tr {
+  height: 6vh;
+}
+
+table th,
+table td {
+  padding: 5px 10px;
+  text-wrap: wrap;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  border-radius: 3px;
+  max-width: 250px;
+  overflow: hidden;
+}
+
+.selectedInList {
+  background-color: #e8edf2;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 3px 10px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: max-content;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  margin: 2px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.list-content {
+  max-width: 765px;
+  width: 100%;
+  padding: 15px;
+}
+
+/* Для браузеров на основе WebKit (Chrome, Safari, Opera) */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Для Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}

@@ -1,0 +1,49 @@
+import { FC, useContext } from 'react';
+import { EducationRequestsContext } from '../context/EducationRequestsContext';
+import { useParams } from 'react-router-dom';
+
+import Title from '../components/Title';
+import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
+
+const EducationRequestOverviewPage: FC = () => {
+  const educationRequests: IEducationRequest[] = useContext(
+    EducationRequestsContext
+  );
+  const params = useParams();
+  const currentRequest: IEducationRequest | undefined = educationRequests.find(
+    (request: IEducationRequest) => request.id === Number(params.requestId)
+  );
+
+  return (
+    <>
+      <Title text="Просмотр образовательного запроса" />
+
+      <div className="overview__container">
+        <div className="overview__item">
+          <h2 className="mini-title">Тема запроса</h2>
+          <div className="overview__content">{currentRequest?.subject}</div>
+        </div>
+        <div className="overview__item">
+          <h2 className="mini-title">Описание запроса</h2>
+          <div className="overview__content">{currentRequest?.descr}</div>
+        </div>
+        <div className="overview__item">
+          <h2 className="mini-title">Команда</h2>
+          <div className="overview__content">{currentRequest?.teamName}</div>
+        </div>
+        <div className="overview__item">
+          <h2 className="mini-title">Владелец запроса</h2>
+          <div className="overview__content">{currentRequest?.ownerName}</div>
+        </div>
+        <div className="overview__item">
+          <h2 className="mini-title">Дата создания запроса</h2>
+          <div className="overview__content">
+            {currentRequest?.createdDate.toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default EducationRequestOverviewPage;

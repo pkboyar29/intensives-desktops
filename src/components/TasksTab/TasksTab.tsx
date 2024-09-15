@@ -1,21 +1,20 @@
-import './TasksTab.css'
-import React, { useState } from 'react'
+import './TasksTab.css';
+import React, { useState } from 'react';
 
 type TasksTabProps = {
-    onTabChange: (selectedTab: number) => void
-}
+  onTabChange: (selectedTab: number) => void;
+};
 
 export default function TasksTab(props: TasksTabProps) {
-    const [activeTab, setActiveTab] = useState<number>();
+  const [activeTab, setActiveTab] = useState<number>();
 
-    function handleTab(tabId: number) {
-        setActiveTab(tabId);
-        props.onTabChange(tabId);
-
-    }
-    return(
-    <div className='tab-container'>
-        <div
+  function handleTab(tabId: number) {
+    setActiveTab(tabId);
+    props.onTabChange(tabId);
+  }
+  return (
+    <div className="tab-container">
+      <div
         className={`tab ${activeTab == 0 ? 'active' : ''}`}
         onClick={() => handleTab(0)}
       >
@@ -34,5 +33,5 @@ export default function TasksTab(props: TasksTabProps) {
         To do
       </div>
     </div>
-    )
+  );
 }
