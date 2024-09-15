@@ -9,8 +9,8 @@ import { CurrentUserContext } from '../context/CurrentUserContext';
 import authHeader from '../helpers/getHeaders';
 
 import Title from '../components/Title';
-import { Team } from '../ts/types/Team';
-import { Event } from '../ts/types/Event';
+import { ITeam } from '../ts/interfaces/ITeam';
+import { Event } from '../ts/interfaces/Event';
 
 type FormValues = {
   marks: { criteriaId: number; mark: number }[];
@@ -34,7 +34,7 @@ const TeamEvaluationPage: FC = () => {
     },
   });
 
-  const currentTeam: Team | undefined = teams.find((team: Team) => {
+  const currentTeam: ITeam | undefined = teams.find((team: ITeam) => {
     if (params.teamId) {
       return team.id === parseInt(params.teamId, 10);
     }

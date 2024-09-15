@@ -1,4 +1,4 @@
-export type Team = {
+export interface ITeam {
   id: number;
   name: string;
   tutorId: number | null;
@@ -6,4 +6,4 @@ export type Team = {
   mentorId: number | null;
   mentorNameSurname: string | null;
   intensiveId: number;
-};
+}

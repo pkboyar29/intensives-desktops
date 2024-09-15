@@ -1,13 +1,13 @@
 import { FC, ReactNode, createContext, useState } from 'react';
 import axios from 'axios';
-import { Intensive } from '../ts/types/Intensive';
+import { IIntensive } from '../ts/interfaces/IIntensive';
 
 import authHeader from '../helpers/getHeaders';
 
 interface IntensiveContextType {
-  intensives: Intensive[];
+  intensives: IIntensive[];
   getIntensives: () => void;
-  getIntensiveById: (intensiveId: number) => Promise<Intensive>;
+  getIntensiveById: (intensiveId: number) => Promise<IIntensive>;
 }
 
 export const IntensivesContext = createContext<IntensiveContextType>({
@@ -32,11 +32,11 @@ interface IntensivesContextProviderProps {
 const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
   children,
 }) => {
-  const [intensives, setIntensives] = useState<Intensive[]>([]);
+  const [intensives, setIntensives] = useState<IIntensive[]>([]);
 
   const mapIntensivs = async (
     unmappedIntensivs: any[]
-  ): Promise<Intensive[]> => {
+  ): Promise<IIntensive[]> => {
     const mappedIntensives = await Promise.all(
       unmappedIntensivs.map(async (unmappedIntensiv: any) =>
         mapIntensiv(unmappedIntensiv)
@@ -45,7 +45,7 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
     return mappedIntensives;
   };
 
-  const mapIntensiv = async (unmappedIntensiv: any): Promise<Intensive> => {
+  const mapIntensiv = async (unmappedIntensiv: any): Promise<IIntensive> => {
     try {
       return {
         id: unmappedIntensiv.id,
@@ -76,14 +76,14 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
         { headers: await authHeader() }
       );
 
-      const mappedIntensives: Intensive[] = await mapIntensivs(
+      const mappedIntensives: IIntensive[] = await mapIntensivs(
         response.data.results
       );
       setIntensives(mappedIntensives);
     } catch (error) {}
   };
 
-  const getIntensiveById = async (intensiveId: number): Promise<Intensive> => {
+  const getIntensiveById = async (intensiveId: number): Promise<IIntensive> => {
     const intensivResponse = await axios.get(
       `${process.env.REACT_APP_BACKEND_URL}/intensives/${intensiveId}/`,
       { headers: await authHeader() }

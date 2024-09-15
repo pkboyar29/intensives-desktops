@@ -2,7 +2,7 @@ import { FC, useContext } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
-import { EducationRequest } from '../ts/types/EducationRequest';
+import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
 import { EducationRequestsContext } from '../context/EducationRequestsContext';
 
@@ -12,10 +12,10 @@ import Table from '../components/Table';
 const EducationRequestsPage: FC = () => {
   const navigate = useNavigate();
 
-  const educationRequests: EducationRequest[] = useContext(
+  const educationRequests: IEducationRequest[] = useContext(
     EducationRequestsContext
   );
-  const columnHelper = createColumnHelper<EducationRequest>();
+  const columnHelper = createColumnHelper<IEducationRequest>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',

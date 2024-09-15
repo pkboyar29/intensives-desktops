@@ -1,7 +1,7 @@
 import { FC, useContext } from 'react';
 import { Outlet, Link, useParams } from 'react-router-dom';
 
-import { Intensive } from '../../ts/types/Intensive';
+import { IIntensive } from '../../ts/interfaces/IIntensive';
 
 import Sidebar from '../../components/Sidebar';
 import { IntensivesContext } from '../../context/IntensivesContext';
@@ -10,8 +10,8 @@ const ManagerMainPage: FC = () => {
   const params = useParams();
 
   const { intensives } = useContext(IntensivesContext);
-  const currentIntensive: Intensive | undefined = intensives.find(
-    (intensive: Intensive) => intensive.id === Number(params.intensiveId)
+  const currentIntensive: IIntensive | undefined = intensives.find(
+    (intensive: IIntensive) => intensive.id === Number(params.intensiveId)
   );
 
   return (

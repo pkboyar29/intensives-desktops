@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { EventsContext } from '../context/EventsContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
-import { Event } from '../ts/types/Event';
+import { Event } from '../ts/interfaces/Event';
 
 import Title from '../components/Title';
 import Table from '../components/Table';

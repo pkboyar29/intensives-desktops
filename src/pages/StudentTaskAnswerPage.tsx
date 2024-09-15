@@ -1,12 +1,12 @@
 import { FC, useState, useEffect } from 'react';
 import Title from '../components/Title';
-import { Task } from '../ts/types/Task';
+import { ITask } from '../ts/interfaces/ITask';
 import { useParams } from 'react-router-dom';
 import PrimaryButton from '../components/PrimaryButton';
 
 const StudentTaskAnswerPage: FC = () => {
   const { taskId } = useParams();
-  const [taskInfo, setTaskInfo] = useState<Task>();
+  const [taskInfo, setTaskInfo] = useState<ITask>();
 
   useEffect(() => {
     loadTaskInfo();
@@ -14,7 +14,7 @@ const StudentTaskAnswerPage: FC = () => {
 
   function loadTaskInfo() {
     console.log(taskId);
-    const data: Task = {
+    const data: ITask = {
       name: 'Название задачи',
       desc: 'Описание задачи',
       finish_dt: new Date('2024-07-01'),

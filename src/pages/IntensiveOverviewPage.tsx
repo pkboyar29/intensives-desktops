@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Intensive } from '../ts/types/Intensive';
+import { IIntensive } from '../ts/interfaces/IIntensive';
 import { IntensivesContext } from '../context/IntensivesContext';
 import { TeamsContext } from '../context/TeamsContext';
 
@@ -12,7 +12,7 @@ import OverviewItem from '../components/OverviewItem';
 const IntensiveOverviewPage: FC = () => {
   const params = useParams();
   const [currentIntensive, setCurrentIntensive] = useState<
-    Intensive | undefined
+    IIntensive | undefined
   >(undefined);
   const { getIntensiveById } = useContext(IntensivesContext);
   const { currentTeam } = useContext(TeamsContext);
@@ -21,7 +21,7 @@ const IntensiveOverviewPage: FC = () => {
   useEffect(() => {
     const fetchDataForTeacher = async () => {
       if (params.intensiveId) {
-        const currentIntensive: Intensive = await getIntensiveById(
+        const currentIntensive: IIntensive = await getIntensiveById(
           parseInt(params.intensiveId, 10)
         );
         setCurrentIntensive(currentIntensive);
@@ -34,7 +34,7 @@ const IntensiveOverviewPage: FC = () => {
   useEffect(() => {
     const fetchDataForStudent = async () => {
       if (params.teamId) {
-        const currentIntensive: Intensive = await getIntensiveById(
+        const currentIntensive: IIntensive = await getIntensiveById(
           currentTeam.intensiveId
         );
         setCurrentIntensive(currentIntensive);

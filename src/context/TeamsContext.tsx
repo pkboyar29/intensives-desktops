@@ -1,16 +1,16 @@
 import { FC, ReactNode, createContext, useState } from 'react';
 import axios from 'axios';
 
-import { Team } from '../ts/types/Team';
+import { ITeam } from '../ts/interfaces/ITeam';
 import authHeader from '../helpers/getHeaders';
 
 interface TeamsContextType {
-  teams: Team[];
+  teams: ITeam[];
   getTeams: (intensiveId: number) => void;
-  getCurrentTeamForStudent: (studentId: number) => Promise<Team>;
-  currentTeam: Team;
+  getCurrentTeamForStudent: (studentId: number) => Promise<ITeam>;
+  currentTeam: ITeam;
   setCurrentTeamForStudent: (teamId: number) => void;
-  getTeamById: (teamId: number) => Promise<Team>;
+  getTeamById: (teamId: number) => Promise<ITeam>;
 }
 
 export const TeamsContext = createContext<TeamsContextType>({
@@ -53,8 +53,8 @@ interface TeamsContextProviderProps {
 }
 
 const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [currentTeam, setCurrentTeam] = useState<Team>({
+  const [teams, setTeams] = useState<ITeam[]>([]);
+  const [currentTeam, setCurrentTeam] = useState<ITeam>({
     id: 0,
     name: '',
     tutorId: null,
@@ -64,7 +64,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     intensiveId: 0,
   });
 
-  const mapTeams = async (unmappedTeams: any[]): Promise<Team[]> => {
+  const mapTeams = async (unmappedTeams: any[]): Promise<ITeam[]> => {
     const mappedTeams = await Promise.all(
       unmappedTeams.map(async (unmappedTeam: any) => mapTeam(unmappedTeam))
     );
@@ -72,7 +72,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     return mappedTeams;
   };
 
-  const mapTeam = async (unmappedTeam: any): Promise<Team> => {
+  const mapTeam = async (unmappedTeam: any): Promise<ITeam> => {
     let tutorNameSurname = 'Нету';
     let mentorNameSurname = 'Нету';
 
@@ -132,24 +132,26 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     const ourIntensiveTeams = allTeams.filter(
       (team: any) => team.intensive === intensiveId
     );
-    const mappedTeams: Team[] = await mapTeams(ourIntensiveTeams);
+    const mappedTeams: ITeam[] = await mapTeams(ourIntensiveTeams);
     setTeams(mappedTeams);
   };
 
-  const getTeamById = async (teamId: number): Promise<Team> => {
+  const getTeamById = async (teamId: number): Promise<ITeam> => {
     const teamResponse = await axios.get(
       `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`,
       { headers: await authHeader() }
     );
     const unmappedTeam = teamResponse.data;
 
-    const mappedTeam: Promise<Team> = mapTeam(unmappedTeam);
+    const mappedTeam: Promise<ITeam> = mapTeam(unmappedTeam);
     return mappedTeam;
   };
 
   // что возвращать, если текущей команды для студента нет, надо тут что-то возвращать и сообщать о том, что на данный момент нет никаких открытых интенсивов
   // например возвращать 0
-  const getCurrentTeamForStudent = async (studentId: number): Promise<Team> => {
+  const getCurrentTeamForStudent = async (
+    studentId: number
+  ): Promise<ITeam> => {
     const studentsWithRolesResponse = await axios.get(
       `${process.env.REACT_APP_BACKEND_URL}/role_of_students_on_intensives`,
       { headers: await authHeader() }
@@ -162,7 +164,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     );
     const currentTeamId = currentStudentWithRoleAndTeam.command;
 
-    const currentTeamPromise: Promise<Team> = getTeamById(currentTeamId);
+    const currentTeamPromise: Promise<ITeam> = getTeamById(currentTeamId);
     return await currentTeamPromise;
   };
 

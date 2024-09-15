@@ -2,7 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate, Link } from 'react-router-dom';
 
-import { Intensive } from '../ts/types/Intensive';
+import { IIntensive } from '../ts/interfaces/IIntensive';
 import { IntensivesContext } from '../context/IntensivesContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 
@@ -26,7 +26,7 @@ const IntensivesPage: FC = () => {
     fetchData();
   }, [currentUser]);
 
-  const columnHelper = createColumnHelper<Intensive>();
+  const columnHelper = createColumnHelper<IIntensive>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',

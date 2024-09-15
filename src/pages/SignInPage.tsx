@@ -6,8 +6,8 @@ import Cookies from 'js-cookie';
 
 import { CurrentUserContext } from '../context/CurrentUserContext';
 import { TeamsContext } from '../context/TeamsContext';
-import { User } from '../ts/types/User';
-import { Team } from '../ts/types/Team';
+import { IUser } from '../ts/interfaces/IUser';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 interface SignInProps {
   email: string;
@@ -40,17 +40,17 @@ const SignInPage: FC = () => {
       Cookies.set('refresh', response.data.refresh);
       Cookies.set('access', response.data.access);
 
-      const currentUserInfo: User = await updateCurrentUser();
+      const currentUserInfo: IUser = await updateCurrentUser();
       redirect(currentUserInfo);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const redirect = async (currentUser: User) => {
+  const redirect = async (currentUser: IUser) => {
     if (currentUser.user_role_id === 1) {
       if (currentUser.student_id) {
-        const currentTeam: Promise<Team> = getCurrentTeamForStudent(
+        const currentTeam: Promise<ITeam> = getCurrentTeamForStudent(
           currentUser.student_id
         );
         const currentTeamId = (await currentTeam).id;

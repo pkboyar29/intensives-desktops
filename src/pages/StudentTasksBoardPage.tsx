@@ -1,7 +1,7 @@
 import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
 import { FC } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { TaskTableRow } from '../ts/types/Task';
+import { ITaskTableRow } from '../ts/interfaces/ITask';
 import Title from '../components/Title';
 import Table from '../components/Table';
 import PrimaryButton from '../components/PrimaryButton';
@@ -11,7 +11,7 @@ import TasksTab from '../components/TasksTab/TasksTab';
 const StudentTasksBoardPage: FC = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const intensives: TaskTableRow[] = [
+  const intensives: ITaskTableRow[] = [
     {
       name: 'Задача 1',
       assignee: 0,
@@ -19,7 +19,7 @@ const StudentTasksBoardPage: FC = () => {
       status: 'To Do',
     },
   ];
-  const columnHelper = createColumnHelper<TaskTableRow>();
+  const columnHelper = createColumnHelper<ITaskTableRow>();
   const columns = [
     columnHelper.accessor('name', {
       header: () => 'Название',

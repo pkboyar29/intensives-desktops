@@ -8,7 +8,7 @@ import authHeader from '../helpers/getHeaders';
 import { EventsContext } from '../context/EventsContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import { Team } from '../ts/types/Team';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 import Title from '../components/Title';
 import OverviewContent from '../components/OverviewContent';
@@ -147,7 +147,7 @@ const EventOverviewPage: FC = () => {
             Прикрепленные команды
           </h2>
           <div className="mt-2 font-sans text-base text-bright_gray">
-            {currentEvent?.teams.map((team: Team) => (
+            {currentEvent?.teams.map((team: ITeam) => (
               <div key={team.id} className="flex items-center gap-8 mb-5">
                 <div key={team.id}>{team.name}</div>
                 {currentEvent?.isCurrentTeacherJury &&

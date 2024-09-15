@@ -1,4 +1,4 @@
-export type User = {
+export interface IUser {
   id: number;
   teacher_id: number | null;
   student_id: number | null;
@@ -7,4 +7,4 @@ export type User = {
   middle_name: string;
   email: string;
   user_role_id: number;
-};
+}

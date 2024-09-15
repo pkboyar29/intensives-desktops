@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import { CurrentUserContext } from './CurrentUserContext';
 
-import { Event } from '../ts/types/Event';
-import { Team } from '../ts/types/Team';
+import { Event } from '../ts/interfaces/Event';
+import { ITeam } from '../ts/interfaces/ITeam';
 import { TeamsContext } from './TeamsContext';
 import authHeader from '../helpers/getHeaders';
 
@@ -85,7 +85,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
         criteriasNamesPromises
       );
 
-      const teams: Team[] = unmappedEvent.commands.map(
+      const teams: ITeam[] = unmappedEvent.commands.map(
         async (teamId: number) => {
           const teamResponse = await axios.get(
             `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`,
@@ -185,7 +185,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
   const setEventsForTeam = async (teamId: number): Promise<void> => {
     try {
-      const team: Promise<Team> = getTeamById(teamId);
+      const team: Promise<ITeam> = getTeamById(teamId);
 
       const eventsResponse = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${

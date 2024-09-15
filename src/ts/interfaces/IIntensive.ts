@@ -1,4 +1,4 @@
-export type Intensive = {
+export interface IIntensive {
   id: number;
   name: string;
   description: string;
@@ -6,4 +6,4 @@ export type Intensive = {
   open_dt: Date;
   close_dt: Date;
   flow: string;
-};
+}

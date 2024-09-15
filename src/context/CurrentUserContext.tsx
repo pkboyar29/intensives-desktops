@@ -1,5 +1,5 @@
 import { createContext, FC, ReactNode, useState } from 'react';
-import { User } from '../ts/types/User';
+import { IUser } from '../ts/interfaces/IUser';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -10,8 +10,8 @@ interface CustomJwtPayload {
 }
 
 interface CurrentUserContextType {
-  currentUser: User | null;
-  updateCurrentUser: () => Promise<User>;
+  currentUser: IUser | null;
+  updateCurrentUser: () => Promise<IUser>;
   logOut: () => void;
 }
 
@@ -36,9 +36,9 @@ interface CurrentUserProviderProps {
 }
 
 const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
-  const [currentUserInfo, setCurrentUserInfo] = useState<User | null>(null);
+  const [currentUserInfo, setCurrentUserInfo] = useState<IUser | null>(null);
 
-  const updateCurrentUserInfo = async (): Promise<User> => {
+  const updateCurrentUserInfo = async (): Promise<IUser> => {
     const token = Cookies.get('access');
 
     if (token) {
@@ -76,7 +76,7 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
           teacher_id = ourTeacher.id;
         }
 
-        const user: User = {
+        const user: IUser = {
           id: userResponse.data.id,
           teacher_id: teacher_id,
           student_id: student_id,

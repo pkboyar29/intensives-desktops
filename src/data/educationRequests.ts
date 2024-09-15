@@ -1,6 +1,6 @@
-import { EducationRequest } from '../ts/types/EducationRequest';
+import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
-export const educationRequests: EducationRequest[] = [
+export const educationRequests: IEducationRequest[] = [
   {
     id: 1,
     subject: 'Нужен мастеркласс по Unity',

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { TeamsContext } from '../context/TeamsContext';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Team } from '../ts/types/Team';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 import Title from '../components/Title';
 import Table from '../components/Table';
@@ -23,7 +23,7 @@ const TeamsPage: FC = () => {
     fetchData();
   }, []);
 
-  const columnHelper = createColumnHelper<Team>();
+  const columnHelper = createColumnHelper<ITeam>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',

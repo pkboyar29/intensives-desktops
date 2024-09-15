@@ -3,15 +3,15 @@ import { EducationRequestsContext } from '../context/EducationRequestsContext';
 import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title';
-import { EducationRequest } from '../ts/types/EducationRequest';
+import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
 const EducationRequestOverviewPage: FC = () => {
-  const educationRequests: EducationRequest[] = useContext(
+  const educationRequests: IEducationRequest[] = useContext(
     EducationRequestsContext
   );
   const params = useParams();
-  const currentRequest: EducationRequest | undefined = educationRequests.find(
-    (request: EducationRequest) => request.id === Number(params.requestId)
+  const currentRequest: IEducationRequest | undefined = educationRequests.find(
+    (request: IEducationRequest) => request.id === Number(params.requestId)
   );
 
   return (

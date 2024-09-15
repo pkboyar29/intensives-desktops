@@ -1,6 +1,6 @@
-import { Task } from '../ts/types/Task';
+import { ITask } from '../ts/interfaces/ITask';
 
-export default function StudentTaskElem(props: Task) {
+export default function StudentTaskElem(props: ITask) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex space-x-4">

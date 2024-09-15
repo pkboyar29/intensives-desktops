@@ -1,6 +1,6 @@
-import { Team } from './Team';
+import { ITeam } from './ITeam';
 
-export type Event = {
+export interface Event {
   id: number;
   name: string;
   description: string;
@@ -15,7 +15,7 @@ export type Event = {
   resultTypeId: number;
   criterias: number[];
   criteriasNames: string[];
-  teams: Team[];
+  teams: ITeam[];
   teachers_command: number[];
   isCurrentTeacherJury: boolean;
-};
+}

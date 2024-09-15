@@ -1,11 +1,11 @@
 import { FC, createContext, ReactNode } from 'react';
 
-import { EducationRequest } from '../ts/types/EducationRequest';
+import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
-export const EducationRequestsContext = createContext<EducationRequest[]>([]);
+export const EducationRequestsContext = createContext<IEducationRequest[]>([]);
 
 interface EducationRequestsContextProviderProps {
-  educationRequests: EducationRequest[];
+  educationRequests: IEducationRequest[];
   children: ReactNode;
 }
 

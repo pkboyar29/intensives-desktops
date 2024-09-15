@@ -8,14 +8,14 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import Title from '../components/Title';
 
-import { Intensive } from '../ts/types/Intensive';
+import { IIntensive } from '../ts/interfaces/IIntensive';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
   const [currentIntensive, setCurrentIntensive] = useState<
-    Intensive | undefined
+    IIntensive | undefined
   >(undefined);
   const { getIntensiveById } = useContext(IntensivesContext);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -23,7 +23,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
   useEffect(() => {
     const fetchDataForManager = async () => {
       if (intensiveId) {
-        const currentIntensive: Intensive = await getIntensiveById(
+        const currentIntensive: IIntensive = await getIntensiveById(
           parseInt(intensiveId, 10)
         );
         setCurrentIntensive(currentIntensive);
