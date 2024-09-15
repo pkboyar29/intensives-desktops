@@ -7,6 +7,7 @@ import { IntensivesContext } from '../../context/IntensivesContext';
 import { useForm } from 'react-hook-form';
 
 import Title from '../Title';
+import InputDescription from '../InputDescription';
 
 interface ManageIntensiveFields {
   name: string;
@@ -117,21 +118,19 @@ const ManageIntensiveForm: FC = () => {
         <div className="py-3 text-lg font-bold">Интенсив</div>
 
         <div className="flex flex-col w-full gap-2 my-3 text-lg">
-          <div>Название интенсива</div>
-          <input
-            {...register('name')}
-            type="text"
-            className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+          <InputDescription
+            fieldName="name"
+            register={register}
+            description="Название интенсива"
             placeholder="Название интенсива"
           />
         </div>
 
         <div className="flex flex-col w-full gap-2 my-3 text-lg">
-          <div>Описание интенсива</div>
-          <input
-            {...register('description')}
-            type="text"
-            className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+          <InputDescription
+            fieldName="description"
+            register={register}
+            description="Описание интенсива"
             placeholder="Описание интенсива"
           />
         </div>
@@ -140,20 +139,22 @@ const ManageIntensiveForm: FC = () => {
 
         <div className="flex justify-between gap-2.5">
           <div className="flex flex-col w-full gap-2 my-3 text-lg">
-            <div>Дата начала</div>
-            <input
-              {...register('open_dt')}
+            <InputDescription
+              fieldName="open_dt"
+              register={register}
               type="date"
-              className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+              description="Дата начала"
+              placeholder="Дата начала"
             />
           </div>
 
           <div className="flex flex-col w-full gap-2 my-3 text-lg">
-            <div>Дата окончания</div>
-            <input
-              {...register('close_dt')}
+            <InputDescription
+              fieldName="close_dt"
+              register={register}
               type="date"
-              className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+              description="Дата окончания"
+              placeholder="Дата окончания"
             />
           </div>
         </div>
