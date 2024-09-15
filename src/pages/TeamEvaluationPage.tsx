@@ -49,8 +49,8 @@ const TeamEvaluationPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (params.intensiveId && params.eventId) {
-        await getTeams(parseInt(params.intensiveId, 10));
-        await setEventsForIntensiv(parseInt(params.intensiveId, 10));
+        getTeams(parseInt(params.intensiveId, 10));
+        setEventsForIntensiv(parseInt(params.intensiveId, 10));
       }
       await getCurrentAnswer();
       setIsLoading(false);
@@ -60,7 +60,7 @@ const TeamEvaluationPage: FC = () => {
 
   const getCurrentAnswer = async () => {
     const answersResponse = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/answers/`,
+      `${import.meta.env.VITE_BACKEND_URL}/answers/`,
       { headers: await authHeader() }
     );
     const allAnswers = answersResponse.data.results;
@@ -100,7 +100,7 @@ const TeamEvaluationPage: FC = () => {
         console.log(requestBody);
 
         const markResponse = await axios.post(
-          `${process.env.REACT_APP_BACKEND_URL}/marks/`,
+          `${import.meta.env.VITE_BACKEND_URL}/marks/`,
           requestBody,
           { headers: await authHeader() }
         );

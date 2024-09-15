@@ -72,7 +72,7 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
   const getIntensives = async (): Promise<void> => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/intensives/`,
+        `${import.meta.env.VITE_BACKEND_URL}/intensives/`,
         { headers: await authHeader() }
       );
 
@@ -85,7 +85,7 @@ const IntensivesProvider: FC<IntensivesContextProviderProps> = ({
 
   const getIntensiveById = async (intensiveId: number): Promise<IIntensive> => {
     const intensivResponse = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/intensives/${intensiveId}/`,
+      `${import.meta.env.VITE_BACKEND_URL}/intensives/${intensiveId}/`,
       { headers: await authHeader() }
     );
     const mappedIntensiv = mapIntensiv(intensivResponse.data);

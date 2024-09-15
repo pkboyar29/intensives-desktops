@@ -46,14 +46,14 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
         const decodedJwt = jwtDecode<CustomJwtPayload>(token);
         const currentUserId = decodedJwt.user_id;
         const userResponse = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/users/${currentUserId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/users/${currentUserId}`,
           { headers: await authHeader() }
         );
 
         let student_id = null;
         if (userResponse.data.role.id === 1) {
           const studentResponse = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL}/students/`,
+            `${import.meta.env.VITE_BACKEND_URL}/students/`,
             { headers: await authHeader() }
           );
           const allStudents = studentResponse.data.results;
@@ -66,7 +66,7 @@ const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
         let teacher_id = null;
         if (userResponse.data.role.id === 3) {
           const teachersResponse = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL}/teachers/`,
+            `${import.meta.env.VITE_BACKEND_URL}/teachers/`,
             { headers: await authHeader() }
           );
           const allTeachers = teachersResponse.data.results;

@@ -78,7 +78,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
 
     if (unmappedTeam.tutor) {
       const tutorResponse = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/teachers/${unmappedTeam.tutor}`,
+        `${import.meta.env.VITE_BACKEND_URL}/teachers/${unmappedTeam.tutor}`,
         { headers: await authHeader() }
       );
       tutorNameSurname = `${
@@ -89,7 +89,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     }
     if (unmappedTeam.mentor) {
       const mentorResponse = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/students/${unmappedTeam.mentor}`,
+        `${import.meta.env.VITE_BACKEND_URL}/students/${unmappedTeam.mentor}`,
         { headers: await authHeader() }
       );
       mentorNameSurname = `${
@@ -125,7 +125,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
 
   const getTeams = async (intensiveId: number) => {
     const allTeamsResponse = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/`,
+      `${import.meta.env.VITE_BACKEND_URL}/commands_on_intensives/`,
       { headers: await authHeader() }
     );
     const allTeams = allTeamsResponse.data.results;
@@ -138,7 +138,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
 
   const getTeamById = async (teamId: number): Promise<ITeam> => {
     const teamResponse = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/${teamId}/`,
+      `${import.meta.env.VITE_BACKEND_URL}/commands_on_intensives/${teamId}/`,
       { headers: await authHeader() }
     );
     const unmappedTeam = teamResponse.data;
@@ -153,7 +153,7 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
     studentId: number
   ): Promise<ITeam> => {
     const studentsWithRolesResponse = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/role_of_students_on_intensives`,
+      `${import.meta.env.VITE_BACKEND_URL}/role_of_students_on_intensives`,
       { headers: await authHeader() }
     );
     const allStudentsWithRoles = studentsWithRolesResponse.data.results;

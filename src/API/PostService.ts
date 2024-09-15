@@ -4,7 +4,7 @@ import authHeader from '../helpers/getHeaders';
 export default class PostService {
   static async getStudenRoles(): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`,
+      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/`,
       { headers: await authHeader() }
     );
     return response;
@@ -14,7 +14,9 @@ export default class PostService {
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/commands_on_intensives/?intensive=${intensiveId}`,
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/commands_on_intensives/?intensive=${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;
@@ -24,7 +26,9 @@ export default class PostService {
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/teachers_on_intensives/?intensive=${intensiveId}`,
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/teachers_on_intensives/?intensive=${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;
@@ -32,7 +36,7 @@ export default class PostService {
 
   static async getAudiences(): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/auditories/`,
+      `${import.meta.env.VITE_BACKEND_URL}/auditories/`,
       { headers: await authHeader() }
     );
     return response;
@@ -40,7 +44,7 @@ export default class PostService {
 
   static async getStages(): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/stages/`,
+      `${import.meta.env.VITE_BACKEND_URL}/stages/`,
       { headers: await authHeader() }
     );
     return response;
@@ -53,7 +57,7 @@ export default class PostService {
     close_dt: string
   ): Promise<AxiosResponse<any>> {
     const response = await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/intensives/`,
+      `${import.meta.env.VITE_BACKEND_URL}/intensives/`,
       {
         university: 1,
         name,
@@ -80,7 +84,7 @@ export default class PostService {
     close_dt: string
   ): Promise<AxiosResponse<any>> {
     const response = await axios.patch(
-      `${process.env.REACT_APP_BACKEND_URL}/intensives/${id}/`,
+      `${import.meta.env.VITE_BACKEND_URL}/intensives/${id}/`,
       {
         name,
         description,
@@ -110,7 +114,7 @@ export default class PostService {
     commands: Array<any>
   ): Promise<AxiosResponse<any>> {
     const response = await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/events/`,
+      `${import.meta.env.VITE_BACKEND_URL}/events/`,
       {
         name,
         description,
@@ -144,7 +148,7 @@ export default class PostService {
     typeResult?: number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.patch(
-      `${process.env.REACT_APP_BACKEND_URL}/events/${eventId}/`,
+      `${import.meta.env.VITE_BACKEND_URL}/events/${eventId}/`,
       {
         name,
         description,
@@ -165,7 +169,7 @@ export default class PostService {
 
   static async postStudentsRole(name: string): Promise<AxiosResponse<any>> {
     const response = await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/`,
+      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/`,
       { name },
       { headers: await authHeader() }
     );
@@ -176,7 +180,7 @@ export default class PostService {
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.delete(
-      `${process.env.REACT_APP_BACKEND_URL}/roles_on_intensives/${intensiveId}/`,
+      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/${intensiveId}/`,
       { headers: await authHeader() }
     );
     return response;
@@ -186,7 +190,7 @@ export default class PostService {
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.delete(
-      `${process.env.REACT_APP_BACKEND_URL}/intensives/${intensiveId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/intensives/${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;
@@ -194,7 +198,7 @@ export default class PostService {
 
   static async getEvents(intensiveId: string | number): Promise<any> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/events/?intensiv=${intensiveId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/events/?intensiv=${intensiveId}`,
       { headers: await authHeader() }
     );
     return response.data;
@@ -202,7 +206,7 @@ export default class PostService {
 
   static async getEvent(eventId: string | number): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/events/${eventId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/events/${eventId}`,
       { headers: await authHeader() }
     );
     return response;
@@ -212,7 +216,7 @@ export default class PostService {
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
     const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/statistics/intensiv/${intensiveId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/statistics/intensiv/${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;

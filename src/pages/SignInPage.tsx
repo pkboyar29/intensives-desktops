@@ -33,17 +33,16 @@ const SignInPage: FC = () => {
     console.log(data);
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/token/`,
+        `${import.meta.env.VITE_BACKEND_URL}/token/`,
         data
       );
-      console.log(response.data);
       Cookies.set('refresh', response.data.refresh);
       Cookies.set('access', response.data.access);
 
       const currentUserInfo: IUser = await updateCurrentUser();
       redirect(currentUserInfo);
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   };
 
