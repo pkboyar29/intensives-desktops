@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Intensive } from '../utils/types/Intensive';
+import { Intensive } from '../ts/types/Intensive';
 import { IntensivesContext } from '../context/IntensivesContext';
 import { TeamsContext } from '../context/TeamsContext';
 

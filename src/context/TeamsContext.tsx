@@ -1,8 +1,8 @@
 import { FC, ReactNode, createContext, useState } from 'react';
 import axios from 'axios';
 
-import { Team } from '../utils/types/Team';
-import authHeader from '../utils/getHeaders';
+import { Team } from '../ts/types/Team';
+import authHeader from '../helpers/getHeaders';
 
 interface TeamsContextType {
   teams: Team[];

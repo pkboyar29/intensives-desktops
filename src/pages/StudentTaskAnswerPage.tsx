@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import Title from '../components/Title';
-import { Task } from '../utils/types/Task';
+import { Task } from '../ts/types/Task';
 import { useParams } from 'react-router-dom';
 import PrimaryButton from '../components/PrimaryButton';
 

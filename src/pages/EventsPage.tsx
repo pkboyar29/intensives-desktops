@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { EventsContext } from '../context/EventsContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
-import { Event } from '../utils/types/Event';
+import { Event } from '../ts/types/Event';
 
 import Title from '../components/Title';
 import Table from '../components/Table';
@@ -31,7 +31,7 @@ const EventsPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (params.teamId && currentUser) {
-        await setEventsForTeam(parseInt(params.teamId));
+        setEventsForTeam(parseInt(params.teamId));
         setIsLoading(false);
       }
     };

@@ -2,7 +2,7 @@ import { FC, useContext } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
-import { EducationRequest } from '../utils/types/EducationRequest';
+import { EducationRequest } from '../ts/types/EducationRequest';
 
 import { EducationRequestsContext } from '../context/EducationRequestsContext';
 

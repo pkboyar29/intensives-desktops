@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
-import authHeader from '../utils/getHeaders';
+import authHeader from '../helpers/getHeaders';
 
 import { EventsContext } from '../context/EventsContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 
-import { Team } from '../utils/types/Team';
+import { Team } from '../ts/types/Team';
 
 import Title from '../components/Title';
 import OverviewContent from '../components/OverviewContent';

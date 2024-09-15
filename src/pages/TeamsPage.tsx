@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { TeamsContext } from '../context/TeamsContext';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Team } from '../utils/types/Team';
+import { Team } from '../ts/types/Team';
 
 import Title from '../components/Title';
 import Table from '../components/Table';

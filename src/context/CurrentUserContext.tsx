@@ -1,9 +1,9 @@
 import { createContext, FC, ReactNode, useState } from 'react';
-import { User } from '../utils/types/User';
+import { User } from '../ts/types/User';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import authHeader from '../utils/getHeaders';
+import authHeader from '../helpers/getHeaders';
 
 interface CustomJwtPayload {
   user_id: number;

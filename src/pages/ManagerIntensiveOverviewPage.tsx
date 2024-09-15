@@ -8,7 +8,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import Title from '../components/Title';
 
-import { Intensive } from '../utils/types/Intensive';
+import { Intensive } from '../ts/types/Intensive';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const { intensiveId } = useParams();

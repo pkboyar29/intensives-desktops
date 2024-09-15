@@ -1,4 +1,4 @@
-import { EducationRequest } from '../utils/types/EducationRequest';
+import { EducationRequest } from '../ts/types/EducationRequest';
 
 export const educationRequests: EducationRequest[] = [
   {

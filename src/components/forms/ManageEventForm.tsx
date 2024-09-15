@@ -4,7 +4,6 @@ import PostService from '../../API/PostService';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 
-import { convertBackDateFormat } from '../../utils';
 import {
   transformISODateToTime,
   transformSeparateDateAndTimeToISO,
@@ -115,8 +114,8 @@ const ManageEventForm: FC = () => {
 
         setValue('name', event.name);
         setValue('description', event.description);
-        setValue('dateStart', convertBackDateFormat(event.start_dt));
-        setValue('dateEnd', convertBackDateFormat(event.finish_dt));
+        setValue('dateStart', event.start_dt.split('T')[0]);
+        setValue('dateEnd', event.finish_dt.split('T')[0]);
         setValue('timeStart', transformISODateToTime(event.start_dt));
         setValue('timeEnd', transformISODateToTime(event.finish_dt));
         setValue('audience', event.auditory);

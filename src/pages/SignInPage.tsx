@@ -6,8 +6,8 @@ import Cookies from 'js-cookie';
 
 import { CurrentUserContext } from '../context/CurrentUserContext';
 import { TeamsContext } from '../context/TeamsContext';
-import { User } from '../utils/types/User';
-import { Team } from '../utils/types/Team';
+import { User } from '../ts/types/User';
+import { Team } from '../ts/types/Team';
 
 interface SignInProps {
   email: string;

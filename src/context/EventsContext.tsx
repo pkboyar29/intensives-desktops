@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { CurrentUserContext } from './CurrentUserContext';
 
-import { Event } from '../utils/types/Event';
-import { Team } from '../utils/types/Team';
+import { Event } from '../ts/types/Event';
+import { Team } from '../ts/types/Team';
 import { TeamsContext } from './TeamsContext';
-import authHeader from '../utils/getHeaders';
+import authHeader from '../helpers/getHeaders';
 
 interface EventsContextType {
   events: Event[];

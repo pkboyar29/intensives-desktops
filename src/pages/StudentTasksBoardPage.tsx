@@ -1,7 +1,7 @@
 import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
 import { FC } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { TaskTableRow } from '../utils/types/Task';
+import { TaskTableRow } from '../ts/types/Task';
 import Title from '../components/Title';
 import Table from '../components/Table';
 import PrimaryButton from '../components/PrimaryButton';

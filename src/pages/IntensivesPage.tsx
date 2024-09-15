@@ -2,7 +2,7 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate, Link } from 'react-router-dom';
 
-import { Intensive } from '../utils/types/Intensive';
+import { Intensive } from '../ts/types/Intensive';
 import { IntensivesContext } from '../context/IntensivesContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import authHeader from '../utils/getHeaders';
+import authHeader from '../helpers/getHeaders';
 
 export default class PostService {
   static async getStudenRoles() {

@@ -1,8 +1,8 @@
 import { FC, ReactNode, createContext, useState } from 'react';
 import axios from 'axios';
-import { Intensive } from '../utils/types/Intensive';
+import { Intensive } from '../ts/types/Intensive';
 
-import authHeader from '../utils/getHeaders';
+import authHeader from '../helpers/getHeaders';
 
 interface IntensiveContextType {
   intensives: Intensive[];
