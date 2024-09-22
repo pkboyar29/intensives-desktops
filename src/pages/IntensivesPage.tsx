@@ -13,8 +13,19 @@ const IntensivesPage: FC = () => {
   const navigate = useNavigate();
 
   const { intensives, getIntensives } = useContext(IntensivesContext);
+  const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
+    []
+  );
+
+  useEffect(() => {
+    setFilteredIntensives(intensives);
+    setSearchText('');
+  }, [intensives]);
+
   const { currentUser } = useContext(CurrentUserContext);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +70,16 @@ const IntensivesPage: FC = () => {
     }
   };
 
+  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+
+    setFilteredIntensives(
+      intensives.filter((intensive) =>
+        intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-[1280px]">
@@ -92,17 +113,23 @@ const IntensivesPage: FC = () => {
 
         <div className="mt-3">
           <input
+            value={searchText}
+            onChange={searchInputChangeHandler}
             className="w-full py-3 px-4 bg-[#f0f2f5] rounded-xl"
             placeholder="Поиск"
           />
         </div>
 
         <div className="mt-10">
-          <Table
-            onClick={intensiveClickHandler}
-            columns={columns}
-            data={intensives}
-          />
+          {filteredIntensives.length !== 0 ? (
+            <Table
+              onClick={intensiveClickHandler}
+              columns={columns}
+              data={filteredIntensives}
+            />
+          ) : (
+            <div className="text-xl font-bold">Ничего не найдено</div>
+          )}
         </div>
       </div>
     </div>

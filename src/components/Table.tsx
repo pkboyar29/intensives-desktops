@@ -15,7 +15,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
   const table = useReactTable({
     data,
     columns,
-    debugTable: true,
+    debugTable: false,
     getCoreRowModel: getCoreRowModel(),
   });
 
