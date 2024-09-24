@@ -62,10 +62,10 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.user_role_id === 2) {
+    if (currentUser?.roleId === 2) {
       navigate(`/manager/${id}/overview`);
     }
-    if (currentUser?.user_role_id === 3) {
+    if (currentUser?.roleId === 3) {
       navigate(`/teacher/${id}/overview`);
     }
   };
@@ -103,7 +103,7 @@ const IntensivesPage: FC = () => {
           <Title text="Интенсивы" />
         </div>
 
-        {currentUser?.user_role_id === 2 && (
+        {currentUser?.roleId === 2 && (
           <div className="flex justify-end mt-10">
             <button className="ml-auto text-white bg-[#1a5ce5] py-2 px-4 rounded-xl">
               <Link to="/createIntensive">Создать интенсив</Link>

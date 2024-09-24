@@ -1,12 +1,12 @@
 import { FC, ReactNode } from 'react';
 
-import { educationRequests } from '../data/educationRequests';
-
 import IntensivesProvider from '../context/IntensivesContext';
-import EducationRequestsProvider from '../context/EducationRequestsContext';
 import EventsProvider from '../context/EventsContext';
 import CurrentUserProvider from '../context/CurrentUserContext';
 import TeamsProvider from '../context/TeamsContext';
+
+import { Provider } from 'react-redux';
+import { store } from '../redux/store';
 
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -20,11 +20,11 @@ const AppProviders: FC<AppProvidersProps> = ({ children }) => {
     <CurrentUserProvider>
       <IntensivesProvider>
         <TeamsProvider>
-          <EducationRequestsProvider educationRequests={educationRequests}>
-            <EventsProvider>
+          <EventsProvider>
+            <Provider store={store}>
               <DndProvider backend={HTML5Backend}>{children}</DndProvider>/
-            </EventsProvider>
-          </EducationRequestsProvider>
+            </Provider>
+          </EventsProvider>
         </TeamsProvider>
       </IntensivesProvider>
     </CurrentUserProvider>

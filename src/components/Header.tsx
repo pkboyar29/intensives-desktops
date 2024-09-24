@@ -1,15 +1,22 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '../redux/store';
+import { resetUserState } from '../redux/slices/userSlice';
 
-import { CurrentUserContext } from '../context/CurrentUserContext';
+import Cookies from 'js-cookie';
 
 const Header: FC = () => {
   const navigate = useNavigate();
 
-  const { currentUser, logOut } = useContext(CurrentUserContext);
+  const currentUser = useAppSelector((state) => state.user.data);
+  const dispatch = useAppDispatch();
 
   const onButtonClick = () => {
-    logOut();
+    Cookies.remove('access');
+    Cookies.remove('refresh');
+
+    dispatch(resetUserState());
+
     navigate('/sign-in');
   };
 
@@ -25,9 +32,7 @@ const Header: FC = () => {
           </div>
           {currentUser && (
             <div className="flex items-center gap-6 font-sans text-lg">
-              <div>
-                {`${currentUser?.first_name}  ${currentUser?.last_name}`}
-              </div>
+              <div>{`${currentUser?.firstName}  ${currentUser?.lastName}`}</div>
               <button
                 onClick={onButtonClick}
                 className="px-5 py-2 text-base font-bold text-white rounded-xl bg-blue"

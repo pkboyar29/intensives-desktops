@@ -1,16 +1,13 @@
-import { FC, useEffect, useContext } from 'react';
+import { FC } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { CurrentUserContext } from '../context/CurrentUserContext';
+
+import { useGetUserQuery } from '../redux/api/userApi';
 
 import Header from '../components/Header';
 import routeConfig from '../router/routeConfig';
 
 const App: FC = () => {
-  const { updateCurrentUser } = useContext(CurrentUserContext);
-
-  useEffect(() => {
-    updateCurrentUser();
-  }, []);
+  useGetUserQuery();
 
   return (
     <div className="App">

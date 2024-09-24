@@ -1,62 +1,50 @@
-import { FC, useContext, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { CurrentUserContext } from '../context/CurrentUserContext';
-import { TeamsContext } from '../context/TeamsContext';
-import { IUser } from '../ts/interfaces/IUser';
-import { ITeam } from '../ts/interfaces/ITeam';
+import { ISignIn } from '../ts/interfaces/IUser';
 
-interface SignInProps {
-  email: string;
-  password: string;
-}
+import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
+import { useAppSelector } from '../redux/store';
 
 const SignInPage: FC = () => {
-  const { currentUser, updateCurrentUser } = useContext(CurrentUserContext);
-  const { getCurrentTeamForStudent } = useContext(TeamsContext);
+  const [signIn, { error: signInError }] = useSignInMutation();
+  const [trigger] = useLazyGetUserQuery();
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const navigate = useNavigate();
 
-  const { handleSubmit, register } = useForm<SignInProps>({
+  const { handleSubmit, register } = useForm<ISignIn>({
     mode: 'onBlur',
   });
 
   useEffect(() => {
     if (currentUser) {
-      redirect(currentUser);
+      redirect(currentUser.roleId);
     }
   }, [currentUser]);
 
-  const onSubmit = async (data: SignInProps) => {
-    console.log(data);
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/token/`,
-        data
-      );
-      Cookies.set('refresh', response.data.refresh);
-      Cookies.set('access', response.data.access);
-
-      const currentUserInfo: IUser = await updateCurrentUser();
-      redirect(currentUserInfo);
-    } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    if (signInError) {
+      console.log(signInError);
     }
+  }, [signInError]);
+
+  const onSubmit = async (data: ISignIn) => {
+    const signInDataResponse = await signIn(data).unwrap();
+
+    Cookies.set('access', signInDataResponse.access);
+    Cookies.set('refresh', signInDataResponse.refresh);
+
+    trigger();
   };
 
-  const redirect = async (currentUser: IUser) => {
-    if (currentUser.user_role_id === 1) {
-      if (currentUser.student_id) {
-        const currentTeam: Promise<ITeam> = getCurrentTeamForStudent(
-          currentUser.student_id
-        );
-        const currentTeamId = (await currentTeam).id;
-        navigate(`/student/${currentTeamId}/overview`);
-      }
+  const redirect = (roleId: number) => {
+    if (roleId === 1) {
+      navigate('/intensives');
     } else {
-      // if user_role_id == 2 or 3 or 4
+      // if roleId == 2 or 3 or 4
       navigate('/intensives');
     }
   };
