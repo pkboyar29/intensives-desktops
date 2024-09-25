@@ -7,3 +7,8 @@ export interface ITeam {
   mentorNameSurname: string | null;
   intensiveId: number;
 }
+
+export interface ITeamToChoose {
+  id: number;
+  name: string;
+}

@@ -9,10 +9,14 @@ import {
   transformSeparateDateAndTimeToISO,
 } from '../../helpers/dateHelpers';
 
+import { useLazyGetTeamsOnIntensiveQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
+import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherOnIntensiveApi';
 
 import { IStage } from '../../ts/interfaces/IStage';
+import { IAudience } from '../../ts/interfaces/IAudience';
+import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
 import Select from '../Select';
 import InputRadioDescription from '../InputRadioDescription';
@@ -21,7 +25,6 @@ import InputDescription from '../InputDescription';
 import ChooseModal from '../ChooseModal';
 import Title from '../Title';
 import Skeleton from 'react-loading-skeleton';
-import { IAudience } from '../../ts/interfaces/IAudience';
 
 interface ManageEventFormFields {
   name: string;
@@ -42,13 +45,15 @@ const ManageEventForm: FC = () => {
   const [getStages, { isLoading: isGetStagesLoading }] =
     useLazyGetStagesQuery();
   const [getAudiences] = useLazyGetAudiencesQuery();
+  const [getTeams] = useLazyGetTeamsOnIntensiveQuery();
+  const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
 
   const [teamsToChoose, setTeamsToChoose] = useState<any[]>([]);
   const [teachersToChoose, setTeachersToChoose] = useState<any[]>([]);
   const [stagesToChoose, setStagesToChoose] = useState<IStage[]>([]);
   const [audiencesToChoose, setAudiencesToChoose] = useState<IAudience[]>([]);
 
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<ITeamToChoose[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
 
   const [typeScore, setTypeScore] = useState<number>(1);
@@ -66,28 +71,22 @@ const ManageEventForm: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (intensiveId) {
-        const { data: teams } = await PostService.getCommandsOnIntensive(
-          intensiveId
+        const { data: teams } = await getTeams(Number(intensiveId));
+        const { data: teachers } = await getTeachersOnIntensive(
+          Number(intensiveId)
         );
-        const { data: teachers } = await PostService.getTeachersOnIntensive(
-          intensiveId
-        );
+        console.log('teachers are');
+        console.log(teachers);
         const { data: audiencies } = await getAudiences();
-        console.log('audiences are ...');
-        console.log(audiencies);
         const { data: stages } = await getStages();
 
-        setTeamsToChoose(
-          teams.results.map((team: any) => {
-            return { id: team.id, name: team.name };
-          })
-        );
+        if (teams) {
+          setTeamsToChoose(teams);
+        }
 
-        setTeachersToChoose(
-          teachers.results.map((teacher: any) => {
-            return { id: teacher.id, name: teacher.teacher.user.last_name };
-          })
-        );
+        if (teachers) {
+          setTeachersToChoose(teachers);
+        }
 
         // setCommands(filterIncludeObjectsByNames(teams, event.commands));
         // setResponseCommands(filterIncludeObjectsByNames(teams, event.commands));

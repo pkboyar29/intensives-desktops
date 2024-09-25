@@ -2,30 +2,6 @@ import axios, { AxiosResponse } from 'axios';
 import authHeader from '../helpers/getHeaders';
 
 export default class PostService {
-  static async getCommandsOnIntensive(
-    intensiveId: string | number
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_BACKEND_URL
-      }/commands_on_intensives/?intensive=${intensiveId}`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async getTeachersOnIntensive(
-    intensiveId: string | number
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_BACKEND_URL
-      }/teachers_on_intensives/?intensive=${intensiveId}`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
   static async createEvent(
     intensiveId: string | number,
     name: string,
@@ -102,16 +78,6 @@ export default class PostService {
   static async getEvent(eventId: string | number): Promise<AxiosResponse<any>> {
     const response = await axios.get(
       `${import.meta.env.VITE_BACKEND_URL}/events/${eventId}`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async getStatisticsIntensiv(
-    intensiveId: string | number
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/statistics/intensiv/${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;
