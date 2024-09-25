@@ -83,7 +83,7 @@ export const intensiveApi = createApi({
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
-    deleteIntensive: builder.mutation<any, number>({
+    deleteIntensive: builder.mutation<void, number>({
       query: (id) => ({
         url: `/intensives/${id}/`,
         method: 'DELETE',

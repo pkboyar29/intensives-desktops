@@ -1,44 +1,59 @@
 import { FC, useEffect, useState } from 'react';
-import PostService from '../API/PostService';
 import Skeleton from 'react-loading-skeleton';
+
+import {
+  useGetStudentRolesQuery,
+  useCreateStudentRoleMutation,
+  useDeleteStudentRoleMutation,
+} from '../redux/api/studentRoleApi';
+
+import { IStudentRole } from '../ts/interfaces/IStudentRole';
 
 import Title from '../components/Title';
 import Tag from '../components/Tag';
 
 const ManageRolesPage: FC = () => {
-  const [roles, setRoles] = useState<any[]>([]);
-  const [currentRole, setCurrentRole] = useState<string>('');
+  const [studentRoles, setStudentRoles] = useState<IStudentRole[]>([]);
+  const [inputString, setInputString] = useState<string>('');
+
+  const {
+    data: studentRolesResponseData,
+    isSuccess: isSuccessGetStudentRoles,
+  } = useGetStudentRolesQuery();
+  const [createStudentRole] = useCreateStudentRoleMutation();
+  const [deleteStudentRole] = useDeleteStudentRoleMutation();
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (isSuccessGetStudentRoles) {
+      setStudentRoles(studentRolesResponseData);
+    }
+  }, [isSuccessGetStudentRoles]);
+
+  const addRole = async () => {
+    if (inputString.length !== 0) {
       try {
-        const { data } = await PostService.getStudenRoles();
-        setRoles(data.results);
+        const response = await createStudentRole({ name: inputString });
+
+        if (response.data) {
+          setStudentRoles([...studentRoles, response.data]);
+          setInputString('');
+        }
       } catch (e) {
         console.log(e);
       }
-    };
-    fetchData();
-  }, []);
-
-  const addRole = async () => {
-    try {
-      const { data } = await PostService.postStudentsRole(currentRole);
-      setRoles([...roles, data]);
-      setCurrentRole('');
-    } catch (e) {
-      console.log(e);
     }
   };
 
   const deleteRole = async (id: number) => {
     try {
-      await PostService.deleteStudentsRole(id);
-      setRoles(roles.filter((elem) => elem.id !== id));
+      await deleteStudentRole(id);
+      setStudentRoles(
+        studentRoles.filter((studentRole) => studentRole.id !== id)
+      );
+      setInputString('');
     } catch (e) {
       console.log(e);
     }
-    setCurrentRole('');
   };
 
   const addRoleButtonClickHandler = () => {
@@ -46,7 +61,7 @@ const ManageRolesPage: FC = () => {
   };
 
   const roleInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentRole(e.target.value);
+    setInputString(e.target.value);
   };
 
   const roleTagCloseHandler = (id: number) => {
@@ -61,8 +76,8 @@ const ManageRolesPage: FC = () => {
         <div className="flex flex-col gap-6 mt-6">
           <div className="text-xl font-bold">Все роли</div>
           <div className="flex flex-wrap gap-[5px]">
-            {roles.length > 0 ? (
-              roles
+            {studentRoles.length > 0 ? (
+              studentRoles
                 .filter((res) => res.for_student)
                 .map((elem) => (
                   <Tag
@@ -81,7 +96,7 @@ const ManageRolesPage: FC = () => {
             <div className="text-lg">Название роли</div>
             <input
               type="text"
-              value={currentRole}
+              value={inputString}
               className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-lg"
               onChange={roleInputChangeHandler}
               placeholder="Введите название роли"

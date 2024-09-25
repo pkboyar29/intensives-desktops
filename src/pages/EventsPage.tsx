@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { EventsContext } from '../context/EventsContext';
 import { CurrentUserContext } from '../context/CurrentUserContext';
-import { Event } from '../ts/interfaces/Event';
+import { IEvent } from '../ts/interfaces/IEvent';
 
 import Title from '../components/Title';
 import Table from '../components/Table';
@@ -38,7 +38,7 @@ const EventsPage: FC = () => {
     fetchData();
   }, [currentUser, params.teamId]);
 
-  const columnHelper = createColumnHelper<Event>();
+  const columnHelper = createColumnHelper<IEvent>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',

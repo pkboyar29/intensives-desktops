@@ -80,7 +80,7 @@ const EventOverviewPage: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (params.eventId) {
-        await setCurrentEventById(parseInt(params.eventId));
+        setCurrentEventById(parseInt(params.eventId));
 
         if (params.teamId) {
           const allAnswersResponse = await axios.get(
@@ -95,7 +95,7 @@ const EventOverviewPage: FC = () => {
           );
           if (currentAnswer) {
             reset({ textAnswer: currentAnswer.text });
-            await setCurrentAnswer(currentAnswer);
+            setCurrentAnswer(currentAnswer);
           }
           // console.log('текущий ответ это ', currentAnswer)
         }
@@ -152,7 +152,7 @@ const EventOverviewPage: FC = () => {
                 <div key={team.id}>{team.name}</div>
                 {currentEvent?.isCurrentTeacherJury &&
                   currentEvent.markStrategyId !== 1 &&
-                  currentUser?.user_role_id === 3 && (
+                  currentUser?.roleId === 3 && (
                     <button
                       onClick={() =>
                         navigate(
@@ -169,41 +169,40 @@ const EventOverviewPage: FC = () => {
           </div>
         </div>
 
-        {currentUser?.user_role_id === 1 &&
-          currentEvent?.resultTypeId !== 1 && (
-            <>
-              <h2 className="font-sans text-xl font-bold text-black">
-                Отправка ответа
-              </h2>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-3 w-[500px]"
-              >
-                <textarea
-                  className="p-3 font-sans text-base border border-solid border-gray rounded-xl h-36"
-                  placeholder="Введите текстовый ответ"
-                  {...register('textAnswer')}
-                />
-                <div className="flex self-end gap-4">
-                  {currentAnswer && (
-                    <button
-                      type="button"
-                      onClick={deleteAnswer}
-                      className="self-end px-5 py-3 mb-10 font-bold text-white font-inter rounded-xl bg-red w-36"
-                    >
-                      Удалить
-                    </button>
-                  )}
+        {currentUser?.roleId === 1 && currentEvent?.resultTypeId !== 1 && (
+          <>
+            <h2 className="font-sans text-xl font-bold text-black">
+              Отправка ответа
+            </h2>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-3 w-[500px]"
+            >
+              <textarea
+                className="p-3 font-sans text-base border border-solid border-gray rounded-xl h-36"
+                placeholder="Введите текстовый ответ"
+                {...register('textAnswer')}
+              />
+              <div className="flex self-end gap-4">
+                {currentAnswer && (
                   <button
-                    type="submit"
-                    className="self-end px-5 py-3 mb-10 font-bold text-white font-inter rounded-xl bg-blue w-36"
+                    type="button"
+                    onClick={deleteAnswer}
+                    className="self-end px-5 py-3 mb-10 font-bold text-white font-inter rounded-xl bg-red w-36"
                   >
-                    {currentAnswer ? 'Обновить' : 'Отправить'}
+                    Удалить
                   </button>
-                </div>
-              </form>
-            </>
-          )}
+                )}
+                <button
+                  type="submit"
+                  className="self-end px-5 py-3 mb-10 font-bold text-white font-inter rounded-xl bg-blue w-36"
+                >
+                  {currentAnswer ? 'Обновить' : 'Отправить'}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </OverviewContent>
     </>
   );

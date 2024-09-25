@@ -1,6 +1,6 @@
 import { ITeam } from './ITeam';
 
-export interface Event {
+export interface IEvent {
   id: number;
   name: string;
   description: string;

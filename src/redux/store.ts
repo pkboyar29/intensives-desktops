@@ -7,6 +7,7 @@ import teamReducer from './slices/teamSlice';
 
 import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
+import { studentRoleApi } from './api/studentRoleApi';
 
 export const store = configureStore({
   reducer: {
@@ -16,9 +17,14 @@ export const store = configureStore({
     // is it necessary to do it below?
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
+    [studentRoleApi.reducerPath]: studentRoleApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userApi.middleware, intensiveApi.middleware),
+    getDefaultMiddleware().concat(
+      userApi.middleware,
+      intensiveApi.middleware,
+      studentRoleApi.middleware
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

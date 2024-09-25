@@ -2,14 +2,6 @@ import axios, { AxiosResponse } from 'axios';
 import authHeader from '../helpers/getHeaders';
 
 export default class PostService {
-  static async getStudenRoles(): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
   static async getCommandsOnIntensive(
     intensiveId: string | number
   ): Promise<AxiosResponse<any>> {
@@ -110,25 +102,6 @@ export default class PostService {
         commands: commands || [],
         teachers_command: teachers || [],
       },
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async postStudentsRole(name: string): Promise<AxiosResponse<any>> {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/`,
-      { name },
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async deleteStudentsRole(
-    intensiveId: string | number
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/${intensiveId}/`,
       { headers: await authHeader() }
     );
     return response;

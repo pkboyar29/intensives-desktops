@@ -42,7 +42,7 @@ const intensiveSlice = createSlice({
       .addMatcher(
         intensiveApi.endpoints.deleteIntensive.matchFulfilled,
         (state) => {
-          // state.data = null;
+          state.data = null;
         }
       );
   },
