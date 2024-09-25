@@ -1,26 +1,30 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { Outlet, NavLink, Link, useParams } from 'react-router-dom';
 
-import { IIntensive } from '../../ts/interfaces/IIntensive';
+import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
 import Sidebar from '../../components/Sidebar';
-import { IntensivesContext } from '../../context/IntensivesContext';
+import Skeleton from 'react-loading-skeleton';
 
 const TeacherMainPage: FC = () => {
   const params = useParams();
 
-  const { intensives } = useContext(IntensivesContext);
-  const currentIntensive: IIntensive | undefined = intensives.find(
-    (intensive: IIntensive) => intensive.id === Number(params.intensiveId)
+  const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
+    Number(params.intensiveId)
   );
 
   return (
     <>
       <div className="flex h-full">
         <Sidebar>
-          <li className="font-sans text-base font-bold text-black">
-            {currentIntensive?.name}
-          </li>
+          {currentIntensive ? (
+            <li className="font-sans text-base font-bold text-black">
+              {currentIntensive.name}
+            </li>
+          ) : (
+            <Skeleton />
+          )}
+
           <li>
             <NavLink
               className="font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue"

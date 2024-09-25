@@ -1,18 +1,33 @@
 import { FC } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useParams } from 'react-router-dom';
+
+import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
 import Sidebar from '../../components/Sidebar';
+import Skeleton from 'react-loading-skeleton';
 
 const StudentMainPage: FC = () => {
+  const params = useParams();
+
+  const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
+    Number(params.intensiveId)
+  );
+
   return (
     <>
       <div className="flex h-full">
         <Sidebar>
-          {/* <li className='font-sans text-base font-bold text-black'>{currentIntensive?.name}</li> */}
+          {isLoading ? (
+            <Skeleton />
+          ) : (
+            <li className="font-sans text-base font-bold text-black">
+              {currentIntensive?.name}
+            </li>
+          )}
           <li>
             <NavLink
               className="font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue"
-              to="intensiv-overview"
+              to="overview"
             >
               Просмотр интенсива
             </NavLink>
@@ -20,7 +35,7 @@ const StudentMainPage: FC = () => {
           <li>
             <NavLink
               className="font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue"
-              to="overview"
+              to="team-overview"
             >
               Просмотр команды
             </NavLink>
@@ -38,11 +53,9 @@ const StudentMainPage: FC = () => {
               className="font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue"
               to="tasks-board"
             >
-              Задачи
+              Ведение проекта
             </NavLink>
           </li>
-          {/* <li><NavLink className='font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue'
-                  to='education-requests'>Образовательные запросы</NavLink></li> */}
         </Sidebar>
         <div className="w-full mt-10 ml-10">
           <Outlet />

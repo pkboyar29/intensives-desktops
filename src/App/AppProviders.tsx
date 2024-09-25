@@ -1,6 +1,5 @@
 import { FC, ReactNode } from 'react';
 
-import IntensivesProvider from '../context/IntensivesContext';
 import EventsProvider from '../context/EventsContext';
 import CurrentUserProvider from '../context/CurrentUserContext';
 import TeamsProvider from '../context/TeamsContext';
@@ -18,15 +17,13 @@ interface AppProvidersProps {
 const AppProviders: FC<AppProvidersProps> = ({ children }) => {
   return (
     <CurrentUserProvider>
-      <IntensivesProvider>
-        <TeamsProvider>
-          <EventsProvider>
-            <Provider store={store}>
-              <DndProvider backend={HTML5Backend}>{children}</DndProvider>/
-            </Provider>
-          </EventsProvider>
-        </TeamsProvider>
-      </IntensivesProvider>
+      <TeamsProvider>
+        <EventsProvider>
+          <Provider store={store}>
+            <DndProvider backend={HTML5Backend}>{children}</DndProvider>/
+          </Provider>
+        </EventsProvider>
+      </TeamsProvider>
     </CurrentUserProvider>
   );
 };

@@ -1,10 +1,11 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate, Link } from 'react-router-dom';
 
+import { useAppSelector } from '../redux/store';
+import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
+
 import { IIntensive } from '../ts/interfaces/IIntensive';
-import { IntensivesContext } from '../context/IntensivesContext';
-import { CurrentUserContext } from '../context/CurrentUserContext';
 
 import Table from '../components/Table';
 import Title from '../components/Title';
@@ -12,30 +13,28 @@ import Title from '../components/Title';
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
 
-  const { intensives, getIntensives } = useContext(IntensivesContext);
+  const currentUser = useAppSelector((state) => state.user.data);
+
+  const {
+    data: intensives,
+    isLoading,
+    error,
+  } = useGetIntensivesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  }); // OR REFETCH UNDER SPECIFIC CONDITION?
+
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
   );
 
-  useEffect(() => {
-    setFilteredIntensives(intensives);
-    setSearchText('');
-  }, [intensives]);
-
-  const { currentUser } = useContext(CurrentUserContext);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
   const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (currentUser != null) {
-        getIntensives();
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [currentUser]);
+    if (intensives) {
+      setFilteredIntensives(intensives);
+      setSearchText('');
+    }
+  }, [intensives]);
 
   const columnHelper = createColumnHelper<IIntensive>();
   const columns = [
@@ -62,35 +61,38 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleId === 2) {
+    if (currentUser?.roleId === 1) {
+      navigate(`/student/${id}/overview`);
+    } else if (currentUser?.roleId === 2) {
       navigate(`/manager/${id}/overview`);
-    }
-    if (currentUser?.roleId === 3) {
+    } else if (currentUser?.roleId === 3) {
       navigate(`/teacher/${id}/overview`);
     }
   };
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
+    if (intensives) {
+      setSearchText(e.target.value);
 
-    setFilteredIntensives(
-      intensives.filter((intensive) =>
-        intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
-      )
-    );
+      setFilteredIntensives(
+        intensives.filter((intensive) =>
+          intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
+        )
+      );
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="max-w-[1280px]">
+      <div className="max-w-[1280px] mx-auto">
         <div className="mt-3 font-sans text-2xl font-bold">Загрузка...</div>
       </div>
     );
   }
 
-  if (intensives.length === 0 && !isLoading) {
+  if (!intensives && !isLoading) {
     return (
-      <div className="max-w-[1280px]">
+      <div className="max-w-[1280px] mx-auto">
         <Title text="Для вас пока нету открытых интенсивов" />
       </div>
     );

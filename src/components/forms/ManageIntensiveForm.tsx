@@ -1,11 +1,15 @@
 import { FC, useEffect, useState } from 'react';
-import ChooseModal from '../ChooseModal';
-import PostService from '../../API/PostService';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { IntensivesContext } from '../../context/IntensivesContext';
 import { useForm } from 'react-hook-form';
 
+import { useAppSelector } from '../../redux/store';
+
+import {
+  useCreateIntensiveMutation,
+  useUpdateIntensiveMutation,
+} from '../../redux/api/intensiveApi';
+
+import ChooseModal from '../ChooseModal';
 import Title from '../Title';
 import InputDescription from '../InputDescription';
 
@@ -20,7 +24,16 @@ const ManageIntensiveForm: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
-  const { getIntensiveById } = useContext(IntensivesContext);
+  const [
+    createIntensive,
+    { data: createIntensiveResponseData, error: createIntensiveError },
+  ] = useCreateIntensiveMutation();
+  const [
+    updateIntensive,
+    { data: updateIntensiveResponseData, error: updateIntensiveError },
+  ] = useUpdateIntensiveMutation();
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [flows, setFlows] = useState<any[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
@@ -36,10 +49,23 @@ const ManageIntensiveForm: FC = () => {
   });
 
   useEffect(() => {
-    const setInitialData = async () => {
-      if (intensiveId) {
-        const currentIntensive = await getIntensiveById(parseInt(intensiveId));
+    if (createIntensiveResponseData) {
+      navigate(`/manager/${createIntensiveResponseData.id}/overview`);
+    }
+  }, [createIntensiveResponseData]);
 
+  useEffect(() => {
+    if (updateIntensiveResponseData) {
+      console.log('результат это: ');
+      console.log(updateIntensiveResponseData);
+
+      navigate(`/manager/${intensiveId}/overview`);
+    }
+  }, [updateIntensiveResponseData]);
+
+  useEffect(() => {
+    const setInitialData = async () => {
+      if (intensiveId && currentIntensive) {
         setValue('name', currentIntensive.name);
         setValue('description', currentIntensive.description);
         setValue(
@@ -53,28 +79,17 @@ const ManageIntensiveForm: FC = () => {
       }
     };
     setInitialData();
-  }, [intensiveId]);
+  }, [intensiveId, currentIntensive]);
 
   const onSubmit = async (data: ManageIntensiveFields) => {
     try {
-      console.log(data);
       if (intensiveId) {
-        await PostService.updateIntensive(
-          intensiveId,
-          data.name,
-          data.description,
-          data.open_dt,
-          data.close_dt
-        );
-        navigate(`/manager/${intensiveId}/overview`);
+        updateIntensive({
+          id: Number(intensiveId),
+          ...data,
+        });
       } else {
-        const { data: responseData } = await PostService.createIntensive(
-          data.name,
-          data.description,
-          data.open_dt,
-          data.close_dt
-        );
-        navigate(`/manager/${responseData.id}/overview`);
+        createIntensive(data);
       }
     } catch (e) {
       console.log(e);

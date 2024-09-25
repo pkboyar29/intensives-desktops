@@ -1,48 +1,30 @@
-import { FC, useEffect, useState } from 'react';
-import PostService from '../API/PostService';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { IntensivesContext } from '../context/IntensivesContext';
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+import { FC, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { useAppSelector } from '../redux/store';
+import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
 import Title from '../components/Title';
-
-import { IIntensive } from '../ts/interfaces/IIntensive';
+import Skeleton from 'react-loading-skeleton';
 
 const ManagerIntensiveOverviewPage: FC = () => {
-  const { intensiveId } = useParams();
   const navigate = useNavigate();
 
-  const [currentIntensive, setCurrentIntensive] = useState<
-    IIntensive | undefined
-  >(undefined);
-  const { getIntensiveById } = useContext(IntensivesContext);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const [deleteIntensive, { isSuccess, error: deleteIntensiveError }] =
+    useDeleteIntensiveMutation();
 
   useEffect(() => {
-    const fetchDataForManager = async () => {
-      if (intensiveId) {
-        const currentIntensive: IIntensive = await getIntensiveById(
-          parseInt(intensiveId, 10)
-        );
-        setCurrentIntensive(currentIntensive);
-        setIsLoading(false);
-      }
-    };
-    fetchDataForManager();
-  }, [intensiveId]);
-
-  const deleteIntensivButtonHandler = () => {
-    if (intensiveId) {
-      PostService.deleteIntensive(intensiveId);
+    if (isSuccess) {
       navigate('/intensives');
     }
-  };
+  }, [isSuccess]);
 
-  if (isLoading) {
-    return <Skeleton />;
-  }
+  const deleteIntensivButtonHandler = () => {
+    if (currentIntensive) {
+      deleteIntensive(currentIntensive.id);
+    }
+  };
 
   return (
     <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
@@ -117,7 +99,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
             <div className="flex gap-2 mt-3 text-lg font-bold">
               <Link
                 className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-full flex justify-center"
-                to={`/manager/${intensiveId}/editIntensive`}
+                to={`/manager/${currentIntensive?.id}/editIntensive`}
               >
                 Редактировать
               </Link>

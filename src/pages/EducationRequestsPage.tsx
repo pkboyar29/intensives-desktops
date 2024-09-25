@@ -1,10 +1,8 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
 import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
-
-import { EducationRequestsContext } from '../context/EducationRequestsContext';
 
 import Title from '../components/Title';
 import Table from '../components/Table';
@@ -12,9 +10,6 @@ import Table from '../components/Table';
 const EducationRequestsPage: FC = () => {
   const navigate = useNavigate();
 
-  const educationRequests: IEducationRequest[] = useContext(
-    EducationRequestsContext
-  );
   const columnHelper = createColumnHelper<IEducationRequest>();
   const columns = [
     columnHelper.accessor('id', {
@@ -41,7 +36,7 @@ const EducationRequestsPage: FC = () => {
 
       <Table
         onClick={(id: number) => navigate(`${id}`)}
-        data={educationRequests}
+        data={[]}
         columns={columns}
       />
     </>

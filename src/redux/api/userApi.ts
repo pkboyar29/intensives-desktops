@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
 import Cookies from 'js-cookie';
 
 import { ISignIn, ISignInResponse, IUser } from '../../ts/interfaces/IUser';
@@ -71,5 +70,4 @@ export const userApi = createApi({
   }),
 });
 
-export const { useGetUserQuery, useLazyGetUserQuery, useSignInMutation } =
-  userApi;
+export const { useLazyGetUserQuery, useSignInMutation } = userApi;

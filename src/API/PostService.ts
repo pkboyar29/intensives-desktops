@@ -50,58 +50,6 @@ export default class PostService {
     return response;
   }
 
-  static async createIntensive(
-    name: string,
-    description: string,
-    open_dt: string,
-    close_dt: string
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/intensives/`,
-      {
-        university: 1,
-        name,
-        description,
-        is_open: true,
-        open_dt,
-        close_dt,
-        roles: [],
-        flow: [],
-        teachers_command: [],
-        files: [],
-        stages: [],
-      },
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async updateIntensive(
-    id: string | number,
-    name: string,
-    description: string,
-    open_dt: string,
-    close_dt: string
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.patch(
-      `${import.meta.env.VITE_BACKEND_URL}/intensives/${id}/`,
-      {
-        name,
-        description,
-        is_open: true,
-        open_dt,
-        close_dt,
-        roles: [],
-        flow: [],
-        teachers_command: [],
-        files: [],
-        stages: [],
-      },
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
   static async createEvent(
     intensiveId: string | number,
     name: string,
@@ -181,16 +129,6 @@ export default class PostService {
   ): Promise<AxiosResponse<any>> {
     const response = await axios.delete(
       `${import.meta.env.VITE_BACKEND_URL}/roles_on_intensives/${intensiveId}/`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async deleteIntensive(
-    intensiveId: string | number
-  ): Promise<AxiosResponse<any>> {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/intensives/${intensiveId}`,
       { headers: await authHeader() }
     );
     return response;

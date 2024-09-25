@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+
 import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title';

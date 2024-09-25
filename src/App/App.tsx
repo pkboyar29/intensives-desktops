@@ -1,13 +1,23 @@
-import { FC } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { FC, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
-import { useGetUserQuery } from '../redux/api/userApi';
+import { useLazyGetUserQuery } from '../redux/api/userApi';
 
 import Header from '../components/Header';
 import routeConfig from '../router/routeConfig';
 
 const App: FC = () => {
-  useGetUserQuery();
+  const [trigger] = useLazyGetUserQuery();
+
+  const location = useLocation();
+  const nonRequiredAuthRoutes = ['/sign-in', '/not-found'];
+  const requiredAuth = !nonRequiredAuthRoutes.includes(location.pathname);
+
+  useEffect(() => {
+    if (requiredAuth) {
+      trigger();
+    }
+  }, []);
 
   return (
     <div className="App">
