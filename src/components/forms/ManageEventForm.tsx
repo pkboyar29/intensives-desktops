@@ -9,12 +9,19 @@ import {
   transformSeparateDateAndTimeToISO,
 } from '../../helpers/dateHelpers';
 
+import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
+import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
+
+import { IStage } from '../../ts/interfaces/IStage';
+
 import Select from '../Select';
 import InputRadioDescription from '../InputRadioDescription';
 import InputRadio from '../InputRadio';
 import InputDescription from '../InputDescription';
 import ChooseModal from '../ChooseModal';
 import Title from '../Title';
+import Skeleton from 'react-loading-skeleton';
+import { IAudience } from '../../ts/interfaces/IAudience';
 
 interface ManageEventFormFields {
   name: string;
@@ -32,10 +39,14 @@ const ManageEventForm: FC = () => {
     mode: 'onBlur',
   });
 
+  const [getStages, { isLoading: isGetStagesLoading }] =
+    useLazyGetStagesQuery();
+  const [getAudiences] = useLazyGetAudiencesQuery();
+
   const [teamsToChoose, setTeamsToChoose] = useState<any[]>([]);
   const [teachersToChoose, setTeachersToChoose] = useState<any[]>([]);
-  const [stagesToChoose, setStagesToChoose] = useState<any[]>([]);
-  const [audiencesToChoose, setAudiencesToChoose] = useState<any[]>([]);
+  const [stagesToChoose, setStagesToChoose] = useState<IStage[]>([]);
+  const [audiencesToChoose, setAudiencesToChoose] = useState<IAudience[]>([]);
 
   const [teams, setTeams] = useState<any[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
@@ -61,8 +72,10 @@ const ManageEventForm: FC = () => {
         const { data: teachers } = await PostService.getTeachersOnIntensive(
           intensiveId
         );
-        const { data: audiencies } = await PostService.getAudiences();
-        const { data: stages } = await PostService.getStages();
+        const { data: audiencies } = await getAudiences();
+        console.log('audiences are ...');
+        console.log(audiencies);
+        const { data: stages } = await getStages();
 
         setTeamsToChoose(
           teams.results.map((team: any) => {
@@ -84,28 +97,13 @@ const ManageEventForm: FC = () => {
         //   })
         // );
 
-        setAudiencesToChoose(
-          audiencies.results.map((audience: any) => {
-            return {
-              id: audience.id,
-              name:
-                audience.building.address +
-                ' Корпус ' +
-                audience.building.name +
-                ' Аудитория ' +
-                audience.name,
-            };
-          })
-        );
+        if (audiencies) {
+          setAudiencesToChoose(audiencies);
+        }
 
-        setStagesToChoose(
-          stages.results.map((stage: any) => {
-            return {
-              id: stage.id,
-              name: stage.name,
-            };
-          })
-        );
+        if (stages) {
+          setStagesToChoose(stages);
+        }
 
         const eventId: string | null = searchParams.get('eventId');
 
@@ -272,18 +270,15 @@ const ManageEventForm: FC = () => {
 
             <div className="py-3 text-xl font-bold">Этап</div>
 
-            {stagesToChoose.length > 0 ? (
+            {isGetStagesLoading ? (
+              <Skeleton />
+            ) : (
               <Select
                 register={register}
                 fieldName="stage"
                 initialText="Выберите к какому этапу привязать мероприятие"
                 options={stagesToChoose}
               />
-            ) : (
-              <span className="text-[#6B7280]">
-                {' '}
-                На данный момент не создано ни одного этапа{' '}
-              </span>
             )}
 
             <div className="py-3 text-xl font-bold">Участники</div>

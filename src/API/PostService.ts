@@ -26,22 +26,6 @@ export default class PostService {
     return response;
   }
 
-  static async getAudiences(): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/auditories/`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
-  static async getStages(): Promise<AxiosResponse<any>> {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/stages/`,
-      { headers: await authHeader() }
-    );
-    return response;
-  }
-
   static async createEvent(
     intensiveId: string | number,
     name: string,
