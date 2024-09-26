@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { resetUserState } from '../redux/slices/userSlice';
+import { resetIntensiveState } from '../redux/slices/intensiveSlice';
 
 import Cookies from 'js-cookie';
 
@@ -11,11 +12,12 @@ const Header: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
   const dispatch = useAppDispatch();
 
-  const onButtonClick = () => {
+  const logOutClickHandler = () => {
     Cookies.remove('access');
     Cookies.remove('refresh');
 
     dispatch(resetUserState());
+    dispatch(resetIntensiveState());
 
     navigate('/sign-in');
   };
@@ -34,7 +36,7 @@ const Header: FC = () => {
             <div className="flex items-center gap-6 font-sans text-lg">
               <div>{`${currentUser?.firstName}  ${currentUser?.lastName}`}</div>
               <button
-                onClick={onButtonClick}
+                onClick={logOutClickHandler}
                 className="px-5 py-2 text-base font-bold text-white rounded-xl bg-blue"
               >
                 Выйти

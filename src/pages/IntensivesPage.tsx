@@ -9,6 +9,7 @@ import { IIntensive } from '../ts/interfaces/IIntensive';
 
 import Table from '../components/Table';
 import Title from '../components/Title';
+import Skeleton from 'react-loading-skeleton';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
@@ -85,7 +86,9 @@ const IntensivesPage: FC = () => {
   if (isLoading) {
     return (
       <div className="max-w-[1280px] mx-auto">
-        <div className="mt-3 font-sans text-2xl font-bold">Загрузка...</div>
+        <div className="mt-3 font-sans text-2xl font-bold">
+          <Skeleton />
+        </div>
       </div>
     );
   }

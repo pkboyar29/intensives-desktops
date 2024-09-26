@@ -1,6 +1,9 @@
-import { FC, useEffect, useState } from 'react';
-import PostService from '../API/PostService';
+import { FC } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+
+import { useGetEventsOnIntensiveQuery } from '../redux/api/eventApi';
+
+import { IManagerEvent } from '../ts/interfaces/IEvent';
 
 import Title from '../components/Title';
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
@@ -9,40 +12,16 @@ const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
-  const [events, setEvents] = useState<any[]>([]);
+  if (!intensiveId) {
+    throw new Error('Missing intensiveId in URL');
+  }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (intensiveId) {
-        const data = await PostService.getEvents(intensiveId);
-
-        transformEvents(data.results);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    console.log(events);
-  }, [events]);
-
-  const transformEvents = (unmappedEvents: any) => {
-    if (unmappedEvents.length > 0) {
-      let data: any[] = [];
-      unmappedEvents.forEach((unmappedEvent: any) => {
-        data.push({
-          id: unmappedEvent.id,
-          name: unmappedEvent.name,
-          dataStart: unmappedEvent.start_dt,
-          dataEnd: unmappedEvent.finish_dt,
-        });
-      });
-      setEvents(data);
-    }
-  };
+  const { data: events } = useGetEventsOnIntensiveQuery(Number(intensiveId), {
+    refetchOnMountOrArgChange: true,
+  });
 
   interface EventProps {
-    event: any;
+    event: IManagerEvent;
   }
 
   const eventClickHandler = (eventId: number) => {
@@ -61,7 +40,7 @@ const SchedulePage: FC = () => {
         <div className="flex flex-col justify-center">
           <p className="text-xl">{event.name}</p>
           <time className="text-[#637087] text-base">
-            {event.dataStart + ' ' + event.dataEnd}
+            {event.dateStart + ' ' + event.dateEnd}
           </time>
         </div>
       </div>

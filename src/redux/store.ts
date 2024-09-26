@@ -7,6 +7,7 @@ import teamReducer from './slices/teamSlice';
 
 import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
+import { eventApi } from './api/eventApi';
 import { teamApi } from './api/teamApi';
 import { teacherOnIntensiveApi } from './api/teacherOnIntensiveApi';
 import { studentRoleApi } from './api/studentRoleApi';
@@ -21,6 +22,7 @@ export const store = configureStore({
     // is it necessary to do it below?
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
+    [eventApi.reducerPath]: eventApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
     [teacherOnIntensiveApi.reducerPath]: teacherOnIntensiveApi.reducer,
     [studentRoleApi.reducerPath]: studentRoleApi.reducer,
@@ -28,9 +30,12 @@ export const store = configureStore({
     [audienceApi.reducerPath]: audienceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(
       userApi.middleware,
       intensiveApi.middleware,
+      eventApi.middleware,
       teamApi.middleware,
       teacherOnIntensiveApi.middleware,
       studentRoleApi.middleware,
