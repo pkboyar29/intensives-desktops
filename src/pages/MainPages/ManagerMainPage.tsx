@@ -1,32 +1,43 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { Outlet, Link, useParams } from 'react-router-dom';
 
-import { IIntensive } from '../../ts/interfaces/IIntensive';
+import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
+
+import { useAppDispatch } from '../../redux/store';
+import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import Sidebar from '../../components/Sidebar';
-import { IntensivesContext } from '../../context/IntensivesContext';
+import Skeleton from 'react-loading-skeleton';
 
 const ManagerMainPage: FC = () => {
   const params = useParams();
+  const dispatch = useAppDispatch();
 
-  const { intensives } = useContext(IntensivesContext);
-  const currentIntensive: IIntensive | undefined = intensives.find(
-    (intensive: IIntensive) => intensive.id === Number(params.intensiveId)
+  const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
+    Number(params.intensiveId)
   );
+
+  const returnToIntensivesClickHandler = () => {
+    dispatch(resetIntensiveState());
+  };
 
   return (
     <>
       <div className="flex h-full">
         <Sidebar>
           <div className="w-80">
-            <div>
-              <div className="text-lg">{currentIntensive?.name}</div>
-              <div className="text-[#637087]">
-                {currentIntensive?.open_dt.toLocaleDateString()}
-                {` - `}
-                {currentIntensive?.close_dt.toLocaleDateString()}
-              </div>
-            </div>
+            {isLoading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <div className="text-lg">{currentIntensive?.name}</div>
+                <div className="text-[#637087]">
+                  {currentIntensive?.open_dt.toLocaleDateString()}
+                  {` - `}
+                  {currentIntensive?.close_dt.toLocaleDateString()}
+                </div>
+              </>
+            )}
 
             <div className="flex flex-col gap-4 my-3">
               <Link to="overview" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
@@ -53,6 +64,7 @@ const ManagerMainPage: FC = () => {
             </div>
             <Link
               className="block text-center mt-2 px-2 py-4 bg-blue rounded-xl text-white text-[14px] font-inter font-bold"
+              onClick={returnToIntensivesClickHandler}
               to="/intensives"
             >
               Вернуться к списку интенсивов

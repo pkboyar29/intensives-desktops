@@ -109,8 +109,8 @@ const TeamsProvider: FC<TeamsContextProviderProps> = ({ children }) => {
         mentorNameSurname: mentorNameSurname,
         intensiveId: unmappedTeam.intensive,
       };
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
       return {
         id: 0,
         name: 'Unknown',

@@ -10,7 +10,7 @@ import authHeader from '../helpers/getHeaders';
 
 import Title from '../components/Title';
 import { ITeam } from '../ts/interfaces/ITeam';
-import { Event } from '../ts/interfaces/Event';
+import { IEvent } from '../ts/interfaces/IEvent';
 
 type FormValues = {
   marks: { criteriaId: number; mark: number }[];
@@ -40,7 +40,7 @@ const TeamEvaluationPage: FC = () => {
     }
   });
 
-  const currentEvent: Event | undefined = events.find((event: Event) => {
+  const currentEvent: IEvent | undefined = events.find((event: IEvent) => {
     if (params.eventId) {
       return event.id === parseInt(params.eventId, 10);
     }

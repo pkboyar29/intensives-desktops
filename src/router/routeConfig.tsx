@@ -60,16 +60,16 @@ const routeConfig: RouteType[] = [
     requiredAuth: false,
   },
   {
-    path: '/student/:teamId',
+    path: '/student/:intensiveId',
     element: <StudentMainPage />,
     children: [
       {
         path: 'overview',
-        element: <TeamOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
-        path: 'intensiv-overview',
-        element: <IntensiveOverviewPage />,
+        path: 'team-overview',
+        element: <TeamOverviewPage />,
       },
       {
         path: 'events',

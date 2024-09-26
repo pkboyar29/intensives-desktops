@@ -3,15 +3,15 @@ import axios from 'axios';
 
 import { CurrentUserContext } from './CurrentUserContext';
 
-import { Event } from '../ts/interfaces/Event';
+import { IEvent } from '../ts/interfaces/IEvent';
 import { ITeam } from '../ts/interfaces/ITeam';
 import { TeamsContext } from './TeamsContext';
 import authHeader from '../helpers/getHeaders';
 
 interface EventsContextType {
-  events: Event[];
-  currentEvent: Event | undefined;
-  setEventsForIntensiv: (intensiveId: number) => Promise<Event[]>;
+  events: IEvent[];
+  currentEvent: IEvent | undefined;
+  setEventsForIntensiv: (intensiveId: number) => Promise<IEvent[]>;
   setEventsForTeam: (teamId: number) => void;
   setCurrentEventById: (eventId: number) => void;
 }
@@ -46,12 +46,12 @@ interface EventsContextProviderProps {
   children: ReactNode;
 }
 const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
+  const [events, setEvents] = useState<IEvent[]>([]);
+  const [currentEvent, setCurrentEvent] = useState<IEvent | undefined>();
   const { currentUser } = useContext(CurrentUserContext);
   const { getTeamById } = useContext(TeamsContext);
 
-  const mapEvents = async (unmappedEvents: any[]): Promise<Event[]> => {
+  const mapEvents = async (unmappedEvents: any[]): Promise<IEvent[]> => {
     const mappedEvents = await Promise.all(
       unmappedEvents.map(async (unmappedEvent: any) => mapEvent(unmappedEvent))
     );
@@ -173,7 +173,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
 
   const setAndGetEventsForIntensiv = async (
     intensiveId: number
-  ): Promise<Event[]> => {
+  ): Promise<IEvent[]> => {
     try {
       const eventsResponse = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/events/?intensiv=${intensiveId}`,
@@ -181,7 +181,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
       );
       const unmappedEvents = eventsResponse.data.results;
 
-      const mappedEvents: Event[] = await mapEvents(unmappedEvents);
+      const mappedEvents: IEvent[] = await mapEvents(unmappedEvents);
       setEvents(mappedEvents);
 
       return mappedEvents;
@@ -212,7 +212,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
         return isOurTeamInEvent;
       });
 
-      const mappedEvents: Event[] = await mapEvents(ourTeamEvents);
+      const mappedEvents: IEvent[] = await mapEvents(ourTeamEvents);
       setEvents(mappedEvents);
     } catch (error) {
       console.log(error);
@@ -226,7 +226,7 @@ const EventsProvider: FC<EventsContextProviderProps> = ({ children }) => {
         { headers: await authHeader() }
       );
       const unmappedEvent = eventResponse.data;
-      const mappedEvent: Event = await mapEvent(unmappedEvent);
+      const mappedEvent: IEvent = await mapEvent(unmappedEvent);
       setCurrentEvent(mappedEvent);
     } catch (error) {
       console.log(error);

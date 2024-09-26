@@ -1,26 +1,38 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { Outlet, NavLink, Link, useParams } from 'react-router-dom';
 
-import { IIntensive } from '../../ts/interfaces/IIntensive';
+import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
+
+import { useAppDispatch } from '../../redux/store';
+import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import Sidebar from '../../components/Sidebar';
-import { IntensivesContext } from '../../context/IntensivesContext';
+import Skeleton from 'react-loading-skeleton';
 
 const TeacherMainPage: FC = () => {
   const params = useParams();
+  const dispatch = useAppDispatch();
 
-  const { intensives } = useContext(IntensivesContext);
-  const currentIntensive: IIntensive | undefined = intensives.find(
-    (intensive: IIntensive) => intensive.id === Number(params.intensiveId)
+  const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
+    Number(params.intensiveId)
   );
+
+  const returnToIntensivesClickHandler = () => {
+    dispatch(resetIntensiveState());
+  };
 
   return (
     <>
       <div className="flex h-full">
         <Sidebar>
-          <li className="font-sans text-base font-bold text-black">
-            {currentIntensive?.name}
-          </li>
+          {currentIntensive ? (
+            <li className="font-sans text-base font-bold text-black">
+              {currentIntensive.name}
+            </li>
+          ) : (
+            <Skeleton />
+          )}
+
           <li>
             <NavLink
               className="font-sans text-base font-semibold text-black transition-all sidebar__link hover:text-blue"
@@ -47,6 +59,7 @@ const TeacherMainPage: FC = () => {
           </li>
           <Link
             className="block text-center mt-2 px-2 py-4 bg-blue rounded-xl text-white text-[14px] font-inter font-bold"
+            onClick={returnToIntensivesClickHandler}
             to="/intensives"
           >
             Вернуться к списку интенсивов

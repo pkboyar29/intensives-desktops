@@ -1,13 +1,23 @@
 import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import PostService from '../../API/PostService';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 
+import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
+
+import { useLazyGetTeamsOnIntensiveQuery } from '../../redux/api/teamApi';
+import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
+import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
+import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherOnIntensiveApi';
 import {
-  transformISODateToTime,
-  transformSeparateDateAndTimeToISO,
-} from '../../helpers/dateHelpers';
+  useLazyGetEventQuery,
+  useCreateEventMutation,
+  useUpdateEventMutation,
+} from '../../redux/api/eventApi';
+
+import { IStage } from '../../ts/interfaces/IStage';
+import { IAudience } from '../../ts/interfaces/IAudience';
+import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
 import Select from '../Select';
 import InputRadioDescription from '../InputRadioDescription';
@@ -32,12 +42,20 @@ const ManageEventForm: FC = () => {
     mode: 'onBlur',
   });
 
+  const [getStages] = useLazyGetStagesQuery();
+  const [getAudiences] = useLazyGetAudiencesQuery();
+  const [getTeams] = useLazyGetTeamsOnIntensiveQuery();
+  const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
+  const [getEvent] = useLazyGetEventQuery();
+  const [createEvent] = useCreateEventMutation();
+  const [updateEvent] = useUpdateEventMutation();
+
   const [teamsToChoose, setTeamsToChoose] = useState<any[]>([]);
   const [teachersToChoose, setTeachersToChoose] = useState<any[]>([]);
-  const [stagesToChoose, setStagesToChoose] = useState<any[]>([]);
-  const [audiencesToChoose, setAudiencesToChoose] = useState<any[]>([]);
+  const [stagesToChoose, setStagesToChoose] = useState<IStage[]>([]);
+  const [audiencesToChoose, setAudiencesToChoose] = useState<IAudience[]>([]);
 
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<ITeamToChoose[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
 
   const [typeScore, setTypeScore] = useState<number>(1);
@@ -55,26 +73,20 @@ const ManageEventForm: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (intensiveId) {
-        const { data: teams } = await PostService.getCommandsOnIntensive(
-          intensiveId
+        const { data: teams } = await getTeams(Number(intensiveId));
+        const { data: teachers } = await getTeachersOnIntensive(
+          Number(intensiveId)
         );
-        const { data: teachers } = await PostService.getTeachersOnIntensive(
-          intensiveId
-        );
-        const { data: audiencies } = await PostService.getAudiences();
-        const { data: stages } = await PostService.getStages();
+        const { data: audiencies } = await getAudiences();
+        const { data: stages } = await getStages();
 
-        setTeamsToChoose(
-          teams.results.map((team: any) => {
-            return { id: team.id, name: team.name };
-          })
-        );
+        if (teams) {
+          setTeamsToChoose(teams);
+        }
 
-        setTeachersToChoose(
-          teachers.results.map((teacher: any) => {
-            return { id: teacher.id, name: teacher.teacher.user.last_name };
-          })
-        );
+        if (teachers) {
+          setTeachersToChoose(teachers);
+        }
 
         // setCommands(filterIncludeObjectsByNames(teams, event.commands));
         // setResponseCommands(filterIncludeObjectsByNames(teams, event.commands));
@@ -84,42 +96,29 @@ const ManageEventForm: FC = () => {
         //   })
         // );
 
-        setAudiencesToChoose(
-          audiencies.results.map((audience: any) => {
-            return {
-              id: audience.id,
-              name:
-                audience.building.address +
-                ' Корпус ' +
-                audience.building.name +
-                ' Аудитория ' +
-                audience.name,
-            };
-          })
-        );
+        if (audiencies) {
+          setAudiencesToChoose(audiencies);
+        }
 
-        setStagesToChoose(
-          stages.results.map((stage: any) => {
-            return {
-              id: stage.id,
-              name: stage.name,
-            };
-          })
-        );
+        if (stages) {
+          setStagesToChoose(stages);
+        }
 
         const eventId: string | null = searchParams.get('eventId');
 
         if (hasEvent && eventId) {
-          const { data: event } = await PostService.getEvent(eventId);
+          const { data: event } = await getEvent(Number(eventId));
 
-          setValue('name', event.name);
-          setValue('description', event.description);
-          setValue('dateStart', event.start_dt.split('T')[0]);
-          setValue('dateEnd', event.finish_dt.split('T')[0]);
-          setValue('timeStart', transformISODateToTime(event.start_dt));
-          setValue('timeEnd', transformISODateToTime(event.finish_dt));
-          setValue('audience', event.auditory);
-          setValue('stage', event.stage);
+          if (event) {
+            setValue('name', event.name);
+            setValue('description', event.description);
+            setValue('dateStart', event.dateStart);
+            setValue('dateEnd', event.dateEnd);
+            setValue('timeStart', event.timeStart);
+            setValue('timeEnd', event.timeEnd);
+            setValue('audience', event.audience);
+            setValue('stage', event.stage);
+          }
         }
       }
     };
@@ -139,33 +138,47 @@ const ManageEventForm: FC = () => {
       if (intensiveId) {
         if (hasEvent) {
           if (eventId) {
-            await PostService.patchEvent(
-              intensiveId,
-              eventId,
-              data.name,
-              data.description,
-              transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
-              transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
-              data.stage,
-              data.audience,
-              ids_teachers,
-              ids_commands,
-              typeScore,
-              typeResult
-            );
+            await updateEvent({
+              intensiv: Number(intensiveId),
+              eventId: Number(eventId),
+              name: data.name,
+              description: data.description,
+              start_dt: transformSeparateDateAndTimeToISO(
+                data.dateStart,
+                data.timeStart
+              ),
+              finish_dt: transformSeparateDateAndTimeToISO(
+                data.dateEnd,
+                data.timeEnd
+              ),
+              stage: data.stage,
+              auditory: data.audience,
+              teachers_command: ids_teachers,
+              commands: ids_commands,
+              result_type: typeResult,
+              mark_strategy: typeScore,
+            });
           }
         } else {
-          await PostService.createEvent(
-            intensiveId,
-            data.name,
-            data.description,
-            transformSeparateDateAndTimeToISO(data.dateStart, data.timeStart),
-            transformSeparateDateAndTimeToISO(data.dateEnd, data.timeEnd),
-            data.stage,
-            data.audience,
-            ids_teachers,
-            ids_commands
-          );
+          await createEvent({
+            intensiv: Number(intensiveId),
+            name: data.name,
+            description: data.description,
+            start_dt: transformSeparateDateAndTimeToISO(
+              data.dateStart,
+              data.timeStart
+            ),
+            finish_dt: transformSeparateDateAndTimeToISO(
+              data.dateEnd,
+              data.timeEnd
+            ),
+            stage: data.stage,
+            auditory: data.audience,
+            teachers_command: ids_teachers,
+            commands: ids_commands,
+            result_type: typeResult,
+            mark_strategy: typeScore,
+          });
         }
       }
 
@@ -272,19 +285,12 @@ const ManageEventForm: FC = () => {
 
             <div className="py-3 text-xl font-bold">Этап</div>
 
-            {stagesToChoose.length > 0 ? (
-              <Select
-                register={register}
-                fieldName="stage"
-                initialText="Выберите к какому этапу привязать мероприятие"
-                options={stagesToChoose}
-              />
-            ) : (
-              <span className="text-[#6B7280]">
-                {' '}
-                На данный момент не создано ни одного этапа{' '}
-              </span>
-            )}
+            <Select
+              register={register}
+              fieldName="stage"
+              initialText="Выберите к какому этапу привязать мероприятие"
+              options={stagesToChoose}
+            />
 
             <div className="py-3 text-xl font-bold">Участники</div>
 

@@ -2,9 +2,19 @@ export interface IUser {
   id: number;
   teacher_id: number | null;
   student_id: number | null;
-  first_name: string;
-  last_name: string;
-  middle_name: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   email: string;
-  user_role_id: number;
+  roleId: number;
+}
+
+export interface ISignIn {
+  email: string;
+  password: string;
+}
+
+export interface ISignInResponse {
+  access: string;
+  refresh: string;
 }

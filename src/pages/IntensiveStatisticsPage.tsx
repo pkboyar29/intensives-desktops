@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import PostService from '../API/PostService';
 import {
   LineChart,
   Tooltip,
@@ -9,7 +8,7 @@ import {
   YAxis,
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+
 import { useParams } from 'react-router-dom';
 
 import Title from '../components/Title';
@@ -18,32 +17,32 @@ const IntensiveStatisticsPage = () => {
   const [statisticsData, setStatisticsData] = useState<any[]>([]);
   const { intensiveId } = useParams();
 
-  const transformDataResponse = (response: any) => {
-    setStatisticsData(
-      response
-        .map((item: any) => ({
-          score: item.final_mark || 0,
-          name: item.student.last_name,
-        }))
-        .filter((obj: any) => obj.hasOwnProperty('name'))
-        .sort((a: any, b: any) => a.name.localeCompare(b.name))
-    );
-  };
+  // const transformDataResponse = (response: any) => {
+  //   setStatisticsData(
+  //     response
+  //       .map((item: any) => ({
+  //         score: item.final_mark || 0,
+  //         name: item.student.last_name,
+  //       }))
+  //       .filter((obj: any) => obj.hasOwnProperty('name'))
+  //       .sort((a: any, b: any) => a.name.localeCompare(b.name))
+  //   );
+  // };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (intensiveId) {
-          const { data } = await PostService.getStatisticsIntensiv(intensiveId);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (intensiveId) {
+  //         const { data } = await PostService.getStatisticsIntensiv(intensiveId);
 
-          transformDataResponse(data);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchData();
-  }, []);
+  //         transformDataResponse(data);
+  //       }
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   return (
     <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
