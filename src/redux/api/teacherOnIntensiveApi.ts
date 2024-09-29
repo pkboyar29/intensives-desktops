@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import { ITeacherToChoose } from '../../ts/interfaces/ITeacher';
 
@@ -12,16 +12,7 @@ const mapTeacherToChoose = (teacher: any): ITeacherToChoose => {
 
 export const teacherOnIntensiveApi = createApi({
   reducerPath: 'teacherOnIntensiveApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     getTeachersOnIntensive: builder.query<ITeacherToChoose[], number>({
       query: (intensiveId) =>

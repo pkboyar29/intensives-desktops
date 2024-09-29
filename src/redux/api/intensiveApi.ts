@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import {
   IIntensive,
@@ -21,16 +21,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
 
 export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',

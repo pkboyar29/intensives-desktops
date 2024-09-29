@@ -44,7 +44,7 @@ const IntensivesPage: FC = () => {
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor('name', {
-      header: () => 'Наименование',
+      header: () => 'Название',
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor('open_dt', {

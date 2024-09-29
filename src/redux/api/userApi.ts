@@ -1,20 +1,11 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import { ISignIn, ISignInResponse, IUser } from '../../ts/interfaces/IUser';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     signIn: builder.mutation<ISignInResponse, ISignIn>({
       query: (credentials) => ({
