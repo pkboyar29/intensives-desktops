@@ -8,7 +8,7 @@ import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 import { useLazyGetTeamsOnIntensiveQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
-import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherOnIntensiveApi';
+import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
 import {
   useLazyGetEventQuery,
   useCreateEventMutation,
@@ -19,10 +19,10 @@ import { IStage } from '../../ts/interfaces/IStage';
 import { IAudience } from '../../ts/interfaces/IAudience';
 import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
-import Select from '../Select';
-import InputRadioDescription from '../InputRadioDescription';
-import InputRadio from '../InputRadio';
-import InputDescription from '../InputDescription';
+import Select from '../inputs/Select';
+import InputRadioDescription from '../inputs/InputRadioDescription';
+import InputRadio from '../inputs/InputRadio';
+import InputDescription from '../inputs/InputDescription';
 import ChooseModal from '../ChooseModal';
 import Title from '../Title';
 

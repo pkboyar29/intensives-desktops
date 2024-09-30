@@ -1,11 +1,13 @@
 import { FC, HTMLInputTypeAttribute } from 'react';
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister, RegisterOptions } from 'react-hook-form';
 
 interface InputDescriptionProps {
-  fieldName: string;
   register: UseFormRegister<any>;
+  fieldName: string;
+  registerOptions?: RegisterOptions;
   placeholder: string;
   description: string;
+  errorMessage?: string;
   type?: HTMLInputTypeAttribute;
 }
 
@@ -14,6 +16,8 @@ const InputDescription: FC<InputDescriptionProps> = ({
   register,
   placeholder,
   description,
+  registerOptions,
+  errorMessage,
   type,
 }) => {
   return (
@@ -22,9 +26,10 @@ const InputDescription: FC<InputDescriptionProps> = ({
       <input
         type={type ? type : 'text'}
         placeholder={placeholder}
-        {...register(fieldName)}
+        {...register(fieldName, registerOptions)}
         className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
       />
+      {errorMessage && <div className="text-base text-red">{errorMessage}</div>}
     </div>
   );
 };

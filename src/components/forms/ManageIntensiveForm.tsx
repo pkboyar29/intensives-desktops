@@ -8,10 +8,15 @@ import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
 } from '../../redux/api/intensiveApi';
+import { useGetFlowsQuery } from '../../redux/api/flowApi';
+import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 
-import ChooseModal from '../ChooseModal';
 import Title from '../Title';
-import InputDescription from '../InputDescription';
+import InputDescription from '../inputs/InputDescription';
+import MultipleSelectInput from '../inputs/MultipleSelectInput';
+
+import { IFlow } from '../../ts/interfaces/IFlow';
+import { ITeacher } from '../../ts/interfaces/ITeacher';
 
 interface ManageIntensiveFields {
   name: string;
@@ -24,72 +29,57 @@ const ManageIntensiveForm: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
-  const [
-    createIntensive,
-    { data: createIntensiveResponseData, error: createIntensiveError },
-  ] = useCreateIntensiveMutation();
-  const [
-    updateIntensive,
-    { data: updateIntensiveResponseData, error: updateIntensiveError },
-  ] = useUpdateIntensiveMutation();
+  const [createIntensive] = useCreateIntensiveMutation();
+  const [updateIntensive] = useUpdateIntensiveMutation();
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  const [flows, setFlows] = useState<any[]>([]);
-  const [teachers, setTeachers] = useState<any[]>([]);
-  const [studentRoles, setStudentRoles] = useState<any[]>([]);
+  const { data: flows } = useGetFlowsQuery();
+  const [selectedFlows, setSelectedFlows] = useState<IFlow[]>([]);
 
-  // modals
-  const [modalStudRoles, setModalStudRoles] = useState<boolean>(false);
-  const [modalTeachers, setModalTeachers] = useState<boolean>(false);
-  const [modalFlows, setModalFlows] = useState<boolean>(false);
+  const { data: teachers } = useGetTeachersInUniversityQuery();
+  const [selectedTeachers, setSelectedTeachers] = useState<ITeacher[]>([]);
 
-  const { register, handleSubmit, setValue } = useForm<ManageIntensiveFields>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
 
   useEffect(() => {
-    if (createIntensiveResponseData) {
-      navigate(`/manager/${createIntensiveResponseData.id}/overview`);
+    if (intensiveId && currentIntensive) {
+      setValue('name', currentIntensive.name);
+      setValue('description', currentIntensive.description);
+      setValue('open_dt', currentIntensive.open_dt.toISOString().split('T')[0]);
+      setValue(
+        'close_dt',
+        currentIntensive.close_dt.toISOString().split('T')[0]
+      );
+
+      // TODO: set teachers
     }
-  }, [createIntensiveResponseData]);
-
-  useEffect(() => {
-    if (updateIntensiveResponseData) {
-      console.log('результат это: ');
-      console.log(updateIntensiveResponseData);
-
-      navigate(`/manager/${intensiveId}/overview`);
-    }
-  }, [updateIntensiveResponseData]);
-
-  useEffect(() => {
-    const setInitialData = async () => {
-      if (intensiveId && currentIntensive) {
-        setValue('name', currentIntensive.name);
-        setValue('description', currentIntensive.description);
-        setValue(
-          'open_dt',
-          currentIntensive.open_dt.toISOString().split('T')[0]
-        );
-        setValue(
-          'close_dt',
-          currentIntensive.close_dt.toISOString().split('T')[0]
-        );
-      }
-    };
-    setInitialData();
   }, [intensiveId, currentIntensive]);
 
   const onSubmit = async (data: ManageIntensiveFields) => {
     try {
       if (intensiveId) {
-        updateIntensive({
+        await updateIntensive({
           id: Number(intensiveId),
           ...data,
         });
+
+        navigate(`/manager/${intensiveId}/overview`);
       } else {
-        createIntensive(data);
+        const { data: createIntensiveResponseData } = await createIntensive(
+          data
+        );
+
+        if (createIntensiveResponseData) {
+          navigate(`/manager/${createIntensiveResponseData.id}/overview`);
+        }
       }
     } catch (e) {
       console.log(e);
@@ -98,164 +88,144 @@ const ManageIntensiveForm: FC = () => {
 
   return (
     <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      {modalFlows && (
-        <ChooseModal
-          itemsProp={[]}
-          selectedItemsProp={[]}
-          onClose={() => setModalFlows(false)}
-          onSave={() => {}}
-        />
-      )}
-
-      {modalTeachers && (
-        <ChooseModal
-          itemsProp={[]}
-          selectedItemsProp={[]}
-          onClose={() => setModalTeachers(false)}
-          onSave={() => {}}
-        />
-      )}
-
-      {modalStudRoles && (
-        <ChooseModal
-          itemsProp={[]}
-          selectedItemsProp={[]}
-          onClose={() => setModalStudRoles(false)}
-          onSave={() => {}}
-        />
-      )}
-
       <form className="list-content" onSubmit={handleSubmit(onSubmit)}>
         <Title
           text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
         />
 
-        <div className="py-3 text-lg font-bold">Интенсив</div>
+        <div className="mt-6 mb-3">
+          <div className="text-lg font-bold">Интенсив</div>
 
-        <div className="flex flex-col w-full gap-2 my-3 text-lg">
           <InputDescription
             fieldName="name"
             register={register}
+            registerOptions={{
+              required: 'Поле обязательно к заполнению',
+              minLength: {
+                value: 4,
+                message: 'Минимальное количество символов - 4',
+              },
+              maxLength: {
+                value: 50,
+                message: 'Максимальное количество символов - 50',
+              },
+            }}
             description="Название интенсива"
             placeholder="Название интенсива"
+            errorMessage={
+              typeof errors.name?.message === 'string'
+                ? errors.name.message
+                : ''
+            }
           />
-        </div>
 
-        <div className="flex flex-col w-full gap-2 my-3 text-lg">
           <InputDescription
             fieldName="description"
             register={register}
+            registerOptions={{
+              maxLength: {
+                value: 200,
+                message: 'Максимальное количество символов - 200',
+              },
+            }}
             description="Описание интенсива"
             placeholder="Описание интенсива"
+            errorMessage={
+              typeof errors.description?.message === 'string'
+                ? errors.description.message
+                : ''
+            }
           />
         </div>
 
-        <div className="py-3 text-lg font-bold">Время проведения</div>
+        <div className="my-3">
+          <div className="text-lg font-bold">Время проведения</div>
 
-        <div className="flex justify-between gap-2.5">
-          <div className="flex flex-col w-full gap-2 my-3 text-lg">
+          <div className="flex justify-between gap-6">
             <InputDescription
               fieldName="open_dt"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно',
+              }}
               type="date"
               description="Дата начала"
               placeholder="Дата начала"
+              errorMessage={
+                typeof errors.open_dt?.message === 'string'
+                  ? errors.open_dt.message
+                  : ''
+              }
             />
-          </div>
 
-          <div className="flex flex-col w-full gap-2 my-3 text-lg">
             <InputDescription
               fieldName="close_dt"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно',
+                validate: {
+                  lessThanOpenDt: (value: string, formValues) =>
+                    new Date(value) > new Date(formValues.open_dt) ||
+                    'Дата окончания должна быть позже даты начала',
+                },
+              }}
               type="date"
               description="Дата окончания"
               placeholder="Дата окончания"
+              errorMessage={
+                typeof errors.close_dt?.message === 'string'
+                  ? errors.close_dt.message
+                  : ''
+              }
             />
           </div>
         </div>
 
-        <div className="py-3 text-lg font-bold">Участники</div>
+        <div className="my-3">
+          <div className="text-lg font-bold">Участники</div>
 
-        <div className="flex flex-col gap-2 my-3 text-lg">
-          <div>Список учебных групп</div>
-          <button
-            className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] w-max my-2.5"
-            type="button"
-            onClick={() => setModalFlows(true)}
-          >
-            {' '}
-            Выбрать{' '}
-          </button>
-          <div className="flex flex-wrap">
-            {flows.length > 0 ? (
-              flows.map((item: any) => (
-                <div className="ml-4 text-sm selectedInList">{item.name}</div>
-              ))
-            ) : (
-              <span className="text-[#6B7280]">Выберите потоки</span>
-            )}
-          </div>
+          {flows && (
+            <div className="mt-3">
+              <MultipleSelectInput
+                description="Список потоков"
+                items={flows}
+                selectedItems={selectedFlows}
+                setSelectedItems={setSelectedFlows}
+              />
+            </div>
+          )}
+
+          {teachers && (
+            <div className="mt-3">
+              <MultipleSelectInput
+                description="Список преподавателей"
+                items={teachers}
+                selectedItems={selectedTeachers}
+                setSelectedItems={setSelectedTeachers}
+              />
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-2 my-3 text-lg">
-          <div>Список ролей для студентов</div>
-          <button
-            className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] w-max my-2.5"
-            type="button"
-            onClick={() => setModalStudRoles(true)}
-          >
-            {' '}
-            Выбрать{' '}
-          </button>
-          <div className="flex flex-wrap">
-            {flows.length > 0 ? (
-              studentRoles.map((item: any) => (
-                <div className="ml-4 text-sm selectedInList">{item.name}</div>
-              ))
-            ) : (
-              <span className="text-[#6B7280]">Выберите роли</span>
-            )}
-          </div>
-        </div>
+        <div className="my-3">
+          <div className="text-lg font-bold">Файлы для студентов</div>
 
-        <div className="flex flex-col gap-2 my-3 text-lg">
-          <div>Список преподавателей</div>
-          <button
-            className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] w-max my-2.5"
-            type="button"
-            onClick={() => setModalTeachers(true)}
-          >
-            {' '}
-            Выбрать{' '}
-          </button>
-          <div className="flex flex-wrap">
-            {teachers.length > 0 ? (
-              teachers.map((item: any) => (
-                <div className="ml-4 text-sm selectedInList">{item.name}</div>
-              ))
-            ) : (
-              <span className="text-[#6B7280]">Выберите преподавателей</span>
-            )}
-          </div>
-        </div>
-
-        <div className="py-3 text-lg font-bold">Файлы для студентов</div>
-
-        <div className="border-2 border-dashed border-[#9CA3AF] rounded-md p-4 text-[#6B7280] flex flex-col items-center justify-center h-[20vh]">
-          <label
-            htmlFor="fileUpload"
-            className="block mb-1 text-sm font-medium cursor-pointer"
-          >
-            Перетащите необходимые файлы
-          </label>
-          <input
-            id="fileUpload"
-            name="fileUpload"
-            type="file"
-            className="block text-sm text-[#6B7280] file:mr-4 file:py-2 file:px-4 file:rounded-md
+          <div className="border-2 border-dashed border-[#9CA3AF] rounded-md p-4 text-[#6B7280] flex flex-col items-center justify-center h-[20vh] my-3">
+            <label
+              htmlFor="fileUpload"
+              className="block mb-1 text-sm font-medium cursor-pointer"
+            >
+              Перетащите необходимые файлы
+            </label>
+            <input
+              id="fileUpload"
+              name="fileUpload"
+              type="file"
+              className="block text-sm text-[#6B7280] file:mr-4 file:py-2 file:px-4 file:rounded-md
                                file:border-0 file:text-sm file:font-semibold file:bg-[#E0E7FF] file:text-[#1D4ED8] cursor-pointer"
-            multiple
-          />
+              multiple
+            />
+          </div>
         </div>
 
         <div className="my-5">
