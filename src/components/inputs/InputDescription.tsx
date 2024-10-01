@@ -24,7 +24,8 @@ const InputDescription: FC<InputDescriptionProps> = ({
 }) => {
   return (
     <div className="flex flex-col w-full gap-2 my-3 text-lg">
-      <div>{description}</div>
+      <label>{description}</label>
+
       {!isTextArea ? (
         <input
           type={type ? type : 'text'}

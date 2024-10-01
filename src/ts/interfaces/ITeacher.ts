@@ -5,5 +5,6 @@ export interface ITeacher {
 
 export interface ITeacherOnIntensive {
   id: number;
+  teacherId: number;
   name: string;
 }

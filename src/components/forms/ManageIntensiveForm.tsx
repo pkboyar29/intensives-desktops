@@ -16,7 +16,7 @@ import InputDescription from '../inputs/InputDescription';
 import MultipleSelectInput from '../inputs/MultipleSelectInput';
 
 import { IFlow } from '../../ts/interfaces/IFlow';
-import { ITeacher } from '../../ts/interfaces/ITeacher';
+import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
 
 interface ManageIntensiveFields {
   name: string;
@@ -63,9 +63,14 @@ const ManageIntensiveForm: FC = () => {
 
       setSelectedFlows(currentIntensive.flows);
 
-      // TODO: set selected teachers
-      // in form we display teachers in university, but in intensive I get teachers in intensive, so what to do?
-      // setSelectedTeachers(currentIntensive.teachersTeam);
+      const teachersInUniversity: ITeacher[] =
+        currentIntensive.teachersTeam.map(
+          (teacherInIntensive: ITeacherOnIntensive) => ({
+            id: teacherInIntensive.teacherId,
+            name: teacherInIntensive.name,
+          })
+        );
+      setSelectedTeachers(teachersInUniversity);
     }
   }, [intensiveId, currentIntensive]);
 

@@ -9,7 +9,7 @@ export interface IIntensive {
   open_dt: Date;
   close_dt: Date;
   flows: IFlow[];
-  teachersTeam: ITeacherOnIntensive;
+  teachersTeam: ITeacherOnIntensive[];
 }
 
 export interface IIntensiveCreate {

@@ -8,6 +8,7 @@ export const mapTeacherOnIntensive = (
 ): ITeacherOnIntensive => {
   return {
     id: teacherOnIntensive.id,
+    teacherId: teacherOnIntensive.teacher.id,
     name: getFullName(
       teacherOnIntensive.teacher.user.first_name,
       teacherOnIntensive.teacher.user.last_name,
