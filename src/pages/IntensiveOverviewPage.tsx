@@ -40,7 +40,7 @@ const IntensiveOverviewPage: FC = () => {
               />
               <OverviewItem
                 title="Учебный поток"
-                value={currentIntensive?.flow}
+                value={currentIntensive?.flows[0].name}
               />
             </OverviewContent>
           </div>

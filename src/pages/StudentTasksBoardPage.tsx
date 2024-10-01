@@ -53,7 +53,7 @@ const StudentTasksBoardPage: FC = () => {
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
             <Title text="Доска задач" />
-            <PrimaryButton text="Добавить задачу" onClick={clickAddTask} />
+            <PrimaryButton text="Добавить задачу" clickHandler={clickAddTask} />
           </div>
           <TasksTab onTabChange={handleTab} />
           <Table

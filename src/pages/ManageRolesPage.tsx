@@ -10,6 +10,7 @@ import {
 import { IStudentRole } from '../ts/interfaces/IStudentRole';
 
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
 import Tag from '../components/Tag';
 
 const ManageRolesPage: FC = () => {
@@ -103,13 +104,10 @@ const ManageRolesPage: FC = () => {
             />
           </div>
 
-          <button
-            className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-full flex justify-center"
-            onClick={addRoleButtonClickHandler}
-          >
-            {' '}
-            Добавить роль
-          </button>
+          <PrimaryButton
+            text="Добавить роль"
+            clickHandler={addRoleButtonClickHandler}
+          />
         </div>
       </div>
     </div>

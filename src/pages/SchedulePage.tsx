@@ -6,6 +6,8 @@ import { useGetEventsOnIntensiveQuery } from '../redux/api/eventApi';
 import { IManagerEvent } from '../ts/interfaces/IEvent';
 
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
+
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
 
 const SchedulePage: FC = () => {
@@ -57,18 +59,18 @@ const SchedulePage: FC = () => {
       </div>
 
       <div className="flex gap-3 mt-5">
-        <Link
-          to={replaceLastURLSegment('editEvent')}
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px]"
-        >
-          Добавить мероприятие
-        </Link>
-        <Link
-          to=""
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px]"
-        >
-          Добавить этап
-        </Link>
+        <div>
+          <PrimaryButton
+            text="Добавить мероприятие"
+            clickHandler={() => navigate(replaceLastURLSegment('editEvent'))}
+          />
+        </div>
+        <div>
+          <PrimaryButton
+            text="Добавить этап"
+            clickHandler={() => console.log('stage')}
+          />
+        </div>
       </div>
 
       {events?.map((event) => (

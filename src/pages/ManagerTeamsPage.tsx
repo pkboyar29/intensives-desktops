@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
 
 const ManagerTeamsPage: FC = () => {
+  const navigate = useNavigate();
   const { intensiveId } = useParams();
 
   return (
@@ -50,19 +51,19 @@ const ManagerTeamsPage: FC = () => {
         ))}
       </div>
 
-      <div className="flex gap-5 mt-5">
-        <Link
-          className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to={`/manager/${intensiveId}/createTeam`}
-        >
-          Изменить состав команд
-        </Link>
-        <Link
-          className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to="/createTeam"
-        >
-          Изменить команды сопровождения
-        </Link>
+      <div className="flex gap-5 mt-10">
+        <div>
+          <PrimaryButton
+            text="Изменить состав команд"
+            clickHandler={() => navigate(`/manager/${intensiveId}/createTeam`)}
+          />
+        </div>
+        <div>
+          <PrimaryButton
+            text="Изменить команды сопровождения"
+            clickHandler={() => console.log('yes')}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
 import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
@@ -9,6 +9,7 @@ import { IIntensive } from '../ts/interfaces/IIntensive';
 
 import Table from '../components/Table';
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 
 const IntensivesPage: FC = () => {
@@ -110,9 +111,12 @@ const IntensivesPage: FC = () => {
 
         {currentUser?.roleId === 2 && (
           <div className="flex justify-end mt-10">
-            <button className="ml-auto text-white bg-[#1a5ce5] py-2 px-4 rounded-xl">
-              <Link to="/createIntensive">Создать интенсив</Link>
-            </button>
+            <div className="ml-auto">
+              <PrimaryButton
+                text="Создать интенсив"
+                clickHandler={() => navigate(`/createIntensive`)}
+              />
+            </div>
           </div>
         )}
 

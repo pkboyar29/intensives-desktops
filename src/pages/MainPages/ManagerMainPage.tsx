@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Outlet, Link, useParams } from 'react-router-dom';
+import { Outlet, Link, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
@@ -7,9 +7,11 @@ import { useAppDispatch } from '../../redux/store';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import Sidebar from '../../components/Sidebar';
+import PrimaryButton from '../../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 
 const ManagerMainPage: FC = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const dispatch = useAppDispatch();
 
@@ -19,6 +21,7 @@ const ManagerMainPage: FC = () => {
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
+    navigate(`/intensives`);
   };
 
   return (
@@ -62,13 +65,10 @@ const ManagerMainPage: FC = () => {
                 Управление ролями
               </Link>
             </div>
-            <Link
-              className="block text-center mt-2 px-2 py-4 bg-blue rounded-xl text-white text-[14px] font-inter font-bold"
-              onClick={returnToIntensivesClickHandler}
-              to="/intensives"
-            >
-              Вернуться к списку интенсивов
-            </Link>
+            <PrimaryButton
+              text="Вернуться к списку интенсивов"
+              clickHandler={returnToIntensivesClickHandler}
+            />
           </div>
         </Sidebar>
         <div className="w-full p-10">

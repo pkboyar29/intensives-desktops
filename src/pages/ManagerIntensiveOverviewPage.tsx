@@ -1,11 +1,13 @@
 import { FC, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
 import Title from '../components/Title';
 import Skeleton from 'react-loading-skeleton';
+
+import PrimaryButton from '../components/PrimaryButton';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const navigate = useNavigate();
@@ -89,15 +91,15 @@ const ManagerIntensiveOverviewPage: FC = () => {
               </div>
             </div> */}
             <div className="flex gap-2 mt-3 text-lg font-bold">
-              <Link
-                className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-full flex justify-center"
-                to={`/manager/${currentIntensive?.id}/editIntensive`}
-              >
-                Редактировать
-              </Link>
+              <PrimaryButton
+                text="Редактировать"
+                clickHandler={() => {
+                  navigate(`/manager/${currentIntensive?.id}/editIntensive`);
+                }}
+              />
 
               <button
-                className="px-2 py-2.5 rounded-[10px] bg-[#f0f2f5] flex justify-center items-center cursor-pointer"
+                className="px-2 py-3 rounded-[10px] bg-[#f0f2f5] flex justify-center items-center cursor-pointer"
                 onClick={deleteIntensivButtonHandler}
               >
                 Удалить

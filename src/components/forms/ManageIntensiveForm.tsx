@@ -12,6 +12,7 @@ import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 
 import Title from '../Title';
+import PrimaryButton from '../PrimaryButton';
 import InputDescription from '../inputs/InputDescription';
 import MultipleSelectInput from '../inputs/MultipleSelectInput';
 
@@ -270,12 +271,10 @@ const ManageIntensiveForm: FC = () => {
         </div>
 
         <div className="my-5">
-          <button
-            className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] w-full flex justify-center text-lg font-bold"
+          <PrimaryButton
             type="submit"
-          >
-            {intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
-          </button>
+            text={intensiveId ? `Редактировать интенсив` : `Создать интенсив`}
+          />
         </div>
       </form>
     </div>

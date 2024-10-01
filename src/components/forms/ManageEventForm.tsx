@@ -25,6 +25,7 @@ import InputRadio from '../inputs/InputRadio';
 import InputDescription from '../inputs/InputDescription';
 import ChooseModal from '../ChooseModal';
 import Title from '../Title';
+import PrimaryButton from '../PrimaryButton';
 
 interface ManageEventFormFields {
   name: string;
@@ -374,14 +375,14 @@ const ManageEventForm: FC = () => {
             </div>
 
             <div className="mt-4 text-lg">
-              <button
-                className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] flex justify-center w-full"
+              <PrimaryButton
                 type="submit"
-              >
-                {hasEvent
-                  ? 'Редактировать мероприятие'
-                  : 'Добавить мероприятие'}
-              </button>
+                text={
+                  hasEvent
+                    ? 'Редактировать мероприятие'
+                    : 'Добавить мероприятие'
+                }
+              />
             </div>
           </form>
         </div>

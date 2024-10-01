@@ -48,7 +48,7 @@ const StudentTaskAnswerPage: FC = () => {
           />
         </div>
         <div className="flex flex-col items-end w-[100%] mt-5">
-          <PrimaryButton onClick={sendTask} text="Отправить" />
+          <PrimaryButton clickHandler={sendTask} text="Отправить" />
         </div>
       </div>
     </div>
