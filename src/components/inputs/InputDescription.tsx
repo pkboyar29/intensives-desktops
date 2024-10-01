@@ -23,7 +23,7 @@ const InputDescription: FC<InputDescriptionProps> = ({
   type,
 }) => {
   return (
-    <div className="flex flex-col w-full gap-2 my-3 text-lg">
+    <div className="flex flex-col w-full gap-2 text-lg">
       <label>{description}</label>
 
       {!isTextArea ? (
@@ -31,12 +31,12 @@ const InputDescription: FC<InputDescriptionProps> = ({
           type={type ? type : 'text'}
           placeholder={placeholder}
           {...register(fieldName, registerOptions)}
-          className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+          className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-[#637087]"
         />
       ) : (
         <textarea
           placeholder={placeholder}
-          className="p-2.5 rounded-[10px] bg-[#f0f2f5] h-28"
+          className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-[#637087] h-28"
           {...register(fieldName, registerOptions)}
         />
       )}
