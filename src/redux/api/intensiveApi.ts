@@ -7,6 +7,8 @@ import {
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
 
+import { mapTeacherOnIntensive } from './teacherApi';
+
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
     id: unmappedIntensive.id,
@@ -15,7 +17,10 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     isOpen: unmappedIntensive.is_open,
     open_dt: new Date(unmappedIntensive.open_dt),
     close_dt: new Date(unmappedIntensive.close_dt),
-    flow: unmappedIntensive.flow[0],
+    flows: unmappedIntensive.flow,
+    teachersTeam: unmappedIntensive.teacher_command.map(
+      (teacherOnIntensive: any) => mapTeacherOnIntensive(teacherOnIntensive)
+    ),
   };
 };
 
@@ -46,8 +51,6 @@ export const intensiveApi = createApi({
           university: 1,
           is_open: true,
           roles: [],
-          flow: [],
-          teachers_command: [],
           files: [],
           stages: [],
         },
@@ -65,8 +68,6 @@ export const intensiveApi = createApi({
             ...restData,
             is_open: true,
             roles: [],
-            flow: [],
-            teachers_command: [],
             files: [],
             stages: [],
           },

@@ -1,15 +1,17 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 
-import { ITeacher } from '../../ts/interfaces/ITeacher';
+import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
 
-const mapTeacherOnIntensive = (teacher: any): ITeacher => {
+export const mapTeacherOnIntensive = (
+  teacherOnIntensive: any
+): ITeacherOnIntensive => {
   return {
-    id: teacher.id,
+    id: teacherOnIntensive.id,
     name: getFullName(
-      teacher.teacher.user.first_name,
-      teacher.teacher.user.last_name,
-      teacher.teacher.user.middle_name
+      teacherOnIntensive.teacher.user.first_name,
+      teacherOnIntensive.teacher.user.last_name,
+      teacherOnIntensive.teacher.user.middle_name
     ),
   };
 };
@@ -37,10 +39,10 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery,
   endpoints: (builder) => ({
-    getTeachersOnIntensive: builder.query<ITeacher[], number>({
+    getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
       query: (intensiveId) =>
         `teachers_on_intensives/?intensive=${intensiveId}`,
-      transformResponse: (response: any): ITeacher[] =>
+      transformResponse: (response: any): ITeacherOnIntensive[] =>
         response.results.map((teacher: any) => mapTeacherOnIntensive(teacher)),
     }),
     // TODO: when i can pass university to backend, then pass university here

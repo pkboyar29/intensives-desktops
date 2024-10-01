@@ -7,23 +7,21 @@ interface CheckboxProps {
   };
   addSelectedItem: (itemId: number) => void;
   deleteSelectedItem: (itemId: number) => void;
+  isChecked: boolean;
 }
 
 const Checkbox: FC<CheckboxProps> = ({
   item,
   addSelectedItem,
   deleteSelectedItem,
+  isChecked,
 }) => {
-  const [isActive, setIsActive] = useState<boolean>(false);
-
   const checkboxClickHandler = () => {
-    if (!isActive) {
+    if (!isChecked) {
       addSelectedItem(item.id);
     } else {
       deleteSelectedItem(item.id);
     }
-
-    setIsActive((prevIsActive) => !prevIsActive);
   };
 
   return (
@@ -34,7 +32,7 @@ const Checkbox: FC<CheckboxProps> = ({
     >
       <span className="border-2 border-solid border-[#667080] rounded-md w-[18px] h-[18px] p-[1px] flex items-center justify-center">
         <svg
-          className={`${!isActive && 'hidden'}`}
+          className={`${!isChecked && 'hidden'}`}
           width="15"
           height="15"
           viewBox="0 0 15 12"

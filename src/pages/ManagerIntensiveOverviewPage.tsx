@@ -61,25 +61,17 @@ const ManagerIntensiveOverviewPage: FC = () => {
             <div className="pb-2">Список учебных потоков</div>
             <div className="flex flex-wrap">
               {currentIntensive ? (
-                <div className="ml-4 text-sm selectedInList">
-                  {currentIntensive.flow}
-                </div>
+                <>
+                  {currentIntensive.flows.map((flow) => (
+                    <div key={flow.id} className="ml-4 text-sm selectedInList">
+                      {flow.name}
+                    </div>
+                  ))}
+                </>
               ) : (
                 <Skeleton />
               )}
             </div>
-            {/* <div className="py-3 text-lg">
-              <div className="pb-2">Список ролей для студентов</div>
-              <div className="flex flex-wrap">
-                {data ? (
-                  data.roles.map((elem) => (
-                    <div className="ml-4 text-sm selectedInList">{elem}</div>
-                  ))
-                ) : (
-                  <Skeleton />
-                )}
-              </div>
-            </div> */}
             {/* <div className="py-3 text-lg">
               <div className="pb-2">Список преподавателей</div>
               <div className="flex flex-wrap">

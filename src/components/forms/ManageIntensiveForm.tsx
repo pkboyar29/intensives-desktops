@@ -36,9 +36,11 @@ const ManageIntensiveForm: FC = () => {
 
   const { data: flows } = useGetFlowsQuery();
   const [selectedFlows, setSelectedFlows] = useState<IFlow[]>([]);
+  const [flowsErrorMessage, setFlowsErrorMessage] = useState<string>('');
 
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const [selectedTeachers, setSelectedTeachers] = useState<ITeacher[]>([]);
+  const [teachersErrorMessage, setTeachersErrorMessage] = useState<string>('');
 
   const {
     register,
@@ -59,23 +61,52 @@ const ManageIntensiveForm: FC = () => {
         currentIntensive.close_dt.toISOString().split('T')[0]
       );
 
-      // TODO: set teachers
+      setSelectedFlows(currentIntensive.flows);
+
+      // TODO: set selected teachers
+      // in form we display teachers in university, but in intensive I get teachers in intensive, so what to do?
+      // setSelectedTeachers(currentIntensive.teachersTeam);
     }
   }, [intensiveId, currentIntensive]);
 
   const onSubmit = async (data: ManageIntensiveFields) => {
     try {
+      if (selectedFlows.length === 0) {
+        setFlowsErrorMessage('Необходимо выбрать хотя бы один поток!');
+        return;
+      } else {
+        setFlowsErrorMessage('');
+      }
+
+      if (selectedTeachers.length === 0) {
+        setTeachersErrorMessage(
+          'Необходимо выбрать хотя бы одного преподавателя!'
+        );
+        return;
+      } else {
+        setTeachersErrorMessage('');
+      }
+
+      const flows_ids: number[] = selectedFlows.map((flow) => flow.id);
+      const teacher_ids: number[] = selectedTeachers.map(
+        (teacher) => teacher.id
+      );
+
       if (intensiveId) {
         await updateIntensive({
           id: Number(intensiveId),
           ...data,
+          flow: flows_ids,
+          teachers_command: teacher_ids,
         });
 
         navigate(`/manager/${intensiveId}/overview`);
       } else {
-        const { data: createIntensiveResponseData } = await createIntensive(
-          data
-        );
+        const { data: createIntensiveResponseData } = await createIntensive({
+          ...data,
+          flow: flows_ids,
+          teachers_command: teacher_ids,
+        });
 
         if (createIntensiveResponseData) {
           navigate(`/manager/${createIntensiveResponseData.id}/overview`);
@@ -120,6 +151,7 @@ const ManageIntensiveForm: FC = () => {
           />
 
           <InputDescription
+            isTextArea={true}
             fieldName="description"
             register={register}
             registerOptions={{
@@ -188,6 +220,8 @@ const ManageIntensiveForm: FC = () => {
             <div className="mt-3">
               <MultipleSelectInput
                 description="Список потоков"
+                errorMessage={flowsErrorMessage}
+                setErrorMessage={setFlowsErrorMessage}
                 items={flows}
                 selectedItems={selectedFlows}
                 setSelectedItems={setSelectedFlows}
@@ -199,6 +233,8 @@ const ManageIntensiveForm: FC = () => {
             <div className="mt-3">
               <MultipleSelectInput
                 description="Список преподавателей"
+                errorMessage={teachersErrorMessage}
+                setErrorMessage={setTeachersErrorMessage}
                 items={teachers}
                 selectedItems={selectedTeachers}
                 setSelectedItems={setSelectedTeachers}

@@ -1,3 +1,6 @@
+import { IFlow } from './IFlow';
+import { ITeacherOnIntensive } from './ITeacher';
+
 export interface IIntensive {
   id: number;
   name: string;
@@ -5,7 +8,8 @@ export interface IIntensive {
   isOpen: boolean;
   open_dt: Date;
   close_dt: Date;
-  flow: string;
+  flows: IFlow[];
+  teachersTeam: ITeacherOnIntensive;
 }
 
 export interface IIntensiveCreate {
@@ -13,6 +17,8 @@ export interface IIntensiveCreate {
   description: string;
   open_dt: string;
   close_dt: string;
+  teachers_command: number[];
+  flow: number[];
 }
 
 export interface IIntensiveUpdate {
@@ -21,4 +27,6 @@ export interface IIntensiveUpdate {
   description: string;
   open_dt: string;
   close_dt: string;
+  teachers_command: number[];
+  flow: number[];
 }

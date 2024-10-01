@@ -9,6 +9,8 @@ interface Item {
 
 interface MultipleSelectInputProps {
   description: string;
+  errorMessage: string;
+  setErrorMessage: (errorMessage: string) => void;
   items: Item[];
   selectedItems: Item[];
   setSelectedItems: (items: Item[]) => void;
@@ -16,6 +18,8 @@ interface MultipleSelectInputProps {
 
 const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
   description,
+  errorMessage,
+  setErrorMessage,
   items,
   selectedItems,
   setSelectedItems,
@@ -32,6 +36,8 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
     if (selectedItem) {
       setSelectedItems([...selectedItems, selectedItem]);
     }
+
+    setErrorMessage('');
   };
 
   const deleteSelectedItem = (id: number) => {
@@ -82,6 +88,9 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
             item={item}
             addSelectedItem={addSelectedItem}
             deleteSelectedItem={deleteSelectedItem}
+            isChecked={selectedItems.some(
+              (selectedItem) => selectedItem.id === item.id
+            )}
           />
         ))}
       </ul>
@@ -96,6 +105,8 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
           </div>
         ))}
       </div>
+
+      <div className="mt-3 text-base text-red">{errorMessage}</div>
     </div>
   );
 };

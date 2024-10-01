@@ -55,9 +55,9 @@ const IntensivesPage: FC = () => {
       header: () => 'Конец интенсива',
       cell: (info) => info.getValue().toLocaleDateString(),
     }),
-    columnHelper.accessor('flow', {
+    columnHelper.accessor('flows', {
       header: () => 'Участники',
-      cell: (info) => info.getValue(),
+      cell: (info) => info.getValue()[0] && info.getValue()[0].name,
     }),
   ];
 

@@ -7,28 +7,39 @@ interface InputDescriptionProps {
   registerOptions?: RegisterOptions;
   placeholder: string;
   description: string;
+  isTextArea?: boolean;
   errorMessage?: string;
   type?: HTMLInputTypeAttribute;
 }
 
 const InputDescription: FC<InputDescriptionProps> = ({
-  fieldName,
   register,
+  fieldName,
+  registerOptions,
   placeholder,
   description,
-  registerOptions,
+  isTextArea = false,
   errorMessage,
   type,
 }) => {
   return (
     <div className="flex flex-col w-full gap-2 my-3 text-lg">
       <div>{description}</div>
-      <input
-        type={type ? type : 'text'}
-        placeholder={placeholder}
-        {...register(fieldName, registerOptions)}
-        className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
-      />
+      {!isTextArea ? (
+        <input
+          type={type ? type : 'text'}
+          placeholder={placeholder}
+          {...register(fieldName, registerOptions)}
+          className="p-2.5 rounded-[10px] bg-[#f0f2f5]"
+        />
+      ) : (
+        <textarea
+          placeholder={placeholder}
+          className="p-2.5 rounded-[10px] bg-[#f0f2f5] h-28"
+          {...register(fieldName, registerOptions)}
+        />
+      )}
+
       {errorMessage && <div className="text-base text-red">{errorMessage}</div>}
     </div>
   );
