@@ -1,5 +1,7 @@
 import { useState, FC } from 'react';
 
+import Chip from './Chip';
+
 interface ChooseModalProps {
   itemsProp: any[];
   selectedItemsProp: any[];
@@ -53,22 +55,18 @@ const ChooseModal: FC<ChooseModalProps> = ({
 
         <div className="mt-3 w-full h-full rounded-lg overflow-y-auto overflow-x-clip gap-1.5 flex flex-wrap p-2.5 border border-dashed border-[#637087]">
           {items.map((elem, index: number) => (
-            <div
+            <Chip
               key={index}
-              onClick={() => addItem(elem)}
-              className="ml-4 text-sm selectedInList"
-            >
-              {elem.name}
-            </div>
+              clickHandler={() => addItem(elem)}
+              label={elem.name}
+            />
           ))}
         </div>
 
         <div className="flex flex-wrap w-full gap-2.5 mt-5">
           {selectedItems?.map((selectedItem, index: number) => (
             <div key={index} className="flex items-center flex-nowrap">
-              <span className="ml-4 text-sm selectedInList">
-                {selectedItem.name}
-              </span>
+              <Chip label={selectedItem.name} />
               <button
                 onClick={() => {
                   deleteItem(selectedItem);

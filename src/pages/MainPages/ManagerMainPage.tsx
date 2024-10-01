@@ -16,7 +16,10 @@ const ManagerMainPage: FC = () => {
   const dispatch = useAppDispatch();
 
   const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
-    Number(params.intensiveId)
+    Number(params.intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
   );
 
   const returnToIntensivesClickHandler = () => {

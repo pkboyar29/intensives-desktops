@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 
 import Checkbox from './Checkbox';
+import Chip from '../Chip';
 
 interface Item {
   id: number;
@@ -97,12 +98,7 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
 
       <div className="flex flex-wrap gap-2 mx-3 mt-3">
         {selectedItems.map((selectedItem) => (
-          <div
-            className="bg-[#D6DDEC] inline-block rounded-xl px-4 color-[#121217]"
-            key={selectedItem.id}
-          >
-            {selectedItem.name}
-          </div>
+          <Chip key={selectedItem.id} label={selectedItem.name} />
         ))}
       </div>
 

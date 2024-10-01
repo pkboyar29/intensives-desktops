@@ -65,7 +65,7 @@ const SignInPage: FC = () => {
           <div className="py-3 text-[28px] font-bold">Авторизация</div>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 w-[480px]"
+            className="flex flex-col gap-4 w-[480px] mt-3"
           >
             <InputDescription
               register={register}

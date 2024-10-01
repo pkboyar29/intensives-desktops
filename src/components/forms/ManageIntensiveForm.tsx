@@ -130,7 +130,7 @@ const ManageIntensiveForm: FC = () => {
           text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
         />
 
-        <div className="mt-6 mb-3">
+        <div className="flex flex-col gap-3 mt-6 mb-3">
           <div className="text-lg font-bold">Интенсив</div>
 
           <InputDescription
@@ -176,7 +176,7 @@ const ManageIntensiveForm: FC = () => {
           />
         </div>
 
-        <div className="my-3">
+        <div className="flex flex-col gap-3 my-3">
           <div className="text-lg font-bold">Время проведения</div>
 
           <div className="flex justify-between gap-6">

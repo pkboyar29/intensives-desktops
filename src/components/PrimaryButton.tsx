@@ -13,7 +13,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
 }) => {
   return (
     <button
-      className="px-4 py-[9px] text-white text-lg bg-blue hover:bg-dark_blue font-semibold rounded-[10px] w-full flex justify-center transition duration-300 ease-in-out"
+      className="px-4 py-[9px] text-white text-lg bg-blue hover:bg-dark_blue font-semibold rounded-[10px] w-full flex justify-center items-center transition duration-300 ease-in-out"
       onClick={clickHandler}
       type={type}
       {...props}
