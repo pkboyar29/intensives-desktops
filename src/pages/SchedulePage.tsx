@@ -6,6 +6,8 @@ import { useGetEventsOnIntensiveQuery } from '../redux/api/eventApi';
 import { IManagerEvent } from '../ts/interfaces/IEvent';
 
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
+
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
 
 const SchedulePage: FC = () => {
@@ -39,7 +41,7 @@ const SchedulePage: FC = () => {
       >
         <div className="flex flex-col justify-center">
           <p className="text-xl">{event.name}</p>
-          <time className="text-[#637087] text-base">
+          <time className="text-base text-bright_gray">
             {event.dateStart + ' ' + event.dateEnd}
           </time>
         </div>
@@ -51,24 +53,24 @@ const SchedulePage: FC = () => {
     <div className="min-h-screen min-w-[50vw] max-w-[1280px]">
       <div className="flex items-center justify-between">
         <Title text="План интенсива" />
-        <button className="px-2.5 py-1.5 rounded-xl bg-[#f0f2f5] h-[34px] flex justify-center items-center cursor-pointer">
+        <button className="px-2.5 py-1.5 rounded-xl bg-another_white h-[34px] flex justify-center items-center cursor-pointer">
           <div className="text-base font-bold">Редактировать</div>{' '}
         </button>
       </div>
 
       <div className="flex gap-3 mt-5">
-        <Link
-          to={replaceLastURLSegment('editEvent')}
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px]"
-        >
-          Добавить мероприятие
-        </Link>
-        <Link
-          to=""
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px]"
-        >
-          Добавить этап
-        </Link>
+        <div>
+          <PrimaryButton
+            text="Добавить мероприятие"
+            clickHandler={() => navigate(replaceLastURLSegment('editEvent'))}
+          />
+        </div>
+        <div>
+          <PrimaryButton
+            text="Добавить этап"
+            clickHandler={() => console.log('stage')}
+          />
+        </div>
       </div>
 
       {events?.map((event) => (

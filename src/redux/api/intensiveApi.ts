@@ -1,11 +1,13 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import {
   IIntensive,
   IIntensiveCreate,
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
+
+import { mapTeacherOnIntensive } from './teacherApi';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -15,22 +17,16 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     isOpen: unmappedIntensive.is_open,
     open_dt: new Date(unmappedIntensive.open_dt),
     close_dt: new Date(unmappedIntensive.close_dt),
-    flow: unmappedIntensive.flow[0],
+    flows: unmappedIntensive.flow,
+    teachersTeam: unmappedIntensive.teacher_command.map(
+      (teacherOnIntensive: any) => mapTeacherOnIntensive(teacherOnIntensive)
+    ),
   };
 };
 
 export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',
@@ -55,8 +51,6 @@ export const intensiveApi = createApi({
           university: 1,
           is_open: true,
           roles: [],
-          flow: [],
-          teachers_command: [],
           files: [],
           stages: [],
         },
@@ -74,8 +68,6 @@ export const intensiveApi = createApi({
             ...restData,
             is_open: true,
             roles: [],
-            flow: [],
-            teachers_command: [],
             files: [],
             stages: [],
           },

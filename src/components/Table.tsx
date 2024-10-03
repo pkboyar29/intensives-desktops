@@ -26,13 +26,13 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
     <>
       <div className="inline-block w-full mt-8 rounded-lg">
         <table className="w-full">
-          <thead className="bg-[#F1F5F9] border-b border-solid border-[#e5e7eb]">
+          <thead className="border-b border-solid bg-gray_8 border-gray_9">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="">
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-6 py-3 font-sans font-semibold text-left rounded text-thead_cell"
+                    className="px-6 py-3 font-sans font-semibold text-left rounded text-black_2"
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -53,7 +53,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
                 key={row.id}
                 className={`cursor-pointer ${
                   rowIndex !== lastRowIndex &&
-                  `border-b border-solid border-[#e5e7eb]`
+                  `border-b border-solid border-gray_9`
                 }`}
               >
                 {row.getVisibleCells().map((cell) => (

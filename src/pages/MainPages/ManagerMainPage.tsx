@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Outlet, Link, useParams } from 'react-router-dom';
+import { Outlet, Link, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
@@ -7,18 +7,24 @@ import { useAppDispatch } from '../../redux/store';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import Sidebar from '../../components/Sidebar';
+import PrimaryButton from '../../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 
 const ManagerMainPage: FC = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const dispatch = useAppDispatch();
 
   const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
-    Number(params.intensiveId)
+    Number(params.intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
   );
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
+    navigate(`/intensives`);
   };
 
   return (
@@ -31,7 +37,7 @@ const ManagerMainPage: FC = () => {
             ) : (
               <>
                 <div className="text-lg">{currentIntensive?.name}</div>
-                <div className="text-[#637087]">
+                <div className="text-bright_gray">
                   {currentIntensive?.open_dt.toLocaleDateString()}
                   {` - `}
                   {currentIntensive?.close_dt.toLocaleDateString()}
@@ -40,35 +46,35 @@ const ManagerMainPage: FC = () => {
             )}
 
             <div className="flex flex-col gap-4 my-3">
-              <Link to="overview" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link
+                to="overview"
+                className="py-1.5 px-2.5 hover:bg-another_white"
+              >
                 Настройки интенсива
               </Link>
               <Link
                 to="statistics"
-                className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
+                className="py-1.5 px-2.5 hover:bg-another_white"
               >
                 Статистика
               </Link>
-              <Link to="teams" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link to="teams" className="py-1.5 px-2.5 hover:bg-another_white">
                 Управление командами
               </Link>
-              <Link to="plan" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link to="plan" className="py-1.5 px-2.5 hover:bg-another_white">
                 План интенсива
               </Link>
               <Link
                 to="manageRoles"
-                className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
+                className="py-1.5 px-2.5 hover:bg-another_white"
               >
                 Управление ролями
               </Link>
             </div>
-            <Link
-              className="block text-center mt-2 px-2 py-4 bg-blue rounded-xl text-white text-[14px] font-inter font-bold"
-              onClick={returnToIntensivesClickHandler}
-              to="/intensives"
-            >
-              Вернуться к списку интенсивов
-            </Link>
+            <PrimaryButton
+              text="Вернуться к списку интенсивов"
+              clickHandler={returnToIntensivesClickHandler}
+            />
           </div>
         </Sidebar>
         <div className="w-full p-10">

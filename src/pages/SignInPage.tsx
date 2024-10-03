@@ -3,19 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
+import InputDescription from '../components/inputs/InputDescription';
+import PrimaryButton from '../components/PrimaryButton';
+
 import { ISignIn } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
 import { useAppSelector } from '../redux/store';
 
 const SignInPage: FC = () => {
-  const [signIn, { error: signInError }] = useSignInMutation();
-  const [trigger] = useLazyGetUserQuery();
+  const [signIn] = useSignInMutation();
+  const [getUserInfo] = useLazyGetUserQuery();
   const currentUser = useAppSelector((state) => state.user.data);
 
   const navigate = useNavigate();
 
-  const { handleSubmit, register } = useForm<ISignIn>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setError,
+  } = useForm<ISignIn>({
     mode: 'onBlur',
   });
 
@@ -25,19 +33,20 @@ const SignInPage: FC = () => {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    if (signInError) {
-      console.log(signInError);
-    }
-  }, [signInError]);
-
   const onSubmit = async (data: ISignIn) => {
-    const signInDataResponse = await signIn(data).unwrap();
+    try {
+      const signInDataResponse = await signIn(data).unwrap();
 
-    Cookies.set('access', signInDataResponse.access);
-    Cookies.set('refresh', signInDataResponse.refresh);
+      Cookies.set('access', signInDataResponse.access);
+      Cookies.set('refresh', signInDataResponse.refresh);
 
-    trigger();
+      getUserInfo();
+    } catch (e) {
+      setError('password', {
+        type: 'custom',
+        message: 'Email или пароль неверны!',
+      });
+    }
   };
 
   const redirect = (roleId: number) => {
@@ -56,26 +65,40 @@ const SignInPage: FC = () => {
           <div className="py-3 text-[28px] font-bold">Авторизация</div>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 w-[480px]"
+            className="flex flex-col gap-4 w-[480px] mt-3"
           >
-            <input
-              {...register('email')}
-              className="p-4 font-sans text-base border border-black border-solid rounded-lg"
-              type="text"
-              placeholder="Email"
+            <InputDescription
+              register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
+              fieldName="email"
+              placeholder="Введите email"
+              description="Email"
+              errorMessage={
+                typeof errors.email?.message === 'string'
+                  ? errors.email.message
+                  : ''
+              }
             />
-            <input
-              {...register('password')}
-              className="p-4 font-sans text-base border border-black border-solid rounded-lg"
+
+            <InputDescription
+              register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
+              fieldName="password"
+              placeholder="Введите пароль"
+              description="Пароль"
               type="password"
-              placeholder="Пароль"
+              errorMessage={
+                typeof errors.password?.message === 'string'
+                  ? errors.password.message
+                  : ''
+              }
             />
-            <button
-              className="p-4 font-sans text-left text-white rounded-lg bg-blue"
-              type="submit"
-            >
-              ВОЙТИ
-            </button>
+
+            <PrimaryButton text="Войти в систему" type="submit" />
           </form>
         </div>
       </div>

@@ -9,25 +9,26 @@ import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
 import { eventApi } from './api/eventApi';
 import { teamApi } from './api/teamApi';
-import { teacherOnIntensiveApi } from './api/teacherOnIntensiveApi';
+import { teacherApi } from './api/teacherApi';
 import { studentRoleApi } from './api/studentRoleApi';
 import { stageApi } from './api/stageApi';
 import { audienceApi } from './api/audienceApi';
+import { flowApi } from './api/flowApi';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     intensive: intensiveReducer,
     team: teamReducer,
-    // is it necessary to do it below?
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
     [eventApi.reducerPath]: eventApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
-    [teacherOnIntensiveApi.reducerPath]: teacherOnIntensiveApi.reducer,
+    [teacherApi.reducerPath]: teacherApi.reducer,
     [studentRoleApi.reducerPath]: studentRoleApi.reducer,
     [stageApi.reducerPath]: stageApi.reducer,
     [audienceApi.reducerPath]: audienceApi.reducer,
+    [flowApi.reducerPath]: flowApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -37,10 +38,11 @@ export const store = configureStore({
       intensiveApi.middleware,
       eventApi.middleware,
       teamApi.middleware,
-      teacherOnIntensiveApi.middleware,
+      teacherApi.middleware,
       studentRoleApi.middleware,
       stageApi.middleware,
-      audienceApi.middleware
+      audienceApi.middleware,
+      flowApi.middleware
     ),
 });
 

@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
 
 const ManagerTeamsPage: FC = () => {
+  const navigate = useNavigate();
   const { intensiveId } = useParams();
 
   return (
@@ -17,7 +18,7 @@ const ManagerTeamsPage: FC = () => {
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index}>
             <div className="flex gap-2">
-              <div className="flex items-center justify-center bg-[#e8edf2] rounded-[10px] w-12 h-12">
+              <div className="flex items-center justify-center bg-gray_5 rounded-[10px] w-12 h-12">
                 {' '}
                 <svg
                   width="24"
@@ -40,7 +41,7 @@ const ManagerTeamsPage: FC = () => {
             <div className="flex flex-col gap-5 mt-3">
               {Array.from({ length: 6 }).map((_, innerIndex) => (
                 <div key={innerIndex}>
-                  <span className="px-4 py-1 bg-[#e8edf2] rounded-xl hover:bg-[#d9dee3]">
+                  <span className="px-4 py-1 bg-gray_5 rounded-xl hover:bg-gray_6">
                     20-ИСбо-2 Мындрила М.А.
                   </span>
                 </div>
@@ -50,19 +51,19 @@ const ManagerTeamsPage: FC = () => {
         ))}
       </div>
 
-      <div className="flex gap-5 mt-5">
-        <Link
-          className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to={`/manager/${intensiveId}/createTeam`}
-        >
-          Изменить состав команд
-        </Link>
-        <Link
-          className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl inline-block"
-          to="/createTeam"
-        >
-          Изменить команды сопровождения
-        </Link>
+      <div className="flex gap-5 mt-10">
+        <div>
+          <PrimaryButton
+            text="Изменить состав команд"
+            clickHandler={() => navigate(`/manager/${intensiveId}/createTeam`)}
+          />
+        </div>
+        <div>
+          <PrimaryButton
+            text="Изменить команды сопровождения"
+            clickHandler={() => console.log('yes')}
+          />
+        </div>
       </div>
     </div>
   );

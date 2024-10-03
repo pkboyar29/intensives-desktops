@@ -8,7 +8,7 @@ import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 import { useLazyGetTeamsOnIntensiveQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
-import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherOnIntensiveApi';
+import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
 import {
   useLazyGetEventQuery,
   useCreateEventMutation,
@@ -19,12 +19,13 @@ import { IStage } from '../../ts/interfaces/IStage';
 import { IAudience } from '../../ts/interfaces/IAudience';
 import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
-import Select from '../Select';
-import InputRadioDescription from '../InputRadioDescription';
-import InputRadio from '../InputRadio';
-import InputDescription from '../InputDescription';
+import Select from '../inputs/Select';
+import InputRadioDescription from '../inputs/InputRadioDescription';
+import InputRadio from '../inputs/InputRadio';
+import InputDescription from '../inputs/InputDescription';
 import ChooseModal from '../ChooseModal';
 import Title from '../Title';
+import PrimaryButton from '../PrimaryButton';
 
 interface ManageEventFormFields {
   name: string;
@@ -307,7 +308,7 @@ const ManageEventForm: FC = () => {
               </div>
               <div className="flex items-center gap-4 mt-4">
                 <button
-                  className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] flex justify-center"
+                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
                   type="button"
                   onClick={() => setModalTeams(true)}
                 >
@@ -316,7 +317,7 @@ const ManageEventForm: FC = () => {
                 </button>
 
                 {teams.length === 0 && (
-                  <span className="text-[#6B7280]">
+                  <span className="text-gray_3">
                     Выберите участвующих в мероприятии команды
                   </span>
                 )}
@@ -337,7 +338,7 @@ const ManageEventForm: FC = () => {
 
               <div className="flex items-center gap-4 mt-4">
                 <button
-                  className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] flex justify-center"
+                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
                   type="button"
                   onClick={() => setModalTeachers(true)}
                 >
@@ -345,7 +346,7 @@ const ManageEventForm: FC = () => {
                   Выбрать{' '}
                 </button>
                 {teams.length === 0 && (
-                  <span className="text-[#6B7280]">
+                  <span className="text-gray_3">
                     Выберите участвующих в мероприятии преподавателей
                   </span>
                 )}
@@ -374,14 +375,14 @@ const ManageEventForm: FC = () => {
             </div>
 
             <div className="mt-4 text-lg">
-              <button
-                className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] flex justify-center w-full"
+              <PrimaryButton
                 type="submit"
-              >
-                {hasEvent
-                  ? 'Редактировать мероприятие'
-                  : 'Добавить мероприятие'}
-              </button>
+                text={
+                  hasEvent
+                    ? 'Редактировать мероприятие'
+                    : 'Добавить мероприятие'
+                }
+              />
             </div>
           </form>
         </div>

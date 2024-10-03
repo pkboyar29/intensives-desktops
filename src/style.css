@@ -196,21 +196,6 @@ table td {
   overflow: hidden;
 }
 
-.selectedInList {
-  background-color: #e8edf2;
-  height: -moz-fit-content;
-  height: fit-content;
-  padding: 3px 10px;
-  border-radius: 10px;
-  width: 100%;
-  max-width: max-content;
-  text-wrap: nowrap;
-  text-overflow: ellipsis;
-  margin: 2px 2px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 .list-content {
   max-width: 765px;
   width: 100%;

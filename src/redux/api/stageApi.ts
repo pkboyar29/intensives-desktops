@@ -1,20 +1,11 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import { IStage } from '../../ts/interfaces/IStage';
 
 export const stageApi = createApi({
   reducerPath: 'stageApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     // TODO: stop getting all stages. get stages for specific intensive (when this endpoint will appear)
     getStages: builder.query<IStage[], void>({

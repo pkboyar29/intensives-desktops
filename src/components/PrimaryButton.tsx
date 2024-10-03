@@ -1,27 +1,25 @@
-import { FC } from 'react';
+import { FC, ButtonHTMLAttributes } from 'react';
 
-type PrimaryButtonProps = {
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
-  width?: number;
-  height?: number;
-  onClick: () => void;
-};
+  clickHandler?: () => void;
+}
 
 const PrimaryButton: FC<PrimaryButtonProps> = ({
   text,
-  width,
-  height,
-  onClick,
+  clickHandler,
+  type,
+  ...props
 }) => {
   return (
-    <>
-      <button
-        className="px-5 py-3 text-white bg-blue font-l rounded-xl"
-        onClick={onClick}
-      >
-        {text}
-      </button>
-    </>
+    <button
+      className="px-4 py-[9px] text-white text-lg bg-blue hover:bg-dark_blue font-semibold rounded-[10px] w-full flex justify-center items-center transition duration-300 ease-in-out"
+      onClick={clickHandler}
+      type={type}
+      {...props}
+    >
+      {text}
+    </button>
   );
 };
 

@@ -42,13 +42,13 @@ const DragContainer = ({ teamName, func, team }) => {
       onDragOver={(evt) => evt.preventDefault()}
     >
       <div className="flex items-center space-x-2">
-        <span className="font-semibold text-[#333]">{teamName}</span>
+        <span className="font-semibold text-black_3">{teamName}</span>
       </div>
 
       {draggedElements.length ? (
         ''
       ) : (
-        <span className="text-sm text-[#6B7280]">Нет участников</span>
+        <span className="text-sm text-gray_3">Нет участников</span>
       )}
 
       {draggedElements.map((smile) => (
@@ -60,7 +60,7 @@ const DragContainer = ({ teamName, func, team }) => {
           deleteI={deleteItemFromCont}
         />
       ))}
-      <select className="px-4 py-1.5 text-sm rounded-lg border-none outline-none bg-[#f0f2f5] w-min appearance-none">
+      <select className="px-4 py-1.5 text-sm rounded-lg border-none outline-none bg-another_white w-min appearance-none">
         <option>Добавить участника</option>
       </select>
     </div>

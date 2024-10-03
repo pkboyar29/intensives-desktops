@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
@@ -12,16 +12,7 @@ const mapTeamToChoose = (unmappedTeam: any): ITeamToChoose => {
 
 export const teamApi = createApi({
   reducerPath: 'teamApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'same-origin',
-    prepareHeaders: async (headers) => {
-      headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
-      return headers;
-    },
-    mode: 'cors',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     getTeamsOnIntensive: builder.query<ITeamToChoose[], number>({
       query: (intensiveId) =>
