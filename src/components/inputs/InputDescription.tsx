@@ -31,12 +31,12 @@ const InputDescription: FC<InputDescriptionProps> = ({
           type={type ? type : 'text'}
           placeholder={placeholder}
           {...register(fieldName, registerOptions)}
-          className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-[#637087]"
+          className="p-2.5 rounded-[10px] bg-another_white text-bright_gray"
         />
       ) : (
         <textarea
           placeholder={placeholder}
-          className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-[#637087] h-28"
+          className="p-2.5 rounded-[10px] bg-another_white text-bright_gray h-28"
           {...register(fieldName, registerOptions)}
         />
       )}

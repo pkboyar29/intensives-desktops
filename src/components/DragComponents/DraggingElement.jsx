@@ -22,7 +22,7 @@ const DraggingElement = ({ data, func, dragElements, deleteI }) => {
 
   return (
     <div ref={dragRef} className="smile" draggable>
-      <span className="ml-4 text-sm rounded-lg border-none outline-none bg-[#f0f2f5] w-min appearance-none">
+      <span className="ml-4 text-sm border-none rounded-lg outline-none appearance-none bg-another_white w-min">
         {data.content}
       </span>
       <button

@@ -124,7 +124,7 @@ const IntensivesPage: FC = () => {
           <input
             value={searchText}
             onChange={searchInputChangeHandler}
-            className="w-full py-3 px-4 bg-[#f0f2f5] rounded-xl"
+            className="w-full px-4 py-3 bg-another_white rounded-xl"
             placeholder="Поиск"
           />
         </div>

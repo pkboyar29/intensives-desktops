@@ -8,7 +8,7 @@ interface TagProps {
 
 const Tag: FC<TagProps> = ({ name, deleteHandler }) => {
   return (
-    <div className="text-sm bg-[#e8edf2] px-2 py-1 rounded-[10px] max-w-max overflow-hidden whitespace-nowrap flex justify-between items-center gap-[5px]">
+    <div className="text-sm bg-gray_5 px-2 py-1 rounded-[10px] max-w-max overflow-hidden whitespace-nowrap flex justify-between items-center gap-[5px]">
       <span className="w-full overflow-hidden mr-[10px] text-ellipsis whitespace-nowrap">
         {name}
       </span>

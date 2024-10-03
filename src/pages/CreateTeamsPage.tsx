@@ -70,7 +70,7 @@ const CreateTeamsPage: FC = () => {
     <div>
       <Title text="Команды" />
 
-      <p className="text-base mt-2 text-[#6B7280]">
+      <p className="mt-2 text-base text-gray_3">
         Создайте команды и распределите участников интенсива по командам
       </p>
 
@@ -79,7 +79,7 @@ const CreateTeamsPage: FC = () => {
           <input
             type="number"
             onChange={numberTeamsInputChangeHandler}
-            className="p-2 border w-full border-[#D1D5DB] rounded-md"
+            className="w-full p-2 border rounded-md border-gray_4"
             value={countTeams}
           />
           <svg
@@ -101,7 +101,7 @@ const CreateTeamsPage: FC = () => {
 
         <button
           type="button"
-          className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl"
+          className="px-4 py-2 text-white bg-blue rounded-xl"
           onClick={numberTeamsButtonClickHandler}
         >
           Изменить
@@ -110,10 +110,8 @@ const CreateTeamsPage: FC = () => {
 
       <div className="flex gap-10 mt-5">
         <div className="max-w-[470px] flex flex-col gap-3">
-          <h2 className="text-lg font-bold text-[#0D141C]">
-            Созданные команды
-          </h2>
-          <p className="text-base text-[#637087]">
+          <h2 className="text-lg font-bold text-black_2">Созданные команды</h2>
+          <p className="text-base text-bright_gray">
             Для добавления участников в команды вы можете использовать
             выпадающий список или переместить свободных участников в команды с
             помощью drag and drop
@@ -129,7 +127,7 @@ const CreateTeamsPage: FC = () => {
         </div>
 
         <div className="max-w-[470px] flex flex-col gap-3">
-          <h2 className="text-lg font-bold text-[#0D141C]">
+          <h2 className="text-lg font-bold text-black_2">
             Свободные участники
           </h2>
 
@@ -153,20 +151,20 @@ const CreateTeamsPage: FC = () => {
             <input
               type="text"
               placeholder="Поиск"
-              className="w-full py-2 pl-10 pr-2 bg-[#f0f2f5] rounded-lg"
+              className="w-full py-2 pl-10 pr-2 rounded-lg"
               value={searchTerm}
               onChange={handleChange}
             />
           </div>
 
-          <div className="rounded-[10px] border border-dashed border-[#637087] py-3 px-6 flex flex-wrap">
+          <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap">
             {searchResults.map((index) => (
               <DragElement key={index.index} data={index} />
             ))}
           </div>
 
           <div className="flex justify-end">
-            <button className="text-white bg-[#1a5ce5] py-2 px-4 rounded-xl">
+            <button className="px-4 py-2 text-white bg-blue rounded-xl">
               Сохранить
             </button>
           </div>

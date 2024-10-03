@@ -37,7 +37,7 @@ const ManagerMainPage: FC = () => {
             ) : (
               <>
                 <div className="text-lg">{currentIntensive?.name}</div>
-                <div className="text-[#637087]">
+                <div className="text-bright_gray">
                   {currentIntensive?.open_dt.toLocaleDateString()}
                   {` - `}
                   {currentIntensive?.close_dt.toLocaleDateString()}
@@ -46,24 +46,27 @@ const ManagerMainPage: FC = () => {
             )}
 
             <div className="flex flex-col gap-4 my-3">
-              <Link to="overview" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link
+                to="overview"
+                className="py-1.5 px-2.5 hover:bg-another_white"
+              >
                 Настройки интенсива
               </Link>
               <Link
                 to="statistics"
-                className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
+                className="py-1.5 px-2.5 hover:bg-another_white"
               >
                 Статистика
               </Link>
-              <Link to="teams" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link to="teams" className="py-1.5 px-2.5 hover:bg-another_white">
                 Управление командами
               </Link>
-              <Link to="plan" className="py-1.5 px-2.5 hover:bg-[#f0f2f5]">
+              <Link to="plan" className="py-1.5 px-2.5 hover:bg-another_white">
                 План интенсива
               </Link>
               <Link
                 to="manageRoles"
-                className="py-1.5 px-2.5 hover:bg-[#f0f2f5]"
+                className="py-1.5 px-2.5 hover:bg-another_white"
               >
                 Управление ролями
               </Link>

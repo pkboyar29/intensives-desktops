@@ -98,7 +98,7 @@ const ManageRolesPage: FC = () => {
             <input
               type="text"
               value={inputString}
-              className="p-2.5 rounded-[10px] bg-[#f0f2f5] text-lg"
+              className="p-2.5 rounded-[10px] bg-another_white text-lg"
               onChange={roleInputChangeHandler}
               placeholder="Введите название роли"
             />

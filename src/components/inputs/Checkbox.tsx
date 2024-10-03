@@ -30,7 +30,7 @@ const Checkbox: FC<CheckboxProps> = ({
       onClick={() => checkboxClickHandler()}
       className="inline-flex items-center gap-2 cursor-pointer"
     >
-      <span className="border-2 border-solid border-[#667080] rounded-md w-[18px] h-[18px] p-[1px] flex items-center justify-center">
+      <span className="border-2 border-solid border-gray_7 rounded-md w-[18px] h-[18px] p-[1px] flex items-center justify-center">
         <svg
           className={`${!isChecked && 'hidden'}`}
           width="15"

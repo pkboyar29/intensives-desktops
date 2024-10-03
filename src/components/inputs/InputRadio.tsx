@@ -27,7 +27,7 @@ const InputRadio: FC<InputRadioProps> = ({
       : null;
 
   return (
-    <div className="p-2.5 text-lg rounded-lg border border-[#f0f2f5] select-none">
+    <div className="p-2.5 text-lg rounded-lg border border-another_white select-none">
       <input
         type="radio"
         name={nameProp}

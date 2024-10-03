@@ -41,7 +41,7 @@ const SchedulePage: FC = () => {
       >
         <div className="flex flex-col justify-center">
           <p className="text-xl">{event.name}</p>
-          <time className="text-[#637087] text-base">
+          <time className="text-base text-bright_gray">
             {event.dateStart + ' ' + event.dateEnd}
           </time>
         </div>
@@ -53,7 +53,7 @@ const SchedulePage: FC = () => {
     <div className="min-h-screen min-w-[50vw] max-w-[1280px]">
       <div className="flex items-center justify-between">
         <Title text="План интенсива" />
-        <button className="px-2.5 py-1.5 rounded-xl bg-[#f0f2f5] h-[34px] flex justify-center items-center cursor-pointer">
+        <button className="px-2.5 py-1.5 rounded-xl bg-another_white h-[34px] flex justify-center items-center cursor-pointer">
           <div className="text-base font-bold">Редактировать</div>{' '}
         </button>
       </div>

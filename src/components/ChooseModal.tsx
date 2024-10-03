@@ -50,10 +50,10 @@ const ChooseModal: FC<ChooseModalProps> = ({
         <input
           type="text"
           placeholder="Поиск"
-          className="w-full py-3 px-4 mt-3 bg-[#f0f2f5] rounded-xl"
+          className="w-full px-4 py-3 mt-3 bg-another_white rounded-xl"
         />
 
-        <div className="mt-3 w-full h-full rounded-lg overflow-y-auto overflow-x-clip gap-1.5 flex flex-wrap p-2.5 border border-dashed border-[#637087]">
+        <div className="mt-3 w-full h-full rounded-lg overflow-y-auto overflow-x-clip gap-1.5 flex flex-wrap p-2.5 border border-dashed border-bright_gray">
           {items.map((elem, index: number) => (
             <Chip
               key={index}
@@ -80,7 +80,7 @@ const ChooseModal: FC<ChooseModalProps> = ({
 
         <button
           onClick={saveButtonClickHandler}
-          className="bg-[#1a5ce5] text-white px-4 py-2.5 rounded-[10px] text-lg mt-5"
+          className="bg-blue text-white px-4 py-2.5 rounded-[10px] text-lg mt-5"
         >
           Сохранить
         </button>

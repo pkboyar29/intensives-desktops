@@ -18,7 +18,7 @@ const ManagerTeamsPage: FC = () => {
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index}>
             <div className="flex gap-2">
-              <div className="flex items-center justify-center bg-[#e8edf2] rounded-[10px] w-12 h-12">
+              <div className="flex items-center justify-center bg-gray_5 rounded-[10px] w-12 h-12">
                 {' '}
                 <svg
                   width="24"
@@ -41,7 +41,7 @@ const ManagerTeamsPage: FC = () => {
             <div className="flex flex-col gap-5 mt-3">
               {Array.from({ length: 6 }).map((_, innerIndex) => (
                 <div key={innerIndex}>
-                  <span className="px-4 py-1 bg-[#e8edf2] rounded-xl hover:bg-[#d9dee3]">
+                  <span className="px-4 py-1 bg-gray_5 rounded-xl hover:bg-gray_6">
                     20-ИСбо-2 Мындрила М.А.
                   </span>
                 </div>

@@ -56,7 +56,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
             )}
           </div>
 
-          <div className="py-3 text-lg font-bold text-[#121217]">Участники</div>
+          <div className="py-3 text-lg font-bold text-black_2">Участники</div>
 
           <div className="flex flex-col gap-3 text-lg">
             <div className="flex flex-col gap-3">
@@ -97,7 +97,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
               />
 
               <button
-                className="p-4 rounded-[10px] bg-[#f0f2f5] flex justify-center items-center cursor-pointer"
+                className="p-4 rounded-[10px] bg-another_white flex justify-center items-center cursor-pointer"
                 onClick={deleteIntensivButtonHandler}
               >
                 <svg

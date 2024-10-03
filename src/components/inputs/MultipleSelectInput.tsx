@@ -53,7 +53,7 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
       <button
         onClick={toggleDropdownHandler}
         type="button"
-        className={`mt-3 bg-[#f0f2f5] text-[#637087] py-3 px-4 rounded-t-xl w-full flex justify-between items-center ${
+        className={`mt-3 bg-another_white text-bright_gray py-3 px-4 rounded-t-xl w-full flex justify-between items-center ${
           !isOpen && `rounded-b-xl`
         }`}
       >
@@ -79,7 +79,7 @@ const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
       </button>
 
       <ul
-        className={`bg-[#f0f2f5] rounded-b-xl text-[#637087] px-7 pb-4 select-none transition-all duration-300 ease-in-out flex flex-col gap-2.5 ${
+        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none transition-all duration-300 ease-in-out flex flex-col gap-2.5 ${
           !isOpen && `hidden`
         }`}
       >

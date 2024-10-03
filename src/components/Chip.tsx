@@ -9,7 +9,7 @@ const Chip: FC<ChipProps> = ({ label, clickHandler }) => {
   return (
     <div
       onClick={clickHandler}
-      className="bg-[#d6ddec] inline-block rounded-xl px-4 color-[#121217] text-lg"
+      className="inline-block px-4 text-lg bg-gray_4 rounded-xl text-black_2"
     >
       {label}
     </div>

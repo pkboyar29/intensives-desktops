@@ -308,7 +308,7 @@ const ManageEventForm: FC = () => {
               </div>
               <div className="flex items-center gap-4 mt-4">
                 <button
-                  className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] flex justify-center"
+                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
                   type="button"
                   onClick={() => setModalTeams(true)}
                 >
@@ -317,7 +317,7 @@ const ManageEventForm: FC = () => {
                 </button>
 
                 {teams.length === 0 && (
-                  <span className="text-[#6B7280]">
+                  <span className="text-gray_3">
                     Выберите участвующих в мероприятии команды
                   </span>
                 )}
@@ -338,7 +338,7 @@ const ManageEventForm: FC = () => {
 
               <div className="flex items-center gap-4 mt-4">
                 <button
-                  className="bg-[#1a5ce5] text-white px-4 py-1.5 rounded-[10px] flex justify-center"
+                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
                   type="button"
                   onClick={() => setModalTeachers(true)}
                 >
@@ -346,7 +346,7 @@ const ManageEventForm: FC = () => {
                   Выбрать{' '}
                 </button>
                 {teams.length === 0 && (
-                  <span className="text-[#6B7280]">
+                  <span className="text-gray_3">
                     Выберите участвующих в мероприятии преподавателей
                   </span>
                 )}

@@ -20,7 +20,7 @@ const Select: FC<SelectProps> = ({
   return (
     <select
       {...register(fieldName)}
-      className="p-2.5 w-full text-lg rounded-[10px] bg-[#f0f2f5]"
+      className="p-2.5 w-full text-lg rounded-[10px] bg-another_white"
     >
       <option key={0} value={0}>
         {initialText}
