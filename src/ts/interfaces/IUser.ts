@@ -4,9 +4,9 @@ export interface IUser {
   student_id: number | null;
   firstName: string;
   lastName: string;
-  middleName: string;
+  patronymic: string;
   email: string;
-  roleId: number;
+  roleName: string;
 }
 
 export interface ISignIn {

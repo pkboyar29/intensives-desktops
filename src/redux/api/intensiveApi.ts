@@ -17,8 +17,8 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     isOpen: unmappedIntensive.is_open,
     open_dt: new Date(unmappedIntensive.open_dt),
     close_dt: new Date(unmappedIntensive.close_dt),
-    flows: unmappedIntensive.flow,
-    teachersTeam: unmappedIntensive.teacher_command.map(
+    flows: unmappedIntensive.flows,
+    teachersTeam: unmappedIntensive.teacher_team.map(
       (teacherOnIntensive: any) => mapTeacherOnIntensive(teacherOnIntensive)
     ),
   };
@@ -51,8 +51,7 @@ export const intensiveApi = createApi({
           university: 1,
           is_open: true,
           roles: [],
-          files: [],
-          stages: [],
+          stage: [],
         },
       }),
       transformResponse: (response: any): IIntensive => mapIntensive(response),
@@ -68,8 +67,7 @@ export const intensiveApi = createApi({
             ...restData,
             is_open: true,
             roles: [],
-            files: [],
-            stages: [],
+            stage: [],
           },
         };
       },

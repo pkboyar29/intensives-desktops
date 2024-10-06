@@ -17,9 +17,6 @@ export const userApi = createApi({
     getUser: builder.query<IUser, void>({
       query: () => '/users/me',
       transformResponse: (response: any): IUser => {
-        // console.log('we are in transformResponse');
-        // console.log(response);
-
         //   let student_id = null;
         //   if (response.role.id === 1) {
         //     const studentResponse = await axios.get(
@@ -52,9 +49,9 @@ export const userApi = createApi({
           student_id: 0,
           firstName: response.first_name,
           lastName: response.last_name,
-          middleName: response.middle_name,
+          patronymic: response.patronymic,
           email: response.email,
-          roleId: response.role.id,
+          roleName: response.roles[0].name,
         };
       },
     }),
