@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
 
@@ -12,7 +12,7 @@ export const mapTeacherOnIntensive = (
     name: getFullName(
       teacherOnIntensive.teacher.user.first_name,
       teacherOnIntensive.teacher.user.last_name,
-      teacherOnIntensive.teacher.user.middle_name
+      teacherOnIntensive.teacher.user.patronymic
     ),
   };
 };
@@ -23,7 +23,7 @@ const mapTeacherInUniversity = (teacher: any): ITeacher => {
     name: getFullName(
       teacher.user.first_name,
       teacher.user.last_name,
-      teacher.user.middle_name
+      teacher.user.patronymic
     ),
   };
 };
@@ -38,7 +38,7 @@ const getFullName = (
 
 export const teacherApi = createApi({
   reducerPath: 'teacherApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
       query: (intensiveId) =>

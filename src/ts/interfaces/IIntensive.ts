@@ -17,8 +17,8 @@ export interface IIntensiveCreate {
   description: string;
   open_dt: string;
   close_dt: string;
-  teachers_command: number[];
-  flow: number[];
+  teacher_team: number[];
+  flows: number[];
 }
 
 export interface IIntensiveUpdate {
@@ -27,6 +27,6 @@ export interface IIntensiveUpdate {
   description: string;
   open_dt: string;
   close_dt: string;
-  teachers_command: number[];
-  flow: number[];
+  teacher_team: number[];
+  flows: number[];
 }

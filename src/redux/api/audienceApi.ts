@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { IAudience } from '../../ts/interfaces/IAudience';
 
@@ -17,7 +17,7 @@ const mapAudience = (unmappedAudience: any): IAudience => {
 
 export const audienceApi = createApi({
   reducerPath: 'audienceApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getAudiences: builder.query<IAudience[], void>({
       query: () => '/auditories/',

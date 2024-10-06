@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IStudentRole,
@@ -8,7 +8,7 @@ import {
 
 export const studentRoleApi = createApi({
   reducerPath: 'studentRolesApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getStudentRoles: builder.query<IStudentRole[], void>({
       query: () => '/roles_on_intensives/',

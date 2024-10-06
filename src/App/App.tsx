@@ -7,7 +7,7 @@ import Header from '../components/Header';
 import routeConfig from '../router/routeConfig';
 
 const App: FC = () => {
-  const [trigger] = useLazyGetUserQuery();
+  const [getUser] = useLazyGetUserQuery();
 
   const location = useLocation();
   const nonRequiredAuthRoutes = ['/sign-in', '/not-found'];
@@ -15,7 +15,7 @@ const App: FC = () => {
 
   useEffect(() => {
     if (requiredAuth) {
-      trigger();
+      getUser();
     }
   }, []);
 

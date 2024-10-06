@@ -102,16 +102,16 @@ const ManageIntensiveForm: FC = () => {
         await updateIntensive({
           id: Number(intensiveId),
           ...data,
-          flow: flows_ids,
-          teachers_command: teacher_ids,
+          flows: flows_ids,
+          teacher_team: teacher_ids,
         });
 
         navigate(`/manager/${intensiveId}/overview`);
       } else {
         const { data: createIntensiveResponseData } = await createIntensive({
           ...data,
-          flow: flows_ids,
-          teachers_command: teacher_ids,
+          flows: flows_ids,
+          teacher_team: teacher_ids,
         });
 
         if (createIntensiveResponseData) {

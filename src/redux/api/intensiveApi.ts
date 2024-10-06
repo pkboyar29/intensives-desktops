@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IIntensive,
@@ -17,8 +17,8 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     isOpen: unmappedIntensive.is_open,
     open_dt: new Date(unmappedIntensive.open_dt),
     close_dt: new Date(unmappedIntensive.close_dt),
-    flows: unmappedIntensive.flow,
-    teachersTeam: unmappedIntensive.teacher_command.map(
+    flows: unmappedIntensive.flows,
+    teachersTeam: unmappedIntensive.teacher_team.map(
       (teacherOnIntensive: any) => mapTeacherOnIntensive(teacherOnIntensive)
     ),
   };
@@ -26,7 +26,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
 
 export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',
@@ -51,8 +51,7 @@ export const intensiveApi = createApi({
           university: 1,
           is_open: true,
           roles: [],
-          files: [],
-          stages: [],
+          stage: [],
         },
       }),
       transformResponse: (response: any): IIntensive => mapIntensive(response),
@@ -68,8 +67,7 @@ export const intensiveApi = createApi({
             ...restData,
             is_open: true,
             roles: [],
-            files: [],
-            stages: [],
+            stage: [],
           },
         };
       },

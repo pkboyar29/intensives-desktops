@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { transformISODateToTime } from '../../helpers/dateHelpers';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IEventCreate,
@@ -24,7 +24,7 @@ const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
 
 export const eventApi = createApi({
   reducerPath: 'eventApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getEvent: builder.query<IManagerEvent, number>({
       query: (id) => `/events/${id}/`,

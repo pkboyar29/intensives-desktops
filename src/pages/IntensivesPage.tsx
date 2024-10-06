@@ -17,11 +17,7 @@ const IntensivesPage: FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const {
-    data: intensives,
-    isLoading,
-    error,
-  } = useGetIntensivesQuery(undefined, {
+  const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   }); // OR REFETCH UNDER SPECIFIC CONDITION?
 
@@ -63,11 +59,14 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleId === 1) {
+    if (currentUser?.roleName === 'Студент') {
       navigate(`/student/${id}/overview`);
-    } else if (currentUser?.roleId === 2) {
+    } else if (
+      currentUser?.roleName === 'Супер-администратор' ||
+      currentUser?.roleName === 'Организатор'
+    ) {
       navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roleId === 3) {
+    } else if (currentUser?.roleName === 'Преподаватель') {
       navigate(`/teacher/${id}/overview`);
     }
   };
@@ -109,7 +108,8 @@ const IntensivesPage: FC = () => {
           <Title text="Интенсивы" />
         </div>
 
-        {currentUser?.roleId === 2 && (
+        {(currentUser?.roleName === 'Супер-администратор' ||
+          currentUser?.roleName === 'Организатор') && (
           <div className="flex justify-end mt-10">
             <div className="ml-auto">
               <PrimaryButton
