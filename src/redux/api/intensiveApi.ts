@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IIntensive,
@@ -26,7 +26,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
 
 export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',

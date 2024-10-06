@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
 
@@ -38,7 +38,7 @@ const getFullName = (
 
 export const teacherApi = createApi({
   reducerPath: 'teacherApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
       query: (intensiveId) =>

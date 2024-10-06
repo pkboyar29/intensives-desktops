@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { IStage } from '../../ts/interfaces/IStage';
 
 export const stageApi = createApi({
   reducerPath: 'stageApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     // TODO: stop getting all stages. get stages for specific intensive (when this endpoint will appear)
     getStages: builder.query<IStage[], void>({

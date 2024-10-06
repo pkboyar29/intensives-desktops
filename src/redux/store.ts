@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, createAction } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 
 import userReducer from './slices/userSlice';
@@ -14,6 +14,8 @@ import { studentRoleApi } from './api/studentRoleApi';
 import { stageApi } from './api/stageApi';
 import { audienceApi } from './api/audienceApi';
 import { flowApi } from './api/flowApi';
+
+// export const resetAllStates = createAction('resetAllStates');
 
 export const store = configureStore({
   reducer: {

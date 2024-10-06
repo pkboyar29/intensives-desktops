@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { IFlow } from '../../ts/interfaces/IFlow';
 
 export const flowApi = createApi({
   reducerPath: 'flowApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getFlows: builder.query<IFlow[], void>({
       query: () => '/flows/',

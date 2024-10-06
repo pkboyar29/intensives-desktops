@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseQueryWithReauth } from './baseQuery';
 
 import { ISignIn, ISignInResponse, IUser } from '../../ts/interfaces/IUser';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     signIn: builder.mutation<ISignInResponse, ISignIn>({
       query: (credentials) => ({
