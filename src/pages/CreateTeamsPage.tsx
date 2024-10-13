@@ -1,111 +1,132 @@
 import { useState, useEffect, FC } from 'react';
 
+import { useLazyGetStudentsInFlowQuery } from '../redux/api/studentApi';
+import { useAppSelector } from '../redux/store';
+
 import DragElement from '../components/DragComponents/DragElement';
 import DragContainer from '../components/DragComponents/DragContainer';
 import Title from '../components/Title';
+import PrimaryButton from '../components/PrimaryButton';
 
-const base = [
-  { index: 0, content: 'Мындрила М.А,' },
-  { index: 1, content: 'Савенко М.А,' },
-  { index: 2, content: 'Иванов М.А,' },
-  { index: 3, content: 'Кузнецов М.А,' },
-  { index: 4, content: 'Хлебников М.А,' },
-  { index: 5, content: 'Шадрин М.А,' },
-  { index: 6, content: 'Кудров М.А,' },
-  { index: 7, content: 'Краснов М.А,' },
-  { index: 8, content: 'Тереньтьев М.А,' },
-  { index: 9, content: 'Краснов М.А,' },
-  { index: 10, content: 'Иванов М.А,' },
-];
+import SearchIcon from '../components/icons/SearchIcon';
+import MembersIcon from '../components/icons/MembersIcon';
 
-const teamData = [
-  { id: 'Команда1', name: 'Команда 1' },
-  { id: 'Команда2', name: 'Команда 2' },
-];
+import { IStudent } from '../ts/interfaces/IStudent';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const [countTeams, setCountTeams] = useState<number>(2);
-  const [teams, setTeams] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
+  const [getStudentsInFlow] = useLazyGetStudentsInFlowQuery();
 
   useEffect(() => {
-    setTeamMembers(base);
-    setTeams(teamData);
-    setSearchResults(teamMembers);
-  }, []);
+    const fetchStudents = async () => {
+      if (currentIntensive) {
+        // TODO: что-то изменить в случае, если потоков несколько. Если будет просто эндпоинт на получение свободных студентов. То это прям в бекенде будет получаться, если там несколько потоков будет
+        try {
+          const { data: freeStudents } = await getStudentsInFlow(
+            currentIntensive.flows[0].id
+          );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+          console.log('студенты это');
+          console.log(freeStudents);
+
+          if (freeStudents) {
+            setFreeStudents(freeStudents);
+            setSearchResults(freeStudents);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    };
+
+    fetchStudents();
+  }, [currentIntensive]);
+
+  useEffect(() => {
+    if (currentIntensive) {
+      // const teamData: ITeam[] = [
+      //   { id: 1, name: 'Команда 1', intensiveId: currentIntensive.id },
+      //   { id: 2, name: 'Команда 2', intensiveId: currentIntensive.id },
+      // ];
+
+      const teamData: any[] = [
+        { id: 1, name: 'Команда 1' },
+        { id: 2, name: 'Команда 2' },
+      ];
+
+      setTeams(teamData);
+    }
+  }, [currentIntensive]);
+
+  const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
+
+  const [teamsCount, setTeamsCount] = useState<number>(2);
+  const [teams, setTeams] = useState<any[]>([]);
+
+  const [searchString, setSearchString] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<IStudent[]>([]);
+
+  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
   };
 
   useEffect(() => {
-    if (searchTerm)
+    if (searchString)
       setSearchResults(
-        teamMembers.filter((item) =>
-          item.content.toLowerCase().includes(searchTerm.toLowerCase())
+        freeStudents.filter((item) =>
+          item.nameWithGroup.toLowerCase().includes(searchString.toLowerCase())
         )
       );
     else {
-      setSearchResults(teamMembers);
+      setSearchResults(freeStudents);
     }
-  }, [searchTerm, teamMembers]);
+  }, [searchString, freeStudents]);
 
-  const numberTeamsInputChangeHandler = (
+  const teamsCountInputChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setCountTeams(parseInt(e.target.value));
+    setTeamsCount(parseInt(e.target.value));
   };
 
-  const numberTeamsButtonClickHandler = () => {
-    let massTeam = [];
-    for (let i = 1; i <= countTeams; i++) {
-      massTeam.push({ id: `Команда` + i, name: `Команда ${i}` });
+  // TODO: ДЛЯ КОМАНД НАЧАТЬ ИСПОЛЬЗОВАТЬ ИНТЕРФЕЙС ITEAM?, туда надо интенсив привязывать
+  // TODO: логично список команд для организаторов хранить в глобальном состоянии? потому что в трех страницах будет юзаться
+  const teamsCountButtonClickHandler = () => {
+    let newTeams = [];
+    for (let i = 1; i <= teamsCount; i++) {
+      newTeams.push({ id: `Команда` + i, name: `Команда ${i}` });
     }
-    setTeams(massTeam);
+    console.log('hello');
+    setTeams(newTeams);
   };
 
   return (
     <div>
       <Title text="Команды" />
 
-      <p className="mt-2 text-base text-gray_3">
+      <p className="mt-3 text-base text-gray_3">
         Создайте команды и распределите участников интенсива по командам
       </p>
 
-      <div className="flex gap-4 mt-5">
+      <div className="flex items-center gap-4 mt-5">
         <div className="relative w-[480px]">
           <input
             type="number"
-            onChange={numberTeamsInputChangeHandler}
+            placeholder="Количество команд"
+            onChange={teamsCountInputChangeHandler}
             className="w-full p-2 border rounded-md border-gray_4"
-            value={countTeams}
+            value={teamsCount}
           />
-          <svg
-            className="absolute transform -translate-y-1/2 right-3 top-1/2"
-            width="24"
-            height="16"
-            viewBox="0 0 24 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M10.9922 10.805C13.0561 9.43099 13.9769 6.86767 13.2592 4.49441C12.5414 2.12114 10.3544 0.497718 7.875 0.497718C5.39558 0.497718 3.20857 2.12114 2.49084 4.49441C1.7731 6.86767 2.69393 9.43099 4.75781 10.805C2.93952 11.4752 1.38666 12.7153 0.330938 14.3403C0.179932 14.5647 0.161484 14.8531 0.28266 15.095C0.403836 15.3368 0.645857 15.4947 0.916031 15.5081C1.18621 15.5215 1.44266 15.3884 1.58719 15.1597C2.97076 13.0317 5.33677 11.7479 7.875 11.7479C10.4132 11.7479 12.7792 13.0317 14.1628 15.1597C14.3917 15.4999 14.8514 15.5932 15.1948 15.3692C15.5382 15.1452 15.6381 14.6869 15.4191 14.3403C14.3633 12.7153 12.8105 11.4752 10.9922 10.805ZM3.75 6.125C3.75 3.84683 5.59683 2 7.875 2C10.1532 2 12 3.84683 12 6.125C12 8.40317 10.1532 10.25 7.875 10.25C5.5979 10.2474 3.75258 8.4021 3.75 6.125ZM23.4506 15.3781C23.1037 15.6043 22.6391 15.5066 22.4128 15.1597C21.0308 13.0303 18.6636 11.7466 16.125 11.75C15.7108 11.75 15.375 11.4142 15.375 11C15.375 10.5858 15.7108 10.25 16.125 10.25C17.7863 10.2484 19.2846 9.25041 19.9261 7.71798C20.5677 6.18554 20.2273 4.4178 19.0626 3.23312C17.898 2.04844 16.1363 1.67805 14.5931 2.29344C14.3427 2.40171 14.0531 2.36541 13.8372 2.19864C13.6212 2.03188 13.5128 1.76096 13.5542 1.49125C13.5956 1.22154 13.7802 0.995581 14.0363 0.90125C16.7109 -0.165433 19.7592 0.960007 21.099 3.50883C22.4388 6.05765 21.6374 9.2067 19.2422 10.805C21.0605 11.4752 22.6133 12.7153 23.6691 14.3403C23.8953 14.6872 23.7975 15.1518 23.4506 15.3781Z"
-              fill="#4F7396"
-            />
-          </svg>
+          <MembersIcon />
         </div>
 
-        <button
-          type="button"
-          className="px-4 py-2 text-white bg-blue rounded-xl"
-          onClick={numberTeamsButtonClickHandler}
-        >
-          Изменить
-        </button>
+        <div>
+          <PrimaryButton
+            text="Изменить"
+            clickHandler={teamsCountButtonClickHandler}
+          />
+        </div>
       </div>
 
       <div className="flex gap-10 mt-5">
@@ -116,57 +137,48 @@ const CreateTeamsPage: FC = () => {
             выпадающий список или переместить свободных участников в команды с
             помощью drag and drop
           </p>
-          {teams.map((teamName) => (
+          {teams.map((team) => (
             <DragContainer
-              key={teamName.id}
-              teamName={teamName.name}
-              func={setTeamMembers}
-              team={teamMembers}
+              key={team.id}
+              containerName={team.name}
+              setAllElements={setFreeStudents}
+              allElements={freeStudents}
             />
           ))}
         </div>
 
         <div className="max-w-[470px] flex flex-col gap-3">
-          <h2 className="text-lg font-bold text-black_2">
-            Свободные участники
-          </h2>
+          <div className="flex flex-col flex-grow gap-3">
+            <h2 className="text-lg font-bold text-black_2">
+              Свободные участники
+            </h2>
 
-          <div className="relative flex items-center mb-4">
-            <svg
-              className="absolute transform -translate-y-1/2 left-2 top-1/2"
-              width="21"
-              height="21"
-              viewBox="0 0 21 21"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M20.0306 18.9694L15.3366 14.2762C18.1629 10.883 17.8204 5.86693 14.5591 2.88935C11.2978 -0.0882368 6.27134 0.0259986 3.14867 3.14867C0.0259986 6.27134 -0.0882368 11.2978 2.88935 14.5591C5.86693 17.8204 10.883 18.1629 14.2762 15.3366L18.9694 20.0306C19.2624 20.3237 19.7376 20.3237 20.0306 20.0306C20.3237 19.7376 20.3237 19.2624 20.0306 18.9694ZM2.25 9C2.25 5.27208 5.27208 2.25 9 2.25C12.7279 2.25 15.75 5.27208 15.75 9C15.75 12.7279 12.7279 15.75 9 15.75C5.27379 15.7459 2.25413 12.7262 2.25 9Z"
-                fill="#637087"
+            <div className="relative flex items-center mx-4">
+              <SearchIcon />
+              <input
+                type="text"
+                placeholder="Поиск"
+                className="w-full py-3 pl-12 pr-2 rounded-xl bg-another_white"
+                value={searchString}
+                onChange={searchInputChangeHandler}
               />
-            </svg>
+            </div>
 
-            <input
-              type="text"
-              placeholder="Поиск"
-              className="w-full py-2 pl-10 pr-2 rounded-lg"
-              value={searchTerm}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap">
-            {searchResults.map((index) => (
-              <DragElement key={index.index} data={index} />
-            ))}
+            {/* justify-center */}
+            <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2">
+              {searchResults.map((freeStudent) => (
+                <DragElement key={freeStudent.id} data={freeStudent} />
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-end">
-            <button className="px-4 py-2 text-white bg-blue rounded-xl">
-              Сохранить
-            </button>
+            <div>
+              <PrimaryButton
+                text="Сохранить"
+                clickHandler={() => console.log('сохранить?')}
+              />
+            </div>
           </div>
         </div>
       </div>
