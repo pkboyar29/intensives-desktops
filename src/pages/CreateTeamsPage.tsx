@@ -19,6 +19,7 @@ import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
 
+  // TODO: убрать currentIntensive и использовать intensiveId, когда не придется использоваться потоки из интенсива
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const [getStudentsInFlow] = useLazyGetStudentsInFlowQuery();
   const [createTeams] = useCreateTeamsMutation();

@@ -1,6 +1,9 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { useGetTeamsOnIntensiveQuery } from '../redux/api/teamApi';
+
+import Skeleton from 'react-loading-skeleton';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
 import TeamIcon from '../components/icons/TeamIcon';
@@ -9,33 +12,65 @@ const ManagerTeamsPage: FC = () => {
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
+  const { data: teams, isLoading } = useGetTeamsOnIntensiveQuery(
+    Number(intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  useEffect(() => {
+    console.log(teams);
+  }, [teams]);
+
   return (
     <div>
       <Title text="Команды" />
 
-      <h2 className="text-lg font-bold mt-7">Созданные команды</h2>
+      {isLoading ? (
+        <div className="w-1/2 mt-7">
+          <Skeleton />
+        </div>
+      ) : (
+        <>
+          <h2 className="text-lg font-bold mt-7">Созданные команды</h2>
 
-      <div className="flex flex-wrap gap-6 mt-7">
-        {Array.from({ length: 8 }).map((_, index) => (
-          <div key={index}>
-            <div className="flex gap-2 transition duration-300 group">
-              <TeamIcon />
-              <h3 className="text-lg">Команда {index}</h3>
-            </div>
-
-            <div className="flex flex-col gap-5 mt-3">
-              {Array.from({ length: 6 }).map((_, innerIndex) => (
-                <span
-                  key={innerIndex}
-                  className="px-4 py-[5.5px] bg-gray_5 rounded-xl hover:bg-gray_6"
+          {teams && teams.length > 0 ? (
+            <div className="flex flex-wrap gap-6 mt-7">
+              {teams.map((team) => (
+                <div
+                  className="flex-shrink flex-grow-0 basis-[16.67%]"
+                  key={team.id}
                 >
-                  20-ИСбо-2 Мындрила М.А.
-                </span>
+                  <div className="flex gap-2 transition duration-300 group">
+                    <TeamIcon />
+                    <h3 className="text-lg">{team.name}</h3>
+                  </div>
+
+                  <div className="flex flex-col gap-5 mt-3">
+                    {team.studentsInTeam.length > 0 ? (
+                      team.studentsInTeam.map((studentInTeam) => (
+                        <span
+                          key={studentInTeam.id}
+                          className="px-4 py-[5.5px] text-center bg-gray_5 rounded-xl hover:bg-gray_6"
+                        >
+                          {studentInTeam.nameWithGroup}
+                        </span>
+                      ))
+                    ) : (
+                      <div className="text-bright_gray">Нет участников</div>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
-        ))}
-      </div>
+          ) : (
+            <div className="text-xl text-black mt-7">
+              Команды еще не определены для этого интенсива
+            </div>
+          )}
+        </>
+      )}
 
       <div className="flex gap-5 mt-10">
         <div>
