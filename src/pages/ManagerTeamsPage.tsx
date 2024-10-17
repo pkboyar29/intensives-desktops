@@ -41,7 +41,7 @@ const ManagerTeamsPage: FC = () => {
         <div>
           <PrimaryButton
             text="Изменить состав команд"
-            clickHandler={() => navigate(`/manager/${intensiveId}/createTeam`)}
+            clickHandler={() => navigate(`/manager/${intensiveId}/createTeams`)}
           />
         </div>
         <div>

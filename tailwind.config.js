@@ -24,6 +24,7 @@ export default {
       gray_7: '#667080',
       gray_8: '#f1f5f9',
       gray_9: '#e5e7eb',
+      black_gray: '#bdbebf',
     },
     fontFamily: {
       sans: ['Open Sans', 'sans-serif'],

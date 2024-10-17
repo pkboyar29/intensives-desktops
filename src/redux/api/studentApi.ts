@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from './baseQuery';
 import { IStudent } from '../../ts/interfaces/IStudent';
 
 // TODO: учесть, что patronymic (отчество) может быть необязательным
-const mapStudent = (unmappedStudent: any): IStudent => {
+export const mapStudent = (unmappedStudent: any): IStudent => {
   return {
     id: unmappedStudent.id,
     nameWithGroup: getNameWithGroup(

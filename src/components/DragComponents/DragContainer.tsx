@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, FC, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 
 import DroppedElement from './DroppedElement';
@@ -11,6 +11,7 @@ interface DragContainerProps {
   containerName: string;
   setAllElements: (elements: IStudent[]) => void;
   allElements: IStudent[];
+  onDrop: (droppedElements: IStudent[]) => void;
 }
 
 export interface DropResult {
@@ -21,6 +22,7 @@ const DragContainer: FC<DragContainerProps> = ({
   containerName,
   setAllElements,
   allElements,
+  onDrop,
 }) => {
   const [droppedElements, setDroppedElements] = useState<IStudent[]>([]);
 
@@ -49,6 +51,10 @@ const DragContainer: FC<DragContainerProps> = ({
       isDragging: monitor.isOver(),
     }),
   });
+
+  useEffect(() => {
+    onDrop(droppedElements);
+  }, [droppedElements]);
 
   const deleteElementFromContainer = (elementToDelete: IStudent) => {
     setDroppedElements(

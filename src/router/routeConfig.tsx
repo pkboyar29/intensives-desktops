@@ -111,12 +111,8 @@ const routeConfig: RouteType[] = [
         element: <ManagerTeamsPage />,
       },
       {
-        path: 'createTeam',
+        path: 'createTeams',
         element: <CreateTeamsPage />,
-      },
-      {
-        path: 'statistics',
-        element: <IntensiveStatisticsPage />,
       },
       {
         path: 'plan',
@@ -129,6 +125,10 @@ const routeConfig: RouteType[] = [
       {
         path: 'editEvent',
         element: <ManageEventForm />,
+      },
+      {
+        path: 'statistics',
+        element: <IntensiveStatisticsPage />,
       },
     ],
     requiredAuth: false,
