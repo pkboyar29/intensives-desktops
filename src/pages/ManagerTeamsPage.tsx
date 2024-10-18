@@ -1,7 +1,7 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { useGetTeamsOnIntensiveQuery } from '../redux/api/teamApi';
+import { useGetTeamsQuery } from '../redux/api/teamApi';
 
 import Skeleton from 'react-loading-skeleton';
 import Title from '../components/Title';
@@ -12,16 +12,9 @@ const ManagerTeamsPage: FC = () => {
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
-  const { data: teams, isLoading } = useGetTeamsOnIntensiveQuery(
-    Number(intensiveId),
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
-
-  useEffect(() => {
-    console.log(teams);
-  }, [teams]);
+  const { data: teams, isLoading } = useGetTeamsQuery(Number(intensiveId), {
+    refetchOnMountOrArgChange: true,
+  });
 
   return (
     <div>

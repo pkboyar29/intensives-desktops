@@ -31,7 +31,7 @@ export const teamApi = createApi({
   reducerPath: 'teamApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeamsOnIntensive: builder.query<ITeamForManager[], number>({
+    getTeams: builder.query<ITeamForManager[], number>({
       query: (intensiveId) => `teams/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): ITeamForManager[] =>
         response.results.map((team: any) => mapTeamForManager(team)),
@@ -52,7 +52,7 @@ export const teamApi = createApi({
 });
 
 export const {
-  useGetTeamsOnIntensiveQuery,
-  useLazyGetTeamsOnIntensiveQuery,
+  useGetTeamsQuery,
+  useLazyGetTeamsQuery,
   useCreateTeamsMutation,
 } = teamApi;

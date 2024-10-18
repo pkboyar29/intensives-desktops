@@ -7,11 +7,14 @@ import TeamIcon from '../icons/TeamIcon';
 import { ItemTypes } from './ItemTypes';
 import { IStudent } from '../../ts/interfaces/IStudent';
 
+// TODO: МБ КАК-ТО МОЖНО ПЕРЕМЕСТИТЬ SETALLELEMENTS И ALLELEMENTS В ONDROP. ХОТЯ НАВЕРНОЕ ВСЕ НЕ ТАК ПРОСТО...
+// А ЕСЛИ DROPPEDELEMENTS ПЕРЕДАВАТЬ СВОЙСТВОМ МБ ПОЛЕГЧЕ БУДЕТ?
 interface DragContainerProps {
   containerName: string;
   setAllElements: (elements: IStudent[]) => void;
   allElements: IStudent[];
   onDrop: (droppedElements: IStudent[]) => void;
+  initialDroppedElements: IStudent[];
 }
 
 export interface DropResult {
@@ -23,6 +26,7 @@ const DragContainer: FC<DragContainerProps> = ({
   setAllElements,
   allElements,
   onDrop,
+  initialDroppedElements,
 }) => {
   const [droppedElements, setDroppedElements] = useState<IStudent[]>([]);
 
@@ -55,6 +59,10 @@ const DragContainer: FC<DragContainerProps> = ({
   useEffect(() => {
     onDrop(droppedElements);
   }, [droppedElements]);
+
+  useEffect(() => {
+    setDroppedElements(initialDroppedElements);
+  }, []);
 
   const deleteElementFromContainer = (elementToDelete: IStudent) => {
     setDroppedElements(

@@ -5,7 +5,7 @@ import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 
 import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 
-import { useLazyGetTeamsOnIntensiveQuery } from '../../redux/api/teamApi';
+import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
 import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
@@ -45,7 +45,7 @@ const ManageEventForm: FC = () => {
 
   const [getStages] = useLazyGetStagesQuery();
   const [getAudiences] = useLazyGetAudiencesQuery();
-  const [getTeams] = useLazyGetTeamsOnIntensiveQuery();
+  const [getTeams] = useLazyGetTeamsQuery();
   const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
   const [getEvent] = useLazyGetEventQuery();
   const [createEvent] = useCreateEventMutation();

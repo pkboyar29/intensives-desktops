@@ -2,7 +2,10 @@ import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useLazyGetStudentsInFlowQuery } from '../redux/api/studentApi';
-import { useCreateTeamsMutation } from '../redux/api/teamApi';
+import {
+  useCreateTeamsMutation,
+  useLazyGetTeamsQuery,
+} from '../redux/api/teamApi';
 import { useAppSelector } from '../redux/store';
 
 import DragElement from '../components/DragComponents/DragElement';
@@ -19,14 +22,16 @@ import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
 
-  // TODO: убрать currentIntensive и использовать intensiveId, когда не придется использоваться потоки из интенсива
+  // TODO: убрать currentIntensive и использовать intensiveId, когда не придется использоваться потоки из интенсива, то есть когда начну получать свободных студентов
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const [getStudentsInFlow] = useLazyGetStudentsInFlowQuery();
+  const [getTeams] = useLazyGetTeamsQuery();
+
   const [createTeams] = useCreateTeamsMutation();
 
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
-  const [teamsCount, setTeamsCount] = useState<number>(2);
+  const [teamsCount, setTeamsCount] = useState<number>(0);
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
@@ -40,8 +45,8 @@ const CreateTeamsPage: FC = () => {
             currentIntensive.flows[0].id
           );
 
-          console.log('свободные студенты это');
-          console.log(freeStudents);
+          // console.log('свободные студенты это');
+          // console.log(freeStudents);
 
           if (freeStudents) {
             setFreeStudents(freeStudents);
@@ -57,15 +62,32 @@ const CreateTeamsPage: FC = () => {
   }, [currentIntensive]);
 
   useEffect(() => {
-    // TODO: вызывать GET запрос на получение существующих команд. Если их не существует, то отправляем POST запрос при создании команд?
-    if (currentIntensive) {
-      const initialTeamData: ITeamForManager[] = [
-        { id: 1, name: 'Команда 1', studentsInTeam: [] },
-        { id: 2, name: 'Команда 2', studentsInTeam: [] },
-      ];
+    const fetchTeams = async () => {
+      if (currentIntensive) {
+        try {
+          const { data: teamsResponse } = await getTeams(currentIntensive.id);
 
-      setTeams(initialTeamData);
-    }
+          if (teamsResponse && teamsResponse.length > 0) {
+            setTeamsCount(teamsResponse.length);
+            setTeams(teamsResponse);
+
+            // TODO: как-то сделать так, чтобы сами студенты тоже устанавливались как-то, для этого надо изменить DragContainer, передавать туда что-то пропсом
+          } else {
+            const initialTeamData: ITeamForManager[] = [
+              { id: 1, name: 'Команда 1', studentsInTeam: [] },
+              { id: 2, name: 'Команда 2', studentsInTeam: [] },
+            ];
+
+            setTeamsCount(2);
+            setTeams(initialTeamData);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    };
+
+    fetchTeams();
   }, [currentIntensive]);
 
   useEffect(() => {
@@ -80,15 +102,19 @@ const CreateTeamsPage: FC = () => {
     }
   }, [searchString, freeStudents]);
 
-  const [studentsInTeam, setStudentsInTeam] = useState<{
-    [teamId: number]: IStudent[];
-  }>([]);
-
   const updateStudentsInTeam = (teamId: number, students: IStudent[]) => {
-    setStudentsInTeam((prevState) => ({
-      ...prevState,
-      [teamId]: students,
-    }));
+    setTeams((prevTeams) =>
+      prevTeams.map((prevTeam) => {
+        if (prevTeam.id === teamId) {
+          return {
+            ...prevTeam,
+            studentsInTeam: students,
+          };
+        } else {
+          return prevTeam;
+        }
+      })
+    );
   };
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,9 +128,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   // TODO: логично все команды интенсива для организаторов хранить в глобальном состоянии? потому что в трех страницах будет юзаться
-  // TODO: показывать модальное окно? При изменении количества групп, в которых уже есть участники, вы можете начать заполнение заново или сохранить уже добавленных участников в группах.
-  // ДУМАЮ НАДО СРАЗУ ОЧИЩАТЬ. ЛИБО НАДО ОЧИЩАТЬ В СЛУЧАЕ, ЕСЛИ КОЛИЧЕСТВО КОМАНД БУДЕТ УМЕНЬШАТЬСЯ. ЛИБО НЕ ОТОБРАЖАТЬ МОДАЛЬНОЕ ОКНО?
-  // ОТОБРАЖАТЬ МОДАЛЬНОЕ ОКНО С СООБЩЕНИЕМ О РИСКЕ ИСЧЕЗНОВЕНИЯ СОСТАВА КОМАНД, ЕСЛИ КОЛИЧЕСТВО КОМАНД БУДЕТ УМЕНЬШАТЬСЯ
+  // TODO: показывать модальное окно?
   const teamsCountButtonClickHandler = (teamsCount: number) => {
     const prevTeamsCount = teams.length;
     if (prevTeamsCount < teamsCount) {
@@ -122,22 +146,25 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
-  // TODO: как-то разделять тут создание и обновление команд. Ну у меня тут все сложнее будет...
-  // как-то проверять, что вот, тут команд нету, выдает 0 ответов в запросе, значит, будем создавать
   const onSubmit = async () => {
     if (currentIntensive) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
         name: team.name,
-        studentIds: studentsInTeam[team.id]?.map((student) => student.id) || [],
+        studentIds: team.studentsInTeam.map(
+          (studentInTeam) => studentInTeam.id
+        ),
       }));
-      console.log(teamsForRequest);
 
-      await createTeams({
-        intensiveId: currentIntensive.id,
-        teams: teamsForRequest,
-      });
+      try {
+        await createTeams({
+          intensiveId: currentIntensive.id,
+          teams: teamsForRequest,
+        });
 
-      navigate(`/manager/${currentIntensive.id}/teams`);
+        navigate(`/manager/${currentIntensive.id}/teams`);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -184,8 +211,10 @@ const CreateTeamsPage: FC = () => {
               setAllElements={setFreeStudents}
               allElements={freeStudents}
               onDrop={(droppedElements: IStudent[]) => {
+                // onDrop срабатывает, даже когда мы удаляем элементы из контейнера. он просто срабатывает всякий раз, когда droppedElements изменяется. мб переименовать?
                 updateStudentsInTeam(team.id, droppedElements);
               }}
+              initialDroppedElements={team.studentsInTeam}
             />
           ))}
         </div>
