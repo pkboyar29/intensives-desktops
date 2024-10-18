@@ -1,7 +1,7 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useLazyGetStudentsInFlowQuery } from '../redux/api/studentApi';
+import { useLazyGetFreeStudentsQuery } from '../redux/api/studentApi';
 import {
   useCreateTeamsMutation,
   useLazyGetTeamsQuery,
@@ -24,7 +24,7 @@ const CreateTeamsPage: FC = () => {
 
   // TODO: убрать currentIntensive и использовать intensiveId, когда не придется использоваться потоки из интенсива, то есть когда начну получать свободных студентов
   const currentIntensive = useAppSelector((state) => state.intensive.data);
-  const [getStudentsInFlow] = useLazyGetStudentsInFlowQuery();
+  const [getFreeStudents] = useLazyGetFreeStudentsQuery();
   const [getTeams] = useLazyGetTeamsQuery();
 
   const [createTeams] = useCreateTeamsMutation();
@@ -41,12 +41,9 @@ const CreateTeamsPage: FC = () => {
     const fetchStudents = async () => {
       if (currentIntensive) {
         try {
-          const { data: freeStudents } = await getStudentsInFlow(
-            currentIntensive.flows[0].id
+          const { data: freeStudents } = await getFreeStudents(
+            currentIntensive.id
           );
-
-          // console.log('свободные студенты это');
-          // console.log(freeStudents);
 
           if (freeStudents) {
             setFreeStudents(freeStudents);

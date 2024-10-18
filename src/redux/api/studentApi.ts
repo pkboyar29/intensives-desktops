@@ -29,15 +29,16 @@ export const studentApi = createApi({
   reducerPath: 'studentApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    // TODO: переименовать потом на getFreeStudents
-    getStudentsInFlow: builder.query<IStudent[], number>({
-      query: (flowId) => `students/?flow_id=${flowId}`,
-      transformResponse: (response: any): IStudent[] =>
-        response.results.map((unmappedStudent: any) =>
+    getFreeStudents: builder.query<IStudent[], number>({
+      query: (intensiveId) => `students/free/?intensive_id=${intensiveId}`,
+      transformResponse: (response: any): IStudent[] => {
+        console.log(response);
+        return response.map((unmappedStudent: any) =>
           mapStudent(unmappedStudent)
-        ),
+        );
+      },
     }),
   }),
 });
 
-export const { useLazyGetStudentsInFlowQuery } = studentApi;
+export const { useLazyGetFreeStudentsQuery } = studentApi;
