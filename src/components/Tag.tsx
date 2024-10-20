@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import krest from '../icons/krest.svg';
+import CrossIcon from './icons/CrossIcon';
 
 interface TagProps {
   name: string;
@@ -14,7 +14,7 @@ const Tag: FC<TagProps> = ({ name, deleteHandler }) => {
       </span>
 
       <button className="w-3 h-3" onClick={deleteHandler}>
-        <img className="h-2.5 w-2.5 fill-black" loading="lazy" src={krest} />
+        <CrossIcon />
       </button>
     </div>
   );
