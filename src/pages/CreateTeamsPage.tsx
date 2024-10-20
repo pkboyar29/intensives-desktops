@@ -1,33 +1,31 @@
 import { useState, useEffect, FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useLazyGetFreeStudentsQuery } from '../redux/api/studentApi';
 import {
-  useCreateTeamsMutation,
+  useChangeAllTeamsMutation,
   useLazyGetTeamsQuery,
 } from '../redux/api/teamApi';
-import { useAppSelector } from '../redux/store';
 
 import DragElement from '../components/DragComponents/DragElement';
 import DragContainer from '../components/DragComponents/DragContainer';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
+import Modal from '../components/Modal';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
 
-  // TODO: убрать currentIntensive и использовать intensiveId, когда не придется использоваться потоки из интенсива, то есть когда начну получать свободных студентов
-  const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const { intensiveId } = useParams();
   const [getFreeStudents] = useLazyGetFreeStudentsQuery();
   const [getTeams] = useLazyGetTeamsQuery();
-
-  const [createTeams] = useCreateTeamsMutation();
+  const [changeAllTeams] = useChangeAllTeamsMutation();
 
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
@@ -37,12 +35,14 @@ const CreateTeamsPage: FC = () => {
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
 
+  const [modal, setModal] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchStudents = async () => {
-      if (currentIntensive) {
+      if (intensiveId) {
         try {
           const { data: freeStudents } = await getFreeStudents(
-            currentIntensive.id
+            parseInt(intensiveId)
           );
 
           if (freeStudents) {
@@ -56,23 +56,21 @@ const CreateTeamsPage: FC = () => {
     };
 
     fetchStudents();
-  }, [currentIntensive]);
+  }, [intensiveId]);
 
   useEffect(() => {
     const fetchTeams = async () => {
-      if (currentIntensive) {
+      if (intensiveId) {
         try {
-          const { data: teamsResponse } = await getTeams(currentIntensive.id);
+          const { data: teamsResponse } = await getTeams(parseInt(intensiveId));
 
           if (teamsResponse && teamsResponse.length > 0) {
             setTeamsCount(teamsResponse.length);
             setTeams(teamsResponse);
-
-            // TODO: как-то сделать так, чтобы сами студенты тоже устанавливались как-то, для этого надо изменить DragContainer, передавать туда что-то пропсом
           } else {
             const initialTeamData: ITeamForManager[] = [
-              { id: 1, name: 'Команда 1', studentsInTeam: [] },
-              { id: 2, name: 'Команда 2', studentsInTeam: [] },
+              { id: null, index: 1, name: 'Команда 1', studentsInTeam: [] },
+              { id: null, index: 2, name: 'Команда 2', studentsInTeam: [] },
             ];
 
             setTeamsCount(2);
@@ -85,7 +83,7 @@ const CreateTeamsPage: FC = () => {
     };
 
     fetchTeams();
-  }, [currentIntensive]);
+  }, [intensiveId]);
 
   useEffect(() => {
     if (searchString)
@@ -99,10 +97,10 @@ const CreateTeamsPage: FC = () => {
     }
   }, [searchString, freeStudents]);
 
-  const updateStudentsInTeam = (teamId: number, students: IStudent[]) => {
+  const updateStudentsInTeam = (teamIndex: number, students: IStudent[]) => {
     setTeams((prevTeams) =>
       prevTeams.map((prevTeam) => {
-        if (prevTeam.id === teamId) {
+        if (prevTeam.index === teamIndex) {
           return {
             ...prevTeam,
             studentsInTeam: students,
@@ -124,28 +122,72 @@ const CreateTeamsPage: FC = () => {
     setTeamsCount(parseInt(e.target.value));
   };
 
-  // TODO: логично все команды интенсива для организаторов хранить в глобальном состоянии? потому что в трех страницах будет юзаться
-  // TODO: показывать модальное окно?
-  const teamsCountButtonClickHandler = (teamsCount: number) => {
+  const teamsCountButtonClickHandler = () => {
+    setModal(true);
+  };
+
+  const clearTeams = () => {
+    const allStudentsInTeams: IStudent[] = teams.flatMap(
+      (team) => team.studentsInTeam
+    );
+
+    setTeams((prevTeams) =>
+      prevTeams.map((team) => ({ ...team, studentsInTeam: [] }))
+    );
+
+    setFreeStudents((prevFreeStudents) => [
+      ...prevFreeStudents,
+      ...allStudentsInTeams,
+    ]);
+  };
+
+  const changeTeamsCount = (teamsCount: number) => {
     const prevTeamsCount = teams.length;
-    if (prevTeamsCount < teamsCount) {
-      // teams count will increase
 
-      const newTeams: ITeamForManager[] = [];
-      for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
-        newTeams.push({ id: i, name: `Команда ${i}`, studentsInTeam: [] });
+    if (teamsCount !== 0) {
+      if (prevTeamsCount < teamsCount) {
+        // teams count will increase
+
+        const newTeams: ITeamForManager[] = [];
+        for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
+          newTeams.push({
+            id: null,
+            index: i,
+            name: `Команда ${i}`,
+            studentsInTeam: [],
+          });
+        }
+        setTeams((prevState) => [...prevState, ...newTeams]);
+      } else if (prevTeamsCount > teamsCount) {
+        // teams count will reduce
+
+        setTeams((prevTeams) => {
+          const reducedStudentsInTeam: IStudent[] = [];
+          const remainingTeams: ITeamForManager[] = [];
+
+          for (let i = 0; i < prevTeamsCount; i++) {
+            if (i <= teamsCount - 1) {
+              remainingTeams.push(prevTeams[i]);
+            } else {
+              reducedStudentsInTeam.push(...prevTeams[i].studentsInTeam);
+            }
+          }
+
+          setFreeStudents((prevFreeStudents) => [
+            ...prevFreeStudents,
+            ...reducedStudentsInTeam,
+          ]);
+
+          return remainingTeams;
+        });
       }
-      setTeams((prevState) => [...prevState, ...newTeams]);
-    } else if (prevTeamsCount > teamsCount) {
-      // teams count will reduce
-
-      setTeams((prevState) => prevState.slice(0, teamsCount));
     }
   };
 
   const onSubmit = async () => {
-    if (currentIntensive) {
+    if (intensiveId) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
+        id: team.id,
         name: team.name,
         studentIds: team.studentsInTeam.map(
           (studentInTeam) => studentInTeam.id
@@ -153,12 +195,12 @@ const CreateTeamsPage: FC = () => {
       }));
 
       try {
-        await createTeams({
-          intensiveId: currentIntensive.id,
+        await changeAllTeams({
+          intensiveId: parseInt(intensiveId),
           teams: teamsForRequest,
         });
 
-        navigate(`/manager/${currentIntensive.id}/teams`);
+        navigate(`/manager/${parseInt(intensiveId)}/teams`);
       } catch (e) {
         console.log(e);
       }
@@ -166,7 +208,42 @@ const CreateTeamsPage: FC = () => {
   };
 
   return (
-    <div>
+    <>
+      {modal && (
+        <Modal
+          title={'Изменение количества команд'}
+          onCloseModal={() => setModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            При изменении количества команд, в которых уже есть участники, вы
+            можете начать заполнение заново или сохранить уже добавленных
+            участников в командах
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => {
+                  clearTeams();
+                  changeTeamsCount(teamsCount);
+                  setModal(false);
+                }}
+                text="Очистить команды"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  changeTeamsCount(teamsCount);
+                  setModal(false);
+                }}
+                text="Сохранить участников"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       <Title text="Команды" />
 
       <p className="mt-3 text-base text-gray_3">
@@ -188,13 +265,13 @@ const CreateTeamsPage: FC = () => {
         <div>
           <PrimaryButton
             text="Изменить"
-            clickHandler={() => teamsCountButtonClickHandler(teamsCount)}
+            clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
       </div>
 
       <div className="flex gap-10 mt-5">
-        <div className="max-w-[470px] flex flex-col gap-3">
+        <div className="flex flex-col gap-3 basis-1/3">
           <h2 className="text-lg font-bold text-black_2">Созданные команды</h2>
           <p className="text-base text-bright_gray">
             Для добавления участников в команды вы можете использовать
@@ -203,20 +280,20 @@ const CreateTeamsPage: FC = () => {
           </p>
           {teams.map((team) => (
             <DragContainer
-              key={team.id}
+              key={team.index}
               containerName={team.name}
               setAllElements={setFreeStudents}
               allElements={freeStudents}
               onDrop={(droppedElements: IStudent[]) => {
                 // onDrop срабатывает, даже когда мы удаляем элементы из контейнера. он просто срабатывает всякий раз, когда droppedElements изменяется. мб переименовать?
-                updateStudentsInTeam(team.id, droppedElements);
+                updateStudentsInTeam(team.index, droppedElements);
               }}
-              initialDroppedElements={team.studentsInTeam}
+              parentDroppedElements={team.studentsInTeam}
             />
           ))}
         </div>
 
-        <div className="max-w-[470px] flex flex-col gap-3">
+        <div className="sticky flex flex-col gap-3 h-fit top-5 basis-2/3">
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-bold text-black_2">
               Свободные участники
@@ -233,8 +310,7 @@ const CreateTeamsPage: FC = () => {
               />
             </div>
 
-            {/* justify-center */}
-            <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2">
+            <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center">
               {searchResults.map((freeStudent) => (
                 <DragElement key={freeStudent.id} data={freeStudent} />
               ))}
@@ -247,8 +323,8 @@ const CreateTeamsPage: FC = () => {
                 text="Отменить"
                 buttonColor="gray"
                 clickHandler={() => {
-                  if (currentIntensive) {
-                    navigate(`/manager/${currentIntensive.id}/teams`);
+                  if (intensiveId) {
+                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
                   }
                 }}
               />
@@ -259,7 +335,7 @@ const CreateTeamsPage: FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

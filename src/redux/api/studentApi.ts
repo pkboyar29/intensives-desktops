@@ -31,12 +31,8 @@ export const studentApi = createApi({
   endpoints: (builder) => ({
     getFreeStudents: builder.query<IStudent[], number>({
       query: (intensiveId) => `students/free/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): IStudent[] => {
-        console.log(response);
-        return response.map((unmappedStudent: any) =>
-          mapStudent(unmappedStudent)
-        );
-      },
+      transformResponse: (response: any): IStudent[] =>
+        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
     }),
   }),
 });

@@ -12,7 +12,8 @@ export interface ITeam {
 }
 
 export interface ITeamForManager {
-  id: number;
+  id: number | null;
+  index: number;
   name: string;
   studentsInTeam: IStudent[];
   tutorId?: number;
@@ -31,6 +32,7 @@ export interface ITeamsCreate {
 }
 
 export interface ITeamCreate {
+  id: number | null;
   name: string;
   studentIds: number[];
 }

@@ -14,7 +14,7 @@ interface DragContainerProps {
   setAllElements: (elements: IStudent[]) => void;
   allElements: IStudent[];
   onDrop: (droppedElements: IStudent[]) => void;
-  initialDroppedElements: IStudent[];
+  parentDroppedElements: IStudent[];
 }
 
 export interface DropResult {
@@ -26,9 +26,11 @@ const DragContainer: FC<DragContainerProps> = ({
   setAllElements,
   allElements,
   onDrop,
-  initialDroppedElements,
+  parentDroppedElements,
 }) => {
-  const [droppedElements, setDroppedElements] = useState<IStudent[]>([]);
+  const [droppedElements, setDroppedElements] = useState<IStudent[]>(
+    parentDroppedElements
+  );
 
   const [{ isDragging }, dropRef] = useDrop({
     accept: ItemTypes.STUDENT,
@@ -61,8 +63,8 @@ const DragContainer: FC<DragContainerProps> = ({
   }, [droppedElements]);
 
   useEffect(() => {
-    setDroppedElements(initialDroppedElements);
-  }, []);
+    setDroppedElements(parentDroppedElements);
+  }, [parentDroppedElements]);
 
   const deleteElementFromContainer = (elementToDelete: IStudent) => {
     setDroppedElements(

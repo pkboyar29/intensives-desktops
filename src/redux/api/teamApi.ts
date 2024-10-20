@@ -20,6 +20,7 @@ const mapTeamToChoose = (unmappedTeam: any): ITeamToChoose => {
 const mapTeamForManager = (unmappedTeam: any): ITeamForManager => {
   return {
     id: unmappedTeam.id,
+    index: unmappedTeam.id,
     name: unmappedTeam.name,
     studentsInTeam: unmappedTeam.students_in_team.map((unmappedStudent: any) =>
       mapStudent(unmappedStudent.student)
@@ -36,11 +37,12 @@ export const teamApi = createApi({
       transformResponse: (response: any): ITeamForManager[] =>
         response.results.map((team: any) => mapTeamForManager(team)),
     }),
-    createTeams: builder.mutation<ITeamForManager[], ITeamsCreate>({
+    changeAllTeams: builder.mutation<ITeamForManager[], ITeamsCreate>({
       query: (data) => ({
-        url: `/teams/?intensive_id=${data.intensiveId}`,
+        url: `/teams/change_all_teams/?intensive_id=${data.intensiveId}`,
         method: 'POST',
         body: data.teams.map((team) => ({
+          id: team.id,
           name: team.name,
           student_ids: team.studentIds,
         })),
@@ -54,5 +56,5 @@ export const teamApi = createApi({
 export const {
   useGetTeamsQuery,
   useLazyGetTeamsQuery,
-  useCreateTeamsMutation,
+  useChangeAllTeamsMutation,
 } = teamApi;
