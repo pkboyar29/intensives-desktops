@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetEventsOnIntensiveQuery } from '../redux/api/eventApi';
 
@@ -14,6 +14,7 @@ const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
+  // TODO: попробовать удалить, ведь все равно 404 not found отображаться будет
   if (!intensiveId) {
     throw new Error('Missing intensiveId in URL');
   }

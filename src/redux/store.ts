@@ -10,6 +10,7 @@ import { intensiveApi } from './api/intensiveApi';
 import { eventApi } from './api/eventApi';
 import { teamApi } from './api/teamApi';
 import { teacherApi } from './api/teacherApi';
+import { studentApi } from './api/studentApi';
 import { studentRoleApi } from './api/studentRoleApi';
 import { stageApi } from './api/stageApi';
 import { audienceApi } from './api/audienceApi';
@@ -27,6 +28,7 @@ export const store = configureStore({
     [eventApi.reducerPath]: eventApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
     [teacherApi.reducerPath]: teacherApi.reducer,
+    [studentApi.reducerPath]: studentApi.reducer,
     [studentRoleApi.reducerPath]: studentRoleApi.reducer,
     [stageApi.reducerPath]: stageApi.reducer,
     [audienceApi.reducerPath]: audienceApi.reducer,
@@ -41,6 +43,7 @@ export const store = configureStore({
       eventApi.middleware,
       teamApi.middleware,
       teacherApi.middleware,
+      studentApi.middleware,
       studentRoleApi.middleware,
       stageApi.middleware,
       audienceApi.middleware,

@@ -52,23 +52,23 @@ const ManagerMainPage: FC = () => {
               >
                 Настройки интенсива
               </Link>
-              <Link
-                to="statistics"
-                className="py-1.5 px-2.5 hover:bg-another_white"
-              >
-                Статистика
-              </Link>
               <Link to="teams" className="py-1.5 px-2.5 hover:bg-another_white">
                 Управление командами
               </Link>
               <Link to="plan" className="py-1.5 px-2.5 hover:bg-another_white">
-                План интенсива
+                Расписание интенсива
               </Link>
               <Link
                 to="manageRoles"
                 className="py-1.5 px-2.5 hover:bg-another_white"
               >
-                Управление ролями
+                Управление ролями для студентов
+              </Link>
+              <Link
+                to="statistics"
+                className="py-1.5 px-2.5 hover:bg-another_white"
+              >
+                Статистика
               </Link>
             </div>
             <PrimaryButton

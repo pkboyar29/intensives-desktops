@@ -29,7 +29,7 @@ const SignInPage: FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      redirect(currentUser.roleId);
+      redirect(currentUser.roleName);
     }
   }, [currentUser]);
 
@@ -49,8 +49,8 @@ const SignInPage: FC = () => {
     }
   };
 
-  const redirect = (roleId: number) => {
-    if (roleId === 1) {
+  const redirect = (roleName: string) => {
+    if (roleName === 'Студент') {
       navigate('/intensives');
     } else {
       // if roleId == 2 or 3 or 4
