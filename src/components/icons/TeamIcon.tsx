@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-const TeamIcon: FC = () => {
+const TeamIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <div className="flex items-center justify-center bg-gray_5 group-hover:bg-gray_6 rounded-[10px] w-12 h-12">
       {' '}
@@ -10,6 +10,7 @@ const TeamIcon: FC = () => {
         viewBox="0 0 24 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        {...props}
       >
         <path
           fillRule="evenodd"

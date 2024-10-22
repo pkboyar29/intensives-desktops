@@ -75,7 +75,9 @@ const ManagerTeamsPage: FC = () => {
         <div>
           <PrimaryButton
             text="Изменить команды сопровождения"
-            clickHandler={() => console.log('yes')}
+            clickHandler={() =>
+              navigate(`/manager/${intensiveId}/createSupportTeams`)
+            }
           />
         </div>
       </div>

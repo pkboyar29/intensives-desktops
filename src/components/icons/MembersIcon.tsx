@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-const MembersIcon: FC = () => {
+const MembersIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
       className="absolute transform -translate-y-1/2 right-3 top-1/2"
@@ -9,6 +9,7 @@ const MembersIcon: FC = () => {
       viewBox="0 0 24 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"

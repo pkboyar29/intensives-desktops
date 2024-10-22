@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-const SettingsIcon: FC = () => {
+const SettingsIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
       width="18"
@@ -8,6 +8,7 @@ const SettingsIcon: FC = () => {
       viewBox="0 0 18 18"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fill-rule="evenodd"
