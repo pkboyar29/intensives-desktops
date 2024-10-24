@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useLazyGetTeamsQuery } from '../redux/api/teamApi';
 import { useLazyGetTeachersOnIntensiveQuery } from '../redux/api/teacherApi';
@@ -7,6 +7,7 @@ import { useLazyGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
 import DragContainer from '../components/DragComponents/DragContainer';
 import DragElement from '../components/DragComponents/DragElement';
+import PrimaryButton from '../components/PrimaryButton';
 import Title from '../components/Title';
 import TeamIcon from '../components/icons/TeamIcon';
 import SearchIcon from '../components/icons/SearchIcon';
@@ -16,6 +17,7 @@ import { ITeacher } from '../ts/interfaces/ITeacher';
 import { IStudent } from '../ts/interfaces/IStudent';
 
 const CreateSupportTeamsPage: FC = () => {
+  const navigate = useNavigate();
   const { intensiveId } = useParams();
 
   const [getTeams] = useLazyGetTeamsQuery();
@@ -98,6 +100,10 @@ const CreateSupportTeamsPage: FC = () => {
     );
   };
 
+  const onSubmit = () => {
+    console.log('hello submit');
+  };
+
   return (
     <>
       <Title text="Команды сопровождения" />
@@ -174,7 +180,7 @@ const CreateSupportTeamsPage: FC = () => {
                 Тьюторы и наставники
               </div>
 
-              <div className="flex justify-between mt-6 min-w-[266px] border-solid border-b border-b-black pb-2 text-lg">
+              <div className="relative flex justify-between mt-6 min-w-[266px] border-solid border-b border-b-black pb-2 text-lg">
                 <button
                   onClick={() => setSlug('tutors')}
                   className={`transition-colors duration-300 cursor-pointer ${
@@ -191,6 +197,13 @@ const CreateSupportTeamsPage: FC = () => {
                 >
                   Наставники
                 </button>
+
+                <div
+                  className={`absolute bottom-[-2.5px] h-[4px] w-[35px] bg-blue rounded-2xl transition-all duration-300`}
+                  style={{
+                    left: slug === 'tutors' ? '0' : 'calc(100% - 35px)',
+                  }}
+                ></div>
               </div>
 
               <div className="relative flex items-center w-full mt-8">
@@ -205,8 +218,6 @@ const CreateSupportTeamsPage: FC = () => {
               </div>
 
               <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center mt-3 max-w-[550px]">
-                {/* TODO: заменить на DragElement */}
-                {/* DragElement тоже сделать generic компонентом? */}
                 {slug === 'tutors' ? (
                   <>
                     {allTeachers.map((teacher) => (
@@ -233,6 +244,23 @@ const CreateSupportTeamsPage: FC = () => {
                     ))}{' '}
                   </>
                 )}
+              </div>
+
+              <div className="flex justify-end w-full gap-3 mt-3">
+                <div>
+                  <PrimaryButton
+                    text="Отменить"
+                    buttonColor="gray"
+                    clickHandler={() => {
+                      if (intensiveId) {
+                        navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                      }
+                    }}
+                  />
+                </div>
+                <div>
+                  <PrimaryButton text="Сохранить" clickHandler={onSubmit} />
+                </div>
               </div>
             </div>
           </div>
