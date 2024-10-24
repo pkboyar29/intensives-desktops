@@ -1,86 +1,44 @@
-import { useState, FC, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 
 import DroppedElement from './DroppedElement';
 import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
-import { IStudent } from '../../ts/interfaces/IStudent';
 
-// TODO: МБ КАК-ТО МОЖНО ПЕРЕМЕСТИТЬ SETALLELEMENTS И ALLELEMENTS В ONDROP. ХОТЯ НАВЕРНОЕ ВСЕ НЕ ТАК ПРОСТО...
-// А ЕСЛИ DROPPEDELEMENTS ПЕРЕДАВАТЬ СВОЙСТВОМ МБ ПОЛЕГЧЕ БУДЕТ?
-interface DragContainerProps {
+interface DragContainerProps<T extends { id: number; content: string }> {
   containerName: string;
-  setAllElements: (elements: IStudent[]) => void;
-  allElements: IStudent[];
-  onDrop: (droppedElements: IStudent[]) => void;
-  parentDroppedElements: IStudent[];
+  droppedElements: T[];
+  onDrop: (droppedElement: T) => void;
+  onDelete: (deletedElement: T) => void;
 }
 
-export interface DropResult {
-  isDroppedInTheSameContainer: boolean;
-}
-
-const DragContainer: FC<DragContainerProps> = ({
+// TODO: убрать из DragContainer все, что связано с командой?
+const DragContainer = <T extends { id: number; content: string }>({
   containerName,
-  setAllElements,
-  allElements,
+  droppedElements,
   onDrop,
-  parentDroppedElements,
-}) => {
-  const [droppedElements, setDroppedElements] = useState<IStudent[]>(
-    parentDroppedElements
-  );
-
+  onDelete,
+}: DragContainerProps<T>) => {
   const [{ isDragging }, dropRef] = useDrop({
     accept: ItemTypes.STUDENT,
-    drop(newDroppedElement: IStudent): DropResult {
+    drop(newDroppedElement: T) {
       const isDroppedInTheSameContainer: boolean = droppedElements.some(
-        (existingDroppedElement: IStudent) =>
+        (existingDroppedElement: T) =>
           existingDroppedElement.id === newDroppedElement.id
       );
-
       if (isDroppedInTheSameContainer) {
-        return { isDroppedInTheSameContainer: true };
+        return;
       }
 
-      setDroppedElements([...droppedElements, newDroppedElement]);
-      setAllElements(
-        allElements.filter(
-          (freeStudent: IStudent) => freeStudent.id !== newDroppedElement.id
-        )
-      );
-
-      return { isDroppedInTheSameContainer: false };
+      onDrop(newDroppedElement);
     },
     collect: (monitor) => ({
       isDragging: monitor.isOver(),
     }),
   });
 
-  useEffect(() => {
-    onDrop(droppedElements);
-  }, [droppedElements]);
-
-  useEffect(() => {
-    setDroppedElements(parentDroppedElements);
-  }, [parentDroppedElements]);
-
-  const deleteElementFromContainer = (elementToDelete: IStudent) => {
-    setDroppedElements(
-      droppedElements.filter(
-        (draggedElement: IStudent) => elementToDelete.id != draggedElement.id
-      )
-    );
-    setAllElements([...allElements, elementToDelete]);
-  };
-
-  const afterSuccessfulDrop = (newDroppedElement: IStudent) => {
-    setDroppedElements(
-      droppedElements.filter(
-        (droppedElement: IStudent) => droppedElement.id !== newDroppedElement.id
-      )
-    );
+  const deleteElementFromContainer = (elementToDelete: T) => {
+    onDelete(elementToDelete);
   };
 
   return (
@@ -107,18 +65,17 @@ const DragContainer: FC<DragContainerProps> = ({
           {droppedElements.map((droppedElement) => (
             <DroppedElement
               key={droppedElement.id}
-              data={droppedElement}
-              onDropSuccess={afterSuccessfulDrop}
+              element={droppedElement}
               onDelete={deleteElementFromContainer}
             />
           ))}
         </div>
 
-        <select className="mt-[4px] cursor-pointer px-4 py-1.5 text-base rounded-lg border-none outline-none bg-gray_5 w-min appearance-none">
+        {/* <select className="mt-[4px] cursor-pointer px-4 py-1.5 text-base rounded-lg border-none outline-none bg-gray_5 w-min appearance-none">
           <option>
             <div>Добавить участника</div>
           </option>
-        </select>
+        </select> */}
       </div>
     </div>
   );

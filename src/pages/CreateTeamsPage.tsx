@@ -184,6 +184,47 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
+  const handleStudentMove = (
+    team: ITeamForManager,
+    droppedStudent: IStudent
+  ) => {
+    const sourceTeam: ITeamForManager | undefined = teams.find((team) =>
+      team.studentsInTeam.some((student) => student.id === droppedStudent.id)
+    );
+    if (sourceTeam) {
+      const reducedStudentsInTeam: IStudent[] =
+        sourceTeam.studentsInTeam.filter(
+          (student) => student.id !== droppedStudent.id
+        );
+
+      updateStudentsInTeam(sourceTeam.index, reducedStudentsInTeam);
+    } else {
+      setFreeStudents(
+        freeStudents.filter(
+          (freeStudent) => freeStudent.id !== droppedStudent.id
+        )
+      );
+    }
+
+    const newStudentsInTeam: IStudent[] = [
+      ...team.studentsInTeam,
+      droppedStudent,
+    ];
+    updateStudentsInTeam(team.index, newStudentsInTeam);
+  };
+
+  const handleStudentDelete = (
+    team: ITeamForManager,
+    studentToDelete: IStudent
+  ) => {
+    const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
+      (student) => student.id !== studentToDelete.id
+    );
+    updateStudentsInTeam(team.index, reducedStudentsInTeam);
+
+    setFreeStudents([...freeStudents, studentToDelete]);
+  };
+
   const onSubmit = async () => {
     if (intensiveId) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
@@ -282,13 +323,22 @@ const CreateTeamsPage: FC = () => {
             <DragContainer
               key={team.index}
               containerName={team.name}
-              setAllElements={setFreeStudents}
-              allElements={freeStudents}
-              onDrop={(droppedElements: IStudent[]) => {
-                // onDrop срабатывает, даже когда мы удаляем элементы из контейнера. он просто срабатывает всякий раз, когда droppedElements изменяется. мб переименовать?
-                updateStudentsInTeam(team.index, droppedElements);
+              onDrop={(droppedElement) => {
+                handleStudentMove(team, {
+                  id: droppedElement.id,
+                  nameWithGroup: droppedElement.content,
+                });
               }}
-              parentDroppedElements={team.studentsInTeam}
+              onDelete={(deletedElement) => {
+                handleStudentDelete(team, {
+                  id: deletedElement.id,
+                  nameWithGroup: deletedElement.content,
+                });
+              }}
+              droppedElements={team.studentsInTeam.map((studentInTeam) => ({
+                id: studentInTeam.id,
+                content: studentInTeam.nameWithGroup,
+              }))}
             />
           ))}
         </div>
@@ -312,7 +362,13 @@ const CreateTeamsPage: FC = () => {
 
             <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center">
               {searchResults.map((freeStudent) => (
-                <DragElement key={freeStudent.id} data={freeStudent} />
+                <DragElement
+                  key={freeStudent.id}
+                  data={{
+                    id: freeStudent.id,
+                    content: freeStudent.nameWithGroup,
+                  }}
+                />
               ))}
             </div>
           </div>
