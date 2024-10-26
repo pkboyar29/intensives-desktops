@@ -1,21 +1,26 @@
 import { FC } from 'react';
-import krest from '../icons/krest.svg';
+import CrossIcon from './icons/CrossIcon';
 
 interface TagProps {
-  name: string;
-  deleteHandler: () => void;
+  content: string;
+  shouldHaveCrossIcon: boolean;
+  deleteHandler?: () => void;
 }
 
-const Tag: FC<TagProps> = ({ name, deleteHandler }) => {
+const Tag: FC<TagProps> = ({ content, shouldHaveCrossIcon, deleteHandler }) => {
   return (
-    <div className="text-sm bg-gray_5 px-2 py-1 rounded-[10px] max-w-max overflow-hidden whitespace-nowrap flex justify-between items-center gap-[5px]">
-      <span className="w-full overflow-hidden mr-[10px] text-ellipsis whitespace-nowrap">
-        {name}
-      </span>
+    <div
+      className={`text-base bg-gray_5 hover:bg-gray_6 px-3 py-1 w-full flex items-center rounded-xl gap-[5px] ${
+        shouldHaveCrossIcon ? 'justify-between' : 'justify-center'
+      }`}
+    >
+      <span>{content}</span>
 
-      <button className="w-3 h-3" onClick={deleteHandler}>
-        <img className="h-2.5 w-2.5 fill-black" loading="lazy" src={krest} />
-      </button>
+      {shouldHaveCrossIcon && deleteHandler && (
+        <button className="w-3 h-3" onClick={deleteHandler}>
+          <CrossIcon />
+        </button>
+      )}
     </div>
   );
 };

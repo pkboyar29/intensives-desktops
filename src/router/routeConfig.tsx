@@ -19,9 +19,10 @@ import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
 
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
-import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
+import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
+import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import ManageRolesPage from '../pages/ManageRolesPage';
 import SchedulePage from '../pages/SchedulePage';
@@ -113,6 +114,10 @@ const routeConfig: RouteType[] = [
       {
         path: 'createTeams',
         element: <CreateTeamsPage />,
+      },
+      {
+        path: 'createSupportTeams',
+        element: <CreateSupportTeamsPage />,
       },
       {
         path: 'plan',

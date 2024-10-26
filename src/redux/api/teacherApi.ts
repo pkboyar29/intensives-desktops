@@ -40,9 +40,9 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
+    // TODO: тут я храню только id препода на интенсиве, однако надо еще хранить id препода
     getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
-      query: (intensiveId) =>
-        `teachers_on_intensives/?intensive=${intensiveId}`,
+      query: (intensiveId) => `teachers_on_intensives/?intensiv=${intensiveId}`,
       transformResponse: (response: any): ITeacherOnIntensive[] =>
         response.results.map((teacher: any) => mapTeacherOnIntensive(teacher)),
     }),

@@ -34,7 +34,16 @@ export const studentApi = createApi({
       transformResponse: (response: any): IStudent[] =>
         response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
     }),
+    getNotAssignedStudents: builder.query<IStudent[], number>({
+      query: (intensiveId) =>
+        `students/not_assigned/?intensive_id=${intensiveId}`,
+      transformResponse: (response: any): IStudent[] =>
+        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
+    }),
   }),
 });
 
-export const { useLazyGetFreeStudentsQuery } = studentApi;
+export const {
+  useLazyGetFreeStudentsQuery,
+  useLazyGetNotAssignedStudentsQuery,
+} = studentApi;

@@ -1,4 +1,5 @@
 import { IStudent } from './IStudent';
+import { ITeacher, ITeacherOnIntensive } from './ITeacher';
 
 // TODO: убрать тут null?
 export interface ITeam {
@@ -11,13 +12,14 @@ export interface ITeam {
   intensiveId: number;
 }
 
+// TODO: потом ITeam, что выше, не будет нужен, и можно ITeamForManager переименовать на ITeam?
 export interface ITeamForManager {
   id: number | null;
   index: number;
   name: string;
   studentsInTeam: IStudent[];
-  tutorId?: number;
-  mentorId?: number;
+  tutor: ITeacherOnIntensive | null;
+  mentor: IStudent | null;
   teamleadId?: number;
 }
 
@@ -35,4 +37,10 @@ export interface ITeamCreate {
   id: number | null;
   name: string;
   studentIds: number[];
+}
+
+export interface ITeamSupportMembersUpdate {
+  id: number;
+  tutorId: number | null;
+  mentorId: number | null;
 }

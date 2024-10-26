@@ -49,7 +49,7 @@ const TeamsPage: FC = () => {
 
   return (
     <>
-      <Title text="Команды в интенсиве" />
+      <Title text="Команды на интенсиве" />
 
       <Table
         data={teams}

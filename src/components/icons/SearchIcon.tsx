@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-const SearchIcon: FC = () => {
+const SearchIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
       className="absolute transform -translate-y-1/2 left-2 top-1/2"
@@ -9,6 +9,7 @@ const SearchIcon: FC = () => {
       viewBox="0 0 21 21"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"
