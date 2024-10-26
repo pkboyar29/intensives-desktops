@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGetTeamsQuery } from '../redux/api/teamApi';
 
 import Skeleton from 'react-loading-skeleton';
+import Tag from '../components/Tag';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
 import TeamIcon from '../components/icons/TeamIcon';
@@ -32,7 +33,7 @@ const ManagerTeamsPage: FC = () => {
             <div className="flex flex-wrap gap-6 mt-7">
               {teams.map((team) => (
                 <div
-                  className="flex-shrink flex-grow-0 basis-[16.67%]"
+                  className="flex-shrink flex-grow-0 basis-[16.67%] flex flex-col gap-3"
                   key={team.id}
                 >
                   <div className="flex gap-2 transition duration-300 group">
@@ -40,15 +41,45 @@ const ManagerTeamsPage: FC = () => {
                     <h3 className="text-lg">{team.name}</h3>
                   </div>
 
-                  <div className="flex flex-col gap-5 mt-3">
+                  {team.tutor && (
+                    <div className="flex gap-3 h-9">
+                      <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
+                        Т
+                      </div>
+                      <Tag
+                        content={team.tutor.name}
+                        shouldHaveCrossIcon={false}
+                      />
+                    </div>
+                  )}
+
+                  {team.mentor && (
+                    <div className="flex gap-3 h-9">
+                      <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
+                        Н
+                      </div>
+                      <Tag
+                        content={team.mentor.nameWithGroup}
+                        shouldHaveCrossIcon={false}
+                      />
+                    </div>
+                  )}
+
+                  {!team.tutor && (
+                    <div className="text-bright_gray">Нет тьютора</div>
+                  )}
+                  {!team.mentor && (
+                    <div className="text-bright_gray">Нет наставника</div>
+                  )}
+
+                  <div className="flex flex-col gap-3">
                     {team.studentsInTeam.length > 0 ? (
                       team.studentsInTeam.map((studentInTeam) => (
-                        <span
+                        <Tag
                           key={studentInTeam.id}
-                          className="px-4 py-[5.5px] text-center bg-gray_5 rounded-xl hover:bg-gray_6"
-                        >
-                          {studentInTeam.nameWithGroup}
-                        </span>
+                          content={studentInTeam.nameWithGroup}
+                          shouldHaveCrossIcon={false}
+                        />
                       ))
                     ) : (
                       <div className="text-bright_gray">Нет участников</div>

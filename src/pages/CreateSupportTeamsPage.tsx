@@ -1,15 +1,20 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { useLazyGetTeamsQuery } from '../redux/api/teamApi';
+import {
+  useLazyGetTeamsQuery,
+  useUpdateSupportMembersMutation,
+} from '../redux/api/teamApi';
 import { useLazyGetTeachersOnIntensiveQuery } from '../redux/api/teacherApi';
 import { useLazyGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
+import Modal from '../components/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
 import PrimaryButton from '../components/PrimaryButton';
 import Title from '../components/Title';
 import SearchIcon from '../components/icons/SearchIcon';
+import Skeleton from 'react-loading-skeleton';
 
 import { ITeamForManager } from '../ts/interfaces/ITeam';
 import { ITeacher } from '../ts/interfaces/ITeacher';
@@ -19,10 +24,12 @@ const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
-  const [getTeams] = useLazyGetTeamsQuery();
+  // все-таки вместо lazy хуков использовать нормальные?
+  const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
   const [getNotAssignedStudentsOnIntensive] =
     useLazyGetNotAssignedStudentsQuery();
+  const [updateSupportMembers] = useUpdateSupportMembersMutation();
 
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
   // предположить, что тут может быть рандомная цифра?
@@ -38,6 +45,9 @@ const CreateSupportTeamsPage: FC = () => {
   const [searchString, setSearchString] = useState<string>('');
 
   const [slug, setSlug] = useState<'tutors' | 'mentors'>('tutors');
+
+  const [cancelModal, setCancelModal] = useState<boolean>(false);
+  const [saveModal, setSaveModal] = useState<boolean>(false);
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
@@ -110,8 +120,6 @@ const CreateSupportTeamsPage: FC = () => {
       isTutor: boolean;
     }
   ) => {
-    console.log(newDroppedElement);
-
     setTeams((teams) =>
       teams.map((team) => {
         if (currentTeamId !== team.index) {
@@ -161,19 +169,91 @@ const CreateSupportTeamsPage: FC = () => {
     );
   };
 
-  const onSubmit = () => {
-    console.log('hello submit');
+  const onSubmit = async () => {
+    try {
+      await updateSupportMembers(
+        teams.map((team) => ({
+          id: team.index,
+          tutorId: team.tutor?.id || null,
+          mentorId: team.mentor?.id || null,
+        }))
+      );
+
+      setSaveModal(true);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
     <>
+      {cancelModal && (
+        <Modal
+          title="Вы уверены, что хотите прекратить редактирование?"
+          onCloseModal={() => setCancelModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            Вы уверены, что хотите прекратить редактирование? Все сделанные вами
+            изменения не будут сохранены.
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setCancelModal(false)}
+                text="Продолжить редактирование"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setCancelModal(false);
+                  if (intensiveId) {
+                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                  }
+                }}
+                text="Да"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {saveModal && (
+        <Modal
+          title="Команды сопровождения успешно обновлены"
+          onCloseModal={() => setSaveModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            Команды сопровождения успешно обновлены для каждой команды.
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setSaveModal(false);
+                  if (intensiveId) {
+                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                  }
+                }}
+                text="Ок"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       <Title text="Команды сопровождения" />
 
       <p className="mt-3 text-base text-gray_3">
         Распределите наставников и тьюторов по командам
       </p>
 
-      {teams.length <= 0 ? (
+      {isLoading ? (
+        <div className="mt-7">
+          <Skeleton />
+        </div>
+      ) : teams.length <= 0 ? (
         <div className="text-xl font-bold text-black mt-7">
           Команды еще не определены для этого интенсива
         </div>
@@ -197,7 +277,7 @@ const CreateSupportTeamsPage: FC = () => {
 
           <div className="flex gap-20 mt-8">
             {currentTeam && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 basis-1/3">
                 <div className="text-lg font-bold text-black">
                   {currentTeam.name}
                 </div>
@@ -229,14 +309,17 @@ const CreateSupportTeamsPage: FC = () => {
               </div>
             )}
 
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center grow basis-2/3">
               <div className="text-lg font-bold text-black">
                 Тьюторы и наставники
               </div>
 
               <div className="relative flex justify-between mt-6 min-w-[266px] border-solid border-b border-b-black pb-2 text-lg">
                 <button
-                  onClick={() => setSlug('tutors')}
+                  onClick={() => {
+                    setSearchString('');
+                    setSlug('tutors');
+                  }}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'tutors' ? 'text-blue' : 'hover:text-blue'
                   }`}
@@ -244,7 +327,10 @@ const CreateSupportTeamsPage: FC = () => {
                   Тьюторы
                 </button>
                 <button
-                  onClick={() => setSlug('mentors')}
+                  onClick={() => {
+                    setSearchString('');
+                    setSlug('mentors');
+                  }}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'mentors' ? 'text-blue' : 'hover:text-blue'
                   }`}
@@ -271,33 +357,45 @@ const CreateSupportTeamsPage: FC = () => {
                 />
               </div>
 
-              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center mt-3 max-w-[550px]">
+              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center min-w-[550px] mt-3">
                 {slug === 'tutors' ? (
                   <>
-                    {allTeachers.map((teacher) => (
-                      <SupportTeamDragElement
-                        key={teacher.id}
-                        data={{
-                          id: teacher.id,
-                          content: teacher.name,
-                          isTutor: true,
-                        }}
-                      />
-                    ))}
+                    {allTeachers
+                      .filter((teacher) =>
+                        teacher.name
+                          .toLowerCase()
+                          .includes(searchString.toLowerCase())
+                      )
+                      .map((teacher) => (
+                        <SupportTeamDragElement
+                          key={teacher.id}
+                          data={{
+                            id: teacher.id,
+                            content: teacher.name,
+                            isTutor: true,
+                          }}
+                        />
+                      ))}
                   </>
                 ) : (
                   <>
                     {' '}
-                    {allStudents.map((student) => (
-                      <SupportTeamDragElement
-                        key={student.id}
-                        data={{
-                          id: student.id,
-                          content: student.nameWithGroup,
-                          isTutor: false,
-                        }}
-                      />
-                    ))}{' '}
+                    {allStudents
+                      .filter((student) =>
+                        student.nameWithGroup
+                          .toLowerCase()
+                          .includes(searchString.toLowerCase())
+                      )
+                      .map((student) => (
+                        <SupportTeamDragElement
+                          key={student.id}
+                          data={{
+                            id: student.id,
+                            content: student.nameWithGroup,
+                            isTutor: false,
+                          }}
+                        />
+                      ))}{' '}
                   </>
                 )}
               </div>
@@ -308,9 +406,7 @@ const CreateSupportTeamsPage: FC = () => {
                     text="Отменить"
                     buttonColor="gray"
                     clickHandler={() => {
-                      if (intensiveId) {
-                        navigate(`/manager/${parseInt(intensiveId)}/teams`);
-                      }
+                      setCancelModal(true);
                     }}
                   />
                 </div>

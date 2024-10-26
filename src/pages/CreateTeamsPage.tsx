@@ -35,7 +35,9 @@ const CreateTeamsPage: FC = () => {
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
 
-  const [modal, setModal] = useState<boolean>(false);
+  const [teamsCountModal, setTeamsCountModal] = useState<boolean>(false);
+  const [cancelModal, setCancelModal] = useState<boolean>(false);
+  const [saveModal, setSaveModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -137,7 +139,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const teamsCountButtonClickHandler = () => {
-    setModal(true);
+    setTeamsCountModal(true);
   };
 
   const clearTeams = () => {
@@ -257,7 +259,7 @@ const CreateTeamsPage: FC = () => {
           teams: teamsForRequest,
         });
 
-        navigate(`/manager/${parseInt(intensiveId)}/teams`);
+        setSaveModal(true);
       } catch (e) {
         console.log(e);
       }
@@ -266,10 +268,10 @@ const CreateTeamsPage: FC = () => {
 
   return (
     <>
-      {modal && (
+      {teamsCountModal && (
         <Modal
           title={'Изменение количества команд'}
-          onCloseModal={() => setModal(false)}
+          onCloseModal={() => setTeamsCountModal(false)}
         >
           <p className="text-lg text-bright_gray">
             При изменении количества команд, в которых уже есть участники, вы
@@ -283,7 +285,7 @@ const CreateTeamsPage: FC = () => {
                 clickHandler={() => {
                   clearTeams();
                   changeTeamsCount(teamsCount);
-                  setModal(false);
+                  setTeamsCountModal(false);
                 }}
                 text="Очистить команды"
               />
@@ -292,9 +294,65 @@ const CreateTeamsPage: FC = () => {
               <PrimaryButton
                 clickHandler={() => {
                   changeTeamsCount(teamsCount);
-                  setModal(false);
+                  setTeamsCountModal(false);
                 }}
                 text="Сохранить участников"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {cancelModal && (
+        <Modal
+          title="Вы уверены, что хотите прекратить редактирование?"
+          onCloseModal={() => setCancelModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            Вы уверены, что хотите прекратить редактирование? Все сделанные вами
+            изменения не будут сохранены.
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setCancelModal(false)}
+                text="Продолжить редактирование"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setCancelModal(false);
+                  if (intensiveId) {
+                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                  }
+                }}
+                text="Да"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {saveModal && (
+        <Modal
+          title="Команды успешно изменены"
+          onCloseModal={() => setSaveModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            Состав команд успешно изменен
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setSaveModal(false);
+                  if (intensiveId) {
+                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                  }
+                }}
+                text="Ок"
               />
             </div>
           </div>
@@ -395,9 +453,7 @@ const CreateTeamsPage: FC = () => {
                 text="Отменить"
                 buttonColor="gray"
                 clickHandler={() => {
-                  if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
-                  }
+                  setCancelModal(true);
                 }}
               />
             </div>

@@ -9,7 +9,11 @@ interface TagProps {
 
 const Tag: FC<TagProps> = ({ content, shouldHaveCrossIcon, deleteHandler }) => {
   return (
-    <div className="text-base bg-gray_5 hover:bg-gray_6 px-3 py-1 w-full flex justify-between items-center rounded-xl gap-[5px]">
+    <div
+      className={`text-base bg-gray_5 hover:bg-gray_6 px-3 py-1 w-full flex items-center rounded-xl gap-[5px] ${
+        shouldHaveCrossIcon ? 'justify-between' : 'justify-center'
+      }`}
+    >
       <span>{content}</span>
 
       {shouldHaveCrossIcon && deleteHandler && (

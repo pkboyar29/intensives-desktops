@@ -12,7 +12,7 @@ export interface ITeam {
   intensiveId: number;
 }
 
-// TODO: потом ITeam не будет нужен, и можно ITeamForManager переименовать на ITeam?
+// TODO: потом ITeam, что выше, не будет нужен, и можно ITeamForManager переименовать на ITeam?
 export interface ITeamForManager {
   id: number | null;
   index: number;
@@ -37,4 +37,10 @@ export interface ITeamCreate {
   id: number | null;
   name: string;
   studentIds: number[];
+}
+
+export interface ITeamSupportMembersUpdate {
+  id: number;
+  tutorId: number | null;
+  mentorId: number | null;
 }

@@ -216,4 +216,5 @@ input[type='number'] {
 
 .modal-open {
   overflow: hidden;
+  padding-right: 16px;
 }
