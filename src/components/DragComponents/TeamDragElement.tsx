@@ -2,13 +2,13 @@ import { useDrag } from 'react-dnd';
 
 import { ItemTypes } from './ItemTypes';
 
-interface DragElementProps<T extends { id: number; content: string }> {
+interface TeamDragElementProps<T extends { id: number; content: string }> {
   data: T;
 }
 
-const DragElement = <T extends { id: number; content: string }>({
+const TeamDragElement = <T extends { id: number; content: string }>({
   data,
-}: DragElementProps<T>) => {
+}: TeamDragElementProps<T>) => {
   const [, dragRef] = useDrag({
     type: ItemTypes.STUDENT,
     item: data,
@@ -24,4 +24,4 @@ const DragElement = <T extends { id: number; content: string }>({
   );
 };
 
-export default DragElement;
+export default TeamDragElement;

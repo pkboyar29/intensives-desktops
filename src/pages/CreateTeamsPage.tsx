@@ -7,8 +7,8 @@ import {
   useLazyGetTeamsQuery,
 } from '../redux/api/teamApi';
 
-import DragElement from '../components/DragComponents/DragElement';
-import DragContainer from '../components/DragComponents/DragContainer';
+import TeamDragElement from '../components/DragComponents/TeamDragElement';
+import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
 import Modal from '../components/Modal';
@@ -69,8 +69,22 @@ const CreateTeamsPage: FC = () => {
             setTeams(teamsResponse);
           } else {
             const initialTeamData: ITeamForManager[] = [
-              { id: null, index: 1, name: 'Команда 1', studentsInTeam: [] },
-              { id: null, index: 2, name: 'Команда 2', studentsInTeam: [] },
+              {
+                id: null,
+                index: 1,
+                name: 'Команда 1',
+                studentsInTeam: [],
+                tutor: null,
+                mentor: null,
+              },
+              {
+                id: null,
+                index: 2,
+                name: 'Команда 2',
+                studentsInTeam: [],
+                tutor: null,
+                mentor: null,
+              },
             ];
 
             setTeamsCount(2);
@@ -155,6 +169,8 @@ const CreateTeamsPage: FC = () => {
             index: i,
             name: `Команда ${i}`,
             studentsInTeam: [],
+            tutor: null,
+            mentor: null,
           });
         }
         setTeams((prevState) => [...prevState, ...newTeams]);
@@ -320,7 +336,7 @@ const CreateTeamsPage: FC = () => {
             помощью drag and drop
           </p>
           {teams.map((team) => (
-            <DragContainer
+            <TeamDragContainer
               key={team.index}
               containerName={team.name}
               onDrop={(droppedElement) => {
@@ -362,7 +378,7 @@ const CreateTeamsPage: FC = () => {
 
             <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center">
               {searchResults.map((freeStudent) => (
-                <DragElement
+                <TeamDragElement
                   key={freeStudent.id}
                   data={{
                     id: freeStudent.id,

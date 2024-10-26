@@ -82,8 +82,9 @@ const ManageRolesPage: FC = () => {
                 .filter((res) => res.for_student)
                 .map((elem) => (
                   <Tag
+                    shouldHaveCrossIcon={true}
                     key={elem.id}
-                    name={elem.name}
+                    content={elem.name}
                     deleteHandler={() => roleTagCloseHandler(elem.id)}
                   />
                 ))

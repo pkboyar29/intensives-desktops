@@ -5,20 +5,23 @@ import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
 
-interface DragContainerProps<T extends { id: number; content: string }> {
+interface TeamDragContainerProps<T extends { id: number; content: string }> {
   containerName: string;
   droppedElements: T[];
   onDrop: (droppedElement: T) => void;
   onDelete: (deletedElement: T) => void;
 }
 
-// TODO: убрать из DragContainer все, что связано с командой?
-const DragContainer = <T extends { id: number; content: string }>({
+// TODO: тут начать использовать компонент Tag?
+// Раз компонент относится непосредственно к Team, то и необязательно делать дженерик тайпы непосредственно тут?
+// если передавать team типа ITeam, то возможно не имеет смысла разделять компонент на два?
+// начать отображать тьютора и наставника также тут?
+const TeamDragContainer = <T extends { id: number; content: string }>({
   containerName,
   droppedElements,
   onDrop,
   onDelete,
-}: DragContainerProps<T>) => {
+}: TeamDragContainerProps<T>) => {
   const [{ isDragging }, dropRef] = useDrop({
     accept: ItemTypes.STUDENT,
     drop(newDroppedElement: T) {
@@ -81,4 +84,4 @@ const DragContainer = <T extends { id: number; content: string }>({
   );
 };
 
-export default DragContainer;
+export default TeamDragContainer;

@@ -1,15 +1,14 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useLazyGetTeamsQuery } from '../redux/api/teamApi';
 import { useLazyGetTeachersOnIntensiveQuery } from '../redux/api/teacherApi';
 import { useLazyGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
-import DragContainer from '../components/DragComponents/DragContainer';
-import DragElement from '../components/DragComponents/DragElement';
+import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
+import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
 import PrimaryButton from '../components/PrimaryButton';
 import Title from '../components/Title';
-import TeamIcon from '../components/icons/TeamIcon';
 import SearchIcon from '../components/icons/SearchIcon';
 
 import { ITeamForManager } from '../ts/interfaces/ITeam';
@@ -26,7 +25,12 @@ const CreateSupportTeamsPage: FC = () => {
     useLazyGetNotAssignedStudentsQuery();
 
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
-  const [currentTeam, setCurrentTeam] = useState<ITeamForManager>();
+  // предположить, что тут может быть рандомная цифра?
+  const [currentTeamId, setCurrentTeamId] = useState<number>();
+  const currentTeam = useMemo(
+    () => teams.find((team) => team.index === currentTeamId),
+    [teams, currentTeamId]
+  );
 
   const [allTeachers, setAllTeachers] = useState<ITeacher[]>([]);
   const [allStudents, setAllStudents] = useState<IStudent[]>([]);
@@ -47,7 +51,7 @@ const CreateSupportTeamsPage: FC = () => {
 
           if (data) {
             setTeams(data);
-            setCurrentTeam(data[0]);
+            setCurrentTeamId(data[0].id || undefined);
           }
         }
       } catch (e) {
@@ -95,8 +99,65 @@ const CreateSupportTeamsPage: FC = () => {
   }, []);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrentTeam(
-      teams.find((team) => team.index.toString() === event.target.value)
+    setCurrentTeamId(parseInt(event.target.value));
+  };
+
+  const updateTeamSupportMembers = (
+    currentTeamId: number,
+    newDroppedElement: {
+      id: number;
+      content: string;
+      isTutor: boolean;
+    }
+  ) => {
+    console.log(newDroppedElement);
+
+    setTeams((teams) =>
+      teams.map((team) => {
+        if (currentTeamId !== team.index) {
+          return team;
+        }
+
+        const updatedTeam = { ...team };
+
+        if (newDroppedElement.isTutor) {
+          updatedTeam.tutor = {
+            id: newDroppedElement.id,
+            name: newDroppedElement.content,
+            teacherId: 1, // избавиться от этого, например просто другой интерфейс оставить, где не будет teacherId
+          };
+        } else {
+          updatedTeam.mentor = {
+            id: newDroppedElement.id,
+            nameWithGroup: newDroppedElement.content,
+          };
+        }
+
+        return updatedTeam;
+      })
+    );
+  };
+
+  const deleteTeamSupportMember = (
+    currentTeamId: number,
+    deleteTutorOrMentor: boolean
+  ) => {
+    setTeams((teams) =>
+      teams.map((team) => {
+        if (currentTeamId !== team.index) {
+          return team;
+        }
+
+        const updatedTeam = { ...team };
+
+        if (deleteTutorOrMentor) {
+          updatedTeam.tutor = null;
+        } else {
+          updatedTeam.mentor = null;
+        }
+
+        return updatedTeam;
+      })
     );
   };
 
@@ -123,7 +184,7 @@ const CreateSupportTeamsPage: FC = () => {
 
             <select
               onChange={handleSelectChange}
-              value={currentTeam?.index.toString()}
+              value={currentTeamId}
               className="mt-3 bg-another_white rounded-xl p-2.5"
             >
               {teams.map((team) => (
@@ -135,45 +196,38 @@ const CreateSupportTeamsPage: FC = () => {
           </div>
 
           <div className="flex gap-20 mt-8">
-            <div>
-              {currentTeam && (
-                <>
-                  <div className="text-lg font-bold text-black">
-                    {currentTeam.name}
-                  </div>
+            {currentTeam && (
+              <div className="flex flex-col gap-2">
+                <div className="text-lg font-bold text-black">
+                  {currentTeam.name}
+                </div>
 
-                  <p className="text-base text-bright_gray mt-2.5 max-w-[380px]">
-                    Для добавления наставника и тьютора в команду выберите их из
-                    списка справа
-                  </p>
+                <p className="text-base text-bright_gray max-w-[380px]">
+                  Для добавления наставника и тьютора в команду выберите их из
+                  списка справа
+                </p>
 
-                  <div className="mt-2.5 flex gap-4">
-                    <TeamIcon />
-                    <div className="flex flex-col gap-1.5">
-                      <div className="text-lg text-black">
-                        {currentTeam.name}
-                      </div>
-                      <div className="text-bright_gray">Нет тьютора</div>
-                      <div className="text-bright_gray">Нет наставника</div>
-                      {currentTeam.studentsInTeam.length > 0 ? (
-                        <div className="flex flex-col gap-1.5">
-                          {currentTeam.studentsInTeam.map((studentInTeam) => (
-                            <div
-                              key={studentInTeam.id}
-                              className="flex items-center gap-3 px-3 py-1 text-base rounded-xl bg-gray_5 hover:bg-gray_6"
-                            >
-                              {studentInTeam.nameWithGroup}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-bright_gray">Нет участников</div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+                <SupportTeamDragContainer
+                  team={currentTeam}
+                  onDrop={(newDroppedElement) => {
+                    if (currentTeamId) {
+                      updateTeamSupportMembers(
+                        currentTeamId,
+                        newDroppedElement
+                      );
+                    }
+                  }}
+                  onDelete={(deleteTutorOrMentor) => {
+                    if (currentTeamId) {
+                      deleteTeamSupportMember(
+                        currentTeamId,
+                        deleteTutorOrMentor
+                      );
+                    }
+                  }}
+                />
+              </div>
+            )}
 
             <div className="flex flex-col items-center">
               <div className="text-lg font-bold text-black">
@@ -221,11 +275,12 @@ const CreateSupportTeamsPage: FC = () => {
                 {slug === 'tutors' ? (
                   <>
                     {allTeachers.map((teacher) => (
-                      <DragElement
+                      <SupportTeamDragElement
                         key={teacher.id}
                         data={{
                           id: teacher.id,
                           content: teacher.name,
+                          isTutor: true,
                         }}
                       />
                     ))}
@@ -234,11 +289,12 @@ const CreateSupportTeamsPage: FC = () => {
                   <>
                     {' '}
                     {allStudents.map((student) => (
-                      <DragElement
+                      <SupportTeamDragElement
                         key={student.id}
                         data={{
                           id: student.id,
                           content: student.nameWithGroup,
+                          isTutor: false,
                         }}
                       />
                     ))}{' '}
