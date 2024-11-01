@@ -6,7 +6,7 @@ import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 
 import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
-import { useLazyGetStagesQuery } from '../../redux/api/stageApi';
+import { useLazyGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
 import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
 import {
@@ -43,7 +43,7 @@ const ManageEventForm: FC = () => {
     mode: 'onBlur',
   });
 
-  const [getStages] = useLazyGetStagesQuery();
+  const [getStagesForIntensive] = useLazyGetStagesForIntensiveQuery();
   const [getAudiences] = useLazyGetAudiencesQuery();
   const [getTeams] = useLazyGetTeamsQuery();
   const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
@@ -79,7 +79,10 @@ const ManageEventForm: FC = () => {
           Number(intensiveId)
         );
         const { data: audiencies } = await getAudiences();
-        const { data: stages } = await getStages();
+        const { data: stages } = await getStagesForIntensive(
+          Number(intensiveId)
+        );
+        console.log('stages are ', stages);
 
         if (teams) {
           setTeamsToChoose(teams);

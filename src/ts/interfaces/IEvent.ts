@@ -32,6 +32,8 @@ export interface IManagerEvent {
   stage: number;
 }
 
+// TODO: переименовать на startDate и finishDate
+
 export interface IEventCreate {
   name: string;
   description: string;

@@ -8,7 +8,7 @@ import {
 import { useLazyGetTeachersOnIntensiveQuery } from '../redux/api/teacherApi';
 import { useLazyGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
-import Modal from '../components/Modal';
+import Modal from '../components/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
 import PrimaryButton from '../components/PrimaryButton';

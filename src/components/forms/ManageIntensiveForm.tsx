@@ -19,6 +19,7 @@ import MultipleSelectInput from '../inputs/MultipleSelectInput';
 import { IFlow } from '../../ts/interfaces/IFlow';
 import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
 
+// TODO: кейс изменить с snake case на pamel case
 interface ManageIntensiveFields {
   name: string;
   description: string;
