@@ -1,7 +1,7 @@
 import { IFlow } from './IFlow';
 import { ITeacherOnIntensive } from './ITeacher';
 
-// TODO: переименовать на openDate и closeDate
+// TODO: rename to openDate and closeDate
 
 export interface IIntensive {
   id: number;

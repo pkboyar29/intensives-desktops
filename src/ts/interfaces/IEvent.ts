@@ -1,5 +1,6 @@
 import { ITeam } from './ITeam';
 
+// delete?
 export interface IEvent {
   id: number;
   name: string;
@@ -24,26 +25,28 @@ export interface IManagerEvent {
   id: number;
   name: string;
   description: string;
-  dateStart: string;
-  dateEnd: string;
-  timeStart: string;
-  timeEnd: string;
+  startDate: string;
+  finishDate: string;
+  startTime: string;
+  finishTime: string;
   audience: number;
   stage: number;
 }
 
-// TODO: переименовать на startDate и finishDate
-
+// commands - teams
+// teachers_command - teachersTeam
+// mark_strategy - markStrategy. and this is number, not any?
 export interface IEventCreate {
   name: string;
   description: string;
-  start_dt: string;
-  finish_dt: string;
-  stage: number;
+  startDate: string;
+  startTime: string;
+  finishDate: string;
+  finishTime: string;
+  stage: number | null;
   auditory: number;
   mark_strategy?: any;
-  result_type?: any;
-  intensiv: number;
+  intensiveId: number;
   commands?: any[];
   teachers_command?: any[];
 }

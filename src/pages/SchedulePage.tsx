@@ -1,21 +1,18 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { useGetEventsOnIntensiveQuery } from '../redux/api/eventApi';
-import {
-  useLazyGetStagesForIntensiveQuery,
-  useDeleteStageMutation,
-} from '../redux/api/stageApi';
+import { useDeleteStageMutation } from '../redux/api/stageApi';
 
-import { IManagerEvent } from '../ts/interfaces/IEvent';
+import { useGetScheduleQuery } from '../redux/api/scheduleApi';
 
 import PrimaryButton from '../components/PrimaryButton';
 import Modal from '../components/modals/Modal';
 import Title from '../components/Title';
 import DisplaySelect from '../components/DisplaySelect';
-import EditIcon from '../components/icons/EditIcon';
-import TrashIcon from '../components/icons/TrashIcon';
+import Skeleton from 'react-loading-skeleton';
 
+import StageInSchedule from '../components/schedule/StageInSchedule';
+import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
@@ -28,8 +25,13 @@ const SchedulePage: FC = () => {
 
   const [deleteStage] = useDeleteStageMutation();
 
-  const [getStagesForIntensive] = useLazyGetStagesForIntensiveQuery();
-  const [stages, setStages] = useState<IStage[]>([]);
+  const {
+    data: schedule,
+    isLoading: isScheduleLoading,
+    refetch,
+  } = useGetScheduleQuery(Number(intensiveId), {
+    refetchOnMountOrArgChange: true,
+  });
 
   const [stageModal, setStageModal] = useState<{
     status: boolean;
@@ -46,59 +48,6 @@ const SchedulePage: FC = () => {
     stageId: null,
   });
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
-  const { data: events } = useGetEventsOnIntensiveQuery(Number(intensiveId), {
-    refetchOnMountOrArgChange: true,
-  });
-
-  useEffect(() => {
-    const fetchStages = async () => {
-      if (intensiveId) {
-        try {
-          const { data } = await getStagesForIntensive(Number(intensiveId));
-
-          if (data) {
-            setStages(data);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    };
-
-    fetchStages();
-  }, []);
-
-  interface EventProps {
-    event: IManagerEvent;
-  }
-
-  const Event: FC<EventProps> = ({ event }) => {
-    const eventClickHandler = (eventId: number) => {
-      navigate(`${replaceLastURLSegment('editEvent')}?eventId=${eventId}`);
-    };
-
-    return (
-      <>
-        <section className="flex flex-col justify-center items-start px-4 py-4 w-full leading-[150%] max-md:max-w-full">
-          <div
-            key={event.name}
-            className="flex p-4"
-            onClick={() => {
-              eventClickHandler(event.id);
-            }}
-          >
-            <div className="flex flex-col justify-center">
-              <p className="text-xl">{event.name}</p>
-              <time className="text-base text-bright_gray">
-                {event.dateStart + ' ' + event.dateEnd}
-              </time>
-            </div>
-          </div>
-        </section>
-      </>
-    );
-  };
 
   return (
     <>
@@ -117,22 +66,8 @@ const SchedulePage: FC = () => {
               status: false,
             })
           }
-          onChangeStage={(newStage) => {
-            if (!stageModal.stage) {
-              setStages([...stages, newStage]);
-            } else {
-              setStages((stages) =>
-                stages.map((stage) => {
-                  if (stage.id === newStage.id) {
-                    return {
-                      ...newStage,
-                    };
-                  } else {
-                    return stage;
-                  }
-                })
-              );
-            }
+          onChangeStage={() => {
+            refetch();
 
             setStageModal({
               stage: null,
@@ -175,13 +110,9 @@ const SchedulePage: FC = () => {
                   try {
                     if (deleteStageModal.stageId) {
                       await deleteStage(deleteStageModal.stageId);
-
-                      setStages((stages) =>
-                        stages.filter(
-                          (stage) => stage.id !== deleteStageModal.stageId
-                        )
-                      );
                     }
+
+                    refetch();
 
                     setDeleteStageModal({
                       status: false,
@@ -229,51 +160,64 @@ const SchedulePage: FC = () => {
           </DisplaySelect>
         </div>
 
-        {/* TODO: компонент Stage, внутри которого компоненты Event? */}
-        <div className="flex flex-col gap-5 mt-10">
-          {stages.map((stage) => (
-            <div key={stage.id} className="flex justify-between">
-              <div className="flex flex-col gap-3">
-                <div className="text-xl font-bold text-black_2">
-                  {stage.name}
-                </div>
-                <div className="text-bright_gray">
-                  {stage.startDate.toLocaleDateString()} -{' '}
-                  {stage.finishDate.toLocaleDateString()}
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-                  onClick={() => {
-                    setStageModal({
-                      status: true,
-                      stage,
-                    });
-                  }}
-                >
-                  <EditIcon />
-                </button>
-
-                <button
-                  className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-                  onClick={() => {
-                    setDeleteStageModal({
-                      status: true,
-                      stageId: stage.id,
-                    });
-                  }}
-                >
-                  <TrashIcon />
-                </button>
-              </div>
+        {isScheduleLoading ? (
+          <Skeleton className="mt-10" />
+        ) : (
+          <>
+            <div className="flex flex-col gap-5 mt-10">
+              {schedule?.stages.length === 0 ? (
+                <p className="text-xl text-black">
+                  Этапы еще не определены для этого интенсива
+                </p>
+              ) : (
+                <>
+                  {schedule?.stages.map((stage) => (
+                    <StageInSchedule
+                      key={stage.id}
+                      stage={stage}
+                      onEditClick={(stage) =>
+                        setStageModal({
+                          status: true,
+                          stage,
+                        })
+                      }
+                      onDeleteClick={(stageId) =>
+                        setDeleteStageModal({
+                          status: true,
+                          stageId: stage.id,
+                        })
+                      }
+                    />
+                  ))}
+                </>
+              )}
             </div>
-          ))}
-        </div>
 
-        {events?.map((event) => (
-          <Event key={event.id} event={event} />
-        ))}
+            {schedule && schedule.eventsWithoutStage.length > 0 && (
+              <div className="mt-10">
+                <div className="text-2xl font-bold text-black_2">
+                  Мероприятия без этапа
+                </div>
+
+                <div className="ml-2.5 mt-2.5 flex flex-col gap-5">
+                  {schedule?.eventsWithoutStage.map((eventWithoutStage) => (
+                    <EventInSchedule
+                      key={eventWithoutStage.id}
+                      event={eventWithoutStage}
+                      onEventClick={(eventId) =>
+                        navigate(
+                          `${replaceLastURLSegment(
+                            'editEvent'
+                          )}?eventId=${eventId}`
+                        )
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );

@@ -120,7 +120,7 @@ const routeConfig: RouteType[] = [
         element: <CreateSupportTeamsPage />,
       },
       {
-        path: 'plan',
+        path: 'schedule',
         element: <SchedulePage />,
       },
       {

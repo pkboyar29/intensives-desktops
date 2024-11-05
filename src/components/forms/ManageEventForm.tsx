@@ -3,8 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 
-import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
-
 import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
 import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
@@ -30,10 +28,10 @@ import PrimaryButton from '../PrimaryButton';
 interface ManageEventFormFields {
   name: string;
   description: string;
-  dateStart: string;
-  dateEnd: string;
-  timeStart: string;
-  timeEnd: string;
+  startDate: string;
+  finishDate: string;
+  startTime: string;
+  finishTime: string;
   audience: number;
   stage: number;
 }
@@ -82,7 +80,6 @@ const ManageEventForm: FC = () => {
         const { data: stages } = await getStagesForIntensive(
           Number(intensiveId)
         );
-        console.log('stages are ', stages);
 
         if (teams) {
           setTeamsToChoose(teams);
@@ -116,10 +113,10 @@ const ManageEventForm: FC = () => {
           if (event) {
             setValue('name', event.name);
             setValue('description', event.description);
-            setValue('dateStart', event.dateStart);
-            setValue('dateEnd', event.dateEnd);
-            setValue('timeStart', event.timeStart);
-            setValue('timeEnd', event.timeEnd);
+            setValue('startDate', event.startDate);
+            setValue('finishDate', event.finishDate);
+            setValue('startTime', event.startTime);
+            setValue('finishTime', event.finishTime);
             setValue('audience', event.audience);
             setValue('stage', event.stage);
           }
@@ -143,50 +140,40 @@ const ManageEventForm: FC = () => {
         if (hasEvent) {
           if (eventId) {
             await updateEvent({
-              intensiv: Number(intensiveId),
-              eventId: Number(eventId),
+              intensiveId: parseInt(intensiveId),
+              eventId: parseInt(eventId),
               name: data.name,
               description: data.description,
-              start_dt: transformSeparateDateAndTimeToISO(
-                data.dateStart,
-                data.timeStart
-              ),
-              finish_dt: transformSeparateDateAndTimeToISO(
-                data.dateEnd,
-                data.timeEnd
-              ),
-              stage: data.stage,
+              startDate: data.startDate,
+              startTime: data.startTime,
+              finishDate: data.finishDate,
+              finishTime: data.finishTime,
+              stage: data.stage == 0 ? null : data.stage,
               auditory: data.audience,
               teachers_command: ids_teachers,
               commands: ids_commands,
-              result_type: typeResult,
-              mark_strategy: typeScore,
+              mark_strategy: 1,
             });
           }
         } else {
           await createEvent({
-            intensiv: Number(intensiveId),
+            intensiveId: parseInt(intensiveId),
             name: data.name,
             description: data.description,
-            start_dt: transformSeparateDateAndTimeToISO(
-              data.dateStart,
-              data.timeStart
-            ),
-            finish_dt: transformSeparateDateAndTimeToISO(
-              data.dateEnd,
-              data.timeEnd
-            ),
-            stage: data.stage,
+            startDate: data.startDate,
+            startTime: data.startTime,
+            finishDate: data.finishDate,
+            finishTime: data.finishTime,
+            stage: data.stage == 0 ? null : data.stage,
             auditory: data.audience,
             teachers_command: ids_teachers,
             commands: ids_commands,
-            result_type: typeResult,
             mark_strategy: typeScore,
           });
         }
       }
 
-      navigate(replaceLastURLSegment('plan'));
+      navigate(replaceLastURLSegment('schedule'));
     } catch (e) {
       console.log(e);
     }
@@ -246,14 +233,14 @@ const ManageEventForm: FC = () => {
 
             <div className="flex justify-between gap-2.5">
               <InputDescription
-                fieldName="dateStart"
+                fieldName="startDate"
                 register={register}
                 description="Дата начала"
                 placeholder="Дата начала"
                 type="date"
               />
               <InputDescription
-                fieldName="dateEnd"
+                fieldName="finishDate"
                 register={register}
                 description="Дата окончания"
                 placeholder="Дата окончания"
@@ -263,14 +250,14 @@ const ManageEventForm: FC = () => {
 
             <div className="flex justify-between gap-2.5">
               <InputDescription
-                fieldName="timeStart"
+                fieldName="startTime"
                 register={register}
                 description="Время начала"
                 placeholder="Время начала"
                 type="time"
               />
               <InputDescription
-                fieldName="timeEnd"
+                fieldName="finishTime"
                 register={register}
                 description="Время окончания"
                 placeholder="Время окончания"
@@ -320,15 +307,13 @@ const ManageEventForm: FC = () => {
                 </button>
 
                 {teams.length === 0 && (
-                  <span className="text-gray_3">
-                    Выберите участвующих в мероприятии команды
-                  </span>
+                  <span className="text-gray_3">Выберите экспертов</span>
                 )}
               </div>
             </div>
 
             <div className="mt-4 text-lg">
-              <div>Список участвующих преподавателей</div>
+              <div>Эксперты</div>
               <div className="flex flex-wrap gap-1 mt-4">
                 {teachers.length > 0
                   ? teachers.map((item) => (

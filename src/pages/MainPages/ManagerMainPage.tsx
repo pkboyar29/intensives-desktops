@@ -63,7 +63,7 @@ const ManagerMainPage: FC = () => {
               <NavLink to="teams" className={linkClassNames}>
                 Управление командами
               </NavLink>
-              <NavLink to="plan" className={linkClassNames}>
+              <NavLink to="schedule" className={linkClassNames}>
                 Расписание интенсива
               </NavLink>
               <NavLink to="manageRoles" className={linkClassNames}>

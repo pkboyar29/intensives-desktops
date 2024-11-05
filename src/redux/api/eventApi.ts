@@ -1,5 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { transformISODateToTime } from '../../helpers/dateHelpers';
+import {
+  transformISODateToTime,
+  transformSeparateDateAndTimeToISO,
+} from '../../helpers/dateHelpers';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
@@ -8,15 +11,15 @@ import {
   IManagerEvent,
 } from '../../ts/interfaces/IEvent';
 
-const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
+export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
-    dateStart: unmappedEvent.start_dt.split('T')[0],
-    dateEnd: unmappedEvent.finish_dt.split('T')[0],
-    timeStart: transformISODateToTime(unmappedEvent.start_dt),
-    timeEnd: transformISODateToTime(unmappedEvent.finish_dt),
+    startDate: unmappedEvent.start_dt.split('T')[0],
+    finishDate: unmappedEvent.finish_dt.split('T')[0],
+    startTime: transformISODateToTime(unmappedEvent.start_dt),
+    finishTime: transformISODateToTime(unmappedEvent.finish_dt),
     audience: unmappedEvent.auditory,
     stage: unmappedEvent.stage,
   };
@@ -42,14 +45,36 @@ export const eventApi = createApi({
       query: (data) => ({
         url: '/events/',
         method: 'POST',
-        body: data,
+        body: {
+          ...data,
+          intensive: data.intensiveId,
+          start_dt: transformSeparateDateAndTimeToISO(
+            data.startDate,
+            data.startTime
+          ),
+          finish_dt: transformSeparateDateAndTimeToISO(
+            data.finishDate,
+            data.finishTime
+          ),
+        },
       }),
     }),
     updateEvent: builder.mutation<void, IEventUpdate>({
       query: (data) => ({
         url: `/events/${data.eventId}/`,
-        method: 'PATCH',
-        body: data,
+        method: 'PATCH', // maybe use PUT?
+        body: {
+          ...data,
+          intensive: data.intensiveId,
+          start_dt: transformSeparateDateAndTimeToISO(
+            data.startDate,
+            data.startTime
+          ),
+          finish_dt: transformSeparateDateAndTimeToISO(
+            data.finishDate,
+            data.finishTime
+          ),
+        },
       }),
     }),
   }),
