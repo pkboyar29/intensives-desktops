@@ -1,11 +1,5 @@
 import { FC } from 'react';
-import {
-  Outlet,
-  Link,
-  NavLink,
-  useParams,
-  useNavigate,
-} from 'react-router-dom';
+import { Outlet, NavLink, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 

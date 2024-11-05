@@ -17,8 +17,6 @@ import StageModal from '../components/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
 
-import { replaceLastURLSegment } from '../helpers/urlHelpers';
-
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
@@ -48,6 +46,10 @@ const SchedulePage: FC = () => {
     stageId: null,
   });
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
+  const onEventClick = (eventId: number) => {
+    navigate(`${eventId}`);
+  };
 
   return (
     <>
@@ -129,7 +131,7 @@ const SchedulePage: FC = () => {
         </Modal>
       )}
 
-      <div className="min-h-screen min-w-[50vw] max-w-[1280px]">
+      <div className="max-w-[1280px]">
         <div className="flex items-start justify-between">
           <Title text="Расписание интенсива" />
           <DisplaySelect
@@ -152,7 +154,7 @@ const SchedulePage: FC = () => {
               </div>
               <div
                 className="transition cursor-pointer hover:text-blue"
-                onClick={() => navigate(replaceLastURLSegment('editEvent'))}
+                onClick={() => navigate('editEvent')}
               >
                 Добавить мероприятие
               </div>
@@ -187,6 +189,7 @@ const SchedulePage: FC = () => {
                           stageId: stage.id,
                         })
                       }
+                      onEventClick={onEventClick}
                     />
                   ))}
                 </>
@@ -204,13 +207,7 @@ const SchedulePage: FC = () => {
                     <EventInSchedule
                       key={eventWithoutStage.id}
                       event={eventWithoutStage}
-                      onEventClick={(eventId) =>
-                        navigate(
-                          `${replaceLastURLSegment(
-                            'editEvent'
-                          )}?eventId=${eventId}`
-                        )
-                      }
+                      onEventClick={onEventClick}
                     />
                   ))}
                 </div>

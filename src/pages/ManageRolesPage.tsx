@@ -70,8 +70,8 @@ const ManageRolesPage: FC = () => {
   };
 
   return (
-    <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      <div className="list-content">
+    <div className="flex justify-center max-w-[1280px]">
+      <div className="max-w-[765px] w-full">
         <Title text="Роли студентов" />
 
         <div className="flex flex-col gap-6 mt-6">

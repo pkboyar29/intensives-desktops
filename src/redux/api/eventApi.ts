@@ -12,6 +12,7 @@ import {
 } from '../../ts/interfaces/IEvent';
 
 export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
+  console.log('unmappedEvent is ', unmappedEvent);
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,

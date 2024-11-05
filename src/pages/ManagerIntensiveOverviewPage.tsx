@@ -29,8 +29,8 @@ const ManagerIntensiveOverviewPage: FC = () => {
   };
 
   return (
-    <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      <div className="list-content">
+    <div className="flex justify-center max-w-[1280px]">
+      <div className="max-w-[765px] w-full">
         <div className="mb-5">
           {currentIntensive ? (
             <Title text={currentIntensive.name} />

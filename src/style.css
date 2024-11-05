@@ -200,12 +200,6 @@ table td {
   overflow: hidden;
 }
 
-.list-content {
-  max-width: 765px;
-  width: 100%;
-  padding: 15px;
-}
-
 /* Для браузеров на основе WebKit (Chrome, Safari, Opera) */
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {

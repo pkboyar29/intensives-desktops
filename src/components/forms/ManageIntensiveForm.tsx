@@ -125,8 +125,8 @@ const ManageIntensiveForm: FC = () => {
   };
 
   return (
-    <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      <form className="list-content" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex justify-center max-w-[1280px]">
+      <form className="max-w-[765px] w-full" onSubmit={handleSubmit(onSubmit)}>
         <Title
           text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
         />

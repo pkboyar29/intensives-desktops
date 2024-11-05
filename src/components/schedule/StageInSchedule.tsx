@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import EventInSchedule from './EventInSchedule';
 import TrashIcon from '../icons/TrashIcon';
@@ -7,21 +6,19 @@ import EditIcon from '../icons/EditIcon';
 
 import { IStage } from '../../ts/interfaces/IStage';
 
-import { replaceLastURLSegment } from '../../helpers/urlHelpers';
-
 interface StageInScheduleProps {
   stage: IStage;
   onEditClick: (stage: IStage) => void;
   onDeleteClick: (stageId: number) => void;
+  onEventClick: (eventId: number) => void;
 }
 
 const StageInSchedule: FC<StageInScheduleProps> = ({
   stage,
   onEditClick,
   onDeleteClick,
+  onEventClick,
 }) => {
-  const navigate = useNavigate();
-
   return (
     <section>
       <div className="flex justify-between">
@@ -64,11 +61,7 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
               <EventInSchedule
                 key={event.id}
                 event={event}
-                onEventClick={(eventId) =>
-                  navigate(
-                    `${replaceLastURLSegment('editEvent')}?eventId=${eventId}`
-                  )
-                }
+                onEventClick={(eventId) => onEventClick(eventId)}
               />
             ))}
           </div>
