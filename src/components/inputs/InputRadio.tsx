@@ -1,28 +1,28 @@
 import { FC, ReactNode } from 'react';
 
 interface InputRadioProps {
-  valueProp: number | string;
-  funcProp: any;
-  nameProp: string;
-  descriptionProp: string;
+  value: number | string;
+  func: any;
+  name: string;
+  description: string;
   isList?: boolean;
-  activeProp?: any;
+  active?: any;
   children?: ReactNode;
 }
 
 const InputRadio: FC<InputRadioProps> = ({
-  valueProp,
-  funcProp,
-  nameProp,
-  descriptionProp,
+  value,
+  func: funcProp,
+  name: nameProp,
+  description: descriptionProp,
   isList,
-  activeProp,
+  active,
   children,
 }) => {
   const func =
-    valueProp == 1 || valueProp == 'label1' || valueProp == 'label2'
+    value == 1 || value == 'label1' || value == 'label2'
       ? () => {
-          funcProp(valueProp);
+          funcProp(value);
         }
       : null;
 
@@ -31,14 +31,14 @@ const InputRadio: FC<InputRadioProps> = ({
       <input
         type="radio"
         name={nameProp}
-        value={valueProp}
+        value={value}
         onChange={isList ? func : funcProp}
       />
       <label className="p-2">{descriptionProp}</label>
 
       <div
         className={
-          children && activeProp == valueProp ? 'flex flex-col gap-3' : 'hidden'
+          children && active == value ? 'flex flex-col gap-3' : 'hidden'
         }
       >
         {children}

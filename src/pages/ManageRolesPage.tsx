@@ -106,7 +106,7 @@ const ManageRolesPage: FC = () => {
           </div>
 
           <PrimaryButton
-            text="Добавить роль"
+            children="Добавить роль"
             clickHandler={addRoleButtonClickHandler}
           />
         </div>

@@ -113,7 +113,7 @@ const IntensivesPage: FC = () => {
           <div className="flex justify-end mt-10">
             <div className="ml-auto">
               <PrimaryButton
-                text="Создать интенсив"
+                children="Создать интенсив"
                 clickHandler={() => navigate(`/createIntensive`)}
               />
             </div>

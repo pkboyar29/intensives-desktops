@@ -287,7 +287,7 @@ const CreateTeamsPage: FC = () => {
                   changeTeamsCount(teamsCount);
                   setTeamsCountModal(false);
                 }}
-                text="Очистить команды"
+                children="Очистить команды"
               />
             </div>
             <div>
@@ -296,7 +296,7 @@ const CreateTeamsPage: FC = () => {
                   changeTeamsCount(teamsCount);
                   setTeamsCountModal(false);
                 }}
-                text="Сохранить участников"
+                children="Сохранить участников"
               />
             </div>
           </div>
@@ -317,7 +317,7 @@ const CreateTeamsPage: FC = () => {
               <PrimaryButton
                 buttonColor="gray"
                 clickHandler={() => setCancelModal(false)}
-                text="Продолжить редактирование"
+                children="Продолжить редактирование"
               />
             </div>
             <div>
@@ -328,7 +328,7 @@ const CreateTeamsPage: FC = () => {
                     navigate(`/manager/${parseInt(intensiveId)}/teams`);
                   }
                 }}
-                text="Да"
+                children="Да"
               />
             </div>
           </div>
@@ -352,7 +352,7 @@ const CreateTeamsPage: FC = () => {
                     navigate(`/manager/${parseInt(intensiveId)}/teams`);
                   }
                 }}
-                text="Ок"
+                children="Ок"
               />
             </div>
           </div>
@@ -379,7 +379,7 @@ const CreateTeamsPage: FC = () => {
 
         <div>
           <PrimaryButton
-            text="Изменить"
+            children="Изменить"
             clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
@@ -450,7 +450,7 @@ const CreateTeamsPage: FC = () => {
           <div className="flex justify-end gap-3">
             <div>
               <PrimaryButton
-                text="Отменить"
+                children="Отменить"
                 buttonColor="gray"
                 clickHandler={() => {
                   setCancelModal(true);
@@ -458,7 +458,7 @@ const CreateTeamsPage: FC = () => {
               />
             </div>
             <div>
-              <PrimaryButton text="Сохранить" clickHandler={onSubmit} />
+              <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
             </div>
           </div>
         </div>

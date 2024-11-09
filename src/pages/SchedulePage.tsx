@@ -103,7 +103,7 @@ const SchedulePage: FC = () => {
                     stageId: null,
                   })
                 }
-                text="Отменить"
+                children="Отменить"
               />
             </div>
             <div>
@@ -124,7 +124,7 @@ const SchedulePage: FC = () => {
                     console.log(e);
                   }
                 }}
-                text="Удалить"
+                children="Удалить"
               />
             </div>
           </div>

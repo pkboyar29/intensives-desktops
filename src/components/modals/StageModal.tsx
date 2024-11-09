@@ -171,14 +171,14 @@ const StageModal: FC<StageModalProps> = ({
           <PrimaryButton
             buttonColor="gray"
             clickHandler={onCancel}
-            text="Отмена"
+            children="Отмена"
           />
         </div>
         <div>
           <PrimaryButton
             type="submit"
             clickHandler={handleSubmit(onSubmit)}
-            text={stage ? 'Редактировать' : 'Создать'}
+            children={stage ? 'Редактировать' : 'Создать'}
           />
         </div>
       </div>

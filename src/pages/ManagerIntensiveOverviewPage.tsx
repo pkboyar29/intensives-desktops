@@ -91,18 +91,19 @@ const ManagerIntensiveOverviewPage: FC = () => {
 
             <div className="flex mt-10 text-lg font-bold gap-7">
               <PrimaryButton
-                text="Редактировать"
+                children="Редактировать"
                 clickHandler={() => {
                   navigate(`/manager/${currentIntensive?.id}/editIntensive`);
                 }}
               />
 
-              <button
-                className="p-4 rounded-[10px] bg-another_white flex justify-center items-center cursor-pointer"
-                onClick={deleteIntensivButtonHandler}
-              >
-                <TrashIcon />
-              </button>
+              <div>
+                <PrimaryButton
+                  buttonColor="gray"
+                  children={<TrashIcon />}
+                  onClick={deleteIntensivButtonHandler}
+                />
+              </div>
             </div>
           </div>
         </div>

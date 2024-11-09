@@ -2,93 +2,92 @@ import { FC, useState } from 'react';
 import InputRadio from './InputRadio';
 
 interface InputRadioDescriptionProps {
-  setTypeProp: any;
+  setType: any;
 }
 
-const InputRadioDescription: FC<InputRadioDescriptionProps> = ({
-  setTypeProp,
-}) => {
+const InputRadioDescription: FC<InputRadioDescriptionProps> = ({ setType }) => {
   const [activeRadio, setActiveRadio] = useState('');
 
   const handleRadioChange = (radioValue: any, valueType: any) => {
     setActiveRadio(radioValue);
     if (valueType === 'number') {
-      setTypeProp(radioValue);
+      setType(radioValue);
     }
   };
 
   return (
+    // этих стилей уже не существует
     <div className="element-list-input column-container">
       <InputRadio
-        nameProp={'name'}
-        activeProp={activeRadio}
-        valueProp={1}
-        descriptionProp={'Без оценивания'}
-        funcProp={(value: any) => handleRadioChange(value, 'number')}
+        name={'name'}
+        active={activeRadio}
+        value={1}
+        description={'Без оценивания'}
+        func={(value: any) => handleRadioChange(value, 'number')}
         isList={true}
       />
       <InputRadio
-        nameProp={'name'}
-        activeProp={activeRadio}
-        valueProp={'label1'}
-        descriptionProp={'Оценивание по шкале без критериев'}
-        funcProp={handleRadioChange}
+        name={'name'}
+        active={activeRadio}
+        value={'label1'}
+        description={'Оценивание по шкале без критериев'}
+        func={handleRadioChange}
         isList={true}
         children={
           <>
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={6}
-              descriptionProp={'Зачет/Незачет'}
+              name={'nameCh'}
+              value={6}
+              description={'Зачет/Незачет'}
               isList={true}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={3}
+              name={'nameCh'}
+              value={3}
               isList={true}
-              descriptionProp={'Пятибальная шкала'}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              description={'Пятибальная шкала'}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={5}
+              name={'nameCh'}
+              value={5}
               isList={true}
-              descriptionProp={'Стобальная шкала'}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              description={'Стобальная шкала'}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
           </>
         }
       />
       <InputRadio
-        nameProp={'name'}
-        activeProp={activeRadio}
-        valueProp={'label2'}
+        name={'name'}
+        active={activeRadio}
+        value={'label2'}
         isList={true}
-        descriptionProp={'Оценивание по шкале с критериями'}
-        funcProp={handleRadioChange}
+        description={'Оценивание по шкале с критериями'}
+        func={handleRadioChange}
         children={
           <>
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={6}
+              name={'nameCh'}
+              value={6}
               isList={true}
-              descriptionProp={'Зачет/Незачет'}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              description={'Зачет/Незачет'}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={3}
+              name={'nameCh'}
+              value={3}
               isList={true}
-              descriptionProp={'Пятибальная шкала'}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              description={'Пятибальная шкала'}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
             <InputRadio
-              nameProp={'nameCh'}
-              valueProp={5}
+              name={'nameCh'}
+              value={5}
               isList={true}
-              descriptionProp={'Стобальная шкала'}
-              funcProp={(value: any) => handleRadioChange(value, 'number')}
+              description={'Стобальная шкала'}
+              func={(value: any) => handleRadioChange(value, 'number')}
             />
           </>
         }

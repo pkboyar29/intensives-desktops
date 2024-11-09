@@ -10,9 +10,11 @@ import {
   IEventUpdate,
   IManagerEvent,
 } from '../../ts/interfaces/IEvent';
+import { mapTeamForManager } from './teamApi';
+import { mapAudience } from './audienceApi';
+import { mapTeacherEvent } from './teacherApi';
 
 export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
-  console.log('unmappedEvent is ', unmappedEvent);
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
@@ -21,8 +23,14 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     finishDate: unmappedEvent.finish_dt.split('T')[0],
     startTime: transformISODateToTime(unmappedEvent.start_dt),
     finishTime: transformISODateToTime(unmappedEvent.finish_dt),
-    audience: unmappedEvent.auditory,
-    stage: unmappedEvent.stage,
+    audience: mapAudience(unmappedEvent.audience),
+    stageId: unmappedEvent.stage === null ? 0 : unmappedEvent.stage.id,
+    teams: unmappedEvent.teams.map((unmappedTeam: any) =>
+      mapTeamForManager(unmappedTeam)
+    ),
+    experts: unmappedEvent.experts.map((unmappedExpert: any) =>
+      mapTeacherEvent(unmappedExpert)
+    ),
   };
 };
 
@@ -49,6 +57,8 @@ export const eventApi = createApi({
         body: {
           ...data,
           intensive: data.intensiveId,
+          teams: data.teamIds,
+          teacher_on_intensive_ids: data.teacherOnIntensiveIds,
           start_dt: transformSeparateDateAndTimeToISO(
             data.startDate,
             data.startTime
@@ -57,16 +67,19 @@ export const eventApi = createApi({
             data.finishDate,
             data.finishTime
           ),
+          files: [],
         },
       }),
     }),
     updateEvent: builder.mutation<void, IEventUpdate>({
       query: (data) => ({
         url: `/events/${data.eventId}/`,
-        method: 'PATCH', // maybe use PUT?
+        method: 'PUT',
         body: {
           ...data,
           intensive: data.intensiveId,
+          teams: data.teamIds,
+          teacher_on_intensive_ids: data.teacherOnIntensiveIds,
           start_dt: transformSeparateDateAndTimeToISO(
             data.startDate,
             data.startTime
@@ -75,6 +88,7 @@ export const eventApi = createApi({
             data.finishDate,
             data.finishTime
           ),
+          files: [],
         },
       }),
     }),

@@ -99,13 +99,13 @@ const ManagerTeamsPage: FC = () => {
       <div className="flex gap-5 mt-10">
         <div>
           <PrimaryButton
-            text="Изменить состав команд"
+            children="Изменить состав команд"
             clickHandler={() => navigate(`/manager/${intensiveId}/createTeams`)}
           />
         </div>
         <div>
           <PrimaryButton
-            text="Изменить команды сопровождения"
+            children="Изменить команды сопровождения"
             clickHandler={() =>
               navigate(`/manager/${intensiveId}/createSupportTeams`)
             }

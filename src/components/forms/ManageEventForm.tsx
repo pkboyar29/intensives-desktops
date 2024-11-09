@@ -15,15 +15,15 @@ import {
 
 import { IStage } from '../../ts/interfaces/IStage';
 import { IAudience } from '../../ts/interfaces/IAudience';
-import { ITeamToChoose } from '../../ts/interfaces/ITeam';
 
 import Select from '../inputs/Select';
 import InputRadioDescription from '../inputs/InputRadioDescription';
-import InputRadio from '../inputs/InputRadio';
+import TrueInputRadio from '../inputs/TrueInputRadio';
 import InputDescription from '../inputs/InputDescription';
-import ChooseModal from '../ChooseModal';
+import MultipleSelectInput from '../inputs/MultipleSelectInput';
 import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
+import Modal from '../modals/Modal';
 
 interface ManageEventFormFields {
   name: string;
@@ -37,7 +37,12 @@ interface ManageEventFormFields {
 }
 
 const ManageEventForm: FC = () => {
-  const { register, handleSubmit, setValue } = useForm<ManageEventFormFields>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
 
@@ -45,23 +50,31 @@ const ManageEventForm: FC = () => {
   const [getAudiences] = useLazyGetAudiencesQuery();
   const [getTeams] = useLazyGetTeamsQuery();
   const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
-  const [getEvent] = useLazyGetEventQuery();
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
+  const [getEvent] = useLazyGetEventQuery();
 
-  const [teamsToChoose, setTeamsToChoose] = useState<any[]>([]);
-  const [teachersToChoose, setTeachersToChoose] = useState<any[]>([]);
+  const [cancelModal, setCancelModal] = useState<boolean>(false);
+
+  const [teamsToChoose, setTeamsToChoose] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [teachersToChoose, setTeachersToChoose] = useState<
+    { id: number; name: string }[]
+  >([]);
   const [stagesToChoose, setStagesToChoose] = useState<IStage[]>([]);
   const [audiencesToChoose, setAudiencesToChoose] = useState<IAudience[]>([]);
 
-  const [teams, setTeams] = useState<ITeamToChoose[]>([]);
-  const [teachers, setTeachers] = useState<any[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [selectedTeachers, setSelectedTeachers] = useState<
+    { id: number; name: string }[]
+  >([]);
 
+  // TODO: start getting mark strategies from api?
+  // TODO: rename to markStrategy?
   const [typeScore, setTypeScore] = useState<number>(1);
-  const [typeResult, setTypeResult] = useState<number>(1);
-
-  const [modalTeams, setModalTeams] = useState<boolean>(false);
-  const [modalTeachers, setModalTeachers] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -72,8 +85,8 @@ const ManageEventForm: FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (intensiveId) {
-        const { data: teams } = await getTeams(Number(intensiveId));
-        const { data: teachers } = await getTeachersOnIntensive(
+        const { data: teamsToChoose } = await getTeams(Number(intensiveId));
+        const { data: teachersToChoose } = await getTeachersOnIntensive(
           Number(intensiveId)
         );
         const { data: audiencies } = await getAudiences();
@@ -81,21 +94,18 @@ const ManageEventForm: FC = () => {
           Number(intensiveId)
         );
 
-        if (teams) {
-          setTeamsToChoose(teams);
+        if (teamsToChoose) {
+          setTeamsToChoose(
+            teamsToChoose.map((team) => ({
+              id: team.index,
+              name: team.name,
+            }))
+          );
         }
 
-        if (teachers) {
-          setTeachersToChoose(teachers);
+        if (teachersToChoose) {
+          setTeachersToChoose(teachersToChoose);
         }
-
-        // setCommands(filterIncludeObjectsByNames(teams, event.commands));
-        // setResponseCommands(filterIncludeObjectsByNames(teams, event.commands));
-        // setTeachers(
-        //   event.teachers_command.map((teacher) => {
-        //     return { id: teacher };
-        //   })
-        // );
 
         if (audiencies) {
           setAudiencesToChoose(audiencies);
@@ -111,14 +121,28 @@ const ManageEventForm: FC = () => {
           const { data: event } = await getEvent(Number(eventId));
 
           if (event) {
+            setSelectedTeams(
+              event.teams.map((team) => ({
+                id: team.index,
+                name: team.name,
+              }))
+            );
+
+            setSelectedTeachers(
+              event.experts.map((expert) => ({
+                id: expert.teacherOnIntensiveId,
+                name: expert.name,
+              }))
+            );
+
             setValue('name', event.name);
             setValue('description', event.description);
             setValue('startDate', event.startDate);
             setValue('finishDate', event.finishDate);
             setValue('startTime', event.startTime);
             setValue('finishTime', event.finishTime);
-            setValue('audience', event.audience);
-            setValue('stage', event.stage);
+            setValue('audience', event.audience.id);
+            setValue('stage', event.stageId);
           }
         }
       }
@@ -128,12 +152,10 @@ const ManageEventForm: FC = () => {
   }, []);
 
   const onSubmit = async (data: ManageEventFormFields) => {
-    console.log(data);
+    const teamIds = selectedTeams.map((team) => team.id);
+    const teacherOnIntensiveIds = selectedTeachers.map((teacher) => teacher.id);
 
     try {
-      const ids_teachers = teachers?.map((item) => item.id);
-      const ids_commands = teams?.map((item) => item.id);
-
       const eventId: string | null = searchParams.get('eventId');
 
       if (intensiveId) {
@@ -149,10 +171,10 @@ const ManageEventForm: FC = () => {
               finishDate: data.finishDate,
               finishTime: data.finishTime,
               stage: data.stage == 0 ? null : data.stage,
-              auditory: data.audience,
-              teachers_command: ids_teachers,
-              commands: ids_commands,
-              mark_strategy: 1,
+              audience: data.audience,
+              teacherOnIntensiveIds,
+              teamIds,
+              markStrategy: 1,
             });
           }
         } else {
@@ -165,10 +187,10 @@ const ManageEventForm: FC = () => {
             finishDate: data.finishDate,
             finishTime: data.finishTime,
             stage: data.stage == 0 ? null : data.stage,
-            auditory: data.audience,
-            teachers_command: ids_teachers,
-            commands: ids_commands,
-            mark_strategy: typeScore,
+            audience: data.audience,
+            teacherOnIntensiveIds,
+            teamIds,
+            markStrategy: 1,
           });
         }
       }
@@ -181,199 +203,192 @@ const ManageEventForm: FC = () => {
 
   return (
     <>
-      {modalTeams && (
-        <ChooseModal
-          itemsProp={teamsToChoose}
-          selectedItemsProp={teams}
-          onClose={() => setModalTeams(false)}
-          onSave={(newSelectedItems: any[], newItemsToChoose: any[]) => {
-            setTeams(newSelectedItems);
-            setTeamsToChoose(newItemsToChoose);
-          }}
-        />
-      )}
-
-      {modalTeachers && (
-        <ChooseModal
-          itemsProp={teachersToChoose}
-          selectedItemsProp={teachers}
-          onClose={() => setModalTeachers(false)}
-          onSave={(newSelectedItems: any[], newItemsToChoose: any[]) => {
-            setTeachers(newSelectedItems);
-            setTeachersToChoose(newItemsToChoose);
-          }}
-        />
+      {cancelModal && (
+        <Modal
+          title="Вы уверены, что хотите прекратить редактирование?"
+          onCloseModal={() => setCancelModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            Вы уверены, что хотите прекратить редактирование? Все сделанные вами
+            изменения не будут сохранены.
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setCancelModal(false)}
+                children="Продолжить редактирование"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setCancelModal(false);
+                  if (intensiveId) {
+                    navigate(
+                      `/manager/${parseInt(
+                        intensiveId
+                      )}/schedule/${searchParams.get('eventId')}`
+                    );
+                  }
+                }}
+                children="Да"
+              />
+            </div>
+          </div>
+        </Modal>
       )}
 
       <div className="flex justify-center max-w-[1280px]">
-        <div className="max-w-[765px] w-full">
+        <form
+          className="max-w-[765px] w-full"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <Title
             text={
               hasEvent ? 'Редактировать мероприятие' : 'Создать Мероприятие'
             }
           />
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="py-3 text-xl font-bold">Мероприятие</div>
+          <div className="my-3 text-xl font-bold">Мероприятие</div>
 
+          <InputDescription
+            fieldName="name"
+            register={register}
+            registerOptions={{
+              required: 'Поле обязательно для заполнения',
+            }}
+            description="Название мероприятия"
+            placeholder="Название мероприятия"
+            errorMessage={
+              typeof errors.name?.message === 'string'
+                ? errors.name.message
+                : ''
+            }
+          />
+          <InputDescription
+            isTextArea={true}
+            fieldName="description"
+            register={register}
+            description="Описание мероприятия"
+            placeholder="Описание мероприятия"
+          />
+
+          <div className="my-3 text-xl font-bold">Время проведения</div>
+
+          <div className="flex justify-between gap-2.5">
             <InputDescription
-              fieldName="name"
+              fieldName="startDate"
               register={register}
-              description="Название мероприятия"
-              placeholder="Название мероприятия"
+              description="Дата начала"
+              placeholder="Дата начала"
+              type="date"
             />
             <InputDescription
-              fieldName="description"
+              fieldName="finishDate"
               register={register}
-              description="Описание мероприятия"
-              placeholder="Описание мероприятия"
+              description="Дата окончания"
+              placeholder="Дата окончания"
+              type="date"
+            />
+          </div>
+
+          <div className="flex justify-between gap-2.5">
+            <InputDescription
+              fieldName="startTime"
+              register={register}
+              description="Время начала"
+              placeholder="Время начала"
+              type="time"
+            />
+            <InputDescription
+              fieldName="finishTime"
+              register={register}
+              description="Время окончания"
+              placeholder="Время окончания"
+              type="time"
+            />
+          </div>
+
+          <div className="my-3 text-xl font-bold"> Место проведения</div>
+
+          <Select
+            initialText="Выберите место проведения"
+            options={audiencesToChoose}
+            register={register}
+            registerOptions={{
+              validate: {
+                equalZero: (value: string, formValue) =>
+                  value != '0' || 'Поле обязательно для заполнения',
+              },
+            }}
+            fieldName="audience"
+            errorMessage={
+              typeof errors.audience?.message === 'string'
+                ? errors.audience.message
+                : ''
+            }
+          />
+
+          <div className="my-3 text-xl font-bold">Этап</div>
+
+          <Select
+            register={register}
+            fieldName="stage"
+            initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
+            options={stagesToChoose}
+          />
+
+          <div className="my-3 text-xl font-bold">Участники</div>
+
+          {teamsToChoose.length > 0 && (
+            <div className="mt-3">
+              <MultipleSelectInput
+                description="Команды"
+                errorMessage=""
+                setErrorMessage={() => console.log('')}
+                items={teamsToChoose}
+                selectedItems={selectedTeams}
+                setSelectedItems={setSelectedTeams}
+              />
+            </div>
+          )}
+
+          {teachersToChoose.length > 0 && (
+            <div className="mt-3">
+              <MultipleSelectInput
+                description="Эксперты"
+                errorMessage=""
+                setErrorMessage={() => console.log('')}
+                items={teachersToChoose}
+                selectedItems={selectedTeachers}
+                setSelectedItems={setSelectedTeachers}
+              />
+            </div>
+          )}
+
+          <div className="my-3 text-xl font-bold">Оценивание</div>
+
+          <InputRadioDescription setType={setTypeScore} />
+
+          <div className="flex my-5 gap-7">
+            <PrimaryButton
+              buttonColor="gray"
+              type="button"
+              children="Отмена"
+              clickHandler={() => {
+                setCancelModal(true);
+              }}
             />
 
-            <div className="py-3 text-xl font-bold">Время проведения</div>
-
-            <div className="flex justify-between gap-2.5">
-              <InputDescription
-                fieldName="startDate"
-                register={register}
-                description="Дата начала"
-                placeholder="Дата начала"
-                type="date"
-              />
-              <InputDescription
-                fieldName="finishDate"
-                register={register}
-                description="Дата окончания"
-                placeholder="Дата окончания"
-                type="date"
-              />
-            </div>
-
-            <div className="flex justify-between gap-2.5">
-              <InputDescription
-                fieldName="startTime"
-                register={register}
-                description="Время начала"
-                placeholder="Время начала"
-                type="time"
-              />
-              <InputDescription
-                fieldName="finishTime"
-                register={register}
-                description="Время окончания"
-                placeholder="Время окончания"
-                type="time"
-              />
-            </div>
-
-            <div className="py-3 text-xl font-bold"> Место проведения</div>
-
-            <Select
-              initialText="Выберите место проведения"
-              options={audiencesToChoose}
-              register={register}
-              fieldName="audience"
+            <PrimaryButton
+              type="submit"
+              children={
+                hasEvent ? 'Редактировать мероприятие' : 'Добавить мероприятие'
+              }
             />
-
-            <div className="py-3 text-xl font-bold">Этап</div>
-
-            <Select
-              register={register}
-              fieldName="stage"
-              initialText="Выберите к какому этапу привязать мероприятие"
-              options={stagesToChoose}
-            />
-
-            <div className="py-3 text-xl font-bold">Участники</div>
-
-            <div className="text-lg">
-              <div>Команды</div>
-              <div className="flex flex-wrap gap-1 mt-4">
-                {teams.length > 0
-                  ? teams.map((item) => (
-                      <div key={item.name} className="text-sm selectedInList">
-                        {item.name}
-                      </div>
-                    ))
-                  : null}
-              </div>
-              <div className="flex items-center gap-4 mt-4">
-                <button
-                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
-                  type="button"
-                  onClick={() => setModalTeams(true)}
-                >
-                  {' '}
-                  Выбрать{' '}
-                </button>
-
-                {teams.length === 0 && (
-                  <span className="text-gray_3">Выберите экспертов</span>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4 text-lg">
-              <div>Эксперты</div>
-              <div className="flex flex-wrap gap-1 mt-4">
-                {teachers.length > 0
-                  ? teachers.map((item) => (
-                      <div key={item.id} className="text-sm selectedInList">
-                        {item.name}
-                      </div>
-                    ))
-                  : null}
-              </div>
-
-              <div className="flex items-center gap-4 mt-4">
-                <button
-                  className="bg-blue text-white px-4 py-1.5 rounded-[10px] flex justify-center"
-                  type="button"
-                  onClick={() => setModalTeachers(true)}
-                >
-                  {' '}
-                  Выбрать{' '}
-                </button>
-                {teams.length === 0 && (
-                  <span className="text-gray_3">
-                    Выберите участвующих в мероприятии преподавателей
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="py-3 text-xl font-bold">Оценивание</div>
-
-            <InputRadioDescription setTypeProp={setTypeScore} />
-
-            <div className="py-3 text-xl font-bold"> Результат мероприятия</div>
-
-            <div className="flex flex-col gap-3 text-lg">
-              <InputRadio
-                valueProp={typeResult}
-                nameProp={'typeResult'}
-                descriptionProp={'Без результатов'}
-                funcProp={setTypeResult}
-              />
-              <InputRadio
-                valueProp={typeResult}
-                nameProp={'typeResult'}
-                descriptionProp={'Ответ в виде файла или ссылки'}
-                funcProp={setTypeResult}
-              />
-            </div>
-
-            <div className="mt-4 text-lg">
-              <PrimaryButton
-                type="submit"
-                text={
-                  hasEvent
-                    ? 'Редактировать мероприятие'
-                    : 'Добавить мероприятие'
-                }
-              />
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </>
   );

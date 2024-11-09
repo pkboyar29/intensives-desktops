@@ -11,6 +11,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
 import Title from '../components/Title';
 import Skeleton from 'react-loading-skeleton';
+import Chip from '../components/Chip';
 
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
 
@@ -28,8 +29,6 @@ const EventPage: FC = () => {
       try {
         if (params.eventId) {
           const { data } = await getEvent(parseInt(params.eventId));
-
-          console.log(data);
 
           setEvent(data);
         }
@@ -50,38 +49,46 @@ const EventPage: FC = () => {
             <>
               <Title text={event.name} />
 
-              <div className="mt-3 text-base font-bold">
-                {event.startTime} - {event.finishTime}
-              </div>
-
-              <p className="mt-3 text-lg text-black_2">{event.description}</p>
-
-              {/* <div className="flex flex-col gap-2">
-                <div className="text-lg font-bold text-black_2">
-                  Место проведения
+              <div className="flex flex-col gap-4 mt-3">
+                <div className="text-base font-bold">
+                  {event.startTime} - {event.finishTime}
                 </div>
-                <div>{event.audience}</div>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="text-lg font-bold text-black_2">
-                  Участвующие команды
-                </div>
-                <div></div>
-              </div>
+                <p className="text-lg text-black_2">{event.description}</p>
 
-              <div className="flex flex-col gap-2">
-                <div className="text-lg font-bold text-black_2">
-                  Эксперты, проводящие мероприятие
+                <div className="flex flex-col gap-3 text-lg">
+                  <div className="font-bold text-black_2">Место проведения</div>
+                  <div className="">{event.audience.name}</div>
                 </div>
-                <div></div>
-              </div> */}
+
+                <div className="flex flex-col gap-3">
+                  <div className="text-lg font-bold text-black_2">
+                    Участвующие команды
+                  </div>
+                  <div className="flex gap-3">
+                    {event.teams.map((team) => (
+                      <Chip key={team.id} label={team.name} />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="text-lg font-bold text-black_2">
+                    Эксперты, проводящие мероприятие
+                  </div>
+                  <div className="flex gap-3">
+                    {event.experts.map((expert) => (
+                      <Chip key={expert.id} label={expert.name} />
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               {/* TODO: эту роль очевидно потом поменять на роль организатора */}
               {currentUser?.roleName === 'Супер-администратор' && (
                 <div className="flex mt-10 text-lg font-bold gap-7">
                   <PrimaryButton
-                    text="Редактировать"
+                    children="Редактировать"
                     clickHandler={() => {
                       navigate(
                         replaceLastURLSegment(`editEvent?eventId=${event.id}`)
@@ -89,12 +96,13 @@ const EventPage: FC = () => {
                     }}
                   />
 
-                  <button
-                    className="p-4 rounded-[10px] bg-another_white flex justify-center items-center cursor-pointer"
-                    onClick={() => console.log('типо удаление')}
-                  >
-                    <TrashIcon />
-                  </button>
+                  <div>
+                    <PrimaryButton
+                      buttonColor="gray"
+                      children={<TrashIcon />}
+                      onClick={() => console.log('типо удаление')}
+                    />
+                  </div>
                 </div>
               )}
             </>

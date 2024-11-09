@@ -8,18 +8,9 @@ import {
   ITeamsCreate,
   ITeamSupportMembersUpdate,
   ITeamForManager,
-  ITeamToChoose,
 } from '../../ts/interfaces/ITeam';
 
-// delete?
-const mapTeamToChoose = (unmappedTeam: any): ITeamToChoose => {
-  return {
-    id: unmappedTeam.id,
-    name: unmappedTeam.name,
-  };
-};
-
-const mapTeamForManager = (unmappedTeam: any): ITeamForManager => {
+export const mapTeamForManager = (unmappedTeam: any): ITeamForManager => {
   return {
     id: unmappedTeam.id,
     index: unmappedTeam.id,

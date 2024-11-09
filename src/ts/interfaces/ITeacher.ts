@@ -8,3 +8,10 @@ export interface ITeacherOnIntensive {
   teacherId: number;
   name: string;
 }
+
+export interface ITeacherEvent {
+  id: number;
+  teacherOnIntensiveId: number;
+  teacherId: number;
+  name: string;
+}

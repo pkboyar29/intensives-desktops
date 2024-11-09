@@ -1,30 +1,25 @@
-import { FC, useState } from 'react';
+import { useState } from 'react';
 
 import Checkbox from './Checkbox';
 import Chip from '../Chip';
 
-interface Item {
-  id: number;
-  name: string;
-}
-
-interface MultipleSelectInputProps {
+interface MultipleSelectInputProps<T> {
   description: string;
   errorMessage: string;
   setErrorMessage: (errorMessage: string) => void;
-  items: Item[];
-  selectedItems: Item[];
-  setSelectedItems: (items: Item[]) => void;
+  items: T[];
+  selectedItems: T[];
+  setSelectedItems: (items: T[]) => void;
 }
 
-const MultipleSelectInput: FC<MultipleSelectInputProps> = ({
+const MultipleSelectInput = <T extends { id: number; name: string }>({
   description,
   errorMessage,
   setErrorMessage,
   items,
   selectedItems,
   setSelectedItems,
-}) => {
+}: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const toggleDropdownHandler = () => {

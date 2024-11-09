@@ -1,6 +1,8 @@
-import { ITeam } from './ITeam';
+import { IAudience } from './IAudience';
+import { ITeacherEvent } from './ITeacher';
+import { ITeam, ITeamForManager } from './ITeam';
 
-// delete?
+// TODO: delete after i delete all event context?
 export interface IEvent {
   id: number;
   name: string;
@@ -29,13 +31,12 @@ export interface IManagerEvent {
   finishDate: string;
   startTime: string;
   finishTime: string;
-  audience: number;
-  stage: number;
+  audience: IAudience;
+  stageId: number;
+  teams: ITeamForManager[];
+  experts: ITeacherEvent[];
 }
 
-// commands - teams
-// teachers_command - teachersTeam
-// mark_strategy - markStrategy. and this is number, not any?
 export interface IEventCreate {
   name: string;
   description: string;
@@ -44,11 +45,11 @@ export interface IEventCreate {
   finishDate: string;
   finishTime: string;
   stage: number | null;
-  auditory: number;
-  mark_strategy?: any;
+  audience: number;
+  markStrategy?: number;
   intensiveId: number;
-  commands?: any[];
-  teachers_command?: any[];
+  teamIds: number[];
+  teacherOnIntensiveIds: number[];
 }
 
 export interface IEventUpdate extends IEventCreate {

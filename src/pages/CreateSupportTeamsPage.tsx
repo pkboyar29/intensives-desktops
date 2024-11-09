@@ -201,7 +201,7 @@ const CreateSupportTeamsPage: FC = () => {
               <PrimaryButton
                 buttonColor="gray"
                 clickHandler={() => setCancelModal(false)}
-                text="Продолжить редактирование"
+                children="Продолжить редактирование"
               />
             </div>
             <div>
@@ -212,7 +212,7 @@ const CreateSupportTeamsPage: FC = () => {
                     navigate(`/manager/${parseInt(intensiveId)}/teams`);
                   }
                 }}
-                text="Да"
+                children="Да"
               />
             </div>
           </div>
@@ -236,7 +236,7 @@ const CreateSupportTeamsPage: FC = () => {
                     navigate(`/manager/${parseInt(intensiveId)}/teams`);
                   }
                 }}
-                text="Ок"
+                children="Ок"
               />
             </div>
           </div>
@@ -403,7 +403,7 @@ const CreateSupportTeamsPage: FC = () => {
               <div className="flex justify-end w-full gap-3 mt-3">
                 <div>
                   <PrimaryButton
-                    text="Отменить"
+                    children="Отменить"
                     buttonColor="gray"
                     clickHandler={() => {
                       setCancelModal(true);
@@ -411,7 +411,7 @@ const CreateSupportTeamsPage: FC = () => {
                   />
                 </div>
                 <div>
-                  <PrimaryButton text="Сохранить" clickHandler={onSubmit} />
+                  <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
                 </div>
               </div>
             </div>

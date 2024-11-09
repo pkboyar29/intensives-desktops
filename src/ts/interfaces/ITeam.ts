@@ -1,7 +1,7 @@
 import { IStudent } from './IStudent';
-import { ITeacher, ITeacherOnIntensive } from './ITeacher';
+import { ITeacherOnIntensive } from './ITeacher';
 
-// TODO: убрать тут null?
+// TODO: delete when team context deleted?
 export interface ITeam {
   id: number;
   name: string;
@@ -21,11 +21,6 @@ export interface ITeamForManager {
   tutor: ITeacherOnIntensive | null;
   mentor: IStudent | null;
   teamleadId?: number;
-}
-
-export interface ITeamToChoose {
-  id: number;
-  name: string;
 }
 
 export interface ITeamsCreate {

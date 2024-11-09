@@ -1,13 +1,13 @@
-import { FC, ButtonHTMLAttributes } from 'react';
+import { FC, ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  text: string;
+  children: ReactNode;
   buttonColor?: 'blue' | 'gray';
   clickHandler?: () => void;
 }
 
 const PrimaryButton: FC<PrimaryButtonProps> = ({
-  text,
+  children,
   buttonColor = 'blue',
   clickHandler,
   type,
@@ -24,7 +24,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
       type={type}
       {...props}
     >
-      {text}
+      {children}
     </button>
   );
 };

@@ -68,7 +68,7 @@ const ManagerMainPage: FC = () => {
               </NavLink>
             </div>
             <PrimaryButton
-              text="Вернуться к списку интенсивов"
+              children="Вернуться к списку интенсивов"
               clickHandler={returnToIntensivesClickHandler}
             />
           </div>

@@ -38,7 +38,10 @@ const Header: FC = () => {
             <div className="flex items-center gap-6">
               <div className="font-sans text-lg">{`${currentUser?.firstName} ${currentUser?.lastName}`}</div>
               <div className="w-24">
-                <PrimaryButton text="Выйти" clickHandler={logOutClickHandler} />
+                <PrimaryButton
+                  children="Выйти"
+                  clickHandler={logOutClickHandler}
+                />
               </div>
             </div>
           )}

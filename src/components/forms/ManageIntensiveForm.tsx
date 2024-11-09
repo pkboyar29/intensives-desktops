@@ -125,7 +125,7 @@ const ManageIntensiveForm: FC = () => {
   };
 
   return (
-    <div className="flex justify-center max-w-[1280px]">
+    <div className="flex justify-center pt-5">
       <form className="max-w-[765px] w-full" onSubmit={handleSubmit(onSubmit)}>
         <Title
           text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
@@ -273,7 +273,9 @@ const ManageIntensiveForm: FC = () => {
         <div className="my-5">
           <PrimaryButton
             type="submit"
-            text={intensiveId ? `Редактировать интенсив` : `Создать интенсив`}
+            children={
+              intensiveId ? `Редактировать интенсив` : `Создать интенсив`
+            }
           />
         </div>
       </form>

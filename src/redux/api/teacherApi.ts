@@ -1,7 +1,24 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
+import {
+  ITeacher,
+  ITeacherEvent,
+  ITeacherOnIntensive,
+} from '../../ts/interfaces/ITeacher';
+
+export const mapTeacherEvent = (teacherEvent: any): ITeacherEvent => {
+  return {
+    id: teacherEvent.id,
+    teacherOnIntensiveId: teacherEvent.teacher_on_intensive.id,
+    teacherId: teacherEvent.teacher_on_intensive.teacher.id,
+    name: getFullName(
+      teacherEvent.teacher_on_intensive.teacher.user.first_name,
+      teacherEvent.teacher_on_intensive.teacher.user.last_name,
+      teacherEvent.teacher_on_intensive.teacher.user.patronymic
+    ),
+  };
+};
 
 export const mapTeacherOnIntensive = (
   teacherOnIntensive: any
@@ -40,11 +57,15 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    // TODO: тут я храню только id препода на интенсиве, однако надо еще хранить id препода
     getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
-      query: (intensiveId) => `teachers_on_intensives/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): ITeacherOnIntensive[] =>
-        response.results.map((teacher: any) => mapTeacherOnIntensive(teacher)),
+      query: (intensiveId) =>
+        `teachers_on_intensives/?intensive=${intensiveId}`,
+      transformResponse: (response: any): ITeacherOnIntensive[] => {
+        console.log(response);
+        return response.results.map((teacher: any) =>
+          mapTeacherOnIntensive(teacher)
+        );
+      },
     }),
     // TODO: when i can pass university to backend, then pass university here
     getTeachersInUniversity: builder.query<ITeacher[], void>({
