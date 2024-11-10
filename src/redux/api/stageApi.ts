@@ -6,6 +6,7 @@ import { mapManagerEvent } from './eventApi';
 import { IStage, IStageCreate, IStageUpdate } from '../../ts/interfaces/IStage';
 
 export const mapStage = (unmappedStage: any): IStage => {
+  console.log('unmapped stage is ', unmappedStage);
   return {
     id: unmappedStage.id,
     name: unmappedStage.name,

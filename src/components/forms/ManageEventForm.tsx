@@ -36,6 +36,11 @@ interface ManageEventFormFields {
   stage: number;
 }
 
+interface Item {
+  id: number;
+  name: string;
+}
+
 const ManageEventForm: FC = () => {
   const {
     register,
@@ -56,21 +61,13 @@ const ManageEventForm: FC = () => {
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
 
-  const [teamsToChoose, setTeamsToChoose] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const [teachersToChoose, setTeachersToChoose] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const [stagesToChoose, setStagesToChoose] = useState<IStage[]>([]);
-  const [audiencesToChoose, setAudiencesToChoose] = useState<IAudience[]>([]);
+  const [teamsToChoose, setTeamsToChoose] = useState<Item[]>([]);
+  const [teachersToChoose, setTeachersToChoose] = useState<Item[]>([]);
+  const [stagesToChoose, setStagesToChoose] = useState<Item[]>([]);
+  const [audiencesToChoose, setAudiencesToChoose] = useState<Item[]>([]);
 
-  const [selectedTeams, setSelectedTeams] = useState<
-    { id: number; name: string }[]
-  >([]);
-  const [selectedTeachers, setSelectedTeachers] = useState<
-    { id: number; name: string }[]
-  >([]);
+  const [selectedTeams, setSelectedTeams] = useState<Item[]>([]);
+  const [selectedTeachers, setSelectedTeachers] = useState<Item[]>([]);
 
   // TODO: start getting mark strategies from api?
   // TODO: rename to markStrategy?
@@ -112,7 +109,14 @@ const ManageEventForm: FC = () => {
         }
 
         if (stages) {
-          setStagesToChoose(stages);
+          setStagesToChoose(
+            stages.map((stage) => ({
+              id: stage.id,
+              name: `${
+                stage.name
+              } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
+            }))
+          );
         }
 
         const eventId: string | null = searchParams.get('eventId');
@@ -310,7 +314,7 @@ const ManageEventForm: FC = () => {
             />
           </div>
 
-          <div className="my-3 text-xl font-bold"> Место проведения</div>
+          <div className="my-3 text-xl font-bold">Место проведения</div>
 
           <Select
             initialText="Выберите место проведения"
@@ -345,8 +349,6 @@ const ManageEventForm: FC = () => {
             <div className="mt-3">
               <MultipleSelectInput
                 description="Команды"
-                errorMessage=""
-                setErrorMessage={() => console.log('')}
                 items={teamsToChoose}
                 selectedItems={selectedTeams}
                 setSelectedItems={setSelectedTeams}
@@ -358,8 +360,6 @@ const ManageEventForm: FC = () => {
             <div className="mt-3">
               <MultipleSelectInput
                 description="Эксперты"
-                errorMessage=""
-                setErrorMessage={() => console.log('')}
                 items={teachersToChoose}
                 selectedItems={selectedTeachers}
                 setSelectedItems={setSelectedTeachers}

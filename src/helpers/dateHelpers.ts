@@ -12,4 +12,21 @@ const transformSeparateDateAndTimeToISO = (
   return `${date}T${time}:00`;
 };
 
-export { transformISODateToTime, transformSeparateDateAndTimeToISO };
+const getISODateInUTC3 = (date: Date): string => {
+  return date
+    .toLocaleDateString('en-GB', {
+      timeZone: 'Europe/Moscow',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .split('/')
+    .reverse()
+    .join('-');
+};
+
+export {
+  transformISODateToTime,
+  transformSeparateDateAndTimeToISO,
+  getISODateInUTC3,
+};

@@ -5,8 +5,8 @@ import Chip from '../Chip';
 
 interface MultipleSelectInputProps<T> {
   description: string;
-  errorMessage: string;
-  setErrorMessage: (errorMessage: string) => void;
+  errorMessage?: string;
+  setErrorMessage?: (errorMessage: string) => void;
   items: T[];
   selectedItems: T[];
   setSelectedItems: (items: T[]) => void;
@@ -33,7 +33,9 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
       setSelectedItems([...selectedItems, selectedItem]);
     }
 
-    setErrorMessage('');
+    if (setErrorMessage) {
+      setErrorMessage('');
+    }
   };
 
   const deleteSelectedItem = (id: number) => {

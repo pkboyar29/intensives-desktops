@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
@@ -10,6 +10,8 @@ import {
   useCreateStageMutation,
   useUpdateStageMutation,
 } from '../../redux/api/stageApi';
+
+import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 
 import { IStage } from '../../ts/interfaces/IStage';
 
@@ -44,8 +46,8 @@ const StageModal: FC<StageModalProps> = ({
     defaultValues: {
       name: stage?.name,
       description: stage?.description,
-      startDate: stage?.startDate.toISOString().split('T')[0],
-      finishDate: stage?.finishDate.toISOString().split('T')[0],
+      startDate: stage ? getISODateInUTC3(stage.startDate) : '',
+      finishDate: stage ? getISODateInUTC3(stage.finishDate) : '',
     },
   });
 

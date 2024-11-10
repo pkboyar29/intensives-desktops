@@ -11,6 +11,8 @@ import {
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 
+import { getISODateInUTC3 } from '../../helpers/dateHelpers';
+
 import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
 import InputDescription from '../inputs/InputDescription';
@@ -57,11 +59,8 @@ const ManageIntensiveForm: FC = () => {
     if (intensiveId && currentIntensive) {
       setValue('name', currentIntensive.name);
       setValue('description', currentIntensive.description);
-      setValue('open_dt', currentIntensive.open_dt.toISOString().split('T')[0]);
-      setValue(
-        'close_dt',
-        currentIntensive.close_dt.toISOString().split('T')[0]
-      );
+      setValue('open_dt', getISODateInUTC3(currentIntensive.open_dt));
+      setValue('close_dt', getISODateInUTC3(currentIntensive.close_dt));
 
       setSelectedFlows(currentIntensive.flows);
 
