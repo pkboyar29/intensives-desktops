@@ -22,6 +22,7 @@ import MultipleSelectInput from '../inputs/MultipleSelectInput';
 import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
 import Modal from '../modals/Modal';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 interface ManageEventFormFields {
   name: string;
@@ -44,6 +45,7 @@ const ManageEventForm: FC = () => {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
@@ -153,16 +155,35 @@ const ManageEventForm: FC = () => {
     fetchData();
   }, []);
 
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      start_dt?: string[];
+      finish_dt?: string[];
+    };
+    if (errorData.start_dt) {
+      setError('startDate', {
+        type: 'custom',
+        message: errorData.start_dt[0],
+      });
+    }
+    if (errorData.finish_dt) {
+      setError('finishDate', {
+        type: 'custom',
+        message: errorData.finish_dt[0],
+      });
+    }
+  };
+
   const onSubmit = async (data: ManageEventFormFields) => {
     const teamIds = selectedTeams.map((team) => team.id);
     const teacherOnIntensiveIds = selectedTeachers.map((teacher) => teacher.id);
 
-    try {
-      const eventId: string | null = searchParams.get('eventId');
+    const eventId: string | null = searchParams.get('eventId');
 
-      if (intensiveId) {
-        if (hasEvent) {
-          if (eventId) {
+    if (intensiveId) {
+      if (hasEvent) {
+        if (eventId) {
+          const { data: responseData, error: responseError } =
             await updateEvent({
               intensiveId: parseInt(intensiveId),
               eventId: parseInt(eventId),
@@ -178,28 +199,39 @@ const ManageEventForm: FC = () => {
               teamIds,
               markStrategy: 1,
             });
+
+          if (responseData) {
+            navigate(replaceLastURLSegment(''));
           }
-        } else {
-          await createEvent({
-            intensiveId: parseInt(intensiveId),
-            name: data.name,
-            description: data.description,
-            startDate: data.startDate,
-            startTime: data.startTime,
-            finishDate: data.finishDate,
-            finishTime: data.finishTime,
-            stage: data.stage == 0 ? null : data.stage,
-            audience: data.audience,
-            teacherOnIntensiveIds,
-            teamIds,
-            markStrategy: 1,
-          });
+
+          if (responseError) {
+            handleResponseError(responseError as FetchBaseQueryError);
+          }
+        }
+      } else {
+        const { data: responseData, error: responseError } = await createEvent({
+          intensiveId: parseInt(intensiveId),
+          name: data.name,
+          description: data.description,
+          startDate: data.startDate,
+          startTime: data.startTime,
+          finishDate: data.finishDate,
+          finishTime: data.finishTime,
+          stage: data.stage == 0 ? null : data.stage,
+          audience: data.audience,
+          teacherOnIntensiveIds,
+          teamIds,
+          markStrategy: 1,
+        });
+
+        if (responseData) {
+          navigate(replaceLastURLSegment(''));
+        }
+
+        if (responseError) {
+          handleResponseError(responseError as FetchBaseQueryError);
         }
       }
-
-      navigate(replaceLastURLSegment(''));
-    } catch (e) {
-      console.log(e);
     }
   };
 
@@ -259,6 +291,14 @@ const ManageEventForm: FC = () => {
             register={register}
             registerOptions={{
               required: 'Поле обязательно для заполнения',
+              minLength: {
+                value: 4,
+                message: 'Минимальное количество символов - 4',
+              },
+              maxLength: {
+                value: 50,
+                message: 'Максимальное количество символов - 50',
+              },
             }}
             description="Название мероприятия"
             placeholder="Название мероприятия"
@@ -272,8 +312,19 @@ const ManageEventForm: FC = () => {
             isTextArea={true}
             fieldName="description"
             register={register}
+            registerOptions={{
+              maxLength: {
+                value: 500,
+                message: 'Максимальное количество символов - 500',
+              },
+            }}
             description="Описание мероприятия"
             placeholder="Описание мероприятия"
+            errorMessage={
+              typeof errors.description?.message === 'string'
+                ? errors.description.message
+                : ''
+            }
           />
 
           <div className="my-3 text-xl font-bold">Время проведения</div>
@@ -282,16 +333,32 @@ const ManageEventForm: FC = () => {
             <InputDescription
               fieldName="startDate"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
               description="Дата начала"
               placeholder="Дата начала"
               type="date"
+              errorMessage={
+                typeof errors.startDate?.message === 'string'
+                  ? errors.startDate.message
+                  : ''
+              }
             />
             <InputDescription
               fieldName="finishDate"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
               description="Дата окончания"
               placeholder="Дата окончания"
               type="date"
+              errorMessage={
+                typeof errors.finishDate?.message === 'string'
+                  ? errors.finishDate.message
+                  : ''
+              }
             />
           </div>
 
@@ -299,16 +366,32 @@ const ManageEventForm: FC = () => {
             <InputDescription
               fieldName="startTime"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
               description="Время начала"
               placeholder="Время начала"
               type="time"
+              errorMessage={
+                typeof errors.startTime?.message === 'string'
+                  ? errors.startTime.message
+                  : ''
+              }
             />
             <InputDescription
               fieldName="finishTime"
               register={register}
+              registerOptions={{
+                required: 'Поле обязательно для заполнения',
+              }}
               description="Время окончания"
               placeholder="Время окончания"
               type="time"
+              errorMessage={
+                typeof errors.finishTime?.message === 'string'
+                  ? errors.finishTime.message
+                  : ''
+              }
             />
           </div>
 
@@ -320,7 +403,7 @@ const ManageEventForm: FC = () => {
             register={register}
             registerOptions={{
               validate: {
-                equalZero: (value: string, formValue) =>
+                equalZero: (value: string, formValues) =>
                   value != '0' || 'Поле обязательно для заполнения',
               },
             }}

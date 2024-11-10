@@ -162,8 +162,8 @@ const ManageIntensiveForm: FC = () => {
             register={register}
             registerOptions={{
               maxLength: {
-                value: 200,
-                message: 'Максимальное количество символов - 200',
+                value: 500,
+                message: 'Максимальное количество символов - 500',
               },
             }}
             description="Описание интенсива"

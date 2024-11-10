@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
@@ -14,6 +14,7 @@ import {
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 
 import { IStage } from '../../ts/interfaces/IStage';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 interface StageModalProps {
   stage: IStage | null;
@@ -40,6 +41,7 @@ const StageModal: FC<StageModalProps> = ({
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<StageFields>({
     mode: 'onBlur',
@@ -55,31 +57,54 @@ const StageModal: FC<StageModalProps> = ({
   const [updateStage] = useUpdateStageMutation();
 
   const onSubmit = async (data: StageFields) => {
-    try {
-      if (intensiveId) {
-        if (!stage) {
-          const { data: responseData } = await createStage({
-            ...data,
-            intensiveId: parseInt(intensiveId),
-          });
+    if (intensiveId) {
+      if (!stage) {
+        const { data: responseData, error: responseError } = await createStage({
+          ...data,
+          intensiveId: parseInt(intensiveId),
+        });
 
-          if (responseData) {
-            onChangeStage(responseData);
-          }
-        } else {
-          const { data: responseData } = await updateStage({
-            ...data,
-            id: stage.id,
-            intensiveId: parseInt(intensiveId),
-          });
+        if (responseData) {
+          onChangeStage(responseData);
+        }
 
-          if (responseData) {
-            onChangeStage(responseData);
-          }
+        if (responseError) {
+          handleResponseError(responseError as FetchBaseQueryError);
+        }
+      } else {
+        const { data: responseData, error: responseError } = await updateStage({
+          ...data,
+          id: stage.id,
+          intensiveId: parseInt(intensiveId),
+        });
+
+        if (responseData) {
+          onChangeStage(responseData);
+        }
+
+        if (responseError) {
+          handleResponseError(responseError as FetchBaseQueryError);
         }
       }
-    } catch (e) {
-      console.log(e);
+    }
+  };
+
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      start_dt?: string[];
+      finish_dt?: string[];
+    };
+    if (errorData.start_dt) {
+      setError('startDate', {
+        type: 'custom',
+        message: errorData.start_dt[0],
+      });
+    }
+    if (errorData.finish_dt) {
+      setError('finishDate', {
+        type: 'custom',
+        message: errorData.finish_dt[0],
+      });
     }
   };
 
@@ -115,8 +140,8 @@ const StageModal: FC<StageModalProps> = ({
             register={register}
             registerOptions={{
               maxLength: {
-                value: 200,
-                message: 'Максимальное количество символов - 200',
+                value: 500,
+                message: 'Максимальное количество символов - 500',
               },
             }}
             fieldName="description"
