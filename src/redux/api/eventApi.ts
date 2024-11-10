@@ -1,8 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import {
-  transformISODateToTime,
-  transformSeparateDateAndTimeToISO,
-} from '../../helpers/dateHelpers';
+import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
@@ -19,10 +16,8 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
-    startDate: unmappedEvent.start_dt.split('T')[0],
-    finishDate: unmappedEvent.finish_dt.split('T')[0],
-    startTime: transformISODateToTime(unmappedEvent.start_dt),
-    finishTime: transformISODateToTime(unmappedEvent.finish_dt),
+    startDate: new Date(unmappedEvent.start_dt),
+    finishDate: new Date(unmappedEvent.finish_dt),
     audience: mapAudience(unmappedEvent.audience),
     stageId: unmappedEvent.stage === null ? 0 : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>

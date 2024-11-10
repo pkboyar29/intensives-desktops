@@ -27,10 +27,10 @@ export interface IManagerEvent {
   id: number;
   name: string;
   description: string;
-  startDate: string;
-  finishDate: string;
-  startTime: string;
-  finishTime: string;
+  startDate: Date;
+  finishDate: Date;
+  // startTime: string;
+  // finishTime: string;
   audience: IAudience;
   stageId: number;
   teams: ITeamForManager[];

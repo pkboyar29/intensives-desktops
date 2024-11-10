@@ -3,6 +3,7 @@ import { FC } from 'react';
 import EyeIcon from '../icons/EyeIcon';
 
 import { IManagerEvent } from '../../ts/interfaces/IEvent';
+import { getTimeFromDate } from '../../helpers/dateHelpers';
 
 interface EventInScheduleProps {
   event: IManagerEvent;
@@ -24,7 +25,11 @@ const EventInSchedule: FC<EventInScheduleProps> = ({ event, onEventClick }) => {
         </p>
         <time className="text-base text-bright_gray">
           {/* TODO: display here one day and startTime with finishTime */}
-          {event.startDate + ' ' + event.finishDate}
+          {event.startDate.toLocaleDateString() +
+            ' ' +
+            getTimeFromDate(event.startDate) +
+            ' - ' +
+            getTimeFromDate(event.finishDate)}
         </time>
       </div>
     </section>

@@ -14,6 +14,7 @@ import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/Chip';
 
 import { replaceLastURLSegment } from '../helpers/urlHelpers';
+import { getTimeFromDate } from '../helpers/dateHelpers';
 
 const EventPage: FC = () => {
   const navigate = useNavigate();
@@ -50,38 +51,45 @@ const EventPage: FC = () => {
               <Title text={event.name} />
 
               <div className="flex flex-col gap-4 mt-3">
-                <div className="text-base font-bold">
-                  {event.startTime} - {event.finishTime}
+                <div className="flex gap-2 text-base font-bold">
+                  <div>{`${getTimeFromDate(
+                    event.startDate
+                  )} - ${getTimeFromDate(event.finishDate)}`}</div>
+                  <div>{`${event.startDate.toLocaleDateString()}`}</div>
                 </div>
 
                 <p className="text-lg text-black_2">{event.description}</p>
 
                 <div className="flex flex-col gap-3 text-lg">
                   <div className="font-bold text-black_2">Место проведения</div>
-                  <div className="">{event.audience.name}</div>
+                  <div>{event.audience.name}</div>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <div className="text-lg font-bold text-black_2">
-                    Участвующие команды
+                {event.teams.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    <div className="text-lg font-bold text-black_2">
+                      Участвующие команды
+                    </div>
+                    <div className="flex gap-3">
+                      {event.teams.map((team) => (
+                        <Chip key={team.id} label={team.name} />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex gap-3">
-                    {event.teams.map((team) => (
-                      <Chip key={team.id} label={team.name} />
-                    ))}
-                  </div>
-                </div>
+                )}
 
-                <div className="flex flex-col gap-3">
-                  <div className="text-lg font-bold text-black_2">
-                    Эксперты, проводящие мероприятие
+                {event.experts.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    <div className="text-lg font-bold text-black_2">
+                      Эксперты, проводящие мероприятие
+                    </div>
+                    <div className="flex gap-3">
+                      {event.experts.map((expert) => (
+                        <Chip key={expert.id} label={expert.name} />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex gap-3">
-                    {event.experts.map((expert) => (
-                      <Chip key={expert.id} label={expert.name} />
-                    ))}
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* TODO: эту роль очевидно потом поменять на роль организатора */}

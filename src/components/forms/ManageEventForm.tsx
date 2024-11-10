@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { replaceLastURLSegment } from '../../helpers/urlHelpers';
+import { getISODateInUTC3, getTimeFromDate } from '../../helpers/dateHelpers';
 
 import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
@@ -12,9 +13,6 @@ import {
   useCreateEventMutation,
   useUpdateEventMutation,
 } from '../../redux/api/eventApi';
-
-import { IStage } from '../../ts/interfaces/IStage';
-import { IAudience } from '../../ts/interfaces/IAudience';
 
 import Select from '../inputs/Select';
 import InputRadioDescription from '../inputs/InputRadioDescription';
@@ -141,10 +139,10 @@ const ManageEventForm: FC = () => {
 
             setValue('name', event.name);
             setValue('description', event.description);
-            setValue('startDate', event.startDate);
-            setValue('finishDate', event.finishDate);
-            setValue('startTime', event.startTime);
-            setValue('finishTime', event.finishTime);
+            setValue('startDate', getISODateInUTC3(event.startDate));
+            setValue('finishDate', getISODateInUTC3(event.finishDate));
+            setValue('startTime', getTimeFromDate(event.startDate));
+            setValue('finishTime', getTimeFromDate(event.finishDate));
             setValue('audience', event.audience.id);
             setValue('stage', event.stageId);
           }
