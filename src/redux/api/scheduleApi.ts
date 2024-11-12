@@ -3,8 +3,8 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import { mapManagerEvent } from './eventApi';
 import { mapStage } from './stageApi';
-import { IStage } from '../../ts/interfaces/IStage';
 
+import { IStage } from '../../ts/interfaces/IStage';
 import { IManagerEvent } from '../../ts/interfaces/IEvent';
 
 interface ISchedule {

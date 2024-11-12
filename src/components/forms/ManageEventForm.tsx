@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 import { getISODateInUTC3, getTimeFromDate } from '../../helpers/dateHelpers';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
 import { useLazyGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
@@ -15,14 +16,13 @@ import {
 } from '../../redux/api/eventApi';
 
 import Select from '../inputs/Select';
-import InputRadioDescription from '../inputs/InputRadioDescription';
-import TrueInputRadio from '../inputs/TrueInputRadio';
 import InputDescription from '../inputs/InputDescription';
 import MultipleSelectInput from '../inputs/MultipleSelectInput';
 import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
 import Modal from '../modals/Modal';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import FileUpload from '../inputs/FileInput';
+import ScoreTypeBox from '../inputs/ScoreTypeBox';
 
 interface ManageEventFormFields {
   name: string;
@@ -33,6 +33,7 @@ interface ManageEventFormFields {
   finishTime: string;
   audience: number;
   stage: number;
+  // scoreType: 1 | 2 | 3;
 }
 
 interface Item {
@@ -68,10 +69,6 @@ const ManageEventForm: FC = () => {
 
   const [selectedTeams, setSelectedTeams] = useState<Item[]>([]);
   const [selectedTeachers, setSelectedTeachers] = useState<Item[]>([]);
-
-  // TODO: start getting mark strategies from api?
-  // TODO: rename to markStrategy?
-  const [typeScore, setTypeScore] = useState<number>(1);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -179,6 +176,9 @@ const ManageEventForm: FC = () => {
     const teacherOnIntensiveIds = selectedTeachers.map((teacher) => teacher.id);
 
     const eventId: string | null = searchParams.get('eventId');
+
+    // TODO: get here currentScoreType
+    // console.log(currentScoreType);
 
     if (intensiveId) {
       if (hasEvent) {
@@ -450,7 +450,11 @@ const ManageEventForm: FC = () => {
 
           <div className="my-3 text-xl font-bold">Оценивание</div>
 
-          <InputRadioDescription setType={setTypeScore} />
+          <ScoreTypeBox />
+
+          <div className="my-3">
+            <FileUpload />
+          </div>
 
           <div className="flex my-5 gap-7">
             <PrimaryButton

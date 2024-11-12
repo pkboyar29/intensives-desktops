@@ -216,3 +216,16 @@ input[type='number'] {
   overflow: hidden;
   padding-right: 16px;
 }
+
+/* input[type='radio'] {
+  appearance: none;
+  width: 4px;
+  height: 4px;
+  border: 1px solid #007bff;
+  border-radius: 50%;
+  outline: none;
+}
+
+input[type='radio']:checked {
+  background-color: #007bff;
+} */
