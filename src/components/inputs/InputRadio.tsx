@@ -1,29 +1,27 @@
 import { FC, ReactNode } from 'react';
+import { UseFormRegister } from 'react-hook-form';
 
 interface InputRadioProps {
+  register: UseFormRegister<any>;
   value: string;
   currentValue: string;
+  fieldName: string;
   description: string;
-  onChange: (value: string) => void;
   children?: ReactNode;
 }
 
 const InputRadio: FC<InputRadioProps> = ({
+  register,
   value,
   currentValue,
   description,
-  onChange,
+  fieldName,
   children,
 }) => {
   return (
     <>
       <label className="flex items-center gap-3 px-6 py-4 text-lg border cursor-pointer select-none rounded-xl border-another_white">
-        <input
-          type="radio"
-          value={value}
-          checked={currentValue === value}
-          onChange={() => onChange(value)}
-        />
+        <input {...register(fieldName)} type="radio" value={value} />
 
         <p>{description}</p>
       </label>

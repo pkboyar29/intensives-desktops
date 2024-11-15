@@ -10,6 +10,8 @@ import {
 import { mapTeamForManager } from './teamApi';
 import { mapAudience } from './audienceApi';
 import { mapTeacherEvent } from './teacherApi';
+import { mapMarkStrategy } from './markStrategyApi';
+import { mapEventCriteria } from './criteriaApi';
 
 export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
   return {
@@ -25,6 +27,12 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     ),
     experts: unmappedEvent.experts.map((unmappedExpert: any) =>
       mapTeacherEvent(unmappedExpert)
+    ),
+    markStrategy:
+      unmappedEvent.mark_strategy &&
+      mapMarkStrategy(unmappedEvent.mark_strategy),
+    criterias: unmappedEvent.criterias.map((unmappedCriteria: any) =>
+      mapEventCriteria(unmappedCriteria)
     ),
   };
 };
@@ -62,6 +70,8 @@ export const eventApi = createApi({
             data.finishDate,
             data.finishTime
           ),
+          mark_strategy: data.markStrategy ? data.markStrategy : null,
+          criteria_ids: data.criteriaIds ? data.criteriaIds : [],
           files: [],
         },
       }),
@@ -83,6 +93,8 @@ export const eventApi = createApi({
             data.finishDate,
             data.finishTime
           ),
+          mark_strategy: data.markStrategy ? data.markStrategy : null,
+          criteria_ids: data.criteriaIds ? data.criteriaIds : [],
           files: [],
         },
       }),
@@ -92,7 +104,7 @@ export const eventApi = createApi({
 
 export const {
   useGetEventsOnIntensiveQuery,
-  useLazyGetEventQuery,
+  useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,
 } = eventApi;

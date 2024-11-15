@@ -29,4 +29,4 @@ export const audienceApi = createApi({
   }),
 });
 
-export const { useLazyGetAudiencesQuery } = audienceApi;
+export const { useGetAudiencesQuery } = audienceApi;

@@ -1,4 +1,6 @@
 import { IAudience } from './IAudience';
+import { IEventCriteria } from './ICriteria';
+import { IMarkStrategy } from './IMarkStrategy';
 import { ITeacherEvent } from './ITeacher';
 import { ITeam, ITeamForManager } from './ITeam';
 
@@ -29,12 +31,12 @@ export interface IManagerEvent {
   description: string;
   startDate: Date;
   finishDate: Date;
-  // startTime: string;
-  // finishTime: string;
   audience: IAudience;
   stageId: number;
   teams: ITeamForManager[];
   experts: ITeacherEvent[];
+  markStrategy: IMarkStrategy | null;
+  criterias: IEventCriteria[];
 }
 
 export interface IEventCreate {
@@ -46,10 +48,11 @@ export interface IEventCreate {
   finishTime: string;
   stage: number | null;
   audience: number;
-  markStrategy?: number;
   intensiveId: number;
   teamIds: number[];
   teacherOnIntensiveIds: number[];
+  markStrategy?: number;
+  criteriaIds?: number[];
 }
 
 export interface IEventUpdate extends IEventCreate {

@@ -3,9 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
 
-import { useLazyGetEventQuery } from '../redux/api/eventApi';
-
-import { IManagerEvent } from '../ts/interfaces/IEvent';
+import { useGetEventQuery } from '../redux/api/eventApi';
 
 import PrimaryButton from '../components/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
@@ -13,32 +11,35 @@ import Title from '../components/Title';
 import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/Chip';
 
-import { replaceLastURLSegment } from '../helpers/urlHelpers';
 import { getTimeFromDate } from '../helpers/dateHelpers';
 
 const EventPage: FC = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [getEvent, { isLoading }] = useLazyGetEventQuery();
-  const [event, setEvent] = useState<IManagerEvent>();
+  const { data: event, isLoading } = useGetEventQuery(Number(params.eventId), {
+    refetchOnMountOrArgChange: true,
+  });
 
-  const currentUser = useAppSelector((state) => state.user.data);
+  const [scoreTypeString, setScoreTypeString] = useState<
+    | 'Без оценивания'
+    | 'Оценивание по шкале'
+    | 'Оценивание по шкале с критериями'
+  >('Без оценивания');
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        if (params.eventId) {
-          const { data } = await getEvent(parseInt(params.eventId));
-
-          setEvent(data);
-        }
-      } catch (e) {
-        console.log(e);
+    if (event && event.markStrategy) {
+      if (event.criterias.length > 0) {
+        setScoreTypeString('Оценивание по шкале с критериями');
+      } else {
+        setScoreTypeString('Оценивание по шкале');
       }
-    };
-    fetchEvent();
-  }, []);
+    } else {
+      setScoreTypeString('Без оценивания');
+    }
+  }, [event]);
+
+  const currentUser = useAppSelector((state) => state.user.data);
 
   return (
     <div className="flex justify-center max-w-[1280px]">
@@ -81,7 +82,7 @@ const EventPage: FC = () => {
                 {event.experts.length > 0 && (
                   <div className="flex flex-col gap-3">
                     <div className="text-lg font-bold text-black_2">
-                      Эксперты, проводящие мероприятие
+                      Преподаватели, проводящие мероприятие
                     </div>
                     <div className="flex gap-3">
                       {event.experts.map((expert) => (
@@ -90,6 +91,35 @@ const EventPage: FC = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="flex flex-col gap-3 text-lg">
+                  <div className="font-bold text-black_2">Тип оценивания</div>
+                  <div>{scoreTypeString}</div>
+                </div>
+
+                {(scoreTypeString == 'Оценивание по шкале с критериями' ||
+                  scoreTypeString == 'Оценивание по шкале') &&
+                  event.markStrategy && (
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">
+                        Шкала оценивания
+                      </div>
+                      <div>{event.markStrategy.name}</div>
+                    </div>
+                  )}
+
+                {scoreTypeString == 'Оценивание по шкале с критериями' &&
+                  event.criterias &&
+                  event.criterias.length > 0 && (
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">Критерии</div>
+                      <div className="flex gap-3">
+                        {event.criterias.map((criteria) => (
+                          <Chip key={criteria.id} label={criteria.name} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
 
               {/* TODO: эту роль очевидно потом поменять на роль организатора */}
@@ -99,7 +129,7 @@ const EventPage: FC = () => {
                     children="Редактировать"
                     clickHandler={() => {
                       navigate(
-                        replaceLastURLSegment(`editEvent?eventId=${event.id}`)
+                        `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
                       );
                     }}
                   />

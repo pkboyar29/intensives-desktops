@@ -63,7 +63,7 @@ export const stageApi = createApi({
 });
 
 export const {
-  useLazyGetStagesForIntensiveQuery,
+  useGetStagesForIntensiveQuery,
   useCreateStageMutation,
   useUpdateStageMutation,
   useDeleteStageMutation,

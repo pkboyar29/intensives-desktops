@@ -56,6 +56,7 @@ const ManageIntensiveForm: FC = () => {
     mode: 'onBlur',
   });
 
+  // TODO: start using reset instead of setValue
   useEffect(() => {
     if (intensiveId && currentIntensive) {
       setValue('name', currentIntensive.name);

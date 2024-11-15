@@ -3,7 +3,7 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 
-const mapMarkStrategy = (unmappedMarkStrategy: any): IMarkStrategy => {
+export const mapMarkStrategy = (unmappedMarkStrategy: any): IMarkStrategy => {
   return {
     id: unmappedMarkStrategy.id,
     name: unmappedMarkStrategy.name,

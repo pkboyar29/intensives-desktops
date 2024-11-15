@@ -1,16 +1,17 @@
 import { FC, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller, UseFormRegister } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { replaceLastURLSegment } from '../../helpers/urlHelpers';
 import { getISODateInUTC3, getTimeFromDate } from '../../helpers/dateHelpers';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
-import { useLazyGetTeamsQuery } from '../../redux/api/teamApi';
-import { useLazyGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
-import { useLazyGetAudiencesQuery } from '../../redux/api/audienceApi';
-import { useLazyGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
+import { useGetTeamsQuery } from '../../redux/api/teamApi';
+import { useGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
+import { useGetAudiencesQuery } from '../../redux/api/audienceApi';
+import { useGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
+import { useGetMarkStrategiesQuery } from '../../redux/api/markStrategyApi';
+import { useGetCriteriasQuery } from '../../redux/api/criteriaApi';
 import {
-  useLazyGetEventQuery,
+  useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,
 } from '../../redux/api/eventApi';
@@ -22,7 +23,9 @@ import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
 import Modal from '../modals/Modal';
 import FileUpload from '../inputs/FileInput';
-import ScoreTypeBox from '../inputs/ScoreTypeBox';
+import InputRadio from '../inputs/InputRadio';
+
+import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 
 interface ManageEventFormFields {
   name: string;
@@ -33,7 +36,11 @@ interface ManageEventFormFields {
   finishTime: string;
   audience: number;
   stage: number;
-  // scoreType: 1 | 2 | 3;
+  scoreType: 'withoutMarkStrategy' | 'withMarkStrategy' | 'withCriterias';
+  markStrategy: string;
+  criterias: Item[];
+  teams: Item[];
+  teachersOnIntensive: Item[];
 }
 
 interface Item {
@@ -41,116 +48,123 @@ interface Item {
   name: string;
 }
 
+const renderMarkStrategies = (
+  markStrategies: IMarkStrategy[] | undefined,
+  register: UseFormRegister<ManageEventFormFields>,
+  currentValue: string
+) =>
+  markStrategies?.map((markStrategy) => (
+    <InputRadio
+      register={register}
+      fieldName="markStrategy"
+      key={markStrategy.id}
+      value={markStrategy.id.toString()}
+      currentValue={currentValue}
+      description={markStrategy.name}
+    />
+  ));
+
 const ManageEventForm: FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { intensiveId } = useParams();
+  const hasEvent = searchParams.get('eventId');
+
   const {
     register,
     handleSubmit,
-    setValue,
     setError,
+    reset,
+    watch,
+    control,
     formState: { errors },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
+  const formValues = watch();
 
-  const [getStagesForIntensive] = useLazyGetStagesForIntensiveQuery();
-  const [getAudiences] = useLazyGetAudiencesQuery();
-  const [getTeams] = useLazyGetTeamsQuery();
-  const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
-  const [getEvent] = useLazyGetEventQuery();
+
+  const { data: event } = useGetEventQuery(
+    Number(searchParams.get('eventId')),
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: teachersToChoose } = useGetTeachersOnIntensiveQuery(
+    Number(intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
+    Number(intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  // TODO: начать получать аудитории конкретного университета
+  const { data: audiencesToChoose } = useGetAudiencesQuery();
+  const { data: markStrategies } = useGetMarkStrategiesQuery();
+  const { data: criterias } = useGetCriteriasQuery();
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
-
-  const [teamsToChoose, setTeamsToChoose] = useState<Item[]>([]);
-  const [teachersToChoose, setTeachersToChoose] = useState<Item[]>([]);
-  const [stagesToChoose, setStagesToChoose] = useState<Item[]>([]);
-  const [audiencesToChoose, setAudiencesToChoose] = useState<Item[]>([]);
-
-  const [selectedTeams, setSelectedTeams] = useState<Item[]>([]);
-  const [selectedTeachers, setSelectedTeachers] = useState<Item[]>([]);
-
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { intensiveId } = useParams();
-
-  const hasEvent = searchParams.get('eventId');
+  const [successfulSaveModal, setSuccessfulSaveModal] =
+    useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (intensiveId) {
-        const { data: teamsToChoose } = await getTeams(Number(intensiveId));
-        const { data: teachersToChoose } = await getTeachersOnIntensive(
-          Number(intensiveId)
-        );
-        const { data: audiencies } = await getAudiences();
-        const { data: stages } = await getStagesForIntensive(
-          Number(intensiveId)
-        );
+    if (markStrategies) {
+      if (event) {
+        let scoreType:
+          | 'withoutMarkStrategy'
+          | 'withMarkStrategy'
+          | 'withCriterias' = 'withoutMarkStrategy';
 
-        if (teamsToChoose) {
-          setTeamsToChoose(
-            teamsToChoose.map((team) => ({
-              id: team.index,
-              name: team.name,
-            }))
-          );
-        }
-
-        if (teachersToChoose) {
-          setTeachersToChoose(teachersToChoose);
-        }
-
-        if (audiencies) {
-          setAudiencesToChoose(audiencies);
-        }
-
-        if (stages) {
-          setStagesToChoose(
-            stages.map((stage) => ({
-              id: stage.id,
-              name: `${
-                stage.name
-              } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
-            }))
-          );
-        }
-
-        const eventId: string | null = searchParams.get('eventId');
-
-        if (hasEvent && eventId) {
-          const { data: event } = await getEvent(Number(eventId));
-
-          if (event) {
-            setSelectedTeams(
-              event.teams.map((team) => ({
-                id: team.index,
-                name: team.name,
-              }))
-            );
-
-            setSelectedTeachers(
-              event.experts.map((expert) => ({
-                id: expert.teacherOnIntensiveId,
-                name: expert.name,
-              }))
-            );
-
-            setValue('name', event.name);
-            setValue('description', event.description);
-            setValue('startDate', getISODateInUTC3(event.startDate));
-            setValue('finishDate', getISODateInUTC3(event.finishDate));
-            setValue('startTime', getTimeFromDate(event.startDate));
-            setValue('finishTime', getTimeFromDate(event.finishDate));
-            setValue('audience', event.audience.id);
-            setValue('stage', event.stageId);
+        if (event.markStrategy) {
+          if (event.criterias.length > 0) {
+            scoreType = 'withCriterias';
+          } else {
+            scoreType = 'withMarkStrategy';
           }
         }
-      }
-    };
 
-    fetchData();
-  }, []);
+        reset({
+          name: event.name,
+          description: event.description,
+          startDate: getISODateInUTC3(event.startDate),
+          finishDate: getISODateInUTC3(event.finishDate),
+          startTime: getTimeFromDate(event.startDate),
+          finishTime: getTimeFromDate(event.finishDate),
+          audience: event.audience.id,
+          stage: event.stageId,
+          scoreType: scoreType,
+          markStrategy: event.markStrategy
+            ? event.markStrategy.id.toString()
+            : markStrategies[0].id.toString(),
+          criterias: event.criterias.map((criteria) => ({
+            id: criteria.criteriaId,
+            name: criteria.name,
+          })),
+          teams: event.teams.map((team) => ({
+            id: team.index,
+            name: team.name,
+          })),
+          teachersOnIntensive: event.experts.map((expert) => ({
+            id: expert.teacherOnIntensiveId,
+            name: expert.name,
+          })),
+        });
+      } else {
+        reset({
+          scoreType: 'withoutMarkStrategy',
+          markStrategy: markStrategies[0].id.toString(),
+        });
+      }
+    }
+  }, [event, markStrategies]);
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
@@ -172,13 +186,39 @@ const ManageEventForm: FC = () => {
   };
 
   const onSubmit = async (data: ManageEventFormFields) => {
-    const teamIds = selectedTeams.map((team) => team.id);
-    const teacherOnIntensiveIds = selectedTeachers.map((teacher) => teacher.id);
+    console.log(data);
+    const scoreType = data.scoreType;
+
+    if (
+      scoreType === 'withCriterias' &&
+      (!data.criterias || data.criterias.length === 0)
+    ) {
+      setError('criterias', {
+        type: 'custom',
+        message: 'Необходимо установить минимум один критерий',
+      });
+      return;
+    }
+
+    let score = {};
+    switch (scoreType) {
+      case 'withoutMarkStrategy':
+        score = {};
+        break;
+      case 'withMarkStrategy':
+        score = {
+          markStrategy: Number(data.markStrategy),
+        };
+        break;
+      case 'withCriterias':
+        score = {
+          markStrategy: Number(data.markStrategy),
+          criteriaIds: data.criterias.map((criteria) => criteria.id),
+        };
+        break;
+    }
 
     const eventId: string | null = searchParams.get('eventId');
-
-    // TODO: get here currentScoreType
-    // console.log(currentScoreType);
 
     if (intensiveId) {
       if (hasEvent) {
@@ -195,13 +235,15 @@ const ManageEventForm: FC = () => {
               finishTime: data.finishTime,
               stage: data.stage == 0 ? null : data.stage,
               audience: data.audience,
-              teacherOnIntensiveIds,
-              teamIds,
-              markStrategy: 1,
+              teacherOnIntensiveIds: data.teachersOnIntensive.map(
+                (teacher) => teacher.id
+              ),
+              teamIds: data.teams.map((team) => team.id),
+              ...score,
             });
 
           if (responseData) {
-            navigate(replaceLastURLSegment(''));
+            setSuccessfulSaveModal(true);
           }
 
           if (responseError) {
@@ -219,13 +261,15 @@ const ManageEventForm: FC = () => {
           finishTime: data.finishTime,
           stage: data.stage == 0 ? null : data.stage,
           audience: data.audience,
-          teacherOnIntensiveIds,
-          teamIds,
-          markStrategy: 1,
+          teacherOnIntensiveIds: data.teachersOnIntensive.map(
+            (teacher) => teacher.id
+          ),
+          teamIds: data.teams.map((team) => team.id),
+          ...score,
         });
 
         if (responseData) {
-          navigate(replaceLastURLSegment(''));
+          setSuccessfulSaveModal(true);
         }
 
         if (responseError) {
@@ -260,13 +304,41 @@ const ManageEventForm: FC = () => {
                   setCancelModal(false);
                   if (intensiveId) {
                     navigate(
-                      `/manager/${parseInt(
-                        intensiveId
-                      )}/schedule/${searchParams.get('eventId')}`
+                      `/manager/${intensiveId}/schedule/${searchParams.get(
+                        'eventId'
+                      )}`
                     );
                   }
                 }}
                 children="Да"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {successfulSaveModal && (
+        <Modal
+          title={`Мероприятие было успешно ${
+            hasEvent ? 'изменено' : 'создано'
+          }`}
+          onCloseModal={() => setSuccessfulSaveModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Мероприятие было успешно ${hasEvent ? 'изменено' : 'создано'}`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setSuccessfulSaveModal(false);
+                  navigate(
+                    `/manager/${intensiveId}/schedule/${searchParams.get(
+                      'eventId'
+                    )}`
+                  );
+                }}
+                children="Ок"
               />
             </div>
           </div>
@@ -395,62 +467,147 @@ const ManageEventForm: FC = () => {
             />
           </div>
 
-          <div className="my-3 text-xl font-bold">Место проведения</div>
+          {audiencesToChoose && (
+            <>
+              <div className="my-3 text-xl font-bold">Место проведения</div>
+              <Select
+                initialText="Выберите место проведения"
+                options={audiencesToChoose}
+                register={register}
+                registerOptions={{
+                  validate: {
+                    equalZero: (value: string, formValues) =>
+                      value != '0' || 'Поле обязательно для заполнения',
+                  },
+                }}
+                fieldName="audience"
+                errorMessage={
+                  typeof errors.audience?.message === 'string'
+                    ? errors.audience.message
+                    : ''
+                }
+              />
+            </>
+          )}
 
-          <Select
-            initialText="Выберите место проведения"
-            options={audiencesToChoose}
-            register={register}
-            registerOptions={{
-              validate: {
-                equalZero: (value: string, formValues) =>
-                  value != '0' || 'Поле обязательно для заполнения',
-              },
-            }}
-            fieldName="audience"
-            errorMessage={
-              typeof errors.audience?.message === 'string'
-                ? errors.audience.message
-                : ''
-            }
-          />
+          {stagesToChoose && (
+            <>
+              <div className="my-3 text-xl font-bold">Этап</div>
 
-          <div className="my-3 text-xl font-bold">Этап</div>
-
-          <Select
-            register={register}
-            fieldName="stage"
-            initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
-            options={stagesToChoose}
-          />
+              <Select
+                register={register}
+                fieldName="stage"
+                initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
+                options={stagesToChoose.map((stage) => ({
+                  id: stage.id,
+                  name: `${
+                    stage.name
+                  } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
+                }))}
+              />
+            </>
+          )}
 
           <div className="my-3 text-xl font-bold">Участники</div>
 
-          {teamsToChoose.length > 0 && (
+          {teamsToChoose && teamsToChoose.length > 0 && (
             <div className="mt-3">
-              <MultipleSelectInput
-                description="Команды"
-                items={teamsToChoose}
-                selectedItems={selectedTeams}
-                setSelectedItems={setSelectedTeams}
+              <Controller
+                name="teams"
+                control={control}
+                render={({ field }) => (
+                  <MultipleSelectInput
+                    description="Команды"
+                    items={teamsToChoose.map((team) => ({
+                      id: team.index,
+                      name: team.name,
+                    }))}
+                    selectedItems={field.value || []}
+                    setSelectedItems={field.onChange}
+                  />
+                )}
               />
             </div>
           )}
 
-          {teachersToChoose.length > 0 && (
+          {teachersToChoose && teachersToChoose.length > 0 && (
             <div className="mt-3">
-              <MultipleSelectInput
-                description="Эксперты"
-                items={teachersToChoose}
-                selectedItems={selectedTeachers}
-                setSelectedItems={setSelectedTeachers}
+              <Controller
+                name="teachersOnIntensive"
+                control={control}
+                render={({ field }) => (
+                  <MultipleSelectInput
+                    description="Преподаватели"
+                    items={teachersToChoose}
+                    selectedItems={field.value || []}
+                    setSelectedItems={field.onChange}
+                  />
+                )}
               />
             </div>
           )}
 
-          <div className="my-3 text-xl font-bold">Оценивание</div>
+          <div className="mt-3">
+            <div className="text-xl font-bold">Оценивание</div>
 
-          <ScoreTypeBox />
+            <div className="flex flex-col gap-3 mt-3">
+              <InputRadio
+                register={register}
+                fieldName="scoreType"
+                value="withoutMarkStrategy"
+                currentValue={formValues.scoreType}
+                description="Без оценивания"
+              />
+              <InputRadio
+                register={register}
+                fieldName="scoreType"
+                value="withMarkStrategy"
+                currentValue={formValues.scoreType}
+                description="Оценивание по шкале"
+              >
+                {renderMarkStrategies(
+                  markStrategies,
+                  register,
+                  formValues.markStrategy
+                )}
+              </InputRadio>
+              <InputRadio
+                register={register}
+                value="withCriterias"
+                fieldName="scoreType"
+                currentValue={formValues.scoreType}
+                description="Оценивание по шкале с критериями"
+              >
+                {renderMarkStrategies(
+                  markStrategies,
+                  register,
+                  formValues.markStrategy
+                )}
+
+                {criterias && (
+                  <div className="mt-3">
+                    <Controller
+                      name="criterias"
+                      control={control}
+                      render={({ field }) => (
+                        <MultipleSelectInput
+                          description="Список критериев"
+                          items={criterias}
+                          selectedItems={field.value || []}
+                          setSelectedItems={field.onChange}
+                          errorMessage={
+                            typeof errors.criterias?.message === 'string'
+                              ? errors.criterias.message
+                              : ''
+                          }
+                        />
+                      )}
+                    />
+                  </div>
+                )}
+              </InputRadio>
+            </div>
+          </div>
 
           <div className="my-3">
             <FileUpload />

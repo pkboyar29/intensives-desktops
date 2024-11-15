@@ -61,7 +61,6 @@ export const teacherApi = createApi({
       query: (intensiveId) =>
         `teachers_on_intensives/?intensive=${intensiveId}`,
       transformResponse: (response: any): ITeacherOnIntensive[] => {
-        console.log(response);
         return response.results.map((teacher: any) =>
           mapTeacherOnIntensive(teacher)
         );
@@ -77,6 +76,7 @@ export const teacherApi = createApi({
 });
 
 export const {
+  useGetTeachersOnIntensiveQuery,
   useLazyGetTeachersOnIntensiveQuery,
   useGetTeachersInUniversityQuery,
 } = teacherApi;
