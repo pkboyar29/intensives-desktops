@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useForm, Controller, UseFormRegister } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getISODateInUTC3, getTimeFromDate } from '../../helpers/dateHelpers';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { FetchBaseQueryError, skipToken } from '@reduxjs/toolkit/query';
 
 import { useGetTeamsQuery } from '../../redux/api/teamApi';
 import { useGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
@@ -87,7 +87,7 @@ const ManageEventForm: FC = () => {
   const [updateEvent] = useUpdateEventMutation();
 
   const { data: event } = useGetEventQuery(
-    Number(searchParams.get('eventId')),
+    Number(searchParams.get('eventId')) || skipToken,
     { refetchOnMountOrArgChange: true }
   );
 
@@ -322,7 +322,12 @@ const ManageEventForm: FC = () => {
           title={`Мероприятие было успешно ${
             hasEvent ? 'изменено' : 'создано'
           }`}
-          onCloseModal={() => setSuccessfulSaveModal(false)}
+          onCloseModal={() => {
+            setSuccessfulSaveModal(false);
+            navigate(
+              `/manager/${intensiveId}/schedule/${searchParams.get('eventId')}`
+            );
+          }}
         >
           <p className="text-lg text-bright_gray">
             {`Мероприятие было успешно ${hasEvent ? 'изменено' : 'создано'}`}

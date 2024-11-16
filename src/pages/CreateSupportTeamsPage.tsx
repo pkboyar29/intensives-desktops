@@ -209,7 +209,7 @@ const CreateSupportTeamsPage: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
                 children="Да"
@@ -222,7 +222,12 @@ const CreateSupportTeamsPage: FC = () => {
       {saveModal && (
         <Modal
           title="Команды сопровождения успешно обновлены"
-          onCloseModal={() => setSaveModal(false)}
+          onCloseModal={() => {
+            setSaveModal(false);
+            if (intensiveId) {
+              navigate(`/manager/${intensiveId}/teams`);
+            }
+          }}
         >
           <p className="text-lg text-bright_gray">
             Команды сопровождения успешно обновлены для каждой команды.
@@ -233,7 +238,7 @@ const CreateSupportTeamsPage: FC = () => {
                 clickHandler={() => {
                   setSaveModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
                 children="Ок"

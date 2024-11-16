@@ -71,7 +71,7 @@ const EventPage: FC = () => {
                     <div className="text-lg font-bold text-black_2">
                       Участвующие команды
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       {event.teams.map((team) => (
                         <Chip key={team.id} label={team.name} />
                       ))}
@@ -84,7 +84,7 @@ const EventPage: FC = () => {
                     <div className="text-lg font-bold text-black_2">
                       Преподаватели, проводящие мероприятие
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       {event.experts.map((expert) => (
                         <Chip key={expert.id} label={expert.name} />
                       ))}
@@ -113,7 +113,7 @@ const EventPage: FC = () => {
                   event.criterias.length > 0 && (
                     <div className="flex flex-col gap-3 text-lg">
                       <div className="font-bold text-black_2">Критерии</div>
-                      <div className="flex gap-3">
+                      <div className="flex flex-wrap gap-3">
                         {event.criterias.map((criteria) => (
                           <Chip key={criteria.id} label={criteria.name} />
                         ))}

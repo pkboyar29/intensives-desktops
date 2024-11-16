@@ -325,7 +325,7 @@ const CreateTeamsPage: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
                 children="Да"
@@ -338,7 +338,12 @@ const CreateTeamsPage: FC = () => {
       {saveModal && (
         <Modal
           title="Команды успешно изменены"
-          onCloseModal={() => setSaveModal(false)}
+          onCloseModal={() => {
+            setSaveModal(false);
+            if (intensiveId) {
+              navigate(`/manager/${intensiveId}/teams`);
+            }
+          }}
         >
           <p className="text-lg text-bright_gray">
             Состав команд успешно изменен
@@ -349,7 +354,7 @@ const CreateTeamsPage: FC = () => {
                 clickHandler={() => {
                   setSaveModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
                 children="Ок"
