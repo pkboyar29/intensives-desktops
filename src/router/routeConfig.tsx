@@ -27,6 +27,7 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import ManageRolesPage from '../pages/ManageRolesPage';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
+import KanbanBoardPage from '../pages/KanbanBoardPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -92,6 +93,10 @@ const routeConfig: RouteType[] = [
         path: 'task/:taskId',
         element: <StudentTaskAnswerPage />,
       },
+      {
+        path: 'kanban', //команда в url или нет?
+        element: <KanbanBoardPage />
+      }
     ],
     requiredAuth: false,
   },

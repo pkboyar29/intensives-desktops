@@ -15,6 +15,7 @@ import { studentRoleApi } from './api/studentRoleApi';
 import { stageApi } from './api/stageApi';
 import { audienceApi } from './api/audienceApi';
 import { flowApi } from './api/flowApi';
+import { columnApi } from './api/columnApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -33,6 +34,7 @@ export const store = configureStore({
     [stageApi.reducerPath]: stageApi.reducer,
     [audienceApi.reducerPath]: audienceApi.reducer,
     [flowApi.reducerPath]: flowApi.reducer,
+    [columnApi.reducerPath]: columnApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -47,7 +49,8 @@ export const store = configureStore({
       studentRoleApi.middleware,
       stageApi.middleware,
       audienceApi.middleware,
-      flowApi.middleware
+      flowApi.middleware,
+      columnApi.middleware
     ),
 });
 
