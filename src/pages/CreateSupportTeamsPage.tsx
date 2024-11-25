@@ -241,7 +241,7 @@ const CreateSupportTeamsPage: FC = () => {
                     navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                children="Ок"
+                children="Закрыть"
               />
             </div>
           </div>

@@ -1,9 +1,9 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useDeleteStageMutation } from '../redux/api/stageApi';
-
-import { useGetScheduleQuery } from '../redux/api/scheduleApi';
+import { useUpdateEventMutation } from '../redux/api/eventApi';
+import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
 
 import PrimaryButton from '../components/PrimaryButton';
 import Modal from '../components/modals/Modal';
@@ -16,20 +16,30 @@ import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
+import { IManagerEvent } from '../ts/interfaces/IEvent';
 
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
 
-  const [deleteStage] = useDeleteStageMutation();
+  const [deleteStageAPI] = useDeleteStageMutation();
+  const [updateEventAPI] = useUpdateEventMutation();
 
   const {
-    data: schedule,
+    data,
     isLoading: isScheduleLoading,
     refetch,
   } = useGetScheduleQuery(Number(intensiveId), {
     refetchOnMountOrArgChange: true,
   });
+
+  const [schedule, setSchedule] = useState<ISchedule>();
+
+  useEffect(() => {
+    if (data) {
+      setSchedule(data);
+    }
+  }, [data]);
 
   const [stageModal, setStageModal] = useState<{
     status: boolean;
@@ -51,6 +61,107 @@ const SchedulePage: FC = () => {
     navigate(`${eventId}`);
   };
 
+  const onEventEyeIconClick = async (eventId: number) => {
+    const eventWithoutStage = schedule?.eventsWithoutStage.find(
+      (event) => event.id === eventId
+    );
+    if (eventWithoutStage) {
+      toggleEventVisibility(eventWithoutStage);
+    } else {
+      schedule?.stages.forEach((stage) => {
+        const eventWithStage = stage.events.find(
+          (event) => event.id === eventId
+        );
+        if (eventWithStage) {
+          toggleEventVisibility(eventWithStage);
+        }
+      });
+    }
+  };
+
+  const toggleEventVisibility = async (event: IManagerEvent) => {
+    const { data: responseData } = await updateEventAPI({
+      visibility: !event.visibility,
+      eventId: event.id,
+      intensiveId: Number(intensiveId),
+      name: event.name,
+      description: event.description,
+      startDate: event.startDate.toISOString(),
+      finishDate: event.finishDate.toISOString(),
+      teamIds: event.teams.map((team) => team.index),
+      teacherOnIntensiveIds: event.experts.map(
+        (expert) => expert.teacherOnIntensiveId
+      ),
+      audienceId: event.audience.id,
+      stageId: event.stageId ? event.stageId : null,
+      markStrategyId: event.markStrategy ? event.markStrategy.id : null,
+      criteriaIds: event.criterias.map((criteria) => criteria.criteriaId),
+    });
+
+    if (responseData && schedule) {
+      setSchedule({
+        stages: schedule.stages.map((stage) => {
+          if (
+            stage.events.find((eventInStage) => eventInStage.id === event.id)
+          ) {
+            return {
+              ...stage,
+              events: stage.events.map((eventInStage) => {
+                if (eventInStage.id === event.id) {
+                  return {
+                    ...eventInStage,
+                    visibility: !eventInStage.visibility,
+                  };
+                } else {
+                  return eventInStage;
+                }
+              }),
+            };
+          } else {
+            return stage;
+          }
+        }),
+        eventsWithoutStage: schedule.eventsWithoutStage.map(
+          (eventWithoutStage) => {
+            if (eventWithoutStage.id === event.id) {
+              return {
+                ...eventWithoutStage,
+                visibility: !eventWithoutStage.visibility,
+              };
+            } else {
+              return eventWithoutStage;
+            }
+          }
+        ),
+      });
+    }
+  };
+
+  const deleteStage = async (stageId: number) => {
+    try {
+      await deleteStageAPI(stageId);
+
+      refetch();
+      // if (schedule) {
+      //   setSchedule({
+      //     eventsWithoutStage: schedule.eventsWithoutStage,
+      //     stages: schedule.stages.map((stage) => {
+      //       if (stage.id !== stageId) {
+      //         return stage;
+      //       }
+      //     }),
+      //   });
+      // }
+
+      setDeleteStageModal({
+        status: false,
+        stageId: null,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <>
       {stageModal.status && (
@@ -68,7 +179,7 @@ const SchedulePage: FC = () => {
               status: false,
             })
           }
-          onChangeStage={() => {
+          onChangeStage={(newStage) => {
             refetch();
 
             setStageModal({
@@ -108,20 +219,9 @@ const SchedulePage: FC = () => {
             </div>
             <div>
               <PrimaryButton
-                clickHandler={async () => {
-                  try {
-                    if (deleteStageModal.stageId) {
-                      await deleteStage(deleteStageModal.stageId);
-                    }
-
-                    refetch();
-
-                    setDeleteStageModal({
-                      status: false,
-                      stageId: null,
-                    });
-                  } catch (e) {
-                    console.log(e);
+                clickHandler={() => {
+                  if (deleteStageModal.stageId) {
+                    deleteStage(deleteStageModal.stageId);
                   }
                 }}
                 children="Удалить"
@@ -190,6 +290,7 @@ const SchedulePage: FC = () => {
                         })
                       }
                       onEventClick={onEventClick}
+                      onEventEyeIconClick={onEventEyeIconClick}
                     />
                   ))}
                 </>
@@ -208,6 +309,7 @@ const SchedulePage: FC = () => {
                       key={eventWithoutStage.id}
                       event={eventWithoutStage}
                       onEventClick={onEventClick}
+                      onEyeIconClick={onEventEyeIconClick}
                     />
                   ))}
                 </div>

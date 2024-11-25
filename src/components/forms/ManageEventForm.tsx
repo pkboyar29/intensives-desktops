@@ -1,7 +1,11 @@
 import { FC, useEffect, useState } from 'react';
 import { useForm, Controller, UseFormRegister } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getISODateInUTC3, getTimeFromDate } from '../../helpers/dateHelpers';
+import {
+  getISODateInUTC3,
+  getTimeFromDate,
+  transformSeparateDateAndTimeToISO,
+} from '../../helpers/dateHelpers';
 import { FetchBaseQueryError, skipToken } from '@reduxjs/toolkit/query';
 
 import { useGetTeamsQuery } from '../../redux/api/teamApi';
@@ -68,7 +72,6 @@ const ManageEventForm: FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { intensiveId } = useParams();
-  const hasEvent = searchParams.get('eventId');
 
   const {
     register,
@@ -106,14 +109,20 @@ const ManageEventForm: FC = () => {
       refetchOnMountOrArgChange: true,
     }
   );
-  // TODO: начать получать аудитории конкретного университета
+  // TODO: начать получать аудитории университета интенсива
   const { data: audiencesToChoose } = useGetAudiencesQuery();
   const { data: markStrategies } = useGetMarkStrategiesQuery();
   const { data: criterias } = useGetCriteriasQuery();
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
-  const [successfulSaveModal, setSuccessfulSaveModal] =
-    useState<boolean>(false);
+  const [successfulSaveModal, setSuccessfulSaveModal] = useState<{
+    status: boolean;
+    eventId: number | null;
+  }>({
+    status: false,
+    eventId: null,
+  });
+  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (markStrategies) {
@@ -176,19 +185,18 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: errorData.start_dt[0],
       });
-    }
-    if (errorData.finish_dt) {
+    } else if (errorData.finish_dt) {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
       });
+    } else {
+      setErrorModal(true);
     }
   };
 
   const onSubmit = async (data: ManageEventFormFields) => {
-    console.log(data);
     const scoreType = data.scoreType;
-
     if (
       scoreType === 'withCriterias' &&
       (!data.criterias || data.criterias.length === 0)
@@ -200,76 +208,98 @@ const ManageEventForm: FC = () => {
       return;
     }
 
-    let score = {};
+    let scoreRequestBody: {
+      markStrategyId: number | null;
+      criteriaIds: number[];
+    };
     switch (scoreType) {
       case 'withoutMarkStrategy':
-        score = {};
+        scoreRequestBody = {
+          markStrategyId: null,
+          criteriaIds: [],
+        };
         break;
       case 'withMarkStrategy':
-        score = {
-          markStrategy: Number(data.markStrategy),
+        scoreRequestBody = {
+          markStrategyId: Number(data.markStrategy),
+          criteriaIds: [],
         };
         break;
       case 'withCriterias':
-        score = {
-          markStrategy: Number(data.markStrategy),
+        scoreRequestBody = {
+          markStrategyId: Number(data.markStrategy),
           criteriaIds: data.criterias.map((criteria) => criteria.id),
         };
         break;
     }
 
-    const eventId: string | null = searchParams.get('eventId');
-
     if (intensiveId) {
-      if (hasEvent) {
-        if (eventId) {
-          const { data: responseData, error: responseError } =
-            await updateEvent({
-              intensiveId: parseInt(intensiveId),
-              eventId: parseInt(eventId),
-              name: data.name,
-              description: data.description,
-              startDate: data.startDate,
-              startTime: data.startTime,
-              finishDate: data.finishDate,
-              finishTime: data.finishTime,
-              stage: data.stage == 0 ? null : data.stage,
-              audience: data.audience,
-              teacherOnIntensiveIds: data.teachersOnIntensive.map(
-                (teacher) => teacher.id
-              ),
-              teamIds: data.teams.map((team) => team.id),
-              ...score,
-            });
+      if (event) {
+        const { data: responseData, error: responseError } = await updateEvent({
+          intensiveId: parseInt(intensiveId),
+          eventId: event.id,
+          name: data.name,
+          description: data.description,
+          startDate: transformSeparateDateAndTimeToISO(
+            data.startDate,
+            data.startTime
+          ),
+          finishDate: transformSeparateDateAndTimeToISO(
+            data.finishDate,
+            data.finishTime
+          ),
+          stageId: data.stage == 0 ? null : data.stage,
+          audienceId: data.audience,
+          visibility: event.visibility,
+          teacherOnIntensiveIds: data.teachersOnIntensive
+            ? data.teachersOnIntensive.map((teacher) => teacher.id)
+            : [],
+          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          ...scoreRequestBody,
+        });
 
-          if (responseData) {
-            setSuccessfulSaveModal(true);
-          }
+        if (responseData) {
+          setSuccessfulSaveModal({
+            status: true,
+            eventId: event.id,
+          });
+        }
 
-          if (responseError) {
-            handleResponseError(responseError as FetchBaseQueryError);
-          }
+        if (responseError) {
+          handleResponseError(responseError as FetchBaseQueryError);
         }
       } else {
         const { data: responseData, error: responseError } = await createEvent({
           intensiveId: parseInt(intensiveId),
           name: data.name,
           description: data.description,
-          startDate: data.startDate,
-          startTime: data.startTime,
-          finishDate: data.finishDate,
-          finishTime: data.finishTime,
-          stage: data.stage == 0 ? null : data.stage,
-          audience: data.audience,
-          teacherOnIntensiveIds: data.teachersOnIntensive.map(
-            (teacher) => teacher.id
+          startDate: transformSeparateDateAndTimeToISO(
+            data.startDate,
+            data.startTime
           ),
-          teamIds: data.teams.map((team) => team.id),
-          ...score,
+          finishDate: transformSeparateDateAndTimeToISO(
+            data.finishDate,
+            data.finishTime
+          ),
+          stageId: data.stage == 0 ? null : data.stage,
+          audienceId: data.audience,
+          visibility: true,
+          teacherOnIntensiveIds: data.teachersOnIntensive
+            ? data.teachersOnIntensive.map((teacher) => teacher.id)
+            : [],
+          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          ...scoreRequestBody,
         });
 
         if (responseData) {
-          setSuccessfulSaveModal(true);
+          setSuccessfulSaveModal({
+            status: true,
+            eventId: (
+              responseData as {
+                id: number;
+              }
+            ).id,
+          });
         }
 
         if (responseError) {
@@ -317,33 +347,61 @@ const ManageEventForm: FC = () => {
         </Modal>
       )}
 
-      {successfulSaveModal && (
+      {successfulSaveModal.status && (
         <Modal
-          title={`Мероприятие было успешно ${
-            hasEvent ? 'изменено' : 'создано'
-          }`}
+          title={`Мероприятие было успешно ${event ? 'изменено' : 'создано'}`}
           onCloseModal={() => {
-            setSuccessfulSaveModal(false);
             navigate(
-              `/manager/${intensiveId}/schedule/${searchParams.get('eventId')}`
+              `/manager/${intensiveId}/schedule/${successfulSaveModal.eventId}`
             );
+            setSuccessfulSaveModal({
+              status: false,
+              eventId: null,
+            });
           }}
         >
           <p className="text-lg text-bright_gray">
-            {`Мероприятие было успешно ${hasEvent ? 'изменено' : 'создано'}`}
+            {`Мероприятие было успешно ${event ? 'изменено' : 'создано'}`}
           </p>
           <div className="flex justify-end gap-3 mt-6">
             <div>
               <PrimaryButton
                 clickHandler={() => {
-                  setSuccessfulSaveModal(false);
+                  navigate(
+                    `/manager/${intensiveId}/schedule/${successfulSaveModal.eventId}`
+                  );
+                  setSuccessfulSaveModal({
+                    status: false,
+                    eventId: null,
+                  });
+                }}
+                children="Закрыть"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {errorModal && (
+        <Modal
+          title={`Произошла серверная ошибка`}
+          onCloseModal={() => {
+            setErrorModal(false);
+          }}
+        >
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="red"
+                clickHandler={() => {
+                  setErrorModal(false);
                   navigate(
                     `/manager/${intensiveId}/schedule/${searchParams.get(
                       'eventId'
                     )}`
                   );
                 }}
-                children="Ок"
+                children="Закрыть"
               />
             </div>
           </div>
@@ -356,167 +414,166 @@ const ManageEventForm: FC = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <Title
-            text={
-              hasEvent ? 'Редактировать мероприятие' : 'Создать Мероприятие'
-            }
+            text={event ? 'Редактировать мероприятие' : 'Создать Мероприятие'}
           />
 
-          <div className="my-3 text-xl font-bold">Мероприятие</div>
+          <div className="flex flex-col gap-3 my-3">
+            <div className="text-xl font-bold">Мероприятие</div>
 
-          <InputDescription
-            fieldName="name"
-            register={register}
-            registerOptions={{
-              required: 'Поле обязательно для заполнения',
-              minLength: {
-                value: 4,
-                message: 'Минимальное количество символов - 4',
-              },
-              maxLength: {
-                value: 50,
-                message: 'Максимальное количество символов - 50',
-              },
-            }}
-            description="Название мероприятия"
-            placeholder="Название мероприятия"
-            errorMessage={
-              typeof errors.name?.message === 'string'
-                ? errors.name.message
-                : ''
-            }
-          />
-          <InputDescription
-            isTextArea={true}
-            fieldName="description"
-            register={register}
-            registerOptions={{
-              maxLength: {
-                value: 500,
-                message: 'Максимальное количество символов - 500',
-              },
-            }}
-            description="Описание мероприятия"
-            placeholder="Описание мероприятия"
-            errorMessage={
-              typeof errors.description?.message === 'string'
-                ? errors.description.message
-                : ''
-            }
-          />
-
-          <div className="my-3 text-xl font-bold">Время проведения</div>
-
-          <div className="flex justify-between gap-2.5">
             <InputDescription
-              fieldName="startDate"
+              fieldName="name"
               register={register}
               registerOptions={{
                 required: 'Поле обязательно для заполнения',
+                minLength: {
+                  value: 4,
+                  message: 'Минимальное количество символов - 4',
+                },
+                maxLength: {
+                  value: 50,
+                  message: 'Максимальное количество символов - 50',
+                },
               }}
-              description="Дата начала"
-              placeholder="Дата начала"
-              type="date"
+              description="Название мероприятия"
+              placeholder="Название мероприятия"
               errorMessage={
-                typeof errors.startDate?.message === 'string'
-                  ? errors.startDate.message
+                typeof errors.name?.message === 'string'
+                  ? errors.name.message
                   : ''
               }
             />
-            <InputDescription
-              fieldName="finishDate"
-              register={register}
-              registerOptions={{
-                required: 'Поле обязательно для заполнения',
-              }}
-              description="Дата окончания"
-              placeholder="Дата окончания"
-              type="date"
-              errorMessage={
-                typeof errors.finishDate?.message === 'string'
-                  ? errors.finishDate.message
-                  : ''
-              }
-            />
-          </div>
 
-          <div className="flex justify-between gap-2.5">
             <InputDescription
-              fieldName="startTime"
+              isTextArea={true}
+              fieldName="description"
               register={register}
               registerOptions={{
-                required: 'Поле обязательно для заполнения',
+                maxLength: {
+                  value: 500,
+                  message: 'Максимальное количество символов - 500',
+                },
               }}
-              description="Время начала"
-              placeholder="Время начала"
-              type="time"
+              description="Описание мероприятия"
+              placeholder="Описание мероприятия"
               errorMessage={
-                typeof errors.startTime?.message === 'string'
-                  ? errors.startTime.message
+                typeof errors.description?.message === 'string'
+                  ? errors.description.message
                   : ''
               }
             />
-            <InputDescription
-              fieldName="finishTime"
-              register={register}
-              registerOptions={{
-                required: 'Поле обязательно для заполнения',
-              }}
-              description="Время окончания"
-              placeholder="Время окончания"
-              type="time"
-              errorMessage={
-                typeof errors.finishTime?.message === 'string'
-                  ? errors.finishTime.message
-                  : ''
-              }
-            />
-          </div>
 
-          {audiencesToChoose && (
-            <>
-              <div className="my-3 text-xl font-bold">Место проведения</div>
-              <Select
-                initialText="Выберите место проведения"
-                options={audiencesToChoose}
+            <div className="text-xl font-bold">Время проведения</div>
+
+            <div className="flex justify-between gap-2.5">
+              <InputDescription
+                fieldName="startDate"
                 register={register}
                 registerOptions={{
-                  validate: {
-                    equalZero: (value: string, formValues) =>
-                      value != '0' || 'Поле обязательно для заполнения',
-                  },
+                  required: 'Поле обязательно для заполнения',
                 }}
-                fieldName="audience"
+                description="Дата начала"
+                placeholder="Дата начала"
+                type="date"
                 errorMessage={
-                  typeof errors.audience?.message === 'string'
-                    ? errors.audience.message
+                  typeof errors.startDate?.message === 'string'
+                    ? errors.startDate.message
                     : ''
                 }
               />
-            </>
-          )}
-
-          {stagesToChoose && (
-            <>
-              <div className="my-3 text-xl font-bold">Этап</div>
-
-              <Select
+              <InputDescription
+                fieldName="finishDate"
                 register={register}
-                fieldName="stage"
-                initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
-                options={stagesToChoose.map((stage) => ({
-                  id: stage.id,
-                  name: `${
-                    stage.name
-                  } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
-                }))}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                description="Дата окончания"
+                placeholder="Дата окончания"
+                type="date"
+                errorMessage={
+                  typeof errors.finishDate?.message === 'string'
+                    ? errors.finishDate.message
+                    : ''
+                }
               />
-            </>
-          )}
+            </div>
 
-          <div className="my-3 text-xl font-bold">Участники</div>
+            <div className="flex justify-between gap-2.5">
+              <InputDescription
+                fieldName="startTime"
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                description="Время начала"
+                placeholder="Время начала"
+                type="time"
+                errorMessage={
+                  typeof errors.startTime?.message === 'string'
+                    ? errors.startTime.message
+                    : ''
+                }
+              />
+              <InputDescription
+                fieldName="finishTime"
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                description="Время окончания"
+                placeholder="Время окончания"
+                type="time"
+                errorMessage={
+                  typeof errors.finishTime?.message === 'string'
+                    ? errors.finishTime.message
+                    : ''
+                }
+              />
+            </div>
 
-          {teamsToChoose && teamsToChoose.length > 0 && (
-            <div className="mt-3">
+            {audiencesToChoose && (
+              <>
+                <div className="text-xl font-bold">Место проведения</div>
+                <Select
+                  initialText="Выберите место проведения"
+                  options={audiencesToChoose}
+                  register={register}
+                  registerOptions={{
+                    validate: {
+                      equalZero: (value: string, formValues) =>
+                        value != '0' || 'Поле обязательно для заполнения',
+                    },
+                  }}
+                  fieldName="audience"
+                  errorMessage={
+                    typeof errors.audience?.message === 'string'
+                      ? errors.audience.message
+                      : ''
+                  }
+                />
+              </>
+            )}
+
+            {stagesToChoose && (
+              <>
+                <div className="text-xl font-bold">Этап</div>
+
+                <Select
+                  register={register}
+                  fieldName="stage"
+                  initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
+                  options={stagesToChoose.map((stage) => ({
+                    id: stage.id,
+                    name: `${
+                      stage.name
+                    } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
+                  }))}
+                />
+              </>
+            )}
+
+            <div className="text-xl font-bold">Участники</div>
+
+            {teamsToChoose && teamsToChoose.length > 0 && (
               <Controller
                 name="teams"
                 control={control}
@@ -532,11 +589,9 @@ const ManageEventForm: FC = () => {
                   />
                 )}
               />
-            </div>
-          )}
+            )}
 
-          {teachersToChoose && teachersToChoose.length > 0 && (
-            <div className="mt-3">
+            {teachersToChoose && teachersToChoose.length > 0 && (
               <Controller
                 name="teachersOnIntensive"
                 control={control}
@@ -549,10 +604,8 @@ const ManageEventForm: FC = () => {
                   />
                 )}
               />
-            </div>
-          )}
+            )}
 
-          <div className="mt-3">
             <div className="text-xl font-bold">Оценивание</div>
 
             <div className="flex flex-col gap-3 mt-3">
@@ -612,9 +665,7 @@ const ManageEventForm: FC = () => {
                 )}
               </InputRadio>
             </div>
-          </div>
 
-          <div className="my-3">
             <FileUpload />
           </div>
 
@@ -631,7 +682,7 @@ const ManageEventForm: FC = () => {
             <PrimaryButton
               type="submit"
               children={
-                hasEvent ? 'Редактировать мероприятие' : 'Добавить мероприятие'
+                event ? 'Редактировать мероприятие' : 'Добавить мероприятие'
               }
             />
           </div>

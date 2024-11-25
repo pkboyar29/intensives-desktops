@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-interface EditIconProps {
+interface EditIconProps extends React.SVGProps<SVGSVGElement> {
   width?: number;
   height?: number;
 }

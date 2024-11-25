@@ -58,7 +58,7 @@ const ManagerMainPage: FC = () => {
                 Управление командами
               </NavLink>
               <NavLink to="schedule" className={linkClassNames}>
-                Расписание интенсива
+                Управление расписанием
               </NavLink>
               <NavLink to="manageRoles" className={linkClassNames}>
                 Управление ролями для студентов

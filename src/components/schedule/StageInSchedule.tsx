@@ -11,6 +11,7 @@ interface StageInScheduleProps {
   onEditClick: (stage: IStage) => void;
   onDeleteClick: (stageId: number) => void;
   onEventClick: (eventId: number) => void;
+  onEventEyeIconClick: (eventId: number) => void;
 }
 
 const StageInSchedule: FC<StageInScheduleProps> = ({
@@ -18,6 +19,7 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
   onEditClick,
   onDeleteClick,
   onEventClick,
+  onEventEyeIconClick,
 }) => {
   return (
     <section>
@@ -62,6 +64,7 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
                 key={event.id}
                 event={event}
                 onEventClick={(eventId) => onEventClick(eventId)}
+                onEyeIconClick={(eventId) => onEventEyeIconClick(eventId)}
               />
             ))}
           </div>

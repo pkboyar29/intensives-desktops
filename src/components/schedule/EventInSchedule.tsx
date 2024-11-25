@@ -8,13 +8,21 @@ import { getTimeFromDate } from '../../helpers/dateHelpers';
 interface EventInScheduleProps {
   event: IManagerEvent;
   onEventClick: (eventId: number) => void;
+  onEyeIconClick: (eventId: number) => void;
 }
 
-const EventInSchedule: FC<EventInScheduleProps> = ({ event, onEventClick }) => {
+const EventInSchedule: FC<EventInScheduleProps> = ({
+  event,
+  onEventClick,
+  onEyeIconClick,
+}) => {
   return (
     <section className="flex items-center gap-7">
       <button>
-        <EyeIcon />
+        <EyeIcon
+          eyeVisibility={event.visibility}
+          onClick={() => onEyeIconClick(event.id)}
+        />
       </button>
       <div className="flex flex-col">
         <p

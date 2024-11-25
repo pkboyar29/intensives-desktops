@@ -32,27 +32,28 @@ export interface IManagerEvent {
   startDate: Date;
   finishDate: Date;
   audience: IAudience;
+  // TODO: начать хранить целый этап
   stageId: number;
   teams: ITeamForManager[];
   experts: ITeacherEvent[];
   markStrategy: IMarkStrategy | null;
   criterias: IEventCriteria[];
+  visibility: boolean;
 }
 
 export interface IEventCreate {
   name: string;
   description: string;
   startDate: string;
-  startTime: string;
   finishDate: string;
-  finishTime: string;
-  stage: number | null;
-  audience: number;
+  stageId: number | null;
+  audienceId: number;
+  visibility: boolean;
   intensiveId: number;
   teamIds: number[];
   teacherOnIntensiveIds: number[];
-  markStrategy?: number;
-  criteriaIds?: number[];
+  markStrategyId: number | null;
+  criteriaIds: number[];
 }
 
 export interface IEventUpdate extends IEventCreate {

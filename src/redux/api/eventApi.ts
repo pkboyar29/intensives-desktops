@@ -1,5 +1,4 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { transformSeparateDateAndTimeToISO } from '../../helpers/dateHelpers';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
@@ -21,6 +20,7 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     startDate: new Date(unmappedEvent.start_dt),
     finishDate: new Date(unmappedEvent.finish_dt),
     audience: mapAudience(unmappedEvent.audience),
+    visibility: unmappedEvent.visibility,
     stageId: unmappedEvent.stage === null ? 0 : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
       mapTeamForManager(unmappedTeam)
@@ -60,18 +60,14 @@ export const eventApi = createApi({
         body: {
           ...data,
           intensive: data.intensiveId,
+          stage: data.stageId,
+          audience: data.audienceId,
           teams: data.teamIds,
           teacher_on_intensive_ids: data.teacherOnIntensiveIds,
-          start_dt: transformSeparateDateAndTimeToISO(
-            data.startDate,
-            data.startTime
-          ),
-          finish_dt: transformSeparateDateAndTimeToISO(
-            data.finishDate,
-            data.finishTime
-          ),
-          mark_strategy: data.markStrategy ? data.markStrategy : null,
-          criteria_ids: data.criteriaIds ? data.criteriaIds : [],
+          start_dt: data.startDate,
+          finish_dt: data.finishDate,
+          mark_strategy: data.markStrategyId,
+          criteria_ids: data.criteriaIds,
           files: [],
         },
       }),
@@ -83,18 +79,14 @@ export const eventApi = createApi({
         body: {
           ...data,
           intensive: data.intensiveId,
+          stage: data.stageId,
+          audience: data.audienceId,
           teams: data.teamIds,
           teacher_on_intensive_ids: data.teacherOnIntensiveIds,
-          start_dt: transformSeparateDateAndTimeToISO(
-            data.startDate,
-            data.startTime
-          ),
-          finish_dt: transformSeparateDateAndTimeToISO(
-            data.finishDate,
-            data.finishTime
-          ),
-          mark_strategy: data.markStrategy ? data.markStrategy : null,
-          criteria_ids: data.criteriaIds ? data.criteriaIds : [],
+          start_dt: data.startDate,
+          finish_dt: data.finishDate,
+          mark_strategy: data.markStrategyId,
+          criteria_ids: data.criteriaIds,
           files: [],
         },
       }),

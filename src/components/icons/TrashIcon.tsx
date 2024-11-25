@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-interface TrashIconProps {
+interface TrashIconProps extends React.SVGProps<SVGSVGElement> {
   width?: number;
   height?: number;
 }
