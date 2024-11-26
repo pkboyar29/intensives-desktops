@@ -61,22 +61,8 @@ const SchedulePage: FC = () => {
     navigate(`${eventId}`);
   };
 
-  const onEventEyeIconClick = async (eventId: number) => {
-    const eventWithoutStage = schedule?.eventsWithoutStage.find(
-      (event) => event.id === eventId
-    );
-    if (eventWithoutStage) {
-      toggleEventVisibility(eventWithoutStage);
-    } else {
-      schedule?.stages.forEach((stage) => {
-        const eventWithStage = stage.events.find(
-          (event) => event.id === eventId
-        );
-        if (eventWithStage) {
-          toggleEventVisibility(eventWithStage);
-        }
-      });
-    }
+  const onEventEyeIconClick = async (event: IManagerEvent) => {
+    toggleEventVisibility(event);
   };
 
   const toggleEventVisibility = async (event: IManagerEvent) => {
@@ -100,39 +86,17 @@ const SchedulePage: FC = () => {
 
     if (responseData && schedule) {
       setSchedule({
-        stages: schedule.stages.map((stage) => {
-          if (
-            stage.events.find((eventInStage) => eventInStage.id === event.id)
-          ) {
+        stages: schedule.stages,
+        events: schedule.events.map((scheduleEvent) => {
+          if (scheduleEvent.id === event.id) {
             return {
-              ...stage,
-              events: stage.events.map((eventInStage) => {
-                if (eventInStage.id === event.id) {
-                  return {
-                    ...eventInStage,
-                    visibility: !eventInStage.visibility,
-                  };
-                } else {
-                  return eventInStage;
-                }
-              }),
+              ...scheduleEvent,
+              visibility: !scheduleEvent.visibility,
             };
           } else {
-            return stage;
+            return scheduleEvent;
           }
         }),
-        eventsWithoutStage: schedule.eventsWithoutStage.map(
-          (eventWithoutStage) => {
-            if (eventWithoutStage.id === event.id) {
-              return {
-                ...eventWithoutStage,
-                visibility: !eventWithoutStage.visibility,
-              };
-            } else {
-              return eventWithoutStage;
-            }
-          }
-        ),
       });
     }
   };
@@ -142,6 +106,7 @@ const SchedulePage: FC = () => {
       await deleteStageAPI(stageId);
 
       refetch();
+      // TODO: раскоментить?
       // if (schedule) {
       //   setSchedule({
       //     eventsWithoutStage: schedule.eventsWithoutStage,
@@ -277,6 +242,9 @@ const SchedulePage: FC = () => {
                     <StageInSchedule
                       key={stage.id}
                       stage={stage}
+                      stageEvents={schedule.events.filter(
+                        (event) => event.stageId === stage.id
+                      )}
                       onEditClick={(stage) =>
                         setStageModal({
                           status: true,
@@ -297,24 +265,28 @@ const SchedulePage: FC = () => {
               )}
             </div>
 
-            {schedule && schedule.eventsWithoutStage.length > 0 && (
-              <div className="mt-10">
-                <div className="text-2xl font-bold text-black_2">
-                  Мероприятия без этапа
-                </div>
+            {schedule &&
+              schedule.events.filter((event) => event.stageId === null).length >
+                0 && (
+                <div className="mt-10">
+                  <div className="text-2xl font-bold text-black_2">
+                    Мероприятия без этапа
+                  </div>
 
-                <div className="ml-2.5 mt-2.5 flex flex-col gap-5">
-                  {schedule?.eventsWithoutStage.map((eventWithoutStage) => (
-                    <EventInSchedule
-                      key={eventWithoutStage.id}
-                      event={eventWithoutStage}
-                      onEventClick={onEventClick}
-                      onEyeIconClick={onEventEyeIconClick}
-                    />
-                  ))}
+                  <div className="ml-2.5 mt-2.5 flex flex-col gap-5">
+                    {schedule?.events
+                      .filter((event) => event.stageId === null)
+                      .map((eventWithoutStage) => (
+                        <EventInSchedule
+                          key={eventWithoutStage.id}
+                          event={eventWithoutStage}
+                          onEventClick={onEventClick}
+                          onEyeIconClick={onEventEyeIconClick}
+                        />
+                      ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </>
         )}
       </div>

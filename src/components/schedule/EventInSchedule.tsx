@@ -8,7 +8,7 @@ import { getTimeFromDate } from '../../helpers/dateHelpers';
 interface EventInScheduleProps {
   event: IManagerEvent;
   onEventClick: (eventId: number) => void;
-  onEyeIconClick: (eventId: number) => void;
+  onEyeIconClick: (event: IManagerEvent) => void;
 }
 
 const EventInSchedule: FC<EventInScheduleProps> = ({
@@ -21,7 +21,7 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
       <button>
         <EyeIcon
           eyeVisibility={event.visibility}
-          onClick={() => onEyeIconClick(event.id)}
+          onClick={() => onEyeIconClick(event)}
         />
       </button>
       <div className="flex flex-col">

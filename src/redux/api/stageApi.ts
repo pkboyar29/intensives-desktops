@@ -1,8 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { mapManagerEvent } from './eventApi';
-
 import { IStage, IStageCreate, IStageUpdate } from '../../ts/interfaces/IStage';
 
 export const mapStage = (unmappedStage: any): IStage => {
@@ -12,9 +10,6 @@ export const mapStage = (unmappedStage: any): IStage => {
     description: unmappedStage.description,
     startDate: new Date(unmappedStage.start_dt),
     finishDate: new Date(unmappedStage.finish_dt),
-    events: unmappedStage.events
-      ? unmappedStage.events.map((event: any) => mapManagerEvent(event))
-      : [],
   };
 };
 

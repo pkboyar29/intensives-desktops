@@ -32,8 +32,7 @@ export interface IManagerEvent {
   startDate: Date;
   finishDate: Date;
   audience: IAudience;
-  // TODO: начать хранить целый этап
-  stageId: number;
+  stageId: number | null;
   teams: ITeamForManager[];
   experts: ITeacherEvent[];
   markStrategy: IMarkStrategy | null;

@@ -9,6 +9,7 @@ import { useDeleteEventMutation } from '../redux/api/eventApi';
 import Modal from '../components/modals/Modal';
 import PrimaryButton from '../components/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
+import BackArrowIcon from '../components/icons/BackArrowIcon';
 import Title from '../components/Title';
 import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/Chip';
@@ -22,7 +23,11 @@ const EventPage: FC = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const { data: event, isLoading } = useGetEventQuery(Number(params.eventId), {
+  const {
+    data: event,
+    isLoading,
+    isError,
+  } = useGetEventQuery(Number(params.eventId), {
     refetchOnMountOrArgChange: true,
   });
 
@@ -83,6 +88,26 @@ const EventPage: FC = () => {
         <div className="max-w-[765px] w-full">
           {isLoading ? (
             <Skeleton />
+          ) : isError ? (
+            <div className="flex flex-col items-center gap-5 mt-20">
+              <div className="text-2xl font-bold">
+                Мероприятия с данным id не существует
+              </div>
+              <div className="w-fit">
+                <PrimaryButton
+                  buttonColor="gray"
+                  children={
+                    <div className="flex items-center gap-2">
+                      <BackArrowIcon />
+                      <p>Вернуться к расписанию</p>
+                    </div>
+                  }
+                  onClick={() => {
+                    navigate(`/manager/${params.intensiveId}/schedule`);
+                  }}
+                />
+              </div>
+            </div>
           ) : (
             event && (
               <>
@@ -161,9 +186,24 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* TODO: эту роль очевидно потом поменять на роль организатора */}
+                {/* TODO: эту роль очевидно потом поменять на роль организатора (ну только кнопку назад отображать для всех) */}
                 {currentUser?.roleName === 'Супер-администратор' && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                    <div>
+                      <PrimaryButton
+                        buttonColor="gray"
+                        children={
+                          <div className="flex items-center gap-2">
+                            <BackArrowIcon />
+                            <p>Назад</p>
+                          </div>
+                        }
+                        onClick={() => {
+                          navigate(`/manager/${params.intensiveId}/schedule`);
+                        }}
+                      />
+                    </div>
+
                     <PrimaryButton
                       children="Редактировать"
                       clickHandler={() => {

@@ -148,7 +148,7 @@ const ManageEventForm: FC = () => {
           startTime: getTimeFromDate(event.startDate),
           finishTime: getTimeFromDate(event.finishDate),
           audience: event.audience.id,
-          stage: event.stageId,
+          stage: event.stageId ? event.stageId : 0,
           scoreType: scoreType,
           markStrategy: event.markStrategy
             ? event.markStrategy.id.toString()

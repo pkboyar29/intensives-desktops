@@ -21,7 +21,7 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     finishDate: new Date(unmappedEvent.finish_dt),
     audience: mapAudience(unmappedEvent.audience),
     visibility: unmappedEvent.visibility,
-    stageId: unmappedEvent.stage === null ? 0 : unmappedEvent.stage.id,
+    stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
       mapTeamForManager(unmappedTeam)
     ),

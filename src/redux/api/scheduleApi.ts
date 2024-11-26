@@ -9,17 +9,13 @@ import { IManagerEvent } from '../../ts/interfaces/IEvent';
 
 export interface ISchedule {
   stages: IStage[];
-  eventsWithoutStage: IManagerEvent[];
+  events: IManagerEvent[];
 }
 
 const mapSchedule = (unmappedSchedule: any): ISchedule => {
   return {
-    stages: unmappedSchedule.stages.map((stageInSchedule: any) =>
-      mapStage(stageInSchedule)
-    ),
-    eventsWithoutStage: unmappedSchedule.events_without_stage.map(
-      (eventWithoutStage: any) => mapManagerEvent(eventWithoutStage)
-    ),
+    stages: unmappedSchedule.stages.map((stage: any) => mapStage(stage)),
+    events: unmappedSchedule.events.map((event: any) => mapManagerEvent(event)),
   };
 };
 
