@@ -55,7 +55,7 @@ const EventPage: FC = () => {
     <>
       {deleteModal && (
         <Modal
-          title="Вы уверены, что хотите удалить мероприятие?"
+          title="Удаление мероприятия"
           onCloseModal={() => setDeleteModal(false)}
         >
           <p className="text-lg text-bright_gray">

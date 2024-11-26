@@ -157,7 +157,7 @@ const SchedulePage: FC = () => {
 
       {deleteStageModal.status && (
         <Modal
-          title="Вы уверены, что хотите удалить этап?"
+          title="Удаление этапа"
           onCloseModal={() =>
             setDeleteStageModal({
               status: false,
