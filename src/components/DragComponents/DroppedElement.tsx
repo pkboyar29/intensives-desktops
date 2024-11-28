@@ -26,7 +26,7 @@ const DroppedElement = <T extends { id: number; content: string }>({
     <div
       ref={dragRef}
       className="flex items-center gap-3 px-3 py-1 text-base rounded-xl bg-gray_5"
-    >
+    > 
       <span className="flex-grow">{element.content}</span>
       <button
         onClick={() => {
