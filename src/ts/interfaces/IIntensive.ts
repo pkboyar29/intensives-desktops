@@ -1,5 +1,5 @@
 import { IFlow } from './IFlow';
-import { ITeacherOnIntensive } from './ITeacher';
+import { ITeacher } from './ITeacher';
 
 // TODO: rename to openDate and closeDate
 
@@ -8,27 +8,24 @@ export interface IIntensive {
   name: string;
   description: string;
   isOpen: boolean;
-  open_dt: Date;
-  close_dt: Date;
+  openDate: Date;
+  closeDate: Date;
   flows: IFlow[];
-  teachersTeam: ITeacherOnIntensive[];
+  teachers: ITeacher[];
 }
 
 export interface IIntensiveCreate {
   name: string;
   description: string;
-  open_dt: string;
-  close_dt: string;
-  teacher_team: number[];
-  flows: number[];
+  openDate: string;
+  closeDate: string;
+  teacherIds: number[];
+  flowIds: number[];
+  roleIds: number[];
+  universityId: number;
+  isOpen: boolean;
 }
 
-export interface IIntensiveUpdate {
+export interface IIntensiveUpdate extends IIntensiveCreate {
   id: number;
-  name: string;
-  description: string;
-  open_dt: string;
-  close_dt: string;
-  teacher_team: number[];
-  flows: number[];
 }

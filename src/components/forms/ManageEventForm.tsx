@@ -9,7 +9,6 @@ import {
 import { FetchBaseQueryError, skipToken } from '@reduxjs/toolkit/query';
 
 import { useGetTeamsQuery } from '../../redux/api/teamApi';
-import { useGetTeachersOnIntensiveQuery } from '../../redux/api/teacherApi';
 import { useGetAudiencesQuery } from '../../redux/api/audienceApi';
 import { useGetStagesForIntensiveQuery } from '../../redux/api/stageApi';
 import { useGetMarkStrategiesQuery } from '../../redux/api/markStrategyApi';
@@ -19,6 +18,8 @@ import {
   useCreateEventMutation,
   useUpdateEventMutation,
 } from '../../redux/api/eventApi';
+
+import { useAppSelector } from '../../redux/store';
 
 import Select from '../inputs/Select';
 import InputDescription from '../inputs/InputDescription';
@@ -44,7 +45,7 @@ interface ManageEventFormFields {
   markStrategy: string;
   criterias: Item[];
   teams: Item[];
-  teachersOnIntensive: Item[];
+  teachers: Item[];
 }
 
 interface Item {
@@ -73,6 +74,8 @@ const ManageEventForm: FC = () => {
   const [searchParams] = useSearchParams();
   const { intensiveId } = useParams();
 
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
   const {
     register,
     handleSubmit,
@@ -97,12 +100,7 @@ const ManageEventForm: FC = () => {
   const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
     refetchOnMountOrArgChange: true,
   });
-  const { data: teachersToChoose } = useGetTeachersOnIntensiveQuery(
-    Number(intensiveId),
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  const teachersToChoose = currentIntensive?.teachers;
   const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
     Number(intensiveId),
     {
@@ -154,16 +152,16 @@ const ManageEventForm: FC = () => {
             ? event.markStrategy.id.toString()
             : markStrategies[0].id.toString(),
           criterias: event.criterias.map((criteria) => ({
-            id: criteria.criteriaId,
+            id: criteria.id,
             name: criteria.name,
           })),
           teams: event.teams.map((team) => ({
             id: team.index,
             name: team.name,
           })),
-          teachersOnIntensive: event.experts.map((expert) => ({
-            id: expert.teacherOnIntensiveId,
-            name: expert.name,
+          teachers: event.teachers.map((teacher) => ({
+            id: teacher.id,
+            name: teacher.name,
           })),
         });
       } else {
@@ -251,8 +249,8 @@ const ManageEventForm: FC = () => {
           stageId: data.stage == 0 ? null : data.stage,
           audienceId: data.audience,
           visibility: event.visibility,
-          teacherOnIntensiveIds: data.teachersOnIntensive
-            ? data.teachersOnIntensive.map((teacher) => teacher.id)
+          teacherIds: data.teachers
+            ? data.teachers.map((teacher) => teacher.id)
             : [],
           teamIds: data.teams ? data.teams.map((team) => team.id) : [],
           ...scoreRequestBody,
@@ -284,8 +282,8 @@ const ManageEventForm: FC = () => {
           stageId: data.stage == 0 ? null : data.stage,
           audienceId: data.audience,
           visibility: true,
-          teacherOnIntensiveIds: data.teachersOnIntensive
-            ? data.teachersOnIntensive.map((teacher) => teacher.id)
+          teacherIds: data.teachers
+            ? data.teachers.map((teacher) => teacher.id)
             : [],
           teamIds: data.teams ? data.teams.map((team) => team.id) : [],
           ...scoreRequestBody,
@@ -340,7 +338,7 @@ const ManageEventForm: FC = () => {
                     );
                   }
                 }}
-                children="Да"
+                children="Отменить"
               />
             </div>
           </div>
@@ -462,6 +460,24 @@ const ManageEventForm: FC = () => {
               }
             />
 
+            {stagesToChoose && (
+              <>
+                <div className="text-xl font-bold">Этап</div>
+
+                <Select
+                  register={register}
+                  fieldName="stage"
+                  initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
+                  options={stagesToChoose.map((stage) => ({
+                    id: stage.id,
+                    name: `${
+                      stage.name
+                    } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
+                  }))}
+                />
+              </>
+            )}
+
             <div className="text-xl font-bold">Время проведения</div>
 
             <div className="flex justify-between gap-2.5">
@@ -553,24 +569,6 @@ const ManageEventForm: FC = () => {
               </>
             )}
 
-            {stagesToChoose && (
-              <>
-                <div className="text-xl font-bold">Этап</div>
-
-                <Select
-                  register={register}
-                  fieldName="stage"
-                  initialText="Выберите к какому этапу привязать мероприятие или оставьте пустым"
-                  options={stagesToChoose.map((stage) => ({
-                    id: stage.id,
-                    name: `${
-                      stage.name
-                    } ${stage.startDate.toLocaleDateString()} - ${stage.finishDate.toLocaleDateString()}`,
-                  }))}
-                />
-              </>
-            )}
-
             <div className="text-xl font-bold">Участники</div>
 
             {teamsToChoose && teamsToChoose.length > 0 && (
@@ -593,7 +591,7 @@ const ManageEventForm: FC = () => {
 
             {teachersToChoose && teachersToChoose.length > 0 && (
               <Controller
-                name="teachersOnIntensive"
+                name="teachers"
                 control={control}
                 render={({ field }) => (
                   <MultipleSelectInput

@@ -75,13 +75,11 @@ const SchedulePage: FC = () => {
       startDate: event.startDate.toISOString(),
       finishDate: event.finishDate.toISOString(),
       teamIds: event.teams.map((team) => team.index),
-      teacherOnIntensiveIds: event.experts.map(
-        (expert) => expert.teacherOnIntensiveId
-      ),
+      teacherIds: event.teachers.map((teacher) => teacher.id),
       audienceId: event.audience.id,
       stageId: event.stageId ? event.stageId : null,
       markStrategyId: event.markStrategy ? event.markStrategy.id : null,
-      criteriaIds: event.criterias.map((criteria) => criteria.criteriaId),
+      criteriaIds: event.criterias.map((criteria) => criteria.id),
     });
 
     if (responseData && schedule) {

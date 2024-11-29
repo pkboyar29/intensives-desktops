@@ -8,9 +8,9 @@ import {
 } from '../../ts/interfaces/IEvent';
 import { mapTeamForManager } from './teamApi';
 import { mapAudience } from './audienceApi';
-import { mapTeacherEvent } from './teacherApi';
+import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
-import { mapEventCriteria } from './criteriaApi';
+import { mapCriteria } from './criteriaApi';
 
 export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
   return {
@@ -25,14 +25,14 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
       mapTeamForManager(unmappedTeam)
     ),
-    experts: unmappedEvent.experts.map((unmappedExpert: any) =>
-      mapTeacherEvent(unmappedExpert)
+    teachers: unmappedEvent.teachers.map((unmappedTeacher: any) =>
+      mapTeacher(unmappedTeacher)
     ),
     markStrategy:
       unmappedEvent.mark_strategy &&
       mapMarkStrategy(unmappedEvent.mark_strategy),
     criterias: unmappedEvent.criterias.map((unmappedCriteria: any) =>
-      mapEventCriteria(unmappedCriteria)
+      mapCriteria(unmappedCriteria)
     ),
   };
 };
@@ -63,11 +63,11 @@ export const eventApi = createApi({
           stage: data.stageId,
           audience: data.audienceId,
           teams: data.teamIds,
-          teacher_on_intensive_ids: data.teacherOnIntensiveIds,
+          teachers: data.teacherIds,
           start_dt: data.startDate,
           finish_dt: data.finishDate,
           mark_strategy: data.markStrategyId,
-          criteria_ids: data.criteriaIds,
+          criterias: data.criteriaIds,
           files: [],
         },
       }),
@@ -82,11 +82,11 @@ export const eventApi = createApi({
           stage: data.stageId,
           audience: data.audienceId,
           teams: data.teamIds,
-          teacher_on_intensive_ids: data.teacherOnIntensiveIds,
+          teachers: data.teacherIds,
           start_dt: data.startDate,
           finish_dt: data.finishDate,
           mark_strategy: data.markStrategyId,
-          criteria_ids: data.criteriaIds,
+          criterias: data.criteriaIds,
           files: [],
         },
       }),

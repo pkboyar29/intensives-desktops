@@ -1,7 +1,7 @@
 import { IAudience } from './IAudience';
-import { IEventCriteria } from './ICriteria';
+import { ICriteria } from './ICriteria';
 import { IMarkStrategy } from './IMarkStrategy';
-import { ITeacherEvent } from './ITeacher';
+import { ITeacher } from './ITeacher';
 import { ITeam, ITeamForManager } from './ITeam';
 
 // TODO: delete after i delete all event context?
@@ -34,9 +34,9 @@ export interface IManagerEvent {
   audience: IAudience;
   stageId: number | null;
   teams: ITeamForManager[];
-  experts: ITeacherEvent[];
+  teachers: ITeacher[];
   markStrategy: IMarkStrategy | null;
-  criterias: IEventCriteria[];
+  criterias: ICriteria[];
   visibility: boolean;
 }
 
@@ -50,7 +50,7 @@ export interface IEventCreate {
   visibility: boolean;
   intensiveId: number;
   teamIds: number[];
-  teacherOnIntensiveIds: number[];
+  teacherIds: number[];
   markStrategyId: number | null;
   criteriaIds: number[];
 }

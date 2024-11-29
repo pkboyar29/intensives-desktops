@@ -77,7 +77,7 @@ const EventPage: FC = () => {
 
                   navigate(`/manager/${params.intensiveId}/schedule`);
                 }}
-                children="Да"
+                children="Удалить"
               />
             </div>
           </div>
@@ -143,14 +143,14 @@ const EventPage: FC = () => {
                     </div>
                   )}
 
-                  {event.experts.length > 0 && (
+                  {event.teachers.length > 0 && (
                     <div className="flex flex-col gap-3">
                       <div className="text-lg font-bold text-black_2">
                         Преподаватели, проводящие мероприятие
                       </div>
                       <div className="flex flex-wrap gap-3">
-                        {event.experts.map((expert) => (
-                          <Chip key={expert.id} label={expert.name} />
+                        {event.teachers.map((teacher) => (
+                          <Chip key={teacher.id} label={teacher.name} />
                         ))}
                       </div>
                     </div>

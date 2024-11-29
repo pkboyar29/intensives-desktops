@@ -43,9 +43,9 @@ const ManagerMainPage: FC = () => {
                   {currentIntensive?.name}
                 </div>
                 <div className="mt-2 text-bright_gray">
-                  {currentIntensive?.open_dt.toLocaleDateString()}
+                  {currentIntensive?.openDate.toLocaleDateString()}
                   {` - `}
-                  {currentIntensive?.close_dt.toLocaleDateString()}
+                  {currentIntensive?.closeDate.toLocaleDateString()}
                 </div>
               </>
             )}

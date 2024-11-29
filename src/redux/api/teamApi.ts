@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import { mapStudent } from './studentApi';
-import { mapTeacherOnIntensive } from './teacherApi';
+import { mapTeacher } from './teacherApi';
 
 import {
   ITeamsCreate,
@@ -15,10 +15,7 @@ export const mapTeamForManager = (unmappedTeam: any): ITeamForManager => {
     id: unmappedTeam.id,
     index: unmappedTeam.id,
     name: unmappedTeam.name,
-    tutor:
-      unmappedTeam.tutor === null
-        ? null
-        : mapTeacherOnIntensive(unmappedTeam.tutor),
+    tutor: unmappedTeam.tutor === null ? null : mapTeacher(unmappedTeam.tutor),
     mentor:
       unmappedTeam.mentor === null ? null : mapStudent(unmappedTeam.mentor),
     studentsInTeam: unmappedTeam.students_in_team.map((unmappedStudent: any) =>
@@ -55,6 +52,7 @@ export const teamApi = createApi({
       transformResponse: (response: any) =>
         response.map((unmappedTeam: any) => mapTeamForManager(unmappedTeam)),
     }),
+    // изменить на PUT запрос
     updateSupportMembers: builder.mutation<string, ITeamSupportMembersUpdate[]>(
       {
         query: (data) => ({

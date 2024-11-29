@@ -7,7 +7,7 @@ import {
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
 
-import { mapTeacherOnIntensive } from './teacherApi';
+import { mapTeacher } from './teacherApi';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -15,11 +15,11 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     name: unmappedIntensive.name,
     description: unmappedIntensive.description,
     isOpen: unmappedIntensive.is_open,
-    open_dt: new Date(unmappedIntensive.open_dt),
-    close_dt: new Date(unmappedIntensive.close_dt),
+    openDate: new Date(unmappedIntensive.open_dt),
+    closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
-    teachersTeam: unmappedIntensive.teacher_team.map(
-      (teacherOnIntensive: any) => mapTeacherOnIntensive(teacherOnIntensive)
+    teachers: unmappedIntensive.teachers.map((teacher: any) =>
+      mapTeacher(teacher)
     ),
   };
 };
@@ -48,14 +48,18 @@ export const intensiveApi = createApi({
         method: 'POST',
         body: {
           ...data,
-          university: 1,
-          is_open: true,
-          roles: [],
-          stage: [],
+          is_open: data.isOpen,
+          open_dt: data.openDate,
+          close_dt: data.closeDate,
+          teachers: data.teacherIds,
+          flows: data.flowIds,
+          university: data.universityId,
+          roles: data.roleIds,
         },
       }),
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
+    // TODO: отправлять PUT запрос
     updateIntensive: builder.mutation<IIntensive, IIntensiveUpdate>({
       query: (data) => {
         const { id, ...restData } = data;
@@ -65,9 +69,12 @@ export const intensiveApi = createApi({
           method: 'PATCH',
           body: {
             ...restData,
-            is_open: true,
-            roles: [],
-            stage: [],
+            is_open: data.isOpen,
+            open_dt: data.openDate,
+            close_dt: data.closeDate,
+            teachers: data.teacherIds,
+            flows: data.flowIds,
+            roles: data.roleIds,
           },
         };
       },

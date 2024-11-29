@@ -5,8 +5,9 @@ import {
   useLazyGetTeamsQuery,
   useUpdateSupportMembersMutation,
 } from '../redux/api/teamApi';
-import { useLazyGetTeachersOnIntensiveQuery } from '../redux/api/teacherApi';
-import { useLazyGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
+import { useGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
+
+import { useAppSelector } from '../redux/store';
 
 import Modal from '../components/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
@@ -17,30 +18,29 @@ import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 
 import { ITeamForManager } from '../ts/interfaces/ITeam';
-import { ITeacher } from '../ts/interfaces/ITeacher';
-import { IStudent } from '../ts/interfaces/IStudent';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
-  // все-таки вместо lazy хуков использовать нормальные?
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
+  // TODO: все-таки вместо lazy хуков использовать нормальные?
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
-  const [getTeachersOnIntensive] = useLazyGetTeachersOnIntensiveQuery();
-  const [getNotAssignedStudentsOnIntensive] =
-    useLazyGetNotAssignedStudentsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
 
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
-  // предположить, что тут может быть рандомная цифра?
+  // TODO: предположить, что тут может быть рандомная цифра?
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
     () => teams.find((team) => team.index === currentTeamId),
     [teams, currentTeamId]
   );
 
-  const [allTeachers, setAllTeachers] = useState<ITeacher[]>([]);
-  const [allStudents, setAllStudents] = useState<IStudent[]>([]);
+  const allTeachers = currentIntensive?.teachers;
+  const { data: allStudents } = useGetNotAssignedStudentsQuery(
+    Number(intensiveId)
+  );
 
   const [searchString, setSearchString] = useState<string>('');
 
@@ -72,42 +72,6 @@ const CreateSupportTeamsPage: FC = () => {
     fetchTeams();
   }, []);
 
-  useEffect(() => {
-    const fetchTeachersTutors = async () => {
-      try {
-        if (intensiveId) {
-          const { data } = await getTeachersOnIntensive(parseInt(intensiveId));
-
-          if (data) {
-            setAllTeachers(data);
-          }
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchTeachersTutors();
-  }, []);
-
-  useEffect(() => {
-    const fetchStudentsMentors = async () => {
-      try {
-        if (intensiveId) {
-          const { data } = await getNotAssignedStudentsOnIntensive(
-            parseInt(intensiveId)
-          );
-
-          if (data) {
-            setAllStudents(data);
-          }
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchStudentsMentors();
-  }, []);
-
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentTeamId(parseInt(event.target.value));
   };
@@ -132,7 +96,6 @@ const CreateSupportTeamsPage: FC = () => {
           updatedTeam.tutor = {
             id: newDroppedElement.id,
             name: newDroppedElement.content,
-            teacherId: 1, // избавиться от этого, например просто другой интерфейс оставить, где не будет teacherId
           };
         } else {
           updatedTeam.mentor = {
@@ -366,7 +329,7 @@ const CreateSupportTeamsPage: FC = () => {
                 {slug === 'tutors' ? (
                   <>
                     {allTeachers
-                      .filter((teacher) =>
+                      ?.filter((teacher) =>
                         teacher.name
                           .toLowerCase()
                           .includes(searchString.toLowerCase())
@@ -386,7 +349,7 @@ const CreateSupportTeamsPage: FC = () => {
                   <>
                     {' '}
                     {allStudents
-                      .filter((student) =>
+                      ?.filter((student) =>
                         student.nameWithGroup
                           .toLowerCase()
                           .includes(searchString.toLowerCase())

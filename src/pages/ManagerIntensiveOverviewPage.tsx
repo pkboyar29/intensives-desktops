@@ -41,9 +41,9 @@ const ManagerIntensiveOverviewPage: FC = () => {
         <div>
           <div className="py-3 text-lg font-bold">
             {currentIntensive ? (
-              currentIntensive.open_dt.toLocaleDateString() +
+              currentIntensive.openDate.toLocaleDateString() +
               ' - ' +
-              currentIntensive.close_dt.toLocaleDateString()
+              currentIntensive.closeDate.toLocaleDateString()
             ) : (
               <Skeleton />
             )}
@@ -77,7 +77,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
               <div>Список преподавателей</div>
               {currentIntensive ? (
                 <div className="flex flex-wrap gap-3">
-                  {currentIntensive.teachersTeam.map((teacherOnIntensive) => (
+                  {currentIntensive.teachers.map((teacherOnIntensive) => (
                     <Chip
                       key={teacherOnIntensive.id}
                       label={teacherOnIntensive.name}

@@ -1,20 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { ICriteria, IEventCriteria } from '../../ts/interfaces/ICriteria';
+import { ICriteria } from '../../ts/interfaces/ICriteria';
 
-const mapCriteria = (unmappedCriteria: any): ICriteria => {
+export const mapCriteria = (unmappedCriteria: any): ICriteria => {
   return {
     id: unmappedCriteria.id,
     name: unmappedCriteria.name,
-  };
-};
-
-export const mapEventCriteria = (unmappedCriteria: any): IEventCriteria => {
-  return {
-    id: unmappedCriteria.id,
-    criteriaId: unmappedCriteria.criteria.id,
-    name: unmappedCriteria.criteria.name,
   };
 };
 
