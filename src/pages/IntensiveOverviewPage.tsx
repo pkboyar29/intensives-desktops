@@ -19,9 +19,9 @@ const IntensiveOverviewPage: FC = () => {
           <Title text={currentIntensive.name} />
 
           <div className="mt-5 text-lg font-bold">
-            {currentIntensive.open_dt.toLocaleDateString() +
+            {currentIntensive.openDate.toLocaleDateString() +
               ' - ' +
-              currentIntensive.close_dt.toLocaleDateString()}
+              currentIntensive.closeDate.toLocaleDateString()}
           </div>
 
           <div className="mt-5">
@@ -32,11 +32,11 @@ const IntensiveOverviewPage: FC = () => {
               />
               <OverviewItem
                 title="Начало интенсива"
-                value={currentIntensive.open_dt.toLocaleDateString()}
+                value={currentIntensive.openDate.toLocaleDateString()}
               />
               <OverviewItem
                 title="Окончание интенсива"
-                value={currentIntensive.close_dt.toLocaleDateString()}
+                value={currentIntensive.closeDate.toLocaleDateString()}
               />
               <OverviewItem
                 title="Учебный поток"

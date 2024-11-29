@@ -1,4 +1,4 @@
-export interface ITeacher {
+export interface ICriteria {
   id: number;
   name: string;
 }

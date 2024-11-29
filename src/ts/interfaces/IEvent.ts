@@ -1,5 +1,10 @@
-import { ITeam } from './ITeam';
+import { IAudience } from './IAudience';
+import { ICriteria } from './ICriteria';
+import { IMarkStrategy } from './IMarkStrategy';
+import { ITeacher } from './ITeacher';
+import { ITeam, ITeamForManager } from './ITeam';
 
+// TODO: delete after i delete all event context?
 export interface IEvent {
   id: number;
   name: string;
@@ -24,26 +29,30 @@ export interface IManagerEvent {
   id: number;
   name: string;
   description: string;
-  dateStart: string;
-  dateEnd: string;
-  timeStart: string;
-  timeEnd: string;
-  audience: number;
-  stage: number;
+  startDate: Date;
+  finishDate: Date;
+  audience: IAudience;
+  stageId: number | null;
+  teams: ITeamForManager[];
+  teachers: ITeacher[];
+  markStrategy: IMarkStrategy | null;
+  criterias: ICriteria[];
+  visibility: boolean;
 }
 
 export interface IEventCreate {
   name: string;
   description: string;
-  start_dt: string;
-  finish_dt: string;
-  stage: number;
-  auditory: number;
-  mark_strategy?: any;
-  result_type?: any;
-  intensiv: number;
-  commands?: any[];
-  teachers_command?: any[];
+  startDate: string;
+  finishDate: string;
+  stageId: number | null;
+  audienceId: number;
+  visibility: boolean;
+  intensiveId: number;
+  teamIds: number[];
+  teacherIds: number[];
+  markStrategyId: number | null;
+  criteriaIds: number[];
 }
 
 export interface IEventUpdate extends IEventCreate {

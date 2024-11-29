@@ -44,11 +44,11 @@ const IntensivesPage: FC = () => {
       header: () => 'Название',
       cell: (info) => info.getValue(),
     }),
-    columnHelper.accessor('open_dt', {
+    columnHelper.accessor('openDate', {
       header: () => 'Начало интенсива',
       cell: (info) => info.getValue().toLocaleDateString(),
     }),
-    columnHelper.accessor('close_dt', {
+    columnHelper.accessor('closeDate', {
       header: () => 'Конец интенсива',
       cell: (info) => info.getValue().toLocaleDateString(),
     }),
@@ -58,6 +58,7 @@ const IntensivesPage: FC = () => {
     }),
   ];
 
+  // TODO: проверять наличие элемента в массиве
   const intensiveClickHandler = (id: number) => {
     if (currentUser?.roleName === 'Студент') {
       navigate(`/student/${id}/overview`);
@@ -113,7 +114,7 @@ const IntensivesPage: FC = () => {
           <div className="flex justify-end mt-10">
             <div className="ml-auto">
               <PrimaryButton
-                text="Создать интенсив"
+                children="Создать интенсив"
                 clickHandler={() => navigate(`/createIntensive`)}
               />
             </div>

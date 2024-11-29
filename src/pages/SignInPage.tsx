@@ -98,7 +98,7 @@ const SignInPage: FC = () => {
               }
             />
 
-            <PrimaryButton text="Войти в систему" type="submit" />
+            <PrimaryButton children="Войти в систему" type="submit" />
           </form>
         </div>
       </div>

@@ -1,14 +1,16 @@
 import { FC } from 'react';
-import { UseFormRegister } from 'react-hook-form';
+import { RegisterOptions, UseFormRegister } from 'react-hook-form';
 
 interface SelectProps {
   fieldName: string;
   register: UseFormRegister<any>;
+  registerOptions?: RegisterOptions;
   options: {
     id: number;
     name: string;
   }[];
   initialText: string;
+  errorMessage?: string;
 }
 
 const Select: FC<SelectProps> = ({
@@ -16,21 +18,27 @@ const Select: FC<SelectProps> = ({
   initialText,
   fieldName,
   register,
+  registerOptions,
+  errorMessage,
 }) => {
   return (
-    <select
-      {...register(fieldName)}
-      className="p-2.5 w-full text-lg rounded-[10px] bg-another_white"
-    >
-      <option key={0} value={0}>
-        {initialText}
-      </option>
-      {options.map((option) => (
-        <option key={option.id} value={option.id}>
-          {option.name}
+    <div className="flex flex-col w-full gap-2">
+      <select
+        {...register(fieldName, registerOptions)}
+        className="p-2.5 text-lg rounded-[10px] bg-another_white"
+      >
+        <option key={0} value={0}>
+          {initialText}
         </option>
-      ))}
-    </select>
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+
+      {errorMessage && <div className="text-base text-red">{errorMessage}</div>}
+    </div>
   );
 };
 

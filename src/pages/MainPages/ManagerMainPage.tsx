@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Outlet, Link, useParams, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
@@ -22,6 +22,9 @@ const ManagerMainPage: FC = () => {
     }
   );
 
+  const linkClassNames =
+    'py-2 px-2.5 rounded-xl hover:bg-another_white transition duration-200 ease-in-out manager-sidebar__link';
+
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
     navigate(`/intensives`);
@@ -36,43 +39,36 @@ const ManagerMainPage: FC = () => {
               <Skeleton />
             ) : (
               <>
-                <div className="text-lg">{currentIntensive?.name}</div>
-                <div className="text-bright_gray">
-                  {currentIntensive?.open_dt.toLocaleDateString()}
+                <div className="text-xl font-bold text-black_2">
+                  {currentIntensive?.name}
+                </div>
+                <div className="mt-2 text-bright_gray">
+                  {currentIntensive?.openDate.toLocaleDateString()}
                   {` - `}
-                  {currentIntensive?.close_dt.toLocaleDateString()}
+                  {currentIntensive?.closeDate.toLocaleDateString()}
                 </div>
               </>
             )}
 
             <div className="flex flex-col gap-4 my-3">
-              <Link
-                to="overview"
-                className="py-1.5 px-2.5 hover:bg-another_white"
-              >
+              <NavLink to="overview" className={linkClassNames}>
                 Настройки интенсива
-              </Link>
-              <Link to="teams" className="py-1.5 px-2.5 hover:bg-another_white">
+              </NavLink>
+              <NavLink to="teams" className={linkClassNames}>
                 Управление командами
-              </Link>
-              <Link to="plan" className="py-1.5 px-2.5 hover:bg-another_white">
-                Расписание интенсива
-              </Link>
-              <Link
-                to="manageRoles"
-                className="py-1.5 px-2.5 hover:bg-another_white"
-              >
+              </NavLink>
+              <NavLink to="schedule" className={linkClassNames}>
+                Управление расписанием
+              </NavLink>
+              <NavLink to="manageRoles" className={linkClassNames}>
                 Управление ролями для студентов
-              </Link>
-              <Link
-                to="statistics"
-                className="py-1.5 px-2.5 hover:bg-another_white"
-              >
+              </NavLink>
+              <NavLink to="statistics" className={linkClassNames}>
                 Статистика
-              </Link>
+              </NavLink>
             </div>
             <PrimaryButton
-              text="Вернуться к списку интенсивов"
+              children="Вернуться к списку интенсивов"
               clickHandler={returnToIntensivesClickHandler}
             />
           </div>

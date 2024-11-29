@@ -3,7 +3,7 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import { IAudience } from '../../ts/interfaces/IAudience';
 
-const mapAudience = (unmappedAudience: any): IAudience => {
+export const mapAudience = (unmappedAudience: any): IAudience => {
   return {
     id: unmappedAudience.id,
     name:
@@ -29,4 +29,4 @@ export const audienceApi = createApi({
   }),
 });
 
-export const { useLazyGetAudiencesQuery } = audienceApi;
+export const { useGetAudiencesQuery } = audienceApi;

@@ -13,8 +13,11 @@ import { teacherApi } from './api/teacherApi';
 import { studentApi } from './api/studentApi';
 import { studentRoleApi } from './api/studentRoleApi';
 import { stageApi } from './api/stageApi';
+import { scheduleApi } from './api/scheduleApi';
 import { audienceApi } from './api/audienceApi';
 import { flowApi } from './api/flowApi';
+import { markStrategyApi } from './api/markStrategyApi';
+import { criteriaApi } from './api/criteriaApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -31,8 +34,11 @@ export const store = configureStore({
     [studentApi.reducerPath]: studentApi.reducer,
     [studentRoleApi.reducerPath]: studentRoleApi.reducer,
     [stageApi.reducerPath]: stageApi.reducer,
+    [scheduleApi.reducerPath]: scheduleApi.reducer,
     [audienceApi.reducerPath]: audienceApi.reducer,
     [flowApi.reducerPath]: flowApi.reducer,
+    [markStrategyApi.reducerPath]: markStrategyApi.reducer,
+    [criteriaApi.reducerPath]: criteriaApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -46,8 +52,11 @@ export const store = configureStore({
       studentApi.middleware,
       studentRoleApi.middleware,
       stageApi.middleware,
+      scheduleApi.middleware,
       audienceApi.middleware,
-      flowApi.middleware
+      flowApi.middleware,
+      markStrategyApi.middleware,
+      criteriaApi.middleware
     ),
 });
 

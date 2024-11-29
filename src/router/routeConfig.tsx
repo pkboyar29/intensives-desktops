@@ -10,7 +10,7 @@ import IntensivesPage from '../pages/IntensivesPage';
 import EventsPage from '../pages/EventsPage';
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
-import EventOverviewPage from '../pages/EventOverviewPage';
+import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
 import StudentTasksBoardPage from '../pages/StudentTasksBoardPage';
@@ -46,12 +46,13 @@ const routeConfig: RouteType[] = [
         element: <TeamsPage />,
       },
       {
+        // TODO: переименовать на schedule
         path: 'events',
         element: <EventsPage />,
       },
       {
         path: 'events/:eventId',
-        element: <EventOverviewPage />,
+        element: <EventPage />,
       },
       {
         path: 'team-evaluation/:eventId/:teamId',
@@ -73,12 +74,13 @@ const routeConfig: RouteType[] = [
         element: <TeamOverviewPage />,
       },
       {
+        // TODO: переименовать на schedule
         path: 'events',
         element: <EventsPage />,
       },
       {
         path: 'events/:eventId',
-        element: <EventOverviewPage />,
+        element: <EventPage />,
       },
       {
         path: 'tasks-board',
@@ -120,17 +122,22 @@ const routeConfig: RouteType[] = [
         element: <CreateSupportTeamsPage />,
       },
       {
-        path: 'plan',
+        path: 'schedule',
         element: <SchedulePage />,
+      },
+      {
+        path: 'schedule/:eventId',
+        element: <EventPage />,
+      },
+      {
+        path: 'schedule/editEvent',
+        element: <ManageEventForm />,
       },
       {
         path: 'manageRoles',
         element: <ManageRolesPage />,
       },
-      {
-        path: 'editEvent',
-        element: <ManageEventForm />,
-      },
+
       {
         path: 'statistics',
         element: <IntensiveStatisticsPage />,

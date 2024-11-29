@@ -1,23 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
+import { ITeacher } from '../../ts/interfaces/ITeacher';
 
-export const mapTeacherOnIntensive = (
-  teacherOnIntensive: any
-): ITeacherOnIntensive => {
-  return {
-    id: teacherOnIntensive.id,
-    teacherId: teacherOnIntensive.teacher.id,
-    name: getFullName(
-      teacherOnIntensive.teacher.user.first_name,
-      teacherOnIntensive.teacher.user.last_name,
-      teacherOnIntensive.teacher.user.patronymic
-    ),
-  };
-};
-
-const mapTeacherInUniversity = (teacher: any): ITeacher => {
+export const mapTeacher = (teacher: any): ITeacher => {
   return {
     id: teacher.id,
     name: getFullName(
@@ -40,22 +26,13 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    // TODO: тут я храню только id препода на интенсиве, однако надо еще хранить id препода
-    getTeachersOnIntensive: builder.query<ITeacherOnIntensive[], number>({
-      query: (intensiveId) => `teachers_on_intensives/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): ITeacherOnIntensive[] =>
-        response.results.map((teacher: any) => mapTeacherOnIntensive(teacher)),
-    }),
-    // TODO: when i can pass university to backend, then pass university here
+    // TODO: when i can pass university to backend, then pass university here or get this university from token in backend?
     getTeachersInUniversity: builder.query<ITeacher[], void>({
       query: () => `teachers/`,
       transformResponse: (response: any): ITeacher[] =>
-        response.results.map((teacher: any) => mapTeacherInUniversity(teacher)),
+        response.results.map((teacher: any) => mapTeacher(teacher)),
     }),
   }),
 });
 
-export const {
-  useLazyGetTeachersOnIntensiveQuery,
-  useGetTeachersInUniversityQuery,
-} = teacherApi;
+export const { useGetTeachersInUniversityQuery } = teacherApi;

@@ -6,7 +6,7 @@ interface InputDescriptionProps {
   fieldName: string;
   registerOptions?: RegisterOptions;
   placeholder: string;
-  description: string;
+  description?: string;
   isTextArea?: boolean;
   errorMessage?: string;
   type?: HTMLInputTypeAttribute;

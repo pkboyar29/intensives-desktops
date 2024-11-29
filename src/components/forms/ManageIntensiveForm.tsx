@@ -11,19 +11,23 @@ import {
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 
+import { getISODateInUTC3 } from '../../helpers/dateHelpers';
+
 import Title from '../Title';
 import PrimaryButton from '../PrimaryButton';
 import InputDescription from '../inputs/InputDescription';
 import MultipleSelectInput from '../inputs/MultipleSelectInput';
+import FileUpload from '../inputs/FileInput';
 
 import { IFlow } from '../../ts/interfaces/IFlow';
-import { ITeacher, ITeacherOnIntensive } from '../../ts/interfaces/ITeacher';
+import { ITeacher } from '../../ts/interfaces/ITeacher';
 
+// add flows/teachers/roles using Controller
 interface ManageIntensiveFields {
   name: string;
   description: string;
-  open_dt: string;
-  close_dt: string;
+  openDate: string;
+  closeDate: string;
 }
 
 const ManageIntensiveForm: FC = () => {
@@ -52,26 +56,18 @@ const ManageIntensiveForm: FC = () => {
     mode: 'onBlur',
   });
 
+  // TODO: start using reset instead of setValue
   useEffect(() => {
     if (intensiveId && currentIntensive) {
       setValue('name', currentIntensive.name);
       setValue('description', currentIntensive.description);
-      setValue('open_dt', currentIntensive.open_dt.toISOString().split('T')[0]);
-      setValue(
-        'close_dt',
-        currentIntensive.close_dt.toISOString().split('T')[0]
-      );
+      console.log(getISODateInUTC3(currentIntensive.openDate));
+      console.log(getISODateInUTC3(currentIntensive.closeDate));
+      setValue('openDate', getISODateInUTC3(currentIntensive.openDate));
+      setValue('closeDate', getISODateInUTC3(currentIntensive.closeDate));
 
       setSelectedFlows(currentIntensive.flows);
-
-      const teachersInUniversity: ITeacher[] =
-        currentIntensive.teachersTeam.map(
-          (teacherInIntensive: ITeacherOnIntensive) => ({
-            id: teacherInIntensive.teacherId,
-            name: teacherInIntensive.name,
-          })
-        );
-      setSelectedTeachers(teachersInUniversity);
+      setSelectedTeachers(currentIntensive.teachers);
     }
   }, [intensiveId, currentIntensive]);
 
@@ -93,8 +89,8 @@ const ManageIntensiveForm: FC = () => {
         setTeachersErrorMessage('');
       }
 
-      const flows_ids: number[] = selectedFlows.map((flow) => flow.id);
-      const teacher_ids: number[] = selectedTeachers.map(
+      const flowIds: number[] = selectedFlows.map((flow) => flow.id);
+      const teacherIds: number[] = selectedTeachers.map(
         (teacher) => teacher.id
       );
 
@@ -102,16 +98,22 @@ const ManageIntensiveForm: FC = () => {
         await updateIntensive({
           id: Number(intensiveId),
           ...data,
-          flows: flows_ids,
-          teacher_team: teacher_ids,
+          flowIds,
+          teacherIds,
+          roleIds: [],
+          universityId: 1,
+          isOpen: true,
         });
 
         navigate(`/manager/${intensiveId}/overview`);
       } else {
         const { data: createIntensiveResponseData } = await createIntensive({
           ...data,
-          flows: flows_ids,
-          teacher_team: teacher_ids,
+          flowIds,
+          teacherIds,
+          roleIds: [],
+          universityId: 1,
+          isOpen: true,
         });
 
         if (createIntensiveResponseData) {
@@ -124,8 +126,8 @@ const ManageIntensiveForm: FC = () => {
   };
 
   return (
-    <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      <form className="list-content" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex justify-center pt-5">
+      <form className="max-w-[765px] w-full" onSubmit={handleSubmit(onSubmit)}>
         <Title
           text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
         />
@@ -162,8 +164,8 @@ const ManageIntensiveForm: FC = () => {
             register={register}
             registerOptions={{
               maxLength: {
-                value: 200,
-                message: 'Максимальное количество символов - 200',
+                value: 500,
+                message: 'Максимальное количество символов - 500',
               },
             }}
             description="Описание интенсива"
@@ -181,7 +183,7 @@ const ManageIntensiveForm: FC = () => {
 
           <div className="flex justify-between gap-6">
             <InputDescription
-              fieldName="open_dt"
+              fieldName="openDate"
               register={register}
               registerOptions={{
                 required: 'Поле обязательно',
@@ -190,20 +192,20 @@ const ManageIntensiveForm: FC = () => {
               description="Дата начала"
               placeholder="Дата начала"
               errorMessage={
-                typeof errors.open_dt?.message === 'string'
-                  ? errors.open_dt.message
+                typeof errors.openDate?.message === 'string'
+                  ? errors.openDate.message
                   : ''
               }
             />
 
             <InputDescription
-              fieldName="close_dt"
+              fieldName="closeDate"
               register={register}
               registerOptions={{
                 required: 'Поле обязательно',
                 validate: {
                   lessThanOpenDt: (value: string, formValues) =>
-                    new Date(value) > new Date(formValues.open_dt) ||
+                    new Date(value) > new Date(formValues.openDate) ||
                     'Дата окончания должна быть позже даты начала',
                 },
               }}
@@ -211,8 +213,8 @@ const ManageIntensiveForm: FC = () => {
               description="Дата окончания"
               placeholder="Дата окончания"
               errorMessage={
-                typeof errors.close_dt?.message === 'string'
-                  ? errors.close_dt.message
+                typeof errors.closeDate?.message === 'string'
+                  ? errors.closeDate.message
                   : ''
               }
             />
@@ -250,29 +252,15 @@ const ManageIntensiveForm: FC = () => {
         </div>
 
         <div className="my-3">
-          <div className="text-lg font-bold">Файлы для студентов</div>
-
-          <div className="border-2 border-dashed border-gray_2 rounded-md p-4 text-gray_3 flex flex-col items-center justify-center h-[20vh] my-3">
-            <label
-              htmlFor="fileUpload"
-              className="block mb-1 text-sm font-medium cursor-pointer"
-            >
-              Перетащите необходимые файлы
-            </label>
-            <input
-              id="fileUpload"
-              name="fileUpload"
-              type="file"
-              className="block text-sm cursor-pointer text-gray_3 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-bright_blue file:text-blue"
-              multiple
-            />
-          </div>
+          <FileUpload />
         </div>
 
         <div className="my-5">
           <PrimaryButton
             type="submit"
-            text={intensiveId ? `Редактировать интенсив` : `Создать интенсив`}
+            children={
+              intensiveId ? `Редактировать интенсив` : `Создать интенсив`
+            }
           />
         </div>
       </form>

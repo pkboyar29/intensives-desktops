@@ -1,10 +1,3 @@
-const transformISODateToTime = (isoDate: string): string => {
-  const dateObj = new Date(isoDate);
-  const hours = dateObj.getHours().toString().padStart(2, '0');
-  const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
-};
-
 const transformSeparateDateAndTimeToISO = (
   date: string,
   time: string
@@ -12,4 +5,28 @@ const transformSeparateDateAndTimeToISO = (
   return `${date}T${time}:00`;
 };
 
-export { transformISODateToTime, transformSeparateDateAndTimeToISO };
+const getTimeFromDate = (date: Date): string => {
+  const hours: string =
+    date.getHours() < 10 ? `0${date.getHours()}` : date.getHours().toString();
+  const minutes: string =
+    date.getMinutes() < 10
+      ? `0${date.getMinutes()}`
+      : date.getMinutes().toString();
+
+  return `${hours}:${minutes}`;
+};
+
+const getISODateInUTC3 = (date: Date): string => {
+  return date
+    .toLocaleDateString('en-GB', {
+      timeZone: 'Europe/Moscow',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .split('/')
+    .reverse()
+    .join('-');
+};
+
+export { transformSeparateDateAndTimeToISO, getISODateInUTC3, getTimeFromDate };
