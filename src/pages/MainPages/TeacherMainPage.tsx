@@ -61,7 +61,7 @@ const TeacherMainPage: FC = () => {
             </NavLink>
           </li>
           <PrimaryButton
-            text="Вернуться к списку интенсивов"
+            children="Вернуться к списку интенсивов"
             clickHandler={returnToIntensivesClickHandler}
           />
         </Sidebar>

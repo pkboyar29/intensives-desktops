@@ -1,49 +1,35 @@
 import { FC, ReactNode } from 'react';
+import { UseFormRegister } from 'react-hook-form';
 
 interface InputRadioProps {
-  valueProp: number | string;
-  funcProp: any;
-  nameProp: string;
-  descriptionProp: string;
-  isList?: boolean;
-  activeProp?: any;
+  register: UseFormRegister<any>;
+  value: string;
+  currentValue: string;
+  fieldName: string;
+  description: string;
   children?: ReactNode;
 }
 
 const InputRadio: FC<InputRadioProps> = ({
-  valueProp,
-  funcProp,
-  nameProp,
-  descriptionProp,
-  isList,
-  activeProp,
+  register,
+  value,
+  currentValue,
+  description,
+  fieldName,
   children,
 }) => {
-  const func =
-    valueProp == 1 || valueProp == 'label1' || valueProp == 'label2'
-      ? () => {
-          funcProp(valueProp);
-        }
-      : null;
-
   return (
-    <div className="p-2.5 text-lg rounded-lg border border-another_white select-none">
-      <input
-        type="radio"
-        name={nameProp}
-        value={valueProp}
-        onChange={isList ? func : funcProp}
-      />
-      <label className="p-2">{descriptionProp}</label>
+    <>
+      <label className="flex items-center gap-3 px-6 py-4 text-lg border cursor-pointer select-none rounded-xl border-another_white">
+        <input {...register(fieldName)} type="radio" value={value} />
 
-      <div
-        className={
-          children && activeProp == valueProp ? 'flex flex-col gap-3' : 'hidden'
-        }
-      >
-        {children}
-      </div>
-    </div>
+        <p>{description}</p>
+      </label>
+
+      {currentValue === value && children && (
+        <div className="flex flex-col gap-3 ml-10">{children}</div>
+      )}
+    </>
   );
 };
 

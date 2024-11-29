@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 
+import { useAppSelector } from '../redux/store';
+
 import { TeamsContext } from '../context/TeamsContext';
 import { EventsContext } from '../context/EventsContext';
-import { CurrentUserContext } from '../context/CurrentUserContext';
 import authHeader from '../helpers/getHeaders';
 
 import Title from '../components/Title';
@@ -18,11 +19,12 @@ type FormValues = {
 };
 
 const TeamEvaluationPage: FC = () => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const params = useParams();
   const navigate = useNavigate();
   const { teams, getTeams } = useContext(TeamsContext);
   const { events, setEventsForIntensiv } = useContext(EventsContext);
-  const { currentUser } = useContext(CurrentUserContext);
   const [currentAnswer, setCurrentAnswer] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 

@@ -43,7 +43,5 @@ export const studentApi = createApi({
   }),
 });
 
-export const {
-  useLazyGetFreeStudentsQuery,
-  useLazyGetNotAssignedStudentsQuery,
-} = studentApi;
+export const { useLazyGetFreeStudentsQuery, useGetNotAssignedStudentsQuery } =
+  studentApi;

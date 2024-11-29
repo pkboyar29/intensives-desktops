@@ -1,8 +1,9 @@
 import { FC, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { useAppSelector } from '../redux/store';
+
 import { TeamsContext } from '../context/TeamsContext';
-import { CurrentUserContext } from '../context/CurrentUserContext';
 
 import Title from '../components/Title';
 import OverviewContent from '../components/OverviewContent';
@@ -10,7 +11,9 @@ import OverviewContent from '../components/OverviewContent';
 const TeamOverviewPage: FC = () => {
   const params = useParams();
   const { currentTeam, setCurrentTeamForStudent } = useContext(TeamsContext);
-  const { currentUser } = useContext(CurrentUserContext);
+
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {

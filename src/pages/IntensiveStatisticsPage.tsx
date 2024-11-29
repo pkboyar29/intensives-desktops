@@ -45,8 +45,8 @@ const IntensiveStatisticsPage = () => {
   // }, []);
 
   return (
-    <div className="flex justify-center min-h-screen min-w-[50vw] max-w-[1280px]">
-      <div className="list-content">
+    <div className="flex justify-center max-w-[1280px]">
+      <div className="max-w-[765px] w-full">
         <Title text="Статистика за интенсив" />
         <div className="text-base">Оценки участников за интенсив</div>
         {statisticsData ? (

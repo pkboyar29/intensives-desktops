@@ -2,8 +2,9 @@ import { FC, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createColumnHelper } from '@tanstack/react-table';
 
+import { useAppSelector } from '../redux/store';
+
 import { EventsContext } from '../context/EventsContext';
-import { CurrentUserContext } from '../context/CurrentUserContext';
 import { IEvent } from '../ts/interfaces/IEvent';
 
 import Title from '../components/Title';
@@ -15,7 +16,9 @@ const EventsPage: FC = () => {
 
   const { events, setEventsForIntensiv, setEventsForTeam } =
     useContext(EventsContext);
-  const { currentUser } = useContext(CurrentUserContext);
+
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {

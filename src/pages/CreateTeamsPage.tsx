@@ -11,7 +11,7 @@ import TeamDragElement from '../components/DragComponents/TeamDragElement';
 import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
-import Modal from '../components/Modal';
+import Modal from '../components/modals/Modal';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
@@ -287,7 +287,7 @@ const CreateTeamsPage: FC = () => {
                   changeTeamsCount(teamsCount);
                   setTeamsCountModal(false);
                 }}
-                text="Очистить команды"
+                children="Очистить команды"
               />
             </div>
             <div>
@@ -296,7 +296,7 @@ const CreateTeamsPage: FC = () => {
                   changeTeamsCount(teamsCount);
                   setTeamsCountModal(false);
                 }}
-                text="Сохранить участников"
+                children="Сохранить участников"
               />
             </div>
           </div>
@@ -317,7 +317,7 @@ const CreateTeamsPage: FC = () => {
               <PrimaryButton
                 buttonColor="gray"
                 clickHandler={() => setCancelModal(false)}
-                text="Продолжить редактирование"
+                children="Продолжить редактирование"
               />
             </div>
             <div>
@@ -325,10 +325,10 @@ const CreateTeamsPage: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                text="Да"
+                children="Да"
               />
             </div>
           </div>
@@ -338,7 +338,12 @@ const CreateTeamsPage: FC = () => {
       {saveModal && (
         <Modal
           title="Команды успешно изменены"
-          onCloseModal={() => setSaveModal(false)}
+          onCloseModal={() => {
+            setSaveModal(false);
+            if (intensiveId) {
+              navigate(`/manager/${intensiveId}/teams`);
+            }
+          }}
         >
           <p className="text-lg text-bright_gray">
             Состав команд успешно изменен
@@ -349,10 +354,10 @@ const CreateTeamsPage: FC = () => {
                 clickHandler={() => {
                   setSaveModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${parseInt(intensiveId)}/teams`);
+                    navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                text="Ок"
+                children="Закрыть"
               />
             </div>
           </div>
@@ -379,7 +384,7 @@ const CreateTeamsPage: FC = () => {
 
         <div>
           <PrimaryButton
-            text="Изменить"
+            children="Изменить"
             clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
@@ -450,7 +455,7 @@ const CreateTeamsPage: FC = () => {
           <div className="flex justify-end gap-3">
             <div>
               <PrimaryButton
-                text="Отменить"
+                children="Отменить"
                 buttonColor="gray"
                 clickHandler={() => {
                   setCancelModal(true);
@@ -458,7 +463,7 @@ const CreateTeamsPage: FC = () => {
               />
             </div>
             <div>
-              <PrimaryButton text="Сохранить" clickHandler={onSubmit} />
+              <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
             </div>
           </div>
         </div>

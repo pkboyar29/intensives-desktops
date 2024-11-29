@@ -5,6 +5,7 @@ interface ChipProps {
   clickHandler?: () => void;
 }
 
+// TODO: change bg color
 const Chip: FC<ChipProps> = ({ label, clickHandler }) => {
   return (
     <div
