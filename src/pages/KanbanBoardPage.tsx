@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useGetColumnsTeamQuery } from '../redux/api/columnApi';
 import { IColumn } from '../ts/interfaces/IColumn';
+import KanbanColumn from '../components/KanbanColumn';
 
 const KanbanBoardPage: FC = () => {
 
@@ -27,7 +28,13 @@ const KanbanBoardPage: FC = () => {
     }, [kanbanColumns])
 
     return(
-        <div>d</div>
+        <div>
+            <div>tut kolonki:</div>
+            <div className='flex items-center space-x-4'>
+                <KanbanColumn title='backend' colorHEX='#FF7D7D' />
+                <KanbanColumn title='frontend' colorHEX='#7DA2FF' />
+            </div>
+        </div>
     );
 }
 
