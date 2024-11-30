@@ -3,7 +3,7 @@ import { Outlet, NavLink, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
-import { useAppDispatch } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import Sidebar from '../../components/Sidebar';
@@ -15,12 +15,11 @@ const ManagerMainPage: FC = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
 
-  const { data: currentIntensive, isLoading } = useGetIntensiveQuery(
-    Number(params.intensiveId),
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  const { isLoading } = useGetIntensiveQuery(Number(params.intensiveId), {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const linkClassNames =
     'py-2 px-2.5 rounded-xl hover:bg-another_white transition duration-200 ease-in-out manager-sidebar__link';

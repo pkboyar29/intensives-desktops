@@ -61,8 +61,6 @@ const ManageIntensiveForm: FC = () => {
     if (intensiveId && currentIntensive) {
       setValue('name', currentIntensive.name);
       setValue('description', currentIntensive.description);
-      console.log(getISODateInUTC3(currentIntensive.openDate));
-      console.log(getISODateInUTC3(currentIntensive.closeDate));
       setValue('openDate', getISODateInUTC3(currentIntensive.openDate));
       setValue('closeDate', getISODateInUTC3(currentIntensive.closeDate));
 
