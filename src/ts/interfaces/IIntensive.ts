@@ -1,8 +1,6 @@
 import { IFlow } from './IFlow';
 import { ITeacher } from './ITeacher';
 
-// TODO: rename to openDate and closeDate
-
 export interface IIntensive {
   id: number;
   name: string;
@@ -22,7 +20,6 @@ export interface IIntensiveCreate {
   teacherIds: number[];
   flowIds: number[];
   roleIds: number[];
-  universityId: number;
   isOpen: boolean;
 }
 

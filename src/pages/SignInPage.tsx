@@ -29,7 +29,8 @@ const SignInPage: FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      redirect(currentUser.roleName);
+      navigate('/intensives');
+      // redirect(currentUser.roleNames);
     }
   }, [currentUser]);
 
@@ -49,14 +50,15 @@ const SignInPage: FC = () => {
     }
   };
 
-  const redirect = (roleName: string) => {
-    if (roleName === 'Студент') {
-      navigate('/intensives');
-    } else {
-      // if roleId == 2 or 3 or 4
-      navigate('/intensives');
-    }
-  };
+  // TODO: delete
+  // const redirect = (roleName: string) => {
+  //   if (roleName === 'Студент') {
+  //     navigate('/intensives');
+  //   } else {
+  //     // if roleId == 2 or 3 or 4
+  //     navigate('/intensives');
+  //   }
+  // };
 
   return (
     <>

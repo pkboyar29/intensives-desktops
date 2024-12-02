@@ -60,14 +60,15 @@ const IntensivesPage: FC = () => {
 
   // TODO: проверять наличие элемента в массиве
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleName === 'Студент') {
+    if (currentUser?.roleNames.find((roleName) => roleName === 'Студент')) {
       navigate(`/student/${id}/overview`);
     } else if (
-      currentUser?.roleName === 'Супер-администратор' ||
-      currentUser?.roleName === 'Организатор'
+      currentUser?.roleNames.find((roleName) => roleName === 'Организатор')
     ) {
       navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roleName === 'Преподаватель') {
+    } else if (
+      currentUser?.roleNames.find((roleName) => roleName === 'Преподаватель')
+    ) {
       navigate(`/teacher/${id}/overview`);
     }
   };
@@ -109,8 +110,9 @@ const IntensivesPage: FC = () => {
           <Title text="Интенсивы" />
         </div>
 
-        {(currentUser?.roleName === 'Супер-администратор' ||
-          currentUser?.roleName === 'Организатор') && (
+        {currentUser?.roleNames.find(
+          (roleName) => roleName === 'Организатор'
+        ) && (
           <div className="flex justify-end mt-10">
             <div className="ml-auto">
               <PrimaryButton

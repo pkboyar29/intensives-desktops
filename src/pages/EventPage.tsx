@@ -187,7 +187,9 @@ const EventPage: FC = () => {
                 </div>
 
                 {/* TODO: эту роль очевидно потом поменять на роль организатора (ну только кнопку назад отображать для всех) */}
-                {currentUser?.roleName === 'Супер-администратор' && (
+                {currentUser?.roleNames.find(
+                  (roleName) => roleName === 'Организатор'
+                ) && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <div>
                       <PrimaryButton

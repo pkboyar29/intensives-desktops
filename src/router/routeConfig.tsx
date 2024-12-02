@@ -24,7 +24,6 @@ import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
-import ManageRolesPage from '../pages/ManageRolesPage';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 
@@ -133,11 +132,6 @@ const routeConfig: RouteType[] = [
         path: 'schedule/editEvent',
         element: <ManageEventForm />,
       },
-      {
-        path: 'manageRoles',
-        element: <ManageRolesPage />,
-      },
-
       {
         path: 'statistics',
         element: <IntensiveStatisticsPage />,

@@ -6,7 +6,7 @@ export interface IUser {
   lastName: string;
   patronymic: string;
   email: string;
-  roleName: 'Студент' | 'Супер-администратор' | 'Преподаватель' | 'Организатор';
+  roleNames: ('Студент' | 'Администратор' | 'Преподаватель' | 'Организатор')[];
 }
 
 export interface ISignIn {

@@ -99,7 +99,6 @@ const ManageIntensiveForm: FC = () => {
           flowIds,
           teacherIds,
           roleIds: [],
-          universityId: 1,
           isOpen: true,
         });
 
@@ -110,7 +109,6 @@ const ManageIntensiveForm: FC = () => {
           flowIds,
           teacherIds,
           roleIds: [],
-          universityId: 1,
           isOpen: true,
         });
 

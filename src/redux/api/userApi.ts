@@ -51,7 +51,7 @@ export const userApi = createApi({
           lastName: response.last_name,
           patronymic: response.patronymic,
           email: response.email,
-          roleName: response.roles[0].name,
+          roleNames: response.roles.map((role: any) => role.name),
         };
       },
     }),
