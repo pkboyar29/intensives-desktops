@@ -10,6 +10,7 @@ const mapColumn = (unmappedEvent: any): IColumn => {
       id: unmappedEvent.id,
       name: unmappedEvent.name,
       colorHEX: unmappedEvent.colorHEX,
+      position: unmappedEvent.position,
       team: unmappedEvent.team
     };
 };

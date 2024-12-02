@@ -2,6 +2,8 @@ import { FC, useEffect, useState } from 'react';
 import { useGetColumnsTeamQuery } from '../redux/api/columnApi';
 import { IColumn } from '../ts/interfaces/IColumn';
 import KanbanColumn from '../components/KanbanColumn';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const KanbanBoardPage: FC = () => {
 
@@ -31,8 +33,13 @@ const KanbanBoardPage: FC = () => {
         <div>
             <div>tut kolonki:</div>
             <div className='flex items-center space-x-4'>
-                <KanbanColumn title='backend' colorHEX='#FF7D7D' />
-                <KanbanColumn title='frontend' colorHEX='#7DA2FF' />
+                {kanbanColumns.map((column) => (
+                    <KanbanColumn
+                    key={column.id} // Важно добавить уникальный ключ
+                    title={column.name}
+                    colorHEX={column.colorHEX}
+                    />
+                ))}
             </div>
         </div>
     );
