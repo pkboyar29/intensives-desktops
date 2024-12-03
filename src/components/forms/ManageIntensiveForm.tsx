@@ -373,6 +373,7 @@ const ManageIntensiveForm: FC = () => {
                       items={flows}
                       selectedItems={field.value || []}
                       setSelectedItems={field.onChange}
+                      chipSize="big"
                     />
                   </div>
                 )}

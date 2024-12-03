@@ -11,6 +11,7 @@ import Table from '../components/Table';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
+import { IFlow } from '../ts/interfaces/IFlow';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const IntensivesPage: FC = () => {
 
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
-  }); // OR REFETCH UNDER SPECIFIC CONDITION?
+  });
 
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
@@ -54,21 +55,21 @@ const IntensivesPage: FC = () => {
     }),
     columnHelper.accessor('flows', {
       header: () => 'Участники',
-      cell: (info) => info.getValue()[0] && info.getValue()[0].name,
+      cell: (info) =>
+        info
+          .getValue()
+          .map((flow) => flow.name)
+          .join(', '),
     }),
   ];
 
-  // TODO: проверять наличие элемента в массиве
+  // TODO: отображать модальное окно с выбором роли, если их несколько
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleNames.find((roleName) => roleName === 'Студент')) {
+    if (currentUser?.roleNames.includes('Студент')) {
       navigate(`/student/${id}/overview`);
-    } else if (
-      currentUser?.roleNames.find((roleName) => roleName === 'Организатор')
-    ) {
+    } else if (currentUser?.roleNames.includes('Организатор')) {
       navigate(`/manager/${id}/overview`);
-    } else if (
-      currentUser?.roleNames.find((roleName) => roleName === 'Преподаватель')
-    ) {
+    } else if (currentUser?.roleNames.includes('Преподаватель')) {
       navigate(`/teacher/${id}/overview`);
     }
   };
@@ -106,13 +107,9 @@ const IntensivesPage: FC = () => {
   return (
     <div className="max-w-[1280px] mx-auto">
       <div className="mt-10">
-        <div className="">
-          <Title text="Интенсивы" />
-        </div>
+        <Title text="Интенсивы" />
 
-        {currentUser?.roleNames.find(
-          (roleName) => roleName === 'Организатор'
-        ) && (
+        {currentUser?.roleNames.includes('Организатор') && (
           <div className="flex justify-end mt-10">
             <div className="ml-auto">
               <PrimaryButton
@@ -123,14 +120,12 @@ const IntensivesPage: FC = () => {
           </div>
         )}
 
-        <div className="mt-3">
-          <input
-            value={searchText}
-            onChange={searchInputChangeHandler}
-            className="w-full px-4 py-3 bg-another_white rounded-xl"
-            placeholder="Поиск"
-          />
-        </div>
+        <input
+          value={searchText}
+          onChange={searchInputChangeHandler}
+          className="w-full px-4 py-3 mt-3 bg-another_white rounded-xl"
+          placeholder="Поиск"
+        />
 
         <div className="mt-10">
           {filteredIntensives.length !== 0 ? (
