@@ -9,15 +9,19 @@ import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import Sidebar from '../../components/Sidebar';
 import PrimaryButton from '../../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
+import BackArrowIcon from '../../components/icons/BackArrowIcon';
 
 const ManagerMainPage: FC = () => {
   const navigate = useNavigate();
   const params = useParams();
   const dispatch = useAppDispatch();
 
-  const { isLoading } = useGetIntensiveQuery(Number(params.intensiveId), {
-    refetchOnMountOrArgChange: true,
-  });
+  const { isLoading, isError } = useGetIntensiveQuery(
+    Number(params.intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
@@ -31,48 +35,70 @@ const ManagerMainPage: FC = () => {
 
   return (
     <>
-      <div className="flex h-full">
-        <Sidebar>
-          <div className="w-80">
-            {isLoading ? (
-              <Skeleton />
-            ) : (
-              <>
-                <div className="text-xl font-bold text-black_2">
-                  {currentIntensive?.name}
-                </div>
-                <div className="mt-2 text-bright_gray">
-                  {currentIntensive?.openDate.toLocaleDateString()}
-                  {` - `}
-                  {currentIntensive?.closeDate.toLocaleDateString()}
-                </div>
-              </>
-            )}
-
-            <div className="flex flex-col gap-4 my-3">
-              <NavLink to="overview" className={linkClassNames}>
-                Настройки интенсива
-              </NavLink>
-              <NavLink to="teams" className={linkClassNames}>
-                Управление командами
-              </NavLink>
-              <NavLink to="schedule" className={linkClassNames}>
-                Управление расписанием
-              </NavLink>
-              <NavLink to="statistics" className={linkClassNames}>
-                Статистика
-              </NavLink>
-            </div>
+      {isError ? (
+        <div className="flex flex-col items-center gap-5 mt-20">
+          <div className="text-2xl font-bold">
+            Интенсива с данным id не существует
+          </div>
+          <div className="w-fit">
             <PrimaryButton
-              children="Вернуться к списку интенсивов"
-              clickHandler={returnToIntensivesClickHandler}
+              buttonColor="gray"
+              children={
+                <div className="flex items-center gap-2">
+                  <BackArrowIcon />
+                  <p>Вернуться к списку интенсивов</p>
+                </div>
+              }
+              onClick={() => {
+                navigate(`/intensives`);
+              }}
             />
           </div>
-        </Sidebar>
-        <div className="w-full p-10">
-          <Outlet />
         </div>
-      </div>
+      ) : (
+        <div className="flex h-full">
+          <Sidebar>
+            <div className="w-80">
+              {isLoading ? (
+                <Skeleton />
+              ) : (
+                <>
+                  <div className="text-xl font-bold text-black_2">
+                    {currentIntensive?.name}
+                  </div>
+                  <div className="mt-2 text-bright_gray">
+                    {currentIntensive?.openDate.toLocaleDateString()}
+                    {` - `}
+                    {currentIntensive?.closeDate.toLocaleDateString()}
+                  </div>
+                </>
+              )}
+
+              <div className="flex flex-col gap-4 my-3">
+                <NavLink to="overview" className={linkClassNames}>
+                  Настройки интенсива
+                </NavLink>
+                <NavLink to="teams" className={linkClassNames}>
+                  Управление командами
+                </NavLink>
+                <NavLink to="schedule" className={linkClassNames}>
+                  Управление расписанием
+                </NavLink>
+                <NavLink to="statistics" className={linkClassNames}>
+                  Статистика
+                </NavLink>
+              </div>
+              <PrimaryButton
+                children="Вернуться к списку интенсивов"
+                clickHandler={returnToIntensivesClickHandler}
+              />
+            </div>
+          </Sidebar>
+          <div className="w-full p-10">
+            <Outlet />
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -376,7 +376,7 @@ const CreateTeamsPage: FC = () => {
             type="number"
             placeholder="Количество команд"
             onChange={teamsCountInputChangeHandler}
-            className="w-full p-2 border rounded-md border-gray_4"
+            className="w-full p-2 border rounded-md border-gray_5"
             value={teamsCount}
           />
           <MembersIcon />

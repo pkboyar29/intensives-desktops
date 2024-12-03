@@ -8,6 +8,7 @@ import {
 } from '../../ts/interfaces/IIntensive';
 
 import { mapTeacher } from './teacherApi';
+import { mapStudentRole } from './studentRoleApi';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -21,6 +22,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
+    roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
   };
 };
 

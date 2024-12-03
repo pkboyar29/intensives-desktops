@@ -99,7 +99,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         ))}
       </div>
 
-      <div className="mt-3 text-base text-red">{errorMessage}</div>
+      <div className="text-base text-red">{errorMessage}</div>
     </div>
   );
 };

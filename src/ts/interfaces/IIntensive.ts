@@ -1,4 +1,5 @@
 import { IFlow } from './IFlow';
+import { IStudentRole } from './IStudentRole';
 import { ITeacher } from './ITeacher';
 
 export interface IIntensive {
@@ -10,6 +11,7 @@ export interface IIntensive {
   closeDate: Date;
   flows: IFlow[];
   teachers: ITeacher[];
+  roles: IStudentRole[];
 }
 
 export interface IIntensiveCreate {

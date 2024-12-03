@@ -150,7 +150,11 @@ const EventPage: FC = () => {
                       </div>
                       <div className="flex flex-wrap gap-3">
                         {event.teachers.map((teacher) => (
-                          <Chip key={teacher.id} label={teacher.name} />
+                          <Chip
+                            key={teacher.id}
+                            size="small"
+                            label={teacher.name}
+                          />
                         ))}
                       </div>
                     </div>
