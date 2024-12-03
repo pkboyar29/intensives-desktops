@@ -136,10 +136,6 @@ h6 {
 /* SIDEBAR */
 
 .sidebar__link.active {
-  color: #1a5ce5;
-}
-
-.manager-sidebar__link.active {
   background-color: #f0f2f5;
 }
 

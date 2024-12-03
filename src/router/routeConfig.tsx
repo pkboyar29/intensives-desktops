@@ -8,7 +8,6 @@ import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
 import EventsPage from '../pages/EventsPage';
-import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
@@ -38,7 +37,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <IntensiveOverviewPage />,
+        element: <ManagerIntensiveOverviewPage />,
       },
       {
         path: 'teams',
@@ -66,7 +65,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <IntensiveOverviewPage />,
+        element: <ManagerIntensiveOverviewPage />,
       },
       {
         path: 'team-overview',

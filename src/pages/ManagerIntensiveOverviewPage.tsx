@@ -17,6 +17,8 @@ const ManagerIntensiveOverviewPage: FC = () => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const [deleteIntensive] = useDeleteIntensiveMutation();
 
   return (
@@ -62,7 +64,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
             )}
           </div>
           <div>
-            <div className="py-3 text-lg font-bold">
+            <div className="my-3 text-lg font-bold">
               {currentIntensive ? (
                 currentIntensive.openDate.toLocaleDateString() +
                 ' - ' +
@@ -72,15 +74,17 @@ const ManagerIntensiveOverviewPage: FC = () => {
               )}
             </div>
 
-            <div className="py-3">
-              {currentIntensive ? (
-                <div className="text-lg">{currentIntensive.description}</div>
-              ) : (
-                <Skeleton />
-              )}
-            </div>
+            {currentIntensive?.description && (
+              <div className="my-3">
+                {currentIntensive ? (
+                  <div className="text-lg">{currentIntensive.description}</div>
+                ) : (
+                  <Skeleton />
+                )}
+              </div>
+            )}
 
-            <div className="py-3 text-lg font-bold text-black_2">Участники</div>
+            <div className="my-3 text-lg font-bold text-black_2">Участники</div>
 
             <div className="flex flex-col gap-3 text-lg">
               <div className="flex flex-col gap-3">
@@ -131,24 +135,28 @@ const ManagerIntensiveOverviewPage: FC = () => {
                 )}
               </div>
 
-              <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                <PrimaryButton
-                  children="Редактировать"
-                  clickHandler={() => {
-                    navigate(`/manager/${currentIntensive?.id}/editIntensive`);
-                  }}
-                />
-
-                <div>
+              {currentUser?.roleNames.includes('Организатор') && (
+                <div className="flex items-center mt-10 text-lg font-bold gap-7">
                   <PrimaryButton
-                    buttonColor="gray"
-                    children={<TrashIcon />}
-                    onClick={() => {
-                      setDeleteModal(true);
+                    children="Редактировать"
+                    clickHandler={() => {
+                      navigate(
+                        `/manager/${currentIntensive?.id}/editIntensive`
+                      );
                     }}
                   />
+
+                  <div>
+                    <PrimaryButton
+                      buttonColor="gray"
+                      children={<TrashIcon />}
+                      onClick={() => {
+                        setDeleteModal(true);
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

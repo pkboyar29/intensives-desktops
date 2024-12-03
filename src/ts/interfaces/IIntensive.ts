@@ -5,7 +5,7 @@ import { ITeacher } from './ITeacher';
 export interface IIntensive {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   isOpen: boolean;
   openDate: Date;
   closeDate: Date;

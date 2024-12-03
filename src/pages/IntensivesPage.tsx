@@ -11,7 +11,6 @@ import Table from '../components/Table';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
-import { IFlow } from '../ts/interfaces/IFlow';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
@@ -21,7 +20,6 @@ const IntensivesPage: FC = () => {
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
   );
@@ -58,7 +56,7 @@ const IntensivesPage: FC = () => {
       cell: (info) =>
         info
           .getValue()
-          .map((flow) => flow.name)
+          .map((flow) => `Поток ${flow.name}`)
           .join(', '),
     }),
   ];
@@ -109,16 +107,18 @@ const IntensivesPage: FC = () => {
       <div className="mt-10">
         <Title text="Интенсивы" />
 
-        {currentUser?.roleNames.includes('Организатор') && (
-          <div className="flex justify-end mt-10">
-            <div className="ml-auto">
-              <PrimaryButton
-                children="Создать интенсив"
-                clickHandler={() => navigate(`/createIntensive`)}
-              />
+        <div className="mt-10">
+          {currentUser?.roleNames.includes('Организатор') && (
+            <div className="flex justify-end">
+              <div className="ml-auto">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <input
           value={searchText}

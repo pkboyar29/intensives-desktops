@@ -1,15 +1,16 @@
 import { FC } from 'react';
-import { Outlet, NavLink, useParams, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
-import Sidebar from '../../components/Sidebar';
+import IntensiveNotFoundComponent from './components/IntensiveNotFoundComponent';
+import Sidebar from './components/Sidebar';
+import SidebarLink from './components/SidebarLink';
 import PrimaryButton from '../../components/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
-import BackArrowIcon from '../../components/icons/BackArrowIcon';
 
 const ManagerMainPage: FC = () => {
   const navigate = useNavigate();
@@ -25,9 +26,6 @@ const ManagerMainPage: FC = () => {
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  const linkClassNames =
-    'py-2 px-2.5 rounded-xl hover:bg-another_white transition duration-200 ease-in-out manager-sidebar__link';
-
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
     navigate(`/intensives`);
@@ -36,25 +34,7 @@ const ManagerMainPage: FC = () => {
   return (
     <>
       {isError ? (
-        <div className="flex flex-col items-center gap-5 mt-20">
-          <div className="text-2xl font-bold">
-            Интенсива с данным id не существует
-          </div>
-          <div className="w-fit">
-            <PrimaryButton
-              buttonColor="gray"
-              children={
-                <div className="flex items-center gap-2">
-                  <BackArrowIcon />
-                  <p>Вернуться к списку интенсивов</p>
-                </div>
-              }
-              onClick={() => {
-                navigate(`/intensives`);
-              }}
-            />
-          </div>
-        </div>
+        <IntensiveNotFoundComponent />
       ) : (
         <div className="flex h-full">
           <Sidebar>
@@ -75,18 +55,10 @@ const ManagerMainPage: FC = () => {
               )}
 
               <div className="flex flex-col gap-4 my-3">
-                <NavLink to="overview" className={linkClassNames}>
-                  Настройки интенсива
-                </NavLink>
-                <NavLink to="teams" className={linkClassNames}>
-                  Управление командами
-                </NavLink>
-                <NavLink to="schedule" className={linkClassNames}>
-                  Управление расписанием
-                </NavLink>
-                <NavLink to="statistics" className={linkClassNames}>
-                  Статистика
-                </NavLink>
+                <SidebarLink to="overview" text="Настройки интенсива" />
+                <SidebarLink to="teams" text="Управление командами" />
+                <SidebarLink to="schedule" text="Управление расписанием" />
+                <SidebarLink to="statistics" text="Статистика" />
               </div>
               <PrimaryButton
                 children="Вернуться к списку интенсивов"
