@@ -181,6 +181,8 @@ const ManageIntensiveForm: FC = () => {
                   setCancelModal(false);
                   if (intensiveId) {
                     navigate(`/manager/${intensiveId}/overview`);
+                  } else {
+                    navigate(`/intensives`);
                   }
                 }}
                 children="Отменить"
@@ -256,7 +258,11 @@ const ManageIntensiveForm: FC = () => {
         </Modal>
       )}
 
-      <div className="flex justify-center max-w-[1280px]">
+      <div
+        className={`flex justify-center ${
+          !intensiveId ? `mt-5` : `max-w-[1280px]`
+        }`}
+      >
         <form
           className="max-w-[765px] w-full"
           onSubmit={handleSubmit(onSubmit)}
