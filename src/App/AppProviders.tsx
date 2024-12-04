@@ -20,7 +20,7 @@ const AppProviders: FC<AppProvidersProps> = ({ children }) => {
       <TeamsProvider>
         <EventsProvider>
           <Provider store={store}>
-            <DndProvider backend={HTML5Backend}>{children}</DndProvider>/
+            <DndProvider backend={HTML5Backend}>{children}</DndProvider>
           </Provider>
         </EventsProvider>
       </TeamsProvider>
