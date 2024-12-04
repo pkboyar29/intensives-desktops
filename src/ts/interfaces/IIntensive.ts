@@ -16,7 +16,7 @@ export interface IIntensive {
 
 export interface IIntensiveCreate {
   name: string;
-  description: string;
+  description?: string;
   openDate: string;
   closeDate: string;
   teacherIds: number[];
