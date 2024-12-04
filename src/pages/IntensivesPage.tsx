@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useRef } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,18 +20,76 @@ const IntensivesPage: FC = () => {
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-  const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
-    []
-  );
+  const [searchFilteredIntensives, setSearchFilteredIntensives] = useState<
+    IIntensive[]
+  >([]);
+  const [opennessFilteredIntensives, setOpennessFilteredIntensives] = useState<
+    IIntensive[]
+  >([]);
 
   const [searchText, setSearchText] = useState<string>('');
+  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+
+  const openedRef = useRef<HTMLDivElement>(null);
+  const closedRef = useRef<HTMLDivElement>(null);
+  const allRef = useRef<HTMLDivElement>(null);
+  const [activeOptionWidth, setActiveOptionWidth] = useState<number>(0);
+  const [activeOptionOffset, setActiveOptionOffset] = useState<number>(0);
+
+  useEffect(() => {
+    const updateActiveOptionSlug = () => {
+      let activeRef = null;
+      if (openness === 'opened') activeRef = openedRef.current;
+      if (openness === 'closed') activeRef = closedRef.current;
+      if (openness === 'all') activeRef = allRef.current;
+
+      if (activeRef) {
+        const { offsetWidth, offsetLeft } = activeRef;
+        setActiveOptionWidth(offsetWidth);
+        setActiveOptionOffset(offsetLeft);
+      }
+    };
+
+    updateActiveOptionSlug();
+    updateOpennessFilteredIntensives();
+  }, [openness, allRef.current]);
 
   useEffect(() => {
     if (intensives) {
-      setFilteredIntensives(intensives);
+      setSearchFilteredIntensives(intensives);
       setSearchText('');
     }
   }, [intensives]);
+
+  const updateOpennessFilteredIntensives = () => {
+    if (openness === 'opened') {
+      setOpennessFilteredIntensives(
+        searchFilteredIntensives.filter((intensive) => intensive.isOpen)
+      );
+    }
+    if (openness === 'closed') {
+      setOpennessFilteredIntensives(
+        searchFilteredIntensives.filter((intensive) => !intensive.isOpen)
+      );
+    }
+    if (openness === 'all') {
+      setOpennessFilteredIntensives(searchFilteredIntensives);
+    }
+  };
+
+  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (intensives) {
+      setSearchText(e.target.value);
+
+      setSearchFilteredIntensives(
+        intensives.filter((intensive) =>
+          intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
+        )
+      );
+
+      updateOpennessFilteredIntensives();
+    }
+  };
 
   const columnHelper = createColumnHelper<IIntensive>();
   const columns = [
@@ -69,18 +127,6 @@ const IntensivesPage: FC = () => {
       navigate(`/manager/${id}/overview`);
     } else if (currentUser?.roleNames.includes('Преподаватель')) {
       navigate(`/teacher/${id}/overview`);
-    }
-  };
-
-  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (intensives) {
-      setSearchText(e.target.value);
-
-      setFilteredIntensives(
-        intensives.filter((intensive) =>
-          intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
-        )
-      );
     }
   };
 
@@ -127,12 +173,50 @@ const IntensivesPage: FC = () => {
           placeholder="Поиск"
         />
 
+        <div className="relative inline-flex gap-8 pb-2 mt-5 border-b border-black border-solid">
+          <div
+            className={`absolute -bottom-[2px] h-[3px] rounded-lg bg-blue transition-all duration-300 ease-in-out`}
+            style={{
+              width: `${activeOptionWidth}px`,
+              left: `${activeOptionOffset}px`,
+            }}
+          ></div>
+
+          <div
+            ref={openedRef}
+            onClick={() => setOpenness('opened')}
+            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+              openness === 'opened' && 'text-blue'
+            }`}
+          >
+            Актуальные
+          </div>
+          <div
+            ref={closedRef}
+            onClick={() => setOpenness('closed')}
+            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+              openness === 'closed' && 'text-blue'
+            }`}
+          >
+            Прошедшие
+          </div>
+          <div
+            ref={allRef}
+            onClick={() => setOpenness('all')}
+            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+              openness === 'all' && 'text-blue'
+            }`}
+          >
+            Все
+          </div>
+        </div>
+
         <div className="mt-10">
-          {filteredIntensives.length !== 0 ? (
+          {opennessFilteredIntensives.length !== 0 ? (
             <Table
               onClick={intensiveClickHandler}
               columns={columns}
-              data={filteredIntensives}
+              data={opennessFilteredIntensives}
             />
           ) : (
             <div className="text-xl font-bold">Ничего не найдено</div>
