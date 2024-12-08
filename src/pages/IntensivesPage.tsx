@@ -20,12 +20,9 @@ const IntensivesPage: FC = () => {
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-  const [searchFilteredIntensives, setSearchFilteredIntensives] = useState<
-    IIntensive[]
-  >([]);
-  const [opennessFilteredIntensives, setOpennessFilteredIntensives] = useState<
-    IIntensive[]
-  >([]);
+  const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
+    []
+  );
 
   const [searchText, setSearchText] = useState<string>('');
   const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
@@ -51,44 +48,37 @@ const IntensivesPage: FC = () => {
     };
 
     updateActiveOptionSlug();
-    updateOpennessFilteredIntensives();
   }, [openness, allRef.current]);
 
   useEffect(() => {
-    if (intensives) {
-      setSearchFilteredIntensives(intensives);
-      setSearchText('');
-    }
-  }, [intensives]);
+    updateFilteredIntensives();
+  }, [searchText, openness, intensives]);
 
-  const updateOpennessFilteredIntensives = () => {
-    if (openness === 'opened') {
-      setOpennessFilteredIntensives(
-        searchFilteredIntensives.filter((intensive) => intensive.isOpen)
+  const updateFilteredIntensives = () => {
+    if (intensives) {
+      let filteredIntensives: IIntensive[] = [];
+
+      filteredIntensives = intensives.filter((intensive) =>
+        intensive.name.toLowerCase().includes(searchText)
       );
-    }
-    if (openness === 'closed') {
-      setOpennessFilteredIntensives(
-        searchFilteredIntensives.filter((intensive) => !intensive.isOpen)
-      );
-    }
-    if (openness === 'all') {
-      setOpennessFilteredIntensives(searchFilteredIntensives);
+
+      if (openness === 'opened') {
+        filteredIntensives = filteredIntensives.filter(
+          (intensive) => intensive.isOpen
+        );
+      }
+      if (openness === 'closed') {
+        filteredIntensives = filteredIntensives.filter(
+          (intensive) => !intensive.isOpen
+        );
+      }
+
+      setFilteredIntensives(filteredIntensives);
     }
   };
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (intensives) {
-      setSearchText(e.target.value);
-
-      setSearchFilteredIntensives(
-        intensives.filter((intensive) =>
-          intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
-        )
-      );
-
-      updateOpennessFilteredIntensives();
-    }
+    setSearchText(e.target.value);
   };
 
   const columnHelper = createColumnHelper<IIntensive>();
@@ -212,11 +202,11 @@ const IntensivesPage: FC = () => {
         </div>
 
         <div className="mt-10">
-          {opennessFilteredIntensives.length !== 0 ? (
+          {filteredIntensives.length !== 0 ? (
             <Table
               onClick={intensiveClickHandler}
               columns={columns}
-              data={opennessFilteredIntensives}
+              data={filteredIntensives}
             />
           ) : (
             <div className="text-xl font-bold">Ничего не найдено</div>
