@@ -7,6 +7,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
+import SearchIcon from '../components/icons/SearchIcon';
 import IntensiveListCard from '../components/IntensiveListCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
@@ -151,16 +152,6 @@ const IntensivesPage: FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-[1280px] mx-auto">
-        <div className="mt-3 font-sans text-2xl font-bold">
-          <Skeleton />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-[1280px] mx-auto px-4">
       <div className="mt-10">
@@ -179,12 +170,15 @@ const IntensivesPage: FC = () => {
           )}
         </div>
 
-        <input
-          value={searchText}
-          onChange={searchInputChangeHandler}
-          className="w-full px-4 py-3 mt-3 bg-another_white rounded-xl"
-          placeholder="Поиск"
-        />
+        <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
+          <SearchIcon className="text-gray-500" />
+          <input
+            value={searchText}
+            onChange={searchInputChangeHandler}
+            className="w-full pl-4 bg-another_white focus:outline-none"
+            placeholder="Поиск"
+          />
+        </div>
 
         <div className="flex items-center justify-between gap-8 mt-5">
           <div className="flex gap-8">
@@ -230,7 +224,9 @@ const IntensivesPage: FC = () => {
         </div>
 
         <div className="mt-10">
-          {intensives?.length === 0 ? (
+          {isLoading ? (
+            <Skeleton />
+          ) : intensives?.length === 0 ? (
             <div className="text-xl font-bold">
               Для вас нету открытых интенсивов
             </div>
