@@ -5,8 +5,8 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { ITeam } from '../ts/interfaces/ITeam';
 
-import Title from '../components/Title';
-import Table from '../components/Table';
+import Title from '../components/common/Title';
+import Table from '../components/common/Table';
 
 const TeamsPage: FC = () => {
   const params = useParams();

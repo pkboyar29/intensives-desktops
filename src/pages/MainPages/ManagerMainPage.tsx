@@ -10,8 +10,8 @@ import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import IntensiveNotFoundComponent from './components/IntensiveNotFoundComponent';
 import Sidebar from './components/Sidebar';
 import SidebarLink from './components/SidebarLink';
-import PrimaryButton from '../../components/PrimaryButton';
-import SwitchButton from '../../components/SwitchButton';
+import PrimaryButton from '../../components/common/PrimaryButton';
+import SwitchButton from '../../components/common/SwitchButton';
 import Skeleton from 'react-loading-skeleton';
 
 const ManagerMainPage: FC = () => {

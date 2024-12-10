@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
-import InputDescription from '../components/inputs/InputDescription';
-import PrimaryButton from '../components/PrimaryButton';
+import InputDescription from '../components/common/inputs/InputDescription';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 import { ISignIn } from '../ts/interfaces/IUser';
 

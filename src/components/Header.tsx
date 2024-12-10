@@ -4,8 +4,8 @@ import { useAppSelector, useAppDispatch } from '../redux/store';
 import { resetUserState } from '../redux/slices/userSlice';
 import { resetIntensiveState } from '../redux/slices/intensiveSlice';
 
-import PrimaryButton from './PrimaryButton';
-import Modal from './modals/Modal';
+import PrimaryButton from './common/PrimaryButton';
+import Modal from './common/modals/Modal';
 
 import Cookies from 'js-cookie';
 

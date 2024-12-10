@@ -14,12 +14,12 @@ import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 
-import Title from '../Title';
-import PrimaryButton from '../PrimaryButton';
-import InputDescription from '../inputs/InputDescription';
-import MultipleSelectInput from '../inputs/MultipleSelectInput';
-import FileUpload from '../inputs/FileInput';
-import Modal from '../modals/Modal';
+import Title from '../common/Title';
+import PrimaryButton from '../common/PrimaryButton';
+import InputDescription from '../common/inputs/InputDescription';
+import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
+import FileUpload from '../common/inputs/FileInput';
+import Modal from '../common/modals/Modal';
 
 interface Item {
   id: number;

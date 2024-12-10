@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
-import Title from '../components/Title';
-import Chip from '../components/Chip';
-import PrimaryButton from '../components/PrimaryButton';
+import Title from '../components/common/Title';
+import Chip from '../components/common/Chip';
+import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 import TrashIcon from '../components/icons/TrashIcon';
-import Modal from '../components/modals/Modal';
+import Modal from '../components/common/modals/Modal';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const navigate = useNavigate();

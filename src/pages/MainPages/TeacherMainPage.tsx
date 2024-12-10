@@ -9,7 +9,7 @@ import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import IntensiveNotFoundComponent from './components/IntensiveNotFoundComponent';
 import Sidebar from './components/Sidebar';
 import SidebarLink from './components/SidebarLink';
-import PrimaryButton from '../../components/PrimaryButton';
+import PrimaryButton from '../../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 
 const TeacherMainPage: FC = () => {

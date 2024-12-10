@@ -4,7 +4,7 @@ import { NavLink, Outlet, useParams, useNavigate } from 'react-router-dom';
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
 import IntensiveNotFoundComponent from './components/IntensiveNotFoundComponent';
-import PrimaryButton from '../../components/PrimaryButton';
+import PrimaryButton from '../../components/common/PrimaryButton';
 import Sidebar from './components/Sidebar';
 import SidebarLink from './components/SidebarLink';
 import Skeleton from 'react-loading-skeleton';

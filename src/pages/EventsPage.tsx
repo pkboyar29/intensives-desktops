@@ -7,8 +7,8 @@ import { useAppSelector } from '../redux/store';
 import { EventsContext } from '../context/EventsContext';
 import { IEvent } from '../ts/interfaces/IEvent';
 
-import Title from '../components/Title';
-import Table from '../components/Table';
+import Title from '../components/common/Title';
+import Table from '../components/common/Table';
 
 const EventsPage: FC = () => {
   const navigate = useNavigate();

@@ -4,9 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGetTeamsQuery } from '../redux/api/teamApi';
 
 import Skeleton from 'react-loading-skeleton';
-import Tag from '../components/Tag';
-import Title from '../components/Title';
-import PrimaryButton from '../components/PrimaryButton';
+import Tag from '../components/common/Tag';
+import Title from '../components/common/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
 import TeamIcon from '../components/icons/TeamIcon';
 
 const ManagerTeamsPage: FC = () => {

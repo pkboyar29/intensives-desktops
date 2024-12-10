@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import CrossIcon from './icons/CrossIcon';
+import CrossIcon from '../icons/CrossIcon';
 
 interface TagProps {
   content: string;

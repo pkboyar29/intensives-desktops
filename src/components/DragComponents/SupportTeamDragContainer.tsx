@@ -1,6 +1,6 @@
 import { useDrop } from 'react-dnd';
 
-import Tag from '../Tag';
+import Tag from '../common/Tag';
 import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';

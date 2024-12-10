@@ -9,7 +9,7 @@ import { TeamsContext } from '../context/TeamsContext';
 import { EventsContext } from '../context/EventsContext';
 import authHeader from '../helpers/getHeaders';
 
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import { ITeam } from '../ts/interfaces/ITeam';
 import { IEvent } from '../ts/interfaces/IEvent';
 

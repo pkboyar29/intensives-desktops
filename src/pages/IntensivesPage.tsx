@@ -7,11 +7,9 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
-import UpArrowIcon from '../components/icons/UpArrowIcon';
-import DownArrowIcon from '../components/icons/DownArrowIcon';
-import Table from '../components/Table';
-import Title from '../components/Title';
-import PrimaryButton from '../components/PrimaryButton';
+import Table from '../components/common/Table';
+import Title from '../components/common/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 
 const IntensivesPage: FC = () => {
@@ -55,6 +53,10 @@ const IntensivesPage: FC = () => {
 
     updateActiveOptionSlug();
   }, [openness, allRef.current]);
+
+  useEffect(() => {
+    console.log(intensives);
+  }, [intensives]);
 
   useEffect(() => {
     updateFilteredIntensives();
@@ -164,14 +166,6 @@ const IntensivesPage: FC = () => {
     );
   }
 
-  if (!intensives && !isLoading) {
-    return (
-      <div className="max-w-[1280px] mx-auto">
-        <Title text="Для вас пока нету открытых интенсивов" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-[1280px] mx-auto px-4">
       <div className="mt-10">
@@ -253,14 +247,22 @@ const IntensivesPage: FC = () => {
         </div>
 
         <div className="mt-10">
-          {sortedIntensives.length !== 0 ? (
-            <Table
-              onClick={intensiveClickHandler}
-              columns={columns}
-              data={sortedIntensives}
-            />
+          {intensives?.length === 0 ? (
+            <div className="text-xl font-bold">
+              Для вас нету открытых интенсивов
+            </div>
           ) : (
-            <div className="text-xl font-bold">Ничего не найдено</div>
+            <>
+              {sortedIntensives.length !== 0 ? (
+                <Table
+                  onClick={intensiveClickHandler}
+                  columns={columns}
+                  data={sortedIntensives}
+                />
+              ) : (
+                <div className="text-xl font-bold">Ничего не найдено</div>
+              )}
+            </>
           )}
         </div>
       </div>

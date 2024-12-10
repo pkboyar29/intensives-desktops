@@ -5,7 +5,7 @@ import { useAppSelector } from '../redux/store';
 
 import { TeamsContext } from '../context/TeamsContext';
 
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import OverviewContent from '../components/OverviewContent';
 
 const TeamOverviewPage: FC = () => {

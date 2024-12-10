@@ -6,13 +6,13 @@ import { useAppSelector } from '../redux/store';
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
 
-import Modal from '../components/modals/Modal';
-import PrimaryButton from '../components/PrimaryButton';
+import Modal from '../components/common/modals/Modal';
+import PrimaryButton from '../components/common/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
 import BackArrowIcon from '../components/icons/BackArrowIcon';
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
-import Chip from '../components/Chip';
+import Chip from '../components/common/Chip';
 
 import { getTimeFromDate } from '../helpers/dateHelpers';
 

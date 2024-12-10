@@ -11,7 +11,7 @@ import Skeleton from 'react-loading-skeleton';
 
 import { useParams } from 'react-router-dom';
 
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 
 const IntensiveStatisticsPage = () => {
   const [statisticsData, setStatisticsData] = useState<any[]>([]);

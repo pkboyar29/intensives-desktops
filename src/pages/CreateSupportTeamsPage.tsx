@@ -9,11 +9,11 @@ import { useGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
 import { useAppSelector } from '../redux/store';
 
-import Modal from '../components/modals/Modal';
+import Modal from '../components/common/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
-import PrimaryButton from '../components/PrimaryButton';
-import Title from '../components/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
+import Title from '../components/common/Title';
 import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 

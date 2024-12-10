@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
-import Title from '../components/Title';
-import Table from '../components/Table';
+import Title from '../components/common/Title';
+import Table from '../components/common/Table';
 
 const EducationRequestsPage: FC = () => {
   const navigate = useNavigate();
