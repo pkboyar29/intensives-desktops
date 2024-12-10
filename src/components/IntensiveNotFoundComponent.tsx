@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import PrimaryButton from '../../../components/common/PrimaryButton';
-import BackArrowIcon from '../../../components/icons/BackArrowIcon';
+import PrimaryButton from './common/PrimaryButton';
+import BackArrowIcon from './icons/BackArrowIcon';
 
 const IntensiveNotFoundComponent: FC = () => {
   const navigate = useNavigate();

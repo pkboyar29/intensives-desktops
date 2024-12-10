@@ -7,6 +7,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
+import IntensiveListCard from '../components/IntensiveListCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -53,10 +54,6 @@ const IntensivesPage: FC = () => {
 
     updateActiveOptionSlug();
   }, [openness, allRef.current]);
-
-  useEffect(() => {
-    console.log(intensives);
-  }, [intensives]);
 
   useEffect(() => {
     updateFilteredIntensives();
@@ -254,11 +251,23 @@ const IntensivesPage: FC = () => {
           ) : (
             <>
               {sortedIntensives.length !== 0 ? (
-                <Table
-                  onClick={intensiveClickHandler}
-                  columns={columns}
-                  data={sortedIntensives}
-                />
+                currentUser?.roleNames.includes('Организатор') ? (
+                  <Table
+                    onClick={intensiveClickHandler}
+                    columns={columns}
+                    data={sortedIntensives}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {sortedIntensives.map((intensive) => (
+                      <IntensiveListCard
+                        key={intensive.id}
+                        intensive={intensive}
+                        onClick={intensiveClickHandler}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="text-xl font-bold">Ничего не найдено</div>
               )}
