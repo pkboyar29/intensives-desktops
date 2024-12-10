@@ -11,6 +11,7 @@ import IntensiveListCard from '../components/IntensiveListCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Filter from '../components/common/Filter';
 import Skeleton from 'react-loading-skeleton';
 
 const IntensivesPage: FC = () => {
@@ -27,42 +28,25 @@ const IntensivesPage: FC = () => {
   const [sortedIntensives, setSortedIntensives] = useState<IIntensive[]>([]);
 
   const [searchText, setSearchText] = useState<string>('');
-  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
   const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
     'fromOldToNew'
   );
 
-  const openedRef = useRef<HTMLDivElement>(null);
-  const closedRef = useRef<HTMLDivElement>(null);
-  const allRef = useRef<HTMLDivElement>(null);
-  const [activeOptionWidth, setActiveOptionWidth] = useState<number>(0);
-  const [activeOptionOffset, setActiveOptionOffset] = useState<number>(0);
+  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+  const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
+    'all'
+  );
 
-  useEffect(() => {
-    const updateActiveOptionSlug = () => {
-      let activeRef = null;
-      if (openness === 'opened') activeRef = openedRef.current;
-      if (openness === 'closed') activeRef = closedRef.current;
-      if (openness === 'all') activeRef = allRef.current;
-
-      if (activeRef) {
-        const { offsetWidth, offsetLeft } = activeRef;
-        setActiveOptionWidth(offsetWidth);
-        setActiveOptionOffset(offsetLeft);
-      }
-    };
-
-    updateActiveOptionSlug();
-  }, [openness, allRef.current]);
-
+  // обрабатывать зависимость relevance
   useEffect(() => {
     updateFilteredIntensives();
-  }, [searchText, openness, intensives]);
+  }, [searchText, openness, relevance, intensives]);
 
   useEffect(() => {
     updateSortedIntensives();
   }, [sortOption, filteredIntensives]);
 
+  // TODO: обрабатывать relevance
   const updateFilteredIntensives = () => {
     if (intensives) {
       let filteredIntensives: IIntensive[] = [];
@@ -71,14 +55,28 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (openness === 'opened') {
+      if (currentUser?.roleNames.includes('Организатор')) {
+        if (openness === 'opened') {
+          filteredIntensives = filteredIntensives.filter(
+            (intensive) => intensive.isOpen
+          );
+        }
+        if (openness === 'closed') {
+          filteredIntensives = filteredIntensives.filter(
+            (intensive) => !intensive.isOpen
+          );
+        }
+      }
+
+      if (relevance === 'relevant') {
         filteredIntensives = filteredIntensives.filter(
-          (intensive) => intensive.isOpen
+          (intensive) => intensive.closeDate.getTime() > Date.now()
         );
       }
-      if (openness === 'closed') {
+
+      if (relevance === 'past') {
         filteredIntensives = filteredIntensives.filter(
-          (intensive) => !intensive.isOpen
+          (intensive) => intensive.closeDate.getTime() < Date.now()
         );
       }
 
@@ -188,46 +186,34 @@ const IntensivesPage: FC = () => {
           placeholder="Поиск"
         />
 
-        <div className="flex items-center gap-8 mt-5">
-          {currentUser?.roleNames.includes('Организатор') && (
-            <div className="relative inline-flex gap-8 pb-2 border-b border-black border-solid">
-              <div
-                className={`absolute -bottom-[2px] h-[3px] rounded-lg bg-blue transition-all duration-300 ease-in-out`}
-                style={{
-                  width: `${activeOptionWidth}px`,
-                  left: `${activeOptionOffset}px`,
-                }}
-              ></div>
+        <div className="flex items-center justify-between gap-8 mt-5">
+          <div className="flex gap-8">
+            {currentUser?.roleNames.includes('Организатор') && (
+              <Filter
+                onFilterOptionClick={(filterOption) =>
+                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                }
+                activeFilterOption={openness}
+                filterList={[
+                  { label: 'Открытые', value: 'opened' },
+                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Все', value: 'all' },
+                ]}
+              />
+            )}
 
-              <div
-                ref={openedRef}
-                onClick={() => setOpenness('opened')}
-                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-                  openness === 'opened' && 'text-blue'
-                }`}
-              >
-                Открытые
-              </div>
-              <div
-                ref={closedRef}
-                onClick={() => setOpenness('closed')}
-                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-                  openness === 'closed' && 'text-blue'
-                }`}
-              >
-                Закрытые
-              </div>
-              <div
-                ref={allRef}
-                onClick={() => setOpenness('all')}
-                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-                  openness === 'all' && 'text-blue'
-                }`}
-              >
-                Все
-              </div>
-            </div>
-          )}
+            <Filter
+              onFilterOptionClick={(filterOption) =>
+                setRelevance(filterOption as 'all' | 'past' | 'relevant')
+              }
+              activeFilterOption={relevance}
+              filterList={[
+                { label: 'Актуальные', value: 'relevant' },
+                { label: 'Прошедшие', value: 'past' },
+                { label: 'Все', value: 'all' },
+              ]}
+            />
+          </div>
 
           <select
             onChange={selectChangeHandler}
