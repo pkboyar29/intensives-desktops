@@ -7,6 +7,8 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
+import UpArrowIcon from '../components/icons/UpArrowIcon';
+import DownArrowIcon from '../components/icons/DownArrowIcon';
 import Table from '../components/Table';
 import Title from '../components/Title';
 import PrimaryButton from '../components/PrimaryButton';
@@ -23,9 +25,13 @@ const IntensivesPage: FC = () => {
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
   );
+  const [sortedIntensives, setSortedIntensives] = useState<IIntensive[]>([]);
 
   const [searchText, setSearchText] = useState<string>('');
   const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+  const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
+    'fromOldToNew'
+  );
 
   const openedRef = useRef<HTMLDivElement>(null);
   const closedRef = useRef<HTMLDivElement>(null);
@@ -54,6 +60,10 @@ const IntensivesPage: FC = () => {
     updateFilteredIntensives();
   }, [searchText, openness, intensives]);
 
+  useEffect(() => {
+    updateSortedIntensives();
+  }, [sortOption, filteredIntensives]);
+
   const updateFilteredIntensives = () => {
     if (intensives) {
       let filteredIntensives: IIntensive[] = [];
@@ -77,8 +87,32 @@ const IntensivesPage: FC = () => {
     }
   };
 
+  const updateSortedIntensives = () => {
+    if (filteredIntensives) {
+      if (sortOption === 'fromOldToNew') {
+        // сортировка по возрастанию
+        setSortedIntensives(
+          [...filteredIntensives].sort(
+            (a, b) => a.openDate.getTime() - b.openDate.getTime()
+          )
+        );
+      } else if (sortOption === 'fromNewToOld') {
+        // сортировка по убыванию
+        setSortedIntensives(
+          [...filteredIntensives].sort(
+            (a, b) => b.openDate.getTime() - a.openDate.getTime()
+          )
+        );
+      }
+    }
+  };
+
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
+  };
+
+  const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(e.target.value as 'fromOldToNew' | 'fromNewToOld');
   };
 
   const columnHelper = createColumnHelper<IIntensive>();
@@ -109,7 +143,7 @@ const IntensivesPage: FC = () => {
     }),
   ];
 
-  // TODO: отображать модальное окно с выбором роли, если их несколько
+  // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
   const intensiveClickHandler = (id: number) => {
     if (currentUser?.roleNames.includes('Студент')) {
       navigate(`/student/${id}/overview`);
@@ -139,7 +173,7 @@ const IntensivesPage: FC = () => {
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto">
+    <div className="max-w-[1280px] mx-auto px-4">
       <div className="mt-10">
         <Title text="Интенсивы" />
 
@@ -163,50 +197,67 @@ const IntensivesPage: FC = () => {
           placeholder="Поиск"
         />
 
-        <div className="relative inline-flex gap-8 pb-2 mt-5 border-b border-black border-solid">
-          <div
-            className={`absolute -bottom-[2px] h-[3px] rounded-lg bg-blue transition-all duration-300 ease-in-out`}
-            style={{
-              width: `${activeOptionWidth}px`,
-              left: `${activeOptionOffset}px`,
-            }}
-          ></div>
+        <div className="flex items-center gap-8 mt-5">
+          {currentUser?.roleNames.includes('Организатор') && (
+            <div className="relative inline-flex gap-8 pb-2 border-b border-black border-solid">
+              <div
+                className={`absolute -bottom-[2px] h-[3px] rounded-lg bg-blue transition-all duration-300 ease-in-out`}
+                style={{
+                  width: `${activeOptionWidth}px`,
+                  left: `${activeOptionOffset}px`,
+                }}
+              ></div>
 
-          <div
-            ref={openedRef}
-            onClick={() => setOpenness('opened')}
-            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-              openness === 'opened' && 'text-blue'
-            }`}
+              <div
+                ref={openedRef}
+                onClick={() => setOpenness('opened')}
+                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+                  openness === 'opened' && 'text-blue'
+                }`}
+              >
+                Открытые
+              </div>
+              <div
+                ref={closedRef}
+                onClick={() => setOpenness('closed')}
+                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+                  openness === 'closed' && 'text-blue'
+                }`}
+              >
+                Закрытые
+              </div>
+              <div
+                ref={allRef}
+                onClick={() => setOpenness('all')}
+                className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
+                  openness === 'all' && 'text-blue'
+                }`}
+              >
+                Все
+              </div>
+            </div>
+          )}
+
+          <select
+            onChange={selectChangeHandler}
+            value={sortOption}
+            className="bg-another_white rounded-xl p-1.5"
           >
-            Актуальные
-          </div>
-          <div
-            ref={closedRef}
-            onClick={() => setOpenness('closed')}
-            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-              openness === 'closed' && 'text-blue'
-            }`}
-          >
-            Прошедшие
-          </div>
-          <div
-            ref={allRef}
-            onClick={() => setOpenness('all')}
-            className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${
-              openness === 'all' && 'text-blue'
-            }`}
-          >
-            Все
-          </div>
+            <option value="fromOldToNew">
+              Сортировка по дате (сначала старые)
+            </option>
+            <option value="fromNewToOld">
+              Сортировка по дате (сначала новые)
+            </option>
+          </select>
         </div>
 
         <div className="mt-10">
-          {filteredIntensives.length !== 0 ? (
+          {sortedIntensives.length !== 0 ? (
             <Table
               onClick={intensiveClickHandler}
               columns={columns}
-              data={filteredIntensives}
+              data={sortedIntensives}
             />
           ) : (
             <div className="text-xl font-bold">Ничего не найдено</div>
