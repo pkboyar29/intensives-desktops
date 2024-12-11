@@ -37,8 +37,6 @@ const SignInPage: FC = () => {
       const {data: responseData, error: responseError } = await signIn(data);
 
       if (responseData) {
-        console.log('hello world');
-
         Cookies.set('access', responseData.access, {
           expires: 1,
         });

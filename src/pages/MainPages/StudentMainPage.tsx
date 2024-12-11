@@ -3,6 +3,9 @@ import { Outlet, useParams, useNavigate } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
+import { useAppDispatch } from '../../redux/store';
+import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
+
 import IntensiveNotFoundComponent from '../../components/IntensiveNotFoundComponent';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import Sidebar from '../../components/Sidebar';
@@ -13,6 +16,8 @@ const StudentMainPage: FC = () => {
   const navigate = useNavigate();
   const params = useParams();
 
+  const dispatch = useAppDispatch();
+
   const {
     data: currentIntensive,
     isLoading,
@@ -21,6 +26,7 @@ const StudentMainPage: FC = () => {
 
   const returnToIntensivesClickHandler = () => {
     navigate(`/intensives`);
+    dispatch(resetIntensiveState());
   };
 
   return (

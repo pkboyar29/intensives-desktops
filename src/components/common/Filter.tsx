@@ -44,6 +44,7 @@ const Filter: FC<FilterProps> = ({
 
       {filterList.map((filterOption, index) => (
         <div
+          key={index}
           ref={(el) => (filterRefs.current[index] = el)}
           onClick={() => onFilterOptionClick(filterOption.value)}
           className={`text-base transition duration-300 ease-in-out cursor-pointer hover:text-blue ${

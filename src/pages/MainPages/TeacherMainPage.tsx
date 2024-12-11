@@ -28,8 +28,6 @@ const TeacherMainPage: FC = () => {
     navigate(`/intensives`);
   };
 
-  // TODO: где-то идет лютый gap
-
   return (
     <>
       {isError ? (
