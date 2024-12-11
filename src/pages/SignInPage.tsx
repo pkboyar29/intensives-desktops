@@ -34,23 +34,27 @@ const SignInPage: FC = () => {
   }, [currentUser]);
 
   const onSubmit = async (data: ISignIn) => {
-    try {
-      const signInDataResponse = await signIn(data).unwrap();
+      const {data: responseData, error: responseError } = await signIn(data);
 
-      Cookies.set('access', signInDataResponse.access, {
-        expires: 1,
-      });
-      Cookies.set('refresh', signInDataResponse.refresh, {
-        expires: 15,
-      });
+      if (responseData) {
+        console.log('hello world');
 
-      getUserInfo();
-    } catch (e) {
-      setError('password', {
-        type: 'custom',
-        message: 'Email или пароль неверны!',
-      });
-    }
+        Cookies.set('access', responseData.access, {
+          expires: 1,
+        });
+        Cookies.set('refresh', responseData.refresh, {
+          expires: 15,
+        });
+  
+        getUserInfo();  
+      }
+
+      if (responseError) {
+        setError('password', {
+          type: 'custom',
+          message: 'Email или пароль неверны!',
+        });
+      }
   };
 
   return (
