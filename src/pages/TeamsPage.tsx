@@ -1,29 +1,26 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TeamsContext } from '../context/TeamsContext';
-import { createColumnHelper } from '@tanstack/react-table';
 
-import { ITeam } from '../ts/interfaces/ITeam';
+import { createColumnHelper } from '@tanstack/react-table';
 
 import Title from '../components/common/Title';
 import Table from '../components/common/Table';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 const TeamsPage: FC = () => {
   const params = useParams();
-  const { teams, getTeams } = useContext(TeamsContext);
+
+  const teams: ITeam[] = []
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (params.intensiveId) {
-        getTeams(parseInt(params.intensiveId, 10));
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  interface TeamForColumn {
+    id: number,
+    name: string,
+    tutorNameSurname: string,
+    mentorNameSurname: string
+  }
 
-  const columnHelper = createColumnHelper<ITeam>();
+  const columnHelper = createColumnHelper<TeamForColumn>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',
@@ -35,11 +32,11 @@ const TeamsPage: FC = () => {
     }),
     columnHelper.accessor('tutorNameSurname', {
       header: () => 'Тьютор',
-      cell: (info) => info.getValue(),
+      cell: (info) => 'Тьютор',
     }),
     columnHelper.accessor('mentorNameSurname', {
       header: () => 'Наставник',
-      cell: (info) => info.getValue(),
+      cell: (info) => 'Наставник',
     }),
   ];
 

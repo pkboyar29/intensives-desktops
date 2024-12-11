@@ -17,7 +17,7 @@ import Title from '../components/common/Title';
 import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 
-import { ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const CreateSupportTeamsPage: FC = () => {
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
 
-  const [teams, setTeams] = useState<ITeamForManager[]>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
   // TODO: предположить, что тут может быть рандомная цифра?
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(

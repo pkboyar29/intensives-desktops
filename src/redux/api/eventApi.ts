@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from './baseQuery';
 import {
   IEventCreate,
   IEventUpdate,
-  IManagerEvent,
+  IEvent,
 } from '../../ts/interfaces/IEvent';
 import { mapTeamForManager } from './teamApi';
 import { mapAudience } from './audienceApi';
@@ -12,7 +12,7 @@ import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
 import { mapCriteria } from './criteriaApi';
 
-export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
+export const mapManagerEvent = (unmappedEvent: any): IEvent => {
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
@@ -41,14 +41,14 @@ export const eventApi = createApi({
   reducerPath: 'eventApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getEvent: builder.query<IManagerEvent, number>({
+    getEvent: builder.query<IEvent, number>({
       query: (id) => `/events/${id}/`,
-      transformResponse: (response: any): IManagerEvent =>
+      transformResponse: (response: any): IEvent =>
         mapManagerEvent(response),
     }),
-    getEventsOnIntensive: builder.query<IManagerEvent[], number>({
+    getEventsOnIntensive: builder.query<IEvent[], number>({
       query: (intensiveId) => `/events/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): IManagerEvent[] =>
+      transformResponse: (response: any): IEvent[] =>
         response.results.map((unmappedManagerEvent: any) =>
           mapManagerEvent(unmappedManagerEvent)
         ),

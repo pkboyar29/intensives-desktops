@@ -1,31 +1,31 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
 
-import { TeamsContext } from '../context/TeamsContext';
-
 import Title from '../components/common/Title';
 import OverviewContent from '../components/OverviewContent';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 const TeamOverviewPage: FC = () => {
   const params = useParams();
-  const { currentTeam, setCurrentTeamForStudent } = useContext(TeamsContext);
+
+  // TODO: отправлять запрос на получение текущей команды для студента. А если препод будет в эту страницу заходить?
+  const currentTeam: ITeam = {
+    id: null,
+    index: 1,
+    name: '',
+    studentsInTeam: [],
+    tutor: null,
+    mentor: null,
+    teamleadId: 1,  
+  };
 
   const currentUser = useAppSelector((state) => state.user.data);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (params.teamId && currentUser) {
-        setCurrentTeamForStudent(parseInt(params.teamId, 10));
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [currentUser]);
-
+  // TODO: заменить на skeleton
   if (isLoading) {
     return <div className="mt-3 font-sans text-2xl font-bold">Загрузка...</div>;
   }
@@ -38,13 +38,13 @@ const TeamOverviewPage: FC = () => {
         <div>
           <h2 className="font-sans text-xl font-bold text-black">Наставник</h2>
           <div className="mt-2 font-sans text-base text-bright_gray">
-            {currentTeam.mentorNameSurname}
+            {currentTeam.mentor?.nameWithGroup}
           </div>
         </div>
         <div>
           <h2 className="font-sans text-xl font-bold text-black">Тьютор</h2>
           <div className="mt-2 font-sans text-base text-bright_gray">
-            {currentTeam.tutorNameSurname}
+            {currentTeam.tutor?.name}
           </div>
         </div>
       </OverviewContent>

@@ -5,12 +5,12 @@ import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
 
-import { ITeamForManager } from '../../ts/interfaces/ITeam';
+import { ITeam } from '../../ts/interfaces/ITeam';
 
 interface SupportTeamDragContainerProps<
   DroppedElementType extends { id: number; content: string; isTutor: boolean }
 > {
-  team: ITeamForManager;
+  team: ITeam;
   onDrop: (droppedElement: DroppedElementType) => void;
   onDelete: (deleteTutorOrMentor: boolean) => void;
 }
