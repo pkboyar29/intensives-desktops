@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetIntensiveQuery } from '../../redux/api/intensiveApi';
 
-import { useAppDispatch } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 
 import IntensiveNotFoundComponent from '../../components/IntensiveNotFoundComponent';
@@ -17,11 +17,14 @@ const TeacherMainPage: FC = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
 
-  const {
-    data: currentIntensive,
-    isLoading,
-    isError,
-  } = useGetIntensiveQuery(Number(params.intensiveId));
+  const { isLoading, isError } = useGetIntensiveQuery(
+    Number(params.intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
