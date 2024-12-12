@@ -8,7 +8,6 @@ import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
 import EventsPage from '../pages/EventsPage';
-import TeamsPage from '../pages/TeamsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
@@ -41,7 +40,7 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'teams',
-        element: <TeamsPage />,
+        element: <ManagerTeamsPage />,
       },
       {
         // TODO: переименовать на schedule
