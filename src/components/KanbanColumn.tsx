@@ -8,40 +8,40 @@ interface KanbanColumnProps {
     title: string;
     colorHEX: string;
     moveColumn: (dragIndex: number, hoverIndex: number) => void;
-    onUpdateTitle: (newTitle: string) => void;
+    onUpdateTitle: (id:number, newTitle: string) => void;
 }
 
 const KanbanColumn: FC<KanbanColumnProps> = ({ id, index, title, colorHEX, moveColumn, onUpdateTitle }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentTitle, setCurrentTitle] = useState(title);
 
-    const handleEditClick = () => {
-        setIsEditing(true);
-      };
+    const handleDoubleClick = () => {
+        setIsEditing(true); // Включаем режим редактирования
+    };
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCurrentTitle(e.target.value);
-      };
+    };
     
     const handleBlur = () => {
         setIsEditing(false);
         if (currentTitle !== title) {
-          onUpdateTitle(currentTitle); // Вызываем функцию обновления названия на беке
+          onUpdateTitle(id, currentTitle); // Вызываем функцию обновления названия на беке
         }
-      };
+    };
     
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
           setIsEditing(false);
           if (currentTitle !== title) {
-            onUpdateTitle(currentTitle);
+            onUpdateTitle(id, currentTitle);
           }
         }
     };
 
     // Прекращаем drag, если поле ввода активно
     const preventDrag = (e: React.MouseEvent) => {
-        if (isEditing && !(e.target instanceof HTMLInputElement)) {
+        if (isEditing ) {
             e.preventDefault();
         }
     };
@@ -84,17 +84,12 @@ const KanbanColumn: FC<KanbanColumnProps> = ({ id, index, title, colorHEX, moveC
                             onBlur={handleBlur}
                             onKeyDown={handleKeyDown}
                             autoFocus
-                            className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-full" />
+                            className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-full " />
                     ) : (
-                        <h2 className="text-xl font-semibold text-gray-700">
+                        <h2 className="text-xl font-semibold text-gray-700 cursor-pointer" onDoubleClick={handleDoubleClick}>
                             {currentTitle}
                         </h2>
                     )}
-                    <button
-                        onClick={handleEditClick}
-                        className="text-sm text-blue-500 hover:text-blue-700 focus:outline-none opacity-0 group-hover:opacity-100 transition-opacity">
-                        Ред
-                    </button>
 
                 </div>
                 

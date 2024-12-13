@@ -2,7 +2,8 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
-    IColumn, IColumnCreate
+    IColumn, IColumnCreate,
+    IColumnPositionUpdate
 } from '../../ts/interfaces/IColumn';
 
 const mapColumn = (unmappedEvent: any): IColumn => {
@@ -42,6 +43,22 @@ export const columnApi = createApi({
             }),
             transformResponse: (response: any): IColumn => mapColumn(response),
         }),
+        updateColumnPosition: builder.mutation<IColumn, IColumnPositionUpdate>({
+            query: (data) => ({
+                url: `/kanban_columns/${data.id}/`,
+                method: 'PATCH',
+                body: data,
+            }),
+            transformResponse: (response: any): IColumn => mapColumn(response),
+        }),
+        updateColumnName: builder.mutation<IColumn, Partial<IColumn>>({
+            query: ({ id, name }) => ({
+                url: `/kanban_columns/${id}/`,
+                method: 'PATCH',
+                body: { name },
+            }),
+            transformResponse: (response: any): IColumn => mapColumn(response),
+        }),
         deleteColumn: builder.mutation<void, number>({
             query: (id) => ({
               url: `/kanban_columns/${id}/`,
@@ -56,5 +73,7 @@ export const {
     useGetColumnsTeamQuery,
     useCreateColumnMutation,
     useUpdateColumnMutation,
+    useUpdateColumnPositionMutation,
+    useUpdateColumnNameMutation,
     useDeleteColumnMutation
 } = columnApi

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { useGetColumnsTeamQuery } from '../redux/api/columnApi';
+import { useGetColumnsTeamQuery, useUpdateColumnPositionMutation, useUpdateColumnNameMutation, useCreateColumnMutation } from '../redux/api/columnApi';
 import { IColumn } from '../ts/interfaces/IColumn';
 import KanbanColumn from '../components/KanbanColumn';
 import DragKanbanColumn from '../components/DragComponents/DragKanbanColumn';
@@ -12,7 +12,13 @@ const KanbanBoardPage: FC = () => {
         refetchOnMountOrArgChange: true,
     });
 
+    const [createColumnAPI] = useCreateColumnMutation();
+    const [updateColumnPositionAPI] = useUpdateColumnPositionMutation();
+    const [updateColumnNameAPI] = useUpdateColumnNameMutation();
     const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
+
+    const [isColumnCreating, setColumnCreating] = useState(false);
+    const [currentColumnCreatingName, setCurrentColumnCreatingName] = useState("");
 
     useEffect(() => {
         if (columns) {
@@ -25,37 +31,60 @@ const KanbanBoardPage: FC = () => {
     });
 
     useEffect(() => {
-        console.log(kanbanColumns[0])
+        //console.log(kanbanColumns[0])
     }, [kanbanColumns])
 
     // Функция для обновления позиций после перемещения
     const handleMoveColumn = (dragIndex: number, hoverIndex: number) => {
+        console.log("dragIndex: " + dragIndex + " hoverIndex: " + hoverIndex)
         const updatedColumns = [...kanbanColumns];
         const [movedColumn] = updatedColumns.splice(dragIndex, 1);
-        updatedColumns.splice(hoverIndex, 0, movedColumn);
-
-        // Обновляем позицию каждой колонки
-        const newColumns = updatedColumns.map((col, index) => ({
-        ...col,
-        position: index + 1,
-        }));
-
-        setKanbanColumns(newColumns);
-
-        // Дальше отправляем обновление на сервер   
-
+        console.log(movedColumn.id)
+        updateColumnPosition(movedColumn, hoverIndex)
     };
 
-    // Функция для обновления названия
-    const handleUpdateTitle = (newTitle: string) => {
-        console.log(newTitle);
+    const updateColumnPosition = async (column: IColumn, newPosition: number) => {
+        const { data: responseData } = await updateColumnPositionAPI({
+            id: column.id,
+            position: newPosition,
+        });
+
+        console.log(responseData)
     }
+
+    // Функция для обновления названия
+    const handleUpdateTitle = async (id: number, newTitle: string) => {
+        const { data: responseData } = await updateColumnNameAPI({
+            id: id,
+            name: newTitle,
+        });
+    }
+
+    const createColumn = async () => {
+        
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentColumnCreatingName(e.target.value);
+    };
+
+    const handleBlur = () => {
+        setColumnCreating(false);
+        
+    };
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            setColumnCreating(false);
+        }
+    };
+
 
     return(
     <div>
         <DndProvider backend={HTML5Backend}>
             <div>tut kolonki:</div>
-            <div className='flex items-center space-x-4'>
+            <div className='flex items-start space-x-4'>
 
                 {kanbanColumns
                     .slice() // Создаем копию массива, чтобы не мутировать исходный массив
@@ -71,6 +100,19 @@ const KanbanBoardPage: FC = () => {
                         onUpdateTitle={handleUpdateTitle}
                     />
                 ))}
+                
+                {isColumnCreating ? (
+                    <input
+                        type="text"
+                        defaultValue={""}
+                        onBlur={handleBlur}
+                        onKeyDown={handleKeyDown}
+                        onChange={handleInputChange}
+                        autoFocus
+                        className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50" />
+                    ) : (
+                    <button className='w-50 p-4 bg-blue text-white rounded-[10px] duration-300' onClick={() => setColumnCreating(true)}>Создать колонку</button>
+                )}
             </div>
         </DndProvider>
         

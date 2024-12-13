@@ -12,9 +12,7 @@ export interface IColumnCreate {
     team: number;
 }
 
-export interface IColumnUpdate {
-    name: string;
-    colorHEX: string;
+export interface IColumnPositionUpdate {
+    id: number;
     position: number;
-    team: number;
 }
