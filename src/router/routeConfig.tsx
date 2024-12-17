@@ -85,10 +85,6 @@ const routeConfig: RouteType[] = [
         element: <EventPage />,
       },
       {
-        path: 'tasks-board',
-        element: <StudentTasksBoardPage />,
-      },
-      {
         path: 'tasks',
         element: <StudentTasksPage />,
       },
@@ -97,9 +93,9 @@ const routeConfig: RouteType[] = [
         element: <StudentTaskAnswerPage />,
       },
       {
-        path: 'kanban', //команда в url или нет?
-        element: <KanbanBoardPage />
-      }
+        path: 'kanban',
+        element: <KanbanBoardPage />,
+      },
     ],
     requiredAuth: false,
   },
