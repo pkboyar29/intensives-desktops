@@ -49,7 +49,9 @@ const SupportTeamDragContainer = <
           : 'flex gap-4 py-2.5 px-4 select-none'
       }
     >
-      <TeamIcon />
+      <div className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12">
+        <TeamIcon />
+      </div>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center space-x-2">
