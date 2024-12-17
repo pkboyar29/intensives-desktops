@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FC } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import KanbanColumnMenu from './KanbanColumnMenu';
+import KanbanTask from './KanbanTask';
 
 interface KanbanColumnProps {
     id: number;
@@ -108,8 +109,9 @@ const KanbanColumn: FC<KanbanColumnProps> = ({ id, index, title, colorHEX, moveC
                 + Создать задачу
             </button>
 
-            <div className="space-y-2">
-                zadachi tut
+            <div className="space-y-2 mt-4">
+                <KanbanTask id={"INT-1"} title="Задача 1" isCompleted={false} />
+                <KanbanTask id={"INT-2"} title="Задача 2" isCompleted={false} />
             </div>
             
         </div>      

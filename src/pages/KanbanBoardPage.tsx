@@ -83,7 +83,6 @@ const KanbanBoardPage: FC = () => {
     return(
     <div>
         <DndProvider backend={HTML5Backend}>
-            <div>tut kolonki:</div>
             <div className='flex items-start space-x-4'>
 
                 {kanbanColumns
