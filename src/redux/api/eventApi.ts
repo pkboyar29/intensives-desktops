@@ -1,18 +1,14 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import {
-  IEventCreate,
-  IEventUpdate,
-  IManagerEvent,
-} from '../../ts/interfaces/IEvent';
-import { mapTeamForManager } from './teamApi';
+import { IEventCreate, IEventUpdate, IEvent } from '../../ts/interfaces/IEvent';
+import { mapTeam } from './teamApi';
 import { mapAudience } from './audienceApi';
 import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
 import { mapCriteria } from './criteriaApi';
 
-export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
+export const mapManagerEvent = (unmappedEvent: any): IEvent => {
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
@@ -23,7 +19,7 @@ export const mapManagerEvent = (unmappedEvent: any): IManagerEvent => {
     visibility: unmappedEvent.visibility,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
-      mapTeamForManager(unmappedTeam)
+      mapTeam(unmappedTeam)
     ),
     teachers: unmappedEvent.teachers.map((unmappedTeacher: any) =>
       mapTeacher(unmappedTeacher)
@@ -41,14 +37,13 @@ export const eventApi = createApi({
   reducerPath: 'eventApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getEvent: builder.query<IManagerEvent, number>({
+    getEvent: builder.query<IEvent, number>({
       query: (id) => `/events/${id}/`,
-      transformResponse: (response: any): IManagerEvent =>
-        mapManagerEvent(response),
+      transformResponse: (response: any): IEvent => mapManagerEvent(response),
     }),
-    getEventsOnIntensive: builder.query<IManagerEvent[], number>({
+    getEventsOnIntensive: builder.query<IEvent[], number>({
       query: (intensiveId) => `/events/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): IManagerEvent[] =>
+      transformResponse: (response: any): IEvent[] =>
         response.results.map((unmappedManagerEvent: any) =>
           mapManagerEvent(unmappedManagerEvent)
         ),

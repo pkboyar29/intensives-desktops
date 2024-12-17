@@ -1,15 +1,10 @@
-import { FC, useEffect, useContext, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useForm } from 'react-hook-form';
 
 import { useAppSelector } from '../redux/store';
 
-import { TeamsContext } from '../context/TeamsContext';
-import { EventsContext } from '../context/EventsContext';
-import authHeader from '../helpers/getHeaders';
-
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import { ITeam } from '../ts/interfaces/ITeam';
 import { IEvent } from '../ts/interfaces/IEvent';
 
@@ -23,8 +18,6 @@ const TeamEvaluationPage: FC = () => {
 
   const params = useParams();
   const navigate = useNavigate();
-  const { teams, getTeams } = useContext(TeamsContext);
-  const { events, setEventsForIntensiv } = useContext(EventsContext);
   const [currentAnswer, setCurrentAnswer] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -36,45 +29,50 @@ const TeamEvaluationPage: FC = () => {
     },
   });
 
-  const currentTeam: ITeam | undefined = teams.find((team: ITeam) => {
-    if (params.teamId) {
-      return team.id === parseInt(params.teamId, 10);
-    }
-  });
+  const currentTeam: ITeam | undefined = {
+    id: null,
+    index: 1,
+    name: '',
+    studentsInTeam: [],
+    tutor: null,
+    mentor: null,
+    teamleadId: 1,
+  
+  };
 
-  const currentEvent: IEvent | undefined = events.find((event: IEvent) => {
-    if (params.eventId) {
-      return event.id === parseInt(params.eventId, 10);
-    }
-  });
+  const currentEvent: IEvent | undefined = {
+    id: 1,
+    name: '',
+    description: '',
+    startDate: new Date(123),
+    finishDate: new Date(123),
+    audience: {
+      id: 1,
+      name: ''
+    },
+    stageId: null,
+    teams: [],
+    teachers: [],
+    markStrategy: null,
+    criterias: [],
+    visibility: true,  
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      if (params.intensiveId && params.eventId) {
-        getTeams(parseInt(params.intensiveId, 10));
-        setEventsForIntensiv(parseInt(params.intensiveId, 10));
-      }
-      await getCurrentAnswer();
-      setIsLoading(false);
+      console.log('fetch data');
+      // if (params.intensiveId && params.eventId) {
+      //   getTeams(parseInt(params.intensiveId, 10));
+      //   setEventsForIntensiv(parseInt(params.intensiveId, 10));
+      // }
+      // await getCurrentAnswer();
+      // setIsLoading(false);
     };
     fetchData();
   }, []);
 
   const getCurrentAnswer = async () => {
-    const answersResponse = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/answers/`,
-      { headers: await authHeader() }
-    );
-    const allAnswers = answersResponse.data.results;
-    const currentEventAnswers = allAnswers.filter((answer: any) => {
-      if (params.eventId) {
-        return answer.event === parseInt(params.eventId, 10);
-      }
-    });
-    const currentTeamAnswer = currentEventAnswers.find(
-      (answer: any) => String(answer.command) === String(params.teamId)
-    );
-    setCurrentAnswer(currentTeamAnswer);
+    setCurrentAnswer(undefined);
   };
 
   const onSubmit = (data: FormValues) => {
@@ -82,31 +80,32 @@ const TeamEvaluationPage: FC = () => {
 
     marks.forEach(async (mark: any) => {
       try {
-        let requestBody;
-        if (mark.criteriaId === '0') {
-          requestBody = {
-            mark: mark.mark,
-            comment: data.comment,
-            answer: currentAnswer.id,
-            teacher: currentUser?.teacher_id,
-          };
-        } else {
-          requestBody = {
-            mark: mark.mark,
-            comment: data.comment,
-            answer: currentAnswer.id,
-            criteria: mark.criteriaId,
-            teacher: currentUser?.teacher_id,
-          };
-        }
-        console.log(requestBody);
+        console.log('sending request');
+        // let requestBody;
+        // if (mark.criteriaId === '0') {
+        //   requestBody = {
+        //     mark: mark.mark,
+        //     comment: data.comment,
+        //     answer: currentAnswer.id,
+        //     teacher: currentUser?.teacher_id,
+        //   };
+        // } else {
+        //   requestBody = {
+        //     mark: mark.mark,
+        //     comment: data.comment,
+        //     answer: currentAnswer.id,
+        //     criteria: mark.criteriaId,
+        //     teacher: currentUser?.teacher_id,
+        //   };
+        // }
+        // console.log(requestBody);
 
-        const markResponse = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/marks/`,
-          requestBody,
-          { headers: await authHeader() }
-        );
-        console.log(markResponse.data);
+        // const markResponse = await axios.post(
+        //   `${import.meta.env.VITE_BACKEND_URL}/marks/`,
+        //   requestBody,
+        //   { headers: await authHeader() }
+        // );
+        // console.log(markResponse.data);
       } catch (error) {
         console.log(error);
       }
@@ -114,7 +113,7 @@ const TeamEvaluationPage: FC = () => {
   };
 
   const renderMarkContent = (criteriaId: number, index: number) => {
-    switch (currentEvent?.markStrategyId) {
+    switch (currentEvent?.markStrategy?.id) {
       case 2:
         return (
           <>
@@ -182,7 +181,7 @@ const TeamEvaluationPage: FC = () => {
 
       {currentAnswer && (
         <form onSubmit={handleSubmit(onSubmit)}>
-          {currentEvent?.criteriasNames.length === 0 ? (
+          {currentEvent?.criterias.length === 0 ? (
             <>
               <div className="my-5 font-sans text-xl font-bold text-black">
                 Общая оценка
@@ -199,18 +198,18 @@ const TeamEvaluationPage: FC = () => {
               <div className="my-5 font-sans text-xl font-bold text-black">
                 Критерии
               </div>
-              {currentEvent?.criteriasNames.map((criteriaName, index) => (
+              {currentEvent?.criterias.map((criteria, index) => (
                 <div
                   className="flex items-center justify-between gap-16 mb-5 w-96"
-                  key={currentEvent.criterias && currentEvent.criterias[index]}
+                  key={1}
                 >
                   <div className="text-base font-normal text-black font-inter">
-                    {criteriaName}
+                    {criteria.name}
                   </div>
                   <div>
                     {' '}
                     {renderMarkContent(
-                      currentEvent.criterias[index],
+                      1,
                       index
                     )}{' '}
                   </div>

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
-import InputDescription from '../components/inputs/InputDescription';
-import PrimaryButton from '../components/PrimaryButton';
+import InputDescription from '../components/common/inputs/InputDescription';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 import { ISignIn } from '../ts/interfaces/IUser';
 
@@ -29,33 +29,30 @@ const SignInPage: FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      redirect(currentUser.roleName);
+      navigate('/intensives');
     }
   }, [currentUser]);
 
   const onSubmit = async (data: ISignIn) => {
-    try {
-      const signInDataResponse = await signIn(data).unwrap();
+      const {data: responseData, error: responseError } = await signIn(data);
 
-      Cookies.set('access', signInDataResponse.access);
-      Cookies.set('refresh', signInDataResponse.refresh);
+      if (responseData) {
+        Cookies.set('access', responseData.access, {
+          expires: 1,
+        });
+        Cookies.set('refresh', responseData.refresh, {
+          expires: 15,
+        });
+  
+        getUserInfo();  
+      }
 
-      getUserInfo();
-    } catch (e) {
-      setError('password', {
-        type: 'custom',
-        message: 'Email или пароль неверны!',
-      });
-    }
-  };
-
-  const redirect = (roleName: string) => {
-    if (roleName === 'Студент') {
-      navigate('/intensives');
-    } else {
-      // if roleId == 2 or 3 or 4
-      navigate('/intensives');
-    }
+      if (responseError) {
+        setError('password', {
+          type: 'custom',
+          message: 'Email или пароль неверны!',
+        });
+      }
   };
 
   return (

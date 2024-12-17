@@ -2,13 +2,13 @@ import { FC } from 'react';
 
 import EyeIcon from '../icons/EyeIcon';
 
-import { IManagerEvent } from '../../ts/interfaces/IEvent';
+import { IEvent } from '../../ts/interfaces/IEvent';
 import { getTimeFromDate } from '../../helpers/dateHelpers';
 
 interface EventInScheduleProps {
-  event: IManagerEvent;
+  event: IEvent;
   onEventClick: (eventId: number) => void;
-  onEyeIconClick: (event: IManagerEvent) => void;
+  onEyeIconClick: (event: IEvent) => void;
 }
 
 const EventInSchedule: FC<EventInScheduleProps> = ({

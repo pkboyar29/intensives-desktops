@@ -7,9 +7,12 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
-import Table from '../components/Table';
-import Title from '../components/Title';
-import PrimaryButton from '../components/PrimaryButton';
+import SearchIcon from '../components/icons/SearchIcon';
+import IntensiveListCard from '../components/IntensiveListCard';
+import Table from '../components/common/Table';
+import Title from '../components/common/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
+import Filter from '../components/common/Filter';
 import Skeleton from 'react-loading-skeleton';
 
 const IntensivesPage: FC = () => {
@@ -19,20 +22,96 @@ const IntensivesPage: FC = () => {
 
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
-  }); // OR REFETCH UNDER SPECIFIC CONDITION?
-
+  });
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
   );
+  const [sortedIntensives, setSortedIntensives] = useState<IIntensive[]>([]);
 
   const [searchText, setSearchText] = useState<string>('');
+  const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
+    'fromOldToNew'
+  );
+
+  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+  const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
+    'all'
+  );
+
+  // обрабатывать зависимость relevance
+  useEffect(() => {
+    updateFilteredIntensives();
+  }, [searchText, openness, relevance, intensives]);
 
   useEffect(() => {
+    updateSortedIntensives();
+  }, [sortOption, filteredIntensives]);
+
+  // TODO: обрабатывать relevance
+  const updateFilteredIntensives = () => {
     if (intensives) {
-      setFilteredIntensives(intensives);
-      setSearchText('');
+      let filteredIntensives: IIntensive[] = [];
+
+      filteredIntensives = intensives.filter((intensive) =>
+        intensive.name.toLowerCase().includes(searchText)
+      );
+
+      if (currentUser?.roleNames.includes('Организатор')) {
+        if (openness === 'opened') {
+          filteredIntensives = filteredIntensives.filter(
+            (intensive) => intensive.isOpen
+          );
+        }
+        if (openness === 'closed') {
+          filteredIntensives = filteredIntensives.filter(
+            (intensive) => !intensive.isOpen
+          );
+        }
+      }
+
+      if (relevance === 'relevant') {
+        filteredIntensives = filteredIntensives.filter(
+          (intensive) => intensive.closeDate.getTime() > Date.now()
+        );
+      }
+
+      if (relevance === 'past') {
+        filteredIntensives = filteredIntensives.filter(
+          (intensive) => intensive.closeDate.getTime() < Date.now()
+        );
+      }
+
+      setFilteredIntensives(filteredIntensives);
     }
-  }, [intensives]);
+  };
+
+  const updateSortedIntensives = () => {
+    if (filteredIntensives) {
+      if (sortOption === 'fromOldToNew') {
+        // сортировка по возрастанию
+        setSortedIntensives(
+          [...filteredIntensives].sort(
+            (a, b) => a.openDate.getTime() - b.openDate.getTime()
+          )
+        );
+      } else if (sortOption === 'fromNewToOld') {
+        // сортировка по убыванию
+        setSortedIntensives(
+          [...filteredIntensives].sort(
+            (a, b) => b.openDate.getTime() - a.openDate.getTime()
+          )
+        );
+      }
+    }
+  };
+
+  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(e.target.value as 'fromOldToNew' | 'fromNewToOld');
+  };
 
   const columnHelper = createColumnHelper<IIntensive>();
   const columns = [
@@ -54,91 +133,127 @@ const IntensivesPage: FC = () => {
     }),
     columnHelper.accessor('flows', {
       header: () => 'Участники',
-      cell: (info) => info.getValue()[0] && info.getValue()[0].name,
+      cell: (info) =>
+        info
+          .getValue()
+          .map((flow) => `Поток ${flow.name}`)
+          .join(', '),
     }),
   ];
 
-  // TODO: проверять наличие элемента в массиве
+  // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleName === 'Студент') {
+    if (currentUser?.roleNames.includes('Студент')) {
       navigate(`/student/${id}/overview`);
-    } else if (
-      currentUser?.roleName === 'Супер-администратор' ||
-      currentUser?.roleName === 'Организатор'
-    ) {
+    } else if (currentUser?.roleNames.includes('Организатор')) {
       navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roleName === 'Преподаватель') {
+    } else if (currentUser?.roleNames.includes('Преподаватель')) {
       navigate(`/teacher/${id}/overview`);
     }
   };
 
-  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (intensives) {
-      setSearchText(e.target.value);
-
-      setFilteredIntensives(
-        intensives.filter((intensive) =>
-          intensive.name.toLowerCase().includes(e.target.value.toLowerCase())
-        )
-      );
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="max-w-[1280px] mx-auto">
-        <div className="mt-3 font-sans text-2xl font-bold">
-          <Skeleton />
-        </div>
-      </div>
-    );
-  }
-
-  if (!intensives && !isLoading) {
-    return (
-      <div className="max-w-[1280px] mx-auto">
-        <Title text="Для вас пока нету открытых интенсивов" />
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-[1280px] mx-auto">
+    <div className="max-w-[1280px] mx-auto px-4">
       <div className="mt-10">
-        <div className="">
-          <Title text="Интенсивы" />
+        <Title text="Интенсивы" />
+
+        <div className="mt-10">
+          {currentUser?.roleNames.includes('Организатор') && (
+            <div className="flex justify-end">
+              <div className="ml-auto">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        {(currentUser?.roleName === 'Супер-администратор' ||
-          currentUser?.roleName === 'Организатор') && (
-          <div className="flex justify-end mt-10">
-            <div className="ml-auto">
-              <PrimaryButton
-                children="Создать интенсив"
-                clickHandler={() => navigate(`/createIntensive`)}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="mt-3">
+        <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
+          <SearchIcon className="text-gray-500" />
           <input
             value={searchText}
             onChange={searchInputChangeHandler}
-            className="w-full px-4 py-3 bg-another_white rounded-xl"
+            className="w-full pl-4 bg-another_white focus:outline-none"
             placeholder="Поиск"
           />
         </div>
 
-        <div className="mt-10">
-          {filteredIntensives.length !== 0 ? (
-            <Table
-              onClick={intensiveClickHandler}
-              columns={columns}
-              data={filteredIntensives}
+        <div className="flex items-center justify-between gap-8 mt-5">
+          <div className="flex gap-8">
+            {currentUser?.roleNames.includes('Организатор') && (
+              <Filter
+                onFilterOptionClick={(filterOption) =>
+                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                }
+                activeFilterOption={openness}
+                filterList={[
+                  { label: 'Открытые', value: 'opened' },
+                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Все', value: 'all' },
+                ]}
+              />
+            )}
+
+            <Filter
+              onFilterOptionClick={(filterOption) =>
+                setRelevance(filterOption as 'all' | 'past' | 'relevant')
+              }
+              activeFilterOption={relevance}
+              filterList={[
+                { label: 'Актуальные', value: 'relevant' },
+                { label: 'Прошедшие', value: 'past' },
+                { label: 'Все', value: 'all' },
+              ]}
             />
+          </div>
+
+          <select
+            onChange={selectChangeHandler}
+            value={sortOption}
+            className="bg-another_white rounded-xl p-1.5"
+          >
+            <option value="fromOldToNew">
+              Сортировка по дате (сначала старые)
+            </option>
+            <option value="fromNewToOld">
+              Сортировка по дате (сначала новые)
+            </option>
+          </select>
+        </div>
+
+        <div className="mt-10">
+          {isLoading ? (
+            <Skeleton />
+          ) : intensives?.length === 0 ? (
+            <div className="text-xl font-bold">
+              Для вас нету открытых интенсивов
+            </div>
           ) : (
-            <div className="text-xl font-bold">Ничего не найдено</div>
+            <>
+              {sortedIntensives.length !== 0 ? (
+                currentUser?.roleNames.includes('Организатор') ? (
+                  <Table
+                    onClick={intensiveClickHandler}
+                    columns={columns}
+                    data={sortedIntensives}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {sortedIntensives.map((intensive) => (
+                      <IntensiveListCard
+                        key={intensive.id}
+                        intensive={intensive}
+                        onClick={intensiveClickHandler}
+                      />
+                    ))}
+                  </div>
+                )
+              ) : (
+                <div className="text-xl font-bold">Ничего не найдено</div>
+              )}
+            </>
           )}
         </div>
       </div>

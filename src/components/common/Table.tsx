@@ -51,7 +51,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
                   onClick(row.getAllCells()[0].getValue() as number)
                 }
                 key={row.id}
-                className={`cursor-pointer ${
+                className={`cursor-pointer hover:bg-gray_8 transition duration-300 ease-in-out ${
                   rowIndex !== lastRowIndex &&
                   `border-b border-solid border-gray_9`
                 }`}

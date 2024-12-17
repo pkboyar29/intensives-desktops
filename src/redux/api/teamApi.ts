@@ -7,10 +7,10 @@ import { mapTeacher } from './teacherApi';
 import {
   ITeamsCreate,
   ITeamSupportMembersUpdate,
-  ITeamForManager,
+  ITeam,
 } from '../../ts/interfaces/ITeam';
 
-export const mapTeamForManager = (unmappedTeam: any): ITeamForManager => {
+export const mapTeam = (unmappedTeam: any): ITeam => {
   return {
     id: unmappedTeam.id,
     index: unmappedTeam.id,
@@ -28,18 +28,18 @@ export const teamApi = createApi({
   reducerPath: 'teamApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeams: builder.query<ITeamForManager[], number>({
+    getTeams: builder.query<ITeam[], number>({
       query: (intensiveId) => `teams/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeamForManager[] => {
-        const teams: ITeamForManager[] = response.results.map((team: any) =>
-          mapTeamForManager(team)
+      transformResponse: (response: any): ITeam[] => {
+        const teams: ITeam[] = response.results.map((team: any) =>
+          mapTeam(team)
         );
         teams.sort((a, b) => a.name.localeCompare(b.name));
 
         return teams;
       },
     }),
-    changeAllTeams: builder.mutation<ITeamForManager[], ITeamsCreate>({
+    changeAllTeams: builder.mutation<ITeam[], ITeamsCreate>({
       query: (data) => ({
         url: `/teams/change_all_teams/?intensive_id=${data.intensiveId}`,
         method: 'POST',
@@ -50,7 +50,7 @@ export const teamApi = createApi({
         })),
       }),
       transformResponse: (response: any) =>
-        response.map((unmappedTeam: any) => mapTeamForManager(unmappedTeam)),
+        response.map((unmappedTeam: any) => mapTeam(unmappedTeam)),
     }),
     // изменить на PUT запрос
     updateSupportMembers: builder.mutation<string, ITeamSupportMembersUpdate[]>(
@@ -67,6 +67,10 @@ export const teamApi = createApi({
         // transformResponse: (response: any) =>
       }
     ),
+    getMyTeam: builder.query<ITeam, number>({
+      query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
+      transformResponse: (response: any): ITeam => mapTeam(response),
+    }),
   }),
 });
 
@@ -75,4 +79,5 @@ export const {
   useLazyGetTeamsQuery,
   useChangeAllTeamsMutation,
   useUpdateSupportMembersMutation,
+  useLazyGetMyTeamQuery,
 } = teamApi;

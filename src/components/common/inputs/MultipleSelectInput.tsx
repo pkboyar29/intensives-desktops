@@ -10,6 +10,7 @@ interface MultipleSelectInputProps<T> {
   items: T[];
   selectedItems: T[];
   setSelectedItems: (items: T[]) => void;
+  chipSize?: 'small' | 'big';
 }
 
 const MultipleSelectInput = <T extends { id: number; name: string }>({
@@ -19,6 +20,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   items,
   selectedItems,
   setSelectedItems,
+  chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -95,11 +97,15 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
 
       <div className="flex flex-wrap gap-2 mx-3 mt-3">
         {selectedItems.map((selectedItem) => (
-          <Chip key={selectedItem.id} label={selectedItem.name} />
+          <Chip
+            key={selectedItem.id}
+            label={selectedItem.name}
+            size={chipSize}
+          />
         ))}
       </div>
 
-      <div className="mt-3 text-base text-red">{errorMessage}</div>
+      <div className="text-base text-red">{errorMessage}</div>
     </div>
   );
 };

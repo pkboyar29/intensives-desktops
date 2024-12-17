@@ -6,13 +6,13 @@ import { useAppSelector } from '../redux/store';
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
 
-import Modal from '../components/modals/Modal';
-import PrimaryButton from '../components/PrimaryButton';
+import Modal from '../components/common/modals/Modal';
+import PrimaryButton from '../components/common/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
 import BackArrowIcon from '../components/icons/BackArrowIcon';
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
-import Chip from '../components/Chip';
+import Chip from '../components/common/Chip';
 
 import { getTimeFromDate } from '../helpers/dateHelpers';
 
@@ -150,7 +150,11 @@ const EventPage: FC = () => {
                       </div>
                       <div className="flex flex-wrap gap-3">
                         {event.teachers.map((teacher) => (
-                          <Chip key={teacher.id} label={teacher.name} />
+                          <Chip
+                            key={teacher.id}
+                            size="small"
+                            label={teacher.name}
+                          />
                         ))}
                       </div>
                     </div>
@@ -187,7 +191,9 @@ const EventPage: FC = () => {
                 </div>
 
                 {/* TODO: эту роль очевидно потом поменять на роль организатора (ну только кнопку назад отображать для всех) */}
-                {currentUser?.roleName === 'Супер-администратор' && (
+                {currentUser?.roleNames.find(
+                  (roleName) => roleName === 'Организатор'
+                ) && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <div>
                       <PrimaryButton

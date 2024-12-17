@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-// import teamApi
+import { teamApi } from '../api/teamApi';
 
 import { ITeam } from '../../ts/interfaces/ITeam';
 
@@ -19,7 +19,14 @@ const teamSlice = createSlice({
       return initialState;
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      teamApi.endpoints.getMyTeam.matchFulfilled,
+      (state, { payload }) => {
+        state.data = payload;
+      }
+    );
+  },
 });
 
 export const { reset: resetTeamState } = teamSlice.actions;
