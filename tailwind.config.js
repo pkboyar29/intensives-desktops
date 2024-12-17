@@ -19,7 +19,6 @@ export default {
       gray: '#dbdee5',
       bright_gray: '#637087',
       gray_3: '#6b7280',
-      gray_4: '#d6ddec',
       gray_5: '#e8edf2',
       gray_6: '#d9dee3',
       gray_7: '#667080',

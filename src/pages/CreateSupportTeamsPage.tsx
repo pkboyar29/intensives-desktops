@@ -9,15 +9,15 @@ import { useGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
 
 import { useAppSelector } from '../redux/store';
 
-import Modal from '../components/modals/Modal';
+import Modal from '../components/common/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
-import PrimaryButton from '../components/PrimaryButton';
-import Title from '../components/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
+import Title from '../components/common/Title';
 import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 
-import { ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam } from '../ts/interfaces/ITeam';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const CreateSupportTeamsPage: FC = () => {
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
 
-  const [teams, setTeams] = useState<ITeamForManager[]>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
   // TODO: предположить, что тут может быть рандомная цифра?
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(

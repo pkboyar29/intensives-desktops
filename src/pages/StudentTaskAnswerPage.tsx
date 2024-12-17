@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from 'react';
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import { ITask } from '../ts/interfaces/ITask';
 import { useParams } from 'react-router-dom';
-import PrimaryButton from '../components/PrimaryButton';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 const StudentTaskAnswerPage: FC = () => {
   const { taskId } = useParams();

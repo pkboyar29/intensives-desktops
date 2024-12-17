@@ -8,6 +8,7 @@ import {
 } from '../../ts/interfaces/IIntensive';
 
 import { mapTeacher } from './teacherApi';
+import { mapStudentRole } from './studentRoleApi';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -21,6 +22,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
+    roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
   };
 };
 
@@ -31,7 +33,7 @@ export const intensiveApi = createApi({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',
       transformResponse: (response: any): IIntensive[] => {
-        const mappedIntensives: IIntensive[] = response.results.map(
+        const mappedIntensives: IIntensive[] = response.map(
           (unmappedIntensive: any) => mapIntensive(unmappedIntensive)
         );
 
@@ -47,28 +49,28 @@ export const intensiveApi = createApi({
         url: '/intensives/',
         method: 'POST',
         body: {
-          ...data,
+          name: data.name,
+          description: data.description,
           is_open: data.isOpen,
           open_dt: data.openDate,
           close_dt: data.closeDate,
           teachers: data.teacherIds,
           flows: data.flowIds,
-          university: data.universityId,
           roles: data.roleIds,
         },
       }),
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
-    // TODO: отправлять PUT запрос
     updateIntensive: builder.mutation<IIntensive, IIntensiveUpdate>({
       query: (data) => {
-        const { id, ...restData } = data;
+        const { id: intensiveId } = data;
 
         return {
-          url: `/intensives/${id}/`,
-          method: 'PATCH',
+          url: `/intensives/${intensiveId}/`,
+          method: 'PUT',
           body: {
-            ...restData,
+            name: data.name,
+            description: data.description,
             is_open: data.isOpen,
             open_dt: data.openDate,
             close_dt: data.closeDate,

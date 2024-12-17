@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 
-import CaretIcon from './icons/CaretIcon';
+import CaretIcon from '../icons/CaretIcon';
 
 interface DisplaySelectProps {
   dropdownText: string;

@@ -9,11 +9,11 @@ import PrimaryButton from '../PrimaryButton';
 import {
   useCreateStageMutation,
   useUpdateStageMutation,
-} from '../../redux/api/stageApi';
+} from '../../../redux/api/stageApi';
 
-import { getISODateInUTC3 } from '../../helpers/dateHelpers';
+import { getISODateInUTC3 } from '../../../helpers/dateHelpers';
 
-import { IStage } from '../../ts/interfaces/IStage';
+import { IStage } from '../../../ts/interfaces/IStage';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 interface StageModalProps {

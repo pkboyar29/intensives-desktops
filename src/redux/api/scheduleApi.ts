@@ -5,11 +5,11 @@ import { mapManagerEvent } from './eventApi';
 import { mapStage } from './stageApi';
 
 import { IStage } from '../../ts/interfaces/IStage';
-import { IManagerEvent } from '../../ts/interfaces/IEvent';
+import { IEvent } from '../../ts/interfaces/IEvent';
 
 export interface ISchedule {
   stages: IStage[];
-  events: IManagerEvent[];
+  events: IEvent[];
 }
 
 const mapSchedule = (unmappedSchedule: any): ISchedule => {

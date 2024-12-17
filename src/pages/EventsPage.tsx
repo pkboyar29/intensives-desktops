@@ -1,45 +1,23 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { useAppSelector } from '../redux/store';
 
-import { EventsContext } from '../context/EventsContext';
 import { IEvent } from '../ts/interfaces/IEvent';
 
-import Title from '../components/Title';
-import Table from '../components/Table';
+import Title from '../components/common/Title';
+import Table from '../components/common/Table';
 
 const EventsPage: FC = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const { events, setEventsForIntensiv, setEventsForTeam } =
-    useContext(EventsContext);
+  const events: IEvent[] = [];
 
   const currentUser = useAppSelector((state) => state.user.data);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (params.intensiveId && currentUser) {
-        await setEventsForIntensiv(parseInt(params.intensiveId, 10));
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [currentUser, params.intensiveId]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (params.teamId && currentUser) {
-        setEventsForTeam(parseInt(params.teamId));
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [currentUser, params.teamId]);
 
   const columnHelper = createColumnHelper<IEvent>();
   const columns = [

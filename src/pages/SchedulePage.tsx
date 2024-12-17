@@ -5,18 +5,18 @@ import { useDeleteStageMutation } from '../redux/api/stageApi';
 import { useUpdateEventMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
 
-import PrimaryButton from '../components/PrimaryButton';
-import Modal from '../components/modals/Modal';
-import Title from '../components/Title';
-import DisplaySelect from '../components/DisplaySelect';
+import PrimaryButton from '../components/common/PrimaryButton';
+import Modal from '../components/common/modals/Modal';
+import Title from '../components/common/Title';
+import DisplaySelect from '../components/common/DisplaySelect';
 import Skeleton from 'react-loading-skeleton';
 
 import StageInSchedule from '../components/schedule/StageInSchedule';
 import EventInSchedule from '../components/schedule/EventInSchedule';
-import StageModal from '../components/modals/StageModal';
+import StageModal from '../components/common/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
-import { IManagerEvent } from '../ts/interfaces/IEvent';
+import { IEvent } from '../ts/interfaces/IEvent';
 
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
@@ -61,11 +61,11 @@ const SchedulePage: FC = () => {
     navigate(`${eventId}`);
   };
 
-  const onEventEyeIconClick = async (event: IManagerEvent) => {
+  const onEventEyeIconClick = async (event: IEvent) => {
     toggleEventVisibility(event);
   };
 
-  const toggleEventVisibility = async (event: IManagerEvent) => {
+  const toggleEventVisibility = async (event: IEvent) => {
     const { data: responseData } = await updateEventAPI({
       visibility: !event.visibility,
       eventId: event.id,

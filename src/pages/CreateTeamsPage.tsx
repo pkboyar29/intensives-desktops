@@ -9,15 +9,15 @@ import {
 
 import TeamDragElement from '../components/DragComponents/TeamDragElement';
 import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
-import Title from '../components/Title';
-import PrimaryButton from '../components/PrimaryButton';
-import Modal from '../components/modals/Modal';
+import Title from '../components/common/Title';
+import PrimaryButton from '../components/common/PrimaryButton';
+import Modal from '../components/common/modals/Modal';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeamCreate, ITeam } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const CreateTeamsPage: FC = () => {
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
-  const [teams, setTeams] = useState<ITeamForManager[]>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
@@ -70,7 +70,7 @@ const CreateTeamsPage: FC = () => {
             setTeamsCount(teamsResponse.length);
             setTeams(teamsResponse);
           } else {
-            const initialTeamData: ITeamForManager[] = [
+            const initialTeamData: ITeam[] = [
               {
                 id: null,
                 index: 1,
@@ -164,7 +164,7 @@ const CreateTeamsPage: FC = () => {
       if (prevTeamsCount < teamsCount) {
         // teams count will increase
 
-        const newTeams: ITeamForManager[] = [];
+        const newTeams: ITeam[] = [];
         for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
           newTeams.push({
             id: null,
@@ -181,7 +181,7 @@ const CreateTeamsPage: FC = () => {
 
         setTeams((prevTeams) => {
           const reducedStudentsInTeam: IStudent[] = [];
-          const remainingTeams: ITeamForManager[] = [];
+          const remainingTeams: ITeam[] = [];
 
           for (let i = 0; i < prevTeamsCount; i++) {
             if (i <= teamsCount - 1) {
@@ -203,10 +203,10 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentMove = (
-    team: ITeamForManager,
+    team: ITeam,
     droppedStudent: IStudent
   ) => {
-    const sourceTeam: ITeamForManager | undefined = teams.find((team) =>
+    const sourceTeam: ITeam | undefined = teams.find((team) =>
       team.studentsInTeam.some((student) => student.id === droppedStudent.id)
     );
     if (sourceTeam) {
@@ -232,7 +232,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentDelete = (
-    team: ITeamForManager,
+    team: ITeam,
     studentToDelete: IStudent
   ) => {
     const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
@@ -376,7 +376,7 @@ const CreateTeamsPage: FC = () => {
             type="number"
             placeholder="Количество команд"
             onChange={teamsCountInputChangeHandler}
-            className="w-full p-2 border rounded-md border-gray_4"
+            className="w-full p-2 border rounded-md border-gray_5"
             value={teamsCount}
           />
           <MembersIcon />

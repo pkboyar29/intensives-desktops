@@ -8,8 +8,6 @@ import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
 import EventsPage from '../pages/EventsPage';
-import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
-import TeamsPage from '../pages/TeamsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
@@ -24,7 +22,6 @@ import ManagerTeamsPage from '../pages/ManagerTeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
-import ManageRolesPage from '../pages/ManageRolesPage';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 
@@ -39,11 +36,11 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <IntensiveOverviewPage />,
+        element: <ManagerIntensiveOverviewPage />,
       },
       {
         path: 'teams',
-        element: <TeamsPage />,
+        element: <ManagerTeamsPage />,
       },
       {
         // TODO: переименовать на schedule
@@ -67,7 +64,11 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <IntensiveOverviewPage />,
+        element: <ManagerIntensiveOverviewPage />,
+      },
+      {
+        path: 'teams',
+        element: <ManagerTeamsPage />,
       },
       {
         path: 'team-overview',
@@ -133,11 +134,6 @@ const routeConfig: RouteType[] = [
         path: 'schedule/editEvent',
         element: <ManageEventForm />,
       },
-      {
-        path: 'manageRoles',
-        element: <ManageRolesPage />,
-      },
-
       {
         path: 'statistics',
         element: <IntensiveStatisticsPage />,

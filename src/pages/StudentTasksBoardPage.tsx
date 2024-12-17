@@ -2,9 +2,9 @@ import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
 import { FC } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { ITaskTableRow } from '../ts/interfaces/ITask';
-import Title from '../components/Title';
-import Table from '../components/Table';
-import PrimaryButton from '../components/PrimaryButton';
+import Title from '../components/common/Title';
+import Table from '../components/common/Table';
+import PrimaryButton from '../components/common/PrimaryButton';
 import { useNavigate, useParams } from 'react-router-dom';
 import TasksTab from '../components/TasksTab/TasksTab';
 

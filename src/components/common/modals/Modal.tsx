@@ -1,6 +1,6 @@
 import { FC, ReactNode, useEffect, useRef } from 'react';
 
-import CrossIcon from '../icons/CrossIcon';
+import CrossIcon from '../../icons/CrossIcon';
 
 interface ModalProps {
   children: ReactNode;

@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useParams } from 'react-router-dom';
 
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 
 const EducationRequestOverviewPage: FC = () => {
   const params = useParams();

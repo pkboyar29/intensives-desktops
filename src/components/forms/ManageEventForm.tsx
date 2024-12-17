@@ -21,14 +21,14 @@ import {
 
 import { useAppSelector } from '../../redux/store';
 
-import Select from '../inputs/Select';
-import InputDescription from '../inputs/InputDescription';
-import MultipleSelectInput from '../inputs/MultipleSelectInput';
-import Title from '../Title';
-import PrimaryButton from '../PrimaryButton';
-import Modal from '../modals/Modal';
-import FileUpload from '../inputs/FileInput';
-import InputRadio from '../inputs/InputRadio';
+import Select from '../common/inputs/Select';
+import InputDescription from '../common/inputs/InputDescription';
+import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
+import Title from '../common/Title';
+import PrimaryButton from '../common/PrimaryButton';
+import Modal from '../common/modals/Modal';
+import FileUpload from '../common/inputs/FileInput';
+import InputRadio from '../common/inputs/InputRadio';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 
