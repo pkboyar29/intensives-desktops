@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FC } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import KanbanColumnMenu from './KanbanColumnMenu';
 
 interface KanbanColumnProps {
     id: number;
@@ -45,6 +46,14 @@ const KanbanColumn: FC<KanbanColumnProps> = ({ id, index, title, colorHEX, moveC
             e.preventDefault();
         }
     };
+
+    const renameColumn = () => {
+        console.log("rename column")
+    }
+
+    const deleteColumn = () => {
+        console.log("delete column")
+    }
 
     // Используем DnD hook для перемещения колонки
     const [{ isDragging }, dragRef] = useDrag({
@@ -93,9 +102,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({ id, index, title, colorHEX, moveC
 
                 </div>
                 
-                <button className='text-xl hover:text-dark_blue'>
-                    ...
-                </button>
+                <KanbanColumnMenu onRename={renameColumn} onDelete={deleteColumn} />
             </div>
             <button className="w-full text-left text-blue hover:text-dark_blue">
                 + Создать задачу
