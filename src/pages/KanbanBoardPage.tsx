@@ -31,7 +31,7 @@ const KanbanBoardPage: FC = () => {
     });
 
     useEffect(() => {
-        //console.log(kanbanColumns[0])
+        //console.log(kanbanColumns[0])helloworld
     }, [kanbanColumns])
 
     // Функция для обновления позиций после перемещения
