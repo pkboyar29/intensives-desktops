@@ -16,6 +16,7 @@ import { stageApi } from './api/stageApi';
 import { scheduleApi } from './api/scheduleApi';
 import { audienceApi } from './api/audienceApi';
 import { flowApi } from './api/flowApi';
+import { columnApi } from './api/columnApi';
 import { markStrategyApi } from './api/markStrategyApi';
 import { criteriaApi } from './api/criteriaApi';
 
@@ -37,6 +38,7 @@ export const store = configureStore({
     [scheduleApi.reducerPath]: scheduleApi.reducer,
     [audienceApi.reducerPath]: audienceApi.reducer,
     [flowApi.reducerPath]: flowApi.reducer,
+    [columnApi.reducerPath]: columnApi.reducer,
     [markStrategyApi.reducerPath]: markStrategyApi.reducer,
     [criteriaApi.reducerPath]: criteriaApi.reducer,
   },
@@ -55,6 +57,7 @@ export const store = configureStore({
       scheduleApi.middleware,
       audienceApi.middleware,
       flowApi.middleware,
+      columnApi.middleware,
       markStrategyApi.middleware,
       criteriaApi.middleware
     ),
