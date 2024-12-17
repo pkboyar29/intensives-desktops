@@ -67,6 +67,10 @@ const routeConfig: RouteType[] = [
         element: <ManagerIntensiveOverviewPage />,
       },
       {
+        path: 'teams',
+        element: <ManagerTeamsPage />,
+      },
+      {
         path: 'team-overview',
         element: <TeamOverviewPage />,
       },

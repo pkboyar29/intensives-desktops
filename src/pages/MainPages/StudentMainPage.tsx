@@ -57,6 +57,7 @@ const StudentMainPage: FC = () => {
 
               <div className="flex flex-col gap-4 my-3">
                 <SidebarLink to="overview" text="Просмотр интенсива" />
+                <SidebarLink to="teams" text="Команды" />
                 <SidebarLink to="team-overview" text="Просмотр команды" />
                 <SidebarLink to="events" text="Мероприятия" />
                 <SidebarLink to="tasks-board" text="Ведение проекта" />
