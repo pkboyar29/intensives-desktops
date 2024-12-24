@@ -24,7 +24,11 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401 && api.endpoint !== 'signIn') {
+  if (
+    result.error &&
+    result.error.status === 401 &&
+    api.endpoint !== 'signIn'
+  ) {
     const refreshToken = Cookies.get('refresh');
 
     const refreshResult = await baseQuery(
@@ -52,7 +56,11 @@ export const baseQueryWithReauth: BaseQueryFn<
       Cookies.remove('access');
       Cookies.remove('refresh');
 
-      window.location.href = '/sign-in';
+      if (window.location.pathname === '/addTest') {
+        console.log('hi');
+      } else {
+        window.location.href = '/sign-in';
+      }
     }
   }
 

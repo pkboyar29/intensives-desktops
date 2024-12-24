@@ -25,6 +25,7 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
+import AddTestPage from '../pages/AddTextPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -160,6 +161,11 @@ const routeConfig: RouteType[] = [
   {
     path: '/sign-in',
     element: <SignInPage />,
+    requiredAuth: false,
+  },
+  {
+    path: '/addTest',
+    element: <AddTestPage />,
     requiredAuth: false,
   },
   {
