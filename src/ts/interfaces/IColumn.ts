@@ -8,7 +8,6 @@ export interface IColumn {
 
 export interface IColumnCreate {
     name: string;
-    colorHEX: string;
     team: number;
 }
 

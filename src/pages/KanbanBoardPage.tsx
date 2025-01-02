@@ -4,6 +4,7 @@ import {
   useUpdateColumnNameMutation,
   useCreateColumnMutation,
   useLazyGetColumnsTeamQuery,
+  useDeleteColumnMutation
 } from '../redux/api/columnApi';
 import { IColumn } from '../ts/interfaces/IColumn';
 import KanbanColumn from '../components/KanbanColumn';
@@ -22,6 +23,8 @@ const KanbanBoardPage: FC = () => {
   const [createColumnAPI] = useCreateColumnMutation();
   const [updateColumnPositionAPI] = useUpdateColumnPositionMutation();
   const [updateColumnNameAPI] = useUpdateColumnNameMutation();
+  const [deleteColumnAPI] = useDeleteColumnMutation();
+
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
 
   const [isColumnCreating, setColumnCreating] = useState(false);
@@ -35,17 +38,13 @@ const KanbanBoardPage: FC = () => {
   }, [currentTeam]);
 
   useEffect(() => {
-    if (columns) {
-      //console.log("columns: "+columns)
-      setKanbanColumns(columns);
-    } else {
-      console.log('not columns');
-    }
+
   });
 
   useEffect(() => {
-    //console.log(kanbanColumns[0])
-  }, [kanbanColumns]);
+    console.log(columns)
+  }, [columns])
+
 
   // Функция для обновления позиций после перемещения
   const handleMoveColumn = (dragIndex: number, hoverIndex: number) => {
@@ -73,7 +72,33 @@ const KanbanBoardPage: FC = () => {
     });
   };
 
-  const createColumn = async () => {};
+  const createColumn = async () => {
+
+    if(validateColumnName(currentColumnCreatingName) && currentTeam) {
+        try{
+          await createColumnAPI({
+              name: currentColumnCreatingName,
+              team: Number(currentTeam.id),
+          }).unwrap();
+          
+        } catch(error){
+          console.error("Error during column creation:", error);
+        }
+    }
+
+    setCurrentColumnCreatingName("") // обнуляем хук с названием
+  };
+
+  const validateColumnName = (name: string): boolean => {
+    const regex = /^[a-zA-Zа-яА-Я0-9 _-]+$/; // Регулярка для разрешенных символов
+    if(name.trim() === '') {
+      return false;
+    }
+    if(!regex.test(name)) {
+      return false;
+    }
+    return true;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentColumnCreatingName(e.target.value);
@@ -81,21 +106,33 @@ const KanbanBoardPage: FC = () => {
 
   const handleBlur = () => {
     setColumnCreating(false);
+    createColumn();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       setColumnCreating(false);
+      createColumn();
     }
   };
 
+  const handleDeleteColumn = async (id: number) => {
+    try{
+      await deleteColumnAPI(id).unwrap();
+      
+    } catch(error) {
+      console.error("Error on deleting column:", error);
+    }
+  }
+
   return (
-    <div>
+    <div className=''>
       <DndProvider backend={HTML5Backend}>
         <div className="flex items-start space-x-4">
-          {kanbanColumns
-            .slice() // Создаем копию массива, чтобы не мутировать исходный массив
-            .sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
+          {columns &&
+          columns
+            //.slice() // Создаем копию массива, чтобы не мутировать исходный массив
+            //.sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
             .map((column, index) => (
               <KanbanColumn
                 key={column.id}
@@ -105,6 +142,7 @@ const KanbanBoardPage: FC = () => {
                 colorHEX={column.colorHEX}
                 moveColumn={handleMoveColumn}
                 onUpdateTitle={handleUpdateTitle}
+                onDeleteColumn={handleDeleteColumn}
               />
             ))}
 
@@ -115,14 +153,14 @@ const KanbanBoardPage: FC = () => {
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               onChange={handleInputChange}
+              maxLength={50}
               autoFocus
               className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
             />
           ) : (
             <button
               className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
-              onClick={() => setColumnCreating(true)}
-            >
+              onClick={() => setColumnCreating(true)}>
               Создать колонку
             </button>
           )}

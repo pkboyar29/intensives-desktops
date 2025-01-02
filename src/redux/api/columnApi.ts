@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
+import { RootState } from '../store';
 
 import {
   IColumn,
@@ -17,6 +18,7 @@ const mapColumn = (unmappedEvent: any): IColumn => {
   };
 };
 
+
 export const columnApi = createApi({
   reducerPath: 'columnApi',
   baseQuery: baseQueryWithReauth,
@@ -33,6 +35,18 @@ export const columnApi = createApi({
         body: data,
       }),
       transformResponse: (response: any): IColumn => mapColumn(response),
+      async onQueryStarted(arg, {dispatch, queryFulfilled }) {
+        try {
+          const { data: newColumn } = await queryFulfilled;
+          dispatch(
+            columnApi.util.updateQueryData('getColumnsTeam', arg.team, (draft) => {
+              draft.push(newColumn); // Добавляем новую колонку в кеш
+            })
+          );
+        } catch (err) {
+          console.error('Error creating column:', err);
+        }
+      }
     }),
     updateColumn: builder.mutation<IColumn, IColumn>({
       query: (data) => ({
@@ -63,6 +77,28 @@ export const columnApi = createApi({
         url: `/kanban_columns/${id}/`,
         method: 'DELETE',
       }),
+      async onQueryStarted(id, { dispatch, queryFulfilled, getState }) {
+        try{
+          const state = getState() as RootState;
+          const currentTeam = state.team.data;
+
+          await queryFulfilled;
+
+          if (!currentTeam) {
+            console.error('No current team available!');
+            return;
+          }
+          const teamId = currentTeam.index; // Получаем идентификатор команды
+
+          dispatch(
+            columnApi.util.updateQueryData('getColumnsTeam', teamId, (draft) => {
+              return draft.filter((column) => column.id !== id); // Удаляем колонку из кеша
+            })
+          );
+        } catch (err) {
+          console.error('Error deleting column:', err);
+        }
+      }
     }),
   }),
 });

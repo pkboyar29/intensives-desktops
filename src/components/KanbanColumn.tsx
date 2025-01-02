@@ -11,6 +11,7 @@ interface KanbanColumnProps {
   colorHEX: string;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   onUpdateTitle: (id: number, newTitle: string) => void;
+  onDeleteColumn: (id: number) => void;
 }
 
 const KanbanColumn: FC<KanbanColumnProps> = ({
@@ -20,13 +21,10 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   colorHEX,
   moveColumn,
   onUpdateTitle,
+  onDeleteColumn
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);
-
-  const handleDoubleClick = () => {
-    setIsEditing(true); // Включаем режим редактирования
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTitle(e.target.value);
@@ -56,11 +54,11 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   };
 
   const renameColumn = () => {
-    console.log('rename column');
+    setIsEditing(true); // Включаем режим редактирования
   };
 
   const deleteColumn = () => {
-    console.log('delete column');
+    onDeleteColumn(id)
   };
 
   // Используем DnD hook для перемещения колонки
@@ -100,13 +98,14 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
               onChange={handleInputChange}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              maxLength={50}
               autoFocus
               className="w-full text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 "
             />
           ) : (
             <h2
               className="text-xl font-semibold text-gray-700 cursor-pointer"
-              onDoubleClick={handleDoubleClick}
+              onDoubleClick={renameColumn}
             >
               {currentTitle}
             </h2>
