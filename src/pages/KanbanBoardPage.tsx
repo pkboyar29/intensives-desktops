@@ -47,21 +47,23 @@ const KanbanBoardPage: FC = () => {
 
 
   // Функция для обновления позиций после перемещения
-  const handleMoveColumn = (dragIndex: number, hoverIndex: number) => {
-    console.log('dragIndex: ' + dragIndex + ' hoverIndex: ' + hoverIndex);
-    const updatedColumns = [...kanbanColumns];
-    const [movedColumn] = updatedColumns.splice(dragIndex, 1);
-    console.log(movedColumn.id);
-    updateColumnPosition(movedColumn, hoverIndex);
+  const handleMoveColumn = (columnId: number, dragIndex: number, hoverIndex: number) => {
+    console.log('columnId: ' + columnId + 'dragIndex: ' + dragIndex + ' hoverIndex: ' + hoverIndex);
+    //const updatedColumns = [...columns];
+    //const [movedColumn] = columns?.splice(dragIndex, 1);
+    //console.log(movedColumn.id);
+    updateColumnPosition(columnId, hoverIndex);
   };
 
-  const updateColumnPosition = async (column: IColumn, newPosition: number) => {
+  const updateColumnPosition = async (columnId: number, newPosition: number) => {
     const { data: responseData } = await updateColumnPositionAPI({
-      id: column.id,
+      id: columnId,
       position: newPosition,
     });
 
-    console.log(responseData);
+    if(currentTeam) {
+      getColumns(currentTeam.index);
+    }
   };
 
   // Функция для обновления названия
@@ -131,8 +133,8 @@ const KanbanBoardPage: FC = () => {
         <div className="flex items-start space-x-4">
           {columns &&
           columns
-            //.slice() // Создаем копию массива, чтобы не мутировать исходный массив
-            //.sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
+            .slice() // Создаем копию массива, чтобы не мутировать исходный массив
+            .sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
             .map((column, index) => (
               <KanbanColumn
                 key={column.id}

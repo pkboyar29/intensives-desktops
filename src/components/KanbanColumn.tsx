@@ -9,7 +9,7 @@ interface KanbanColumnProps {
   index: number;
   title: string;
   colorHEX: string;
-  moveColumn: (dragIndex: number, hoverIndex: number) => void;
+  moveColumn: (columnId: number, dragIndex: number, hoverIndex: number) => void;
   onUpdateTitle: (id: number, newTitle: string) => void;
   onDeleteColumn: (id: number) => void;
 }
@@ -64,7 +64,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   // Используем DnD hook для перемещения колонки
   const [{ isDragging }, dragRef] = useDrag({
     type: 'COLUMN',
-    item: { index },
+    item: { id, index },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -72,9 +72,9 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const [, dropRef] = useDrop({
     accept: 'COLUMN',
-    hover: (item: { index: number }) => {
+    hover: (item: { id:number, index: number }) => {
       if (item.index !== index) {
-        moveColumn(item.index, index);
+        moveColumn(item.id, item.index, index);
         item.index = index;
       }
     },
