@@ -8,7 +8,8 @@ import {
 } from '../redux/api/columnApi';
 import { IColumn } from '../ts/interfaces/IColumn';
 import KanbanColumn from '../components/KanbanColumn';
-import DragKanbanColumn from '../components/DragComponents/DragKanbanColumn';
+import Modal from '../components/common/modals/Modal';
+import PrimaryButton from '../components/common/PrimaryButton';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -28,8 +29,9 @@ const KanbanBoardPage: FC = () => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
 
   const [isColumnCreating, setColumnCreating] = useState(false);
-  const [currentColumnCreatingName, setCurrentColumnCreatingName] =
-    useState('');
+  const [currentColumnCreatingName, setCurrentColumnCreatingName] = useState('');
+
+  const [deleteModal, setDeleteModal] = useState<number | null>(null);
 
   useEffect(() => {
     if (currentTeam) {
@@ -49,9 +51,6 @@ const KanbanBoardPage: FC = () => {
   // Функция для обновления позиций после перемещения
   const handleMoveColumn = (columnId: number, dragIndex: number, hoverIndex: number) => {
     console.log('columnId: ' + columnId + 'dragIndex: ' + dragIndex + ' hoverIndex: ' + hoverIndex);
-    //const updatedColumns = [...columns];
-    //const [movedColumn] = columns?.splice(dragIndex, 1);
-    //console.log(movedColumn.id);
     updateColumnPosition(columnId, hoverIndex);
   };
 
@@ -119,6 +118,7 @@ const KanbanBoardPage: FC = () => {
   };
 
   const handleDeleteColumn = async (id: number) => {
+    
     try{
       await deleteColumnAPI(id).unwrap();
       
@@ -128,7 +128,37 @@ const KanbanBoardPage: FC = () => {
   }
 
   return (
-    <div className=''>
+    <>
+    {deleteModal && (
+      <Modal
+        title="Удаление колонки"
+        onCloseModal={() => setDeleteModal(null)}
+      >
+        <p className="text-lg text-bright_gray">
+          {`Вы уверены, что хотите удалить колонку? ВСЕ задачи в ней удалятся`}
+        </p>
+        <div className="flex justify-end gap-3 mt-6">
+          <div>
+            <PrimaryButton
+              buttonColor="gray"
+              clickHandler={() => setDeleteModal(null)}
+              children="Отмена"
+            />
+          </div>
+          <div>
+            <PrimaryButton
+              clickHandler={() => {
+                setDeleteModal(null)
+                handleDeleteColumn(deleteModal);
+              }}
+              children="Удалить"
+            />
+          </div>
+        </div>
+      </Modal>
+    )}
+      
+    <div className='w-full'>
       <DndProvider backend={HTML5Backend}>
         <div className="flex items-start space-x-4">
           {columns &&
@@ -136,16 +166,18 @@ const KanbanBoardPage: FC = () => {
             .slice() // Создаем копию массива, чтобы не мутировать исходный массив
             .sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
             .map((column, index) => (
-              <KanbanColumn
-                key={column.id}
-                index={index}
-                id={column.id}
-                title={column.name}
-                colorHEX={column.colorHEX}
-                moveColumn={handleMoveColumn}
-                onUpdateTitle={handleUpdateTitle}
-                onDeleteColumn={handleDeleteColumn}
-              />
+              <div key={column.id} className="flex-shrink-0 min-w-[250px]">
+                <KanbanColumn
+                  key={column.id}
+                  index={index}
+                  id={column.id}
+                  title={column.name}
+                  colorHEX={column.colorHEX}
+                  moveColumn={handleMoveColumn}
+                  onUpdateTitle={handleUpdateTitle}
+                  onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
+                />
+              </div>
             ))}
 
           {isColumnCreating ? (
@@ -169,6 +201,7 @@ const KanbanBoardPage: FC = () => {
         </div>
       </DndProvider>
     </div>
+    </>
   );
 };
 
