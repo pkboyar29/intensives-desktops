@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  useCreateTaskMutation
+} from '../redux/api/taskApi';
 import { FC } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import KanbanColumnMenu from './KanbanColumnMenu';
 import KanbanTask from './KanbanTask';
+import { validateKanban } from '../helpers/kanbanHelpers';
 
 interface KanbanColumnProps {
   id: number;
@@ -23,8 +27,20 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   onUpdateTitle,
   onDeleteColumn
 }) => {
+  const [createTaskAPI] = useCreateTaskMutation();
+
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);
+  const [creatingTask, setCreatingTask] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание задачи
+
+   // Функция для автоматического изменения высоты
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Сбрасываем высоту
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Устанавливаем высоту в зависимости от содержимого
+    }
+  }, [creatingTask]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTitle(e.target.value);
@@ -32,17 +48,19 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (currentTitle !== title) {
+    //валидация названия колонки
+    if (currentTitle !== title && validateKanban(currentTitle)) {
       onUpdateTitle(id, currentTitle); // Вызываем функцию обновления названия на беке
+      title = currentTitle;
+    }
+    else{
+      setCurrentTitle(title)
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      setIsEditing(false);
-      if (currentTitle !== title) {
-        onUpdateTitle(id, currentTitle);
-      }
+      handleBlur();
     }
   };
 
@@ -52,6 +70,35 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       e.preventDefault();
     }
   };
+
+  const handleBlurTask = async () => {
+    //валидация названия задачи
+    if (creatingTask && validateKanban(creatingTask)) {
+      createTask();
+    }
+
+    setCreatingTask(null);
+  };
+
+  const handleKeyDownTask = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBlurTask();
+    }
+  };
+
+  const createTask = async () => {
+
+    try{
+      if(creatingTask) {
+        await createTaskAPI({
+          name: creatingTask,
+          column: id,
+        }).unwrap();
+    }
+    } catch(err) {
+      console.error("Error on crating task:", err);
+    }
+  }
 
   const renameColumn = () => {
     setIsEditing(true); // Включаем режим редактирования
@@ -98,7 +145,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
               onChange={handleInputChange}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              maxLength={50}
+              maxLength={500}
+              placeholder="Введите название колонки..."
               autoFocus
               className="w-full text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 "
             />
@@ -114,12 +162,27 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
         <KanbanColumnMenu onRename={renameColumn} onDelete={deleteColumn} />
       </div>
-      <button className="w-full text-left text-blue hover:text-dark_blue">
-        + Создать задачу
-      </button>
+
+
+      {creatingTask ? (
+        <textarea
+          ref={textareaRef}
+          defaultValue={' '}
+          onBlur={handleBlurTask}
+          onKeyDown={handleKeyDownTask}
+          onChange={(e) => setCreatingTask(e.target.value)}
+          maxLength={500}
+          placeholder="Введите название задачи..."
+          autoFocus
+          className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
+        />
+      ): <button className="w-full text-left text-blue hover:text-dark_blue" onClick={() => setCreatingTask(" ")}>
+          + Создать задачу
+        </button>}
 
       <div className="mt-4 space-y-2">
         <KanbanTask id={'INT-1'} title="Задача 1" isCompleted={false} />
+        <KanbanTask id={'INT-2'} title="Задача 2" isCompleted={false} />
         <KanbanTask id={'INT-2'} title="Задача 2" isCompleted={false} />
       </div>
     </div>

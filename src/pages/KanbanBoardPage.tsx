@@ -6,6 +6,7 @@ import {
   useLazyGetColumnsTeamQuery,
   useDeleteColumnMutation
 } from '../redux/api/columnApi';
+import { validateKanban } from '../helpers/kanbanHelpers';
 import { IColumn } from '../ts/interfaces/IColumn';
 import KanbanColumn from '../components/KanbanColumn';
 import Modal from '../components/common/modals/Modal';
@@ -75,7 +76,7 @@ const KanbanBoardPage: FC = () => {
 
   const createColumn = async () => {
 
-    if(validateColumnName(currentColumnCreatingName) && currentTeam) {
+    if(validateKanban(currentColumnCreatingName) && currentTeam) {
         try{
           await createColumnAPI({
               name: currentColumnCreatingName,
@@ -88,17 +89,6 @@ const KanbanBoardPage: FC = () => {
     }
 
     setCurrentColumnCreatingName("") // обнуляем хук с названием
-  };
-
-  const validateColumnName = (name: string): boolean => {
-    const regex = /^[a-zA-Zа-яА-Я0-9 _-]+$/; // Регулярка для разрешенных символов
-    if(name.trim() === '') {
-      return false;
-    }
-    if(!regex.test(name)) {
-      return false;
-    }
-    return true;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -13,6 +13,17 @@ export const KANBAN_COLORS = [
     '#f78fb3', // розовый
     '#4ca9ff', // голубой
     '#3a915f', // темно-зеленый
-    '#2f2f2f', // темно-серый
+    '#6c6c6c', // обновленный серый
     '#d9d9d9', // светло-серый
 ];
+
+export const validateKanban = (name: string): boolean => {
+    const regex = /^[a-zA-Zа-яА-Я0-9 _-]+$/; // Регулярка для разрешенных символов
+    if(name.trim() === '') {
+      return false;
+    }
+    if(!regex.test(name)) {
+      return false;
+    }
+    return true;
+  };

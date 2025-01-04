@@ -19,6 +19,7 @@ import { flowApi } from './api/flowApi';
 import { columnApi } from './api/columnApi';
 import { markStrategyApi } from './api/markStrategyApi';
 import { criteriaApi } from './api/criteriaApi';
+import { taskApi } from './api/taskApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -39,6 +40,7 @@ export const store = configureStore({
     [audienceApi.reducerPath]: audienceApi.reducer,
     [flowApi.reducerPath]: flowApi.reducer,
     [columnApi.reducerPath]: columnApi.reducer,
+    [taskApi.reducerPath]: taskApi.reducer,
     [markStrategyApi.reducerPath]: markStrategyApi.reducer,
     [criteriaApi.reducerPath]: criteriaApi.reducer,
   },
@@ -58,6 +60,7 @@ export const store = configureStore({
       audienceApi.middleware,
       flowApi.middleware,
       columnApi.middleware,
+      taskApi.middleware,
       markStrategyApi.middleware,
       criteriaApi.middleware
     ),
