@@ -18,8 +18,9 @@ import { useAppSelector } from '../redux/store';
 
 const KanbanBoardPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
+  const columns = useAppSelector((state) => state.kanban.columns);
 
-  const [getColumns, { data: columns, isLoading }] =
+  const [getColumns, { isLoading, isError }] =
     useLazyGetColumnsTeamQuery();
 
   const [createColumnAPI] = useCreateColumnMutation();

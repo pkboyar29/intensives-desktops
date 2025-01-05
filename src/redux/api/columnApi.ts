@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { RootState } from '../store';
-
+import { setColumns, addColumn, deleteColumn } from '../slices/kanbanSlice';
 import {
   IColumn,
   IColumnCreate,
@@ -27,6 +27,14 @@ export const columnApi = createApi({
       query: (team) => `/kanban_columns/?team=${team}`,
       transformResponse: (response: any): IColumn[] =>
         response.map((unmappedColumn: any) => mapColumn(unmappedColumn)),
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try{
+          const { data: columns } = await queryFulfilled;
+          dispatch(setColumns(columns));
+        } catch (err) {
+          console.error('Error by getting column:', err);
+        }
+      }
     }),
     createColumn: builder.mutation<IColumn, IColumnCreate>({
       query: (data) => ({
@@ -38,11 +46,9 @@ export const columnApi = createApi({
       async onQueryStarted(arg, {dispatch, queryFulfilled }) {
         try {
           const { data: newColumn } = await queryFulfilled;
-          dispatch(
-            columnApi.util.updateQueryData('getColumnsTeam', arg.team, (draft) => {
-              draft.push(newColumn); // Добавляем новую колонку в кеш
-            })
-          );
+
+          // Диспатчим addColumn для обновления состояния в slice kanban
+          dispatch(addColumn(newColumn));
         } catch (err) {
           console.error('Error creating column:', err);
         }
@@ -79,22 +85,9 @@ export const columnApi = createApi({
       }),
       async onQueryStarted(id, { dispatch, queryFulfilled, getState }) {
         try{
-          const state = getState() as RootState;
-          const currentTeam = state.team.data;
-
           await queryFulfilled;
-
-          if (!currentTeam) {
-            console.error('No current team available!');
-            return;
-          }
-          const teamId = currentTeam.index; // Получаем идентификатор команды
-
-          dispatch(
-            columnApi.util.updateQueryData('getColumnsTeam', teamId, (draft) => {
-              return draft.filter((column) => column.id !== id); // Удаляем колонку из кеша
-            })
-          );
+          
+          dispatch(deleteColumn(id));
         } catch (err) {
           console.error('Error deleting column:', err);
         }

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import userReducer from './slices/userSlice';
 import intensiveReducer from './slices/intensiveSlice';
 import teamReducer from './slices/teamSlice';
+import kanbanSlice from './slices/kanbanSlice';
 
 import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
@@ -28,6 +29,7 @@ export const store = configureStore({
     user: userReducer,
     intensive: intensiveReducer,
     team: teamReducer,
+    kanban: kanbanSlice,
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
     [eventApi.reducerPath]: eventApi.reducer,
