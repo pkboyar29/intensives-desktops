@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { RootState } from '../store';
-import { setColumns, addColumn, deleteColumn } from '../slices/kanbanSlice';
+import { setColumns, addColumn, deleteColumn, moveColumn } from '../slices/kanbanSlice';
 import {
   IColumn,
   IColumnCreate,
@@ -69,6 +69,23 @@ export const columnApi = createApi({
         body: data,
       }),
       transformResponse: (response: any): IColumn => mapColumn(response),
+      async onQueryStarted({id, position}, { dispatch, queryFulfilled, getState }) {
+         // Сохраняем предыдущее состояние
+        const previousColumns = (getState() as RootState).kanban.columns;
+
+        // Оптимистично обновляем позиции
+        dispatch(moveColumn({ columnId: id, newPosition: position }));
+
+        try{
+          await queryFulfilled; // Дождаться завершения запроса
+        } catch (err) {
+          console.error("Ошибка синхронизации позиции:", err);
+          // Откат к предыдущему состоянию при ошибке
+          if (previousColumns) {
+            dispatch(setColumns(previousColumns));
+          }
+        }
+      }
     }),
     updateColumnName: builder.mutation<IColumn, Partial<IColumn>>({
       query: ({ id, name }) => ({

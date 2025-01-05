@@ -61,10 +61,6 @@ const KanbanBoardPage: FC = () => {
       id: columnId,
       position: newPosition,
     });
-
-    if(currentTeam) {
-      getColumns(currentTeam.index);
-    }
   };
 
   // Функция для обновления названия

@@ -30,9 +30,42 @@ const kanbanSlice = createSlice({
             if(state.columns) {
                 state.columns = state.columns.filter((column) => column.id !== action.payload);
             }
-        }
+        },
+        moveColumn(state, action: PayloadAction<{columnId: number; newPosition: number}>) {
+            if(state.columns) {
+                const { columnId, newPosition } = action.payload;
+
+                // Найти текущую колонку
+                const currentColumn = state.columns.find((col) => col.id === columnId);
+                if (!currentColumn) return;
+
+                const currentPosition = currentColumn.position;
+
+                if (newPosition > currentPosition) {
+                    // Перемещение вправо
+                    state.columns.forEach((column) => {
+                        if (column.position > currentPosition && column.position <= newPosition) {
+                        column.position -= 1; // Сдвигаем на 1 влево
+                        }
+                    });
+                } else if (newPosition < currentPosition) {
+                    // Перемещение влево
+                    state.columns.forEach((column) => {
+                        if (column.position < currentPosition && column.position >= newPosition) {
+                        column.position += 1; // Сдвигаем на 1 вправо
+                        }
+                    });
+                }
+
+                // Устанавливаем новую позицию для перемещаемой колонки
+                currentColumn.position = newPosition;
+
+                // Сортируем массив колонок по позиции, чтобы они оставались упорядоченными
+                state.columns.sort((a, b) => a.position - b.position);
+            }
+        },
     }
 })
 
-export const { setColumns, addColumn, deleteColumn } = kanbanSlice.actions;
+export const { setColumns, addColumn, deleteColumn, moveColumn } = kanbanSlice.actions;
 export default kanbanSlice.reducer;
