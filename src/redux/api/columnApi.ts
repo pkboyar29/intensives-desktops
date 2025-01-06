@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { RootState } from '../store';
-import { setColumns, addColumn, deleteColumn, moveColumn } from '../slices/kanbanSlice';
+import { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor } from '../slices/kanbanSlice';
 import {
   IColumn,
   IColumnCreate,
@@ -94,6 +94,34 @@ export const columnApi = createApi({
         body: { name },
       }),
       transformResponse: (response: any): IColumn => mapColumn(response),
+      async onQueryStarted({id, name}, { dispatch, queryFulfilled, getState }) {
+        try{
+          await queryFulfilled;
+          if(id && name) {
+            dispatch(renameColumn({ columnId: id, newName: name}));
+          }
+        } catch (err) {
+          console.error('Error on rename column:', err);
+        }
+      }
+    }),
+    updateColumnColor: builder.mutation<IColumn, Partial<IColumn>>({
+      query: ({ id, colorHEX }) => ({
+        url: `/kanban_columns/${id}/`,
+        method: 'PATCH',
+        body: { colorHEX },
+      }),
+      transformResponse: (response: any): IColumn => mapColumn(response),
+      async onQueryStarted({id, colorHEX}, { dispatch, queryFulfilled, getState }) {
+        try{
+          await queryFulfilled;
+          if(id && colorHEX) {
+            dispatch(changeColumnColor({ columnId: id, newColorHEX: colorHEX}));
+          }
+        } catch (err) {
+          console.error('Error on changing color column:', err);
+        }
+      }
     }),
     deleteColumn: builder.mutation<void, number>({
       query: (id) => ({
@@ -119,5 +147,6 @@ export const {
   useUpdateColumnMutation,
   useUpdateColumnPositionMutation,
   useUpdateColumnNameMutation,
+  useUpdateColumnColorMutation,
   useDeleteColumnMutation,
 } = columnApi;

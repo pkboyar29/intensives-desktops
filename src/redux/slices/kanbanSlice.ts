@@ -64,8 +64,30 @@ const kanbanSlice = createSlice({
                 state.columns.sort((a, b) => a.position - b.position);
             }
         },
+        renameColumn(state, action: PayloadAction<{columnId: number; newName: string}>) {
+            if(state.columns) {
+                const { columnId, newName } = action.payload;
+
+                // Найти текущую колонку
+                const currentColumn = state.columns.find((col) => col.id === columnId);
+                if (!currentColumn) return;
+
+                currentColumn.name = newName;
+            }
+        },
+        changeColumnColor(state, action: PayloadAction<{columnId: number, newColorHEX: string}>) {
+            if(state.columns) {
+                const { columnId, newColorHEX } = action.payload;
+
+                // Найти текущую колонку
+                const currentColumn = state.columns.find((col) => col.id === columnId);
+                if (!currentColumn) return;
+
+                currentColumn.colorHEX = newColorHEX;
+            }
+        }
     }
 })
 
-export const { setColumns, addColumn, deleteColumn, moveColumn } = kanbanSlice.actions;
+export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor } = kanbanSlice.actions;
 export default kanbanSlice.reducer;
