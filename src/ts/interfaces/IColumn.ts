@@ -6,6 +6,10 @@ export interface IColumn {
     team: number;
 }
 
+export interface IColumnWithTasksIds extends IColumn {
+    taskIds: number[]; // Список ID задач
+}
+
 export interface IColumnCreate {
     name: string;
     team: number;

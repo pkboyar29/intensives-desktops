@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
+  useLazyGetTasksColumnQuery,
   useCreateTaskMutation
 } from '../redux/api/taskApi';
 import { FC } from 'react';
@@ -7,6 +8,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import KanbanColumnMenu from './KanbanColumnMenu';
 import KanbanTask from './KanbanTask';
 import { validateKanban } from '../helpers/kanbanHelpers';
+import { useAppSelector } from '../redux/store';
+
 
 interface KanbanColumnProps {
   id: number;
@@ -27,12 +30,31 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   onUpdateTitle,
   onDeleteColumn
 }) => {
+  const [getTasks, { isLoading, isError }] = useLazyGetTasksColumnQuery();
   const [createTaskAPI] = useCreateTaskMutation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);
   const [creatingTask, setCreatingTask] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание задачи
+
+  useEffect(() => {
+    getTasks(id);
+  }, [id, getTasks]);
+
+  // Получаем колонку по её ID
+  const column = useAppSelector((state) =>
+    state.kanban.columns?.find((col) => col.id === id)
+  );
+
+  // Получаем задачи для этой колонки
+  const tasks = useAppSelector((state) =>
+    column?.taskIds.map((taskId) => state.kanban.tasks?.[taskId])
+  );
+
+  useEffect(() => {
+    //console.log(tasks)
+  }, [tasks]);
 
    // Функция для автоматического изменения высоты
   useEffect(() => {
@@ -181,9 +203,18 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
         </button>}
 
       <div className="mt-4 space-y-2">
-        <KanbanTask id={'INT-1'} title="Задача 1" isCompleted={false} />
-        <KanbanTask id={'INT-2'} title="Задача 2" isCompleted={false} />
-        <KanbanTask id={'INT-2'} title="Задача 2" isCompleted={false} />
+        {tasks && tasks.map((task) => (
+          task && (
+            <div>
+              <KanbanTask
+                key={task.idTask}
+                id={(task.idTask).toString()}
+                name={task.name}
+                isCompleted={task.isCompleted}
+              />
+            </div>
+          )
+        ))}
       </div>
     </div>
   );

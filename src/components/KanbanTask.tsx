@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 interface KanbanTaskProps {
   id: string;
-  title: string;
+  name: string;
   isCompleted: boolean;
   assignee?: string;
   subtasksCount?: number;
@@ -14,7 +14,7 @@ interface KanbanTaskProps {
 
 const KanbanTask: FC<KanbanTaskProps> = ({
   id,
-  title,
+  name,
   isCompleted,
   assignee,
   subtasksCount,
@@ -31,7 +31,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       <div className="flex space-x-2 items-down ml">
         <input type="checkbox" className="w-4 h-4 text-blue-500" />
         <div>
-          <p className="text-sm font-medium text-gray-700">{title}</p>
+          <p className="text-sm font-medium text-gray-700">{name}</p>
           <span className="inline-block px-2 py-1 mt-2 text-xs text-gray-600 rounded bg-gray">
             {id}
           </span>

@@ -20,8 +20,7 @@ const KanbanBoardPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
   const columns = useAppSelector((state) => state.kanban.columns);
 
-  const [getColumns, { isLoading, isError }] =
-    useLazyGetColumnsTeamQuery();
+  const [getColumns, { isLoading, isError }] = useLazyGetColumnsTeamQuery();
 
   const [createColumnAPI] = useCreateColumnMutation();
   const [updateColumnPositionAPI] = useUpdateColumnPositionMutation();
@@ -150,8 +149,6 @@ const KanbanBoardPage: FC = () => {
         <div className="flex items-start space-x-4">
           {columns &&
           columns
-            .slice() // Создаем копию массива, чтобы не мутировать исходный массив
-            .sort((a, b) => a.position - b.position) // Сортировка колонок по позиции
             .map((column, index) => (
               <div key={column.id} className="flex-shrink-0 min-w-[250px]">
                 <KanbanColumn
@@ -165,7 +162,7 @@ const KanbanBoardPage: FC = () => {
                   onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
                 />
               </div>
-            ))}
+          ))}
 
           {isColumnCreating ? (
             <input

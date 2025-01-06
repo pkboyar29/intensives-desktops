@@ -1,29 +1,44 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IColumn } from '../../ts/interfaces/IColumn';
+import { IColumn, IColumnWithTasksIds } from '../../ts/interfaces/IColumn';
 import { ITask } from '../../ts/interfaces/ITask';
 
 interface KanbanState {
-    columns: IColumn[] | null;
-    tasks: ITask[] | null;
+    columns: IColumnWithTasksIds[] | null; // Колонки с taskIds
+    tasks: {
+        [taskId: number]: ITask; // Все задачи (включая подзадачи). "id задачи : сама задача"
+    } | null;
+    subtasks: {
+        [taskId: number]: number[]; // "id задачи : массив id её подзадач"
+    } | null
 }
 
 const initialState: KanbanState = {
     columns: null,
-    tasks: null
+    tasks: {},
+    subtasks: {}
 }
 
 const kanbanSlice = createSlice({
     name: "kanban",
     initialState,
     reducers:{
-        setColumns(state, action: PayloadAction<KanbanState["columns"]>) {
-            state.columns = action.payload;
+        setColumns(state, action: PayloadAction<IColumn[]>) {
+            state.columns = action.payload.map((column) => ({
+                ...column,
+                taskIds: [], // Инициализируем изначально пустой массив задач колонки
+            }))
+            .sort((a, b) => a.position - b.position); // Сортируем колонки по позиции
         },
         addColumn(state, action: PayloadAction<IColumn>) {
+            const newColumn = {
+                ...action.payload,
+                taskIds: [], // Инициализируем пустой массив для задач
+            };
+
             if(state.columns) {
-                state.columns.push(action.payload); // Добавляем новую колонку
+                state.columns.push(newColumn); // Добавляем новую колонку
             } else {
-                state.columns = [action.payload]; // Если колонок не было, создаём массив
+                state.columns = [newColumn]; // Если колонок не было, создаём массив
             }
         },
         deleteColumn(state, action: PayloadAction<number>) {
@@ -85,9 +100,37 @@ const kanbanSlice = createSlice({
 
                 currentColumn.colorHEX = newColorHEX;
             }
+        },
+        setColumnTasks(state, action: PayloadAction<{ columnId: number; tasks: ITask[] }>) {
+            const { columnId, tasks } = action.payload;
+
+            if (!state.columns) return;
+
+            // Убедимся, что tasks и subtasks инициализированы
+            if (!state.tasks) {
+                state.tasks = {};
+            }
+
+            if (!state.subtasks) {
+                state.subtasks = {};
+            }
+
+            // Добавляем или обновляем задачи в tasks
+            tasks.forEach((task) => {
+                state.tasks![task.id] = task;
+            });
+
+            // Обновляем список taskIds для данной колонки
+            const column = state.columns.find((col) => col.id === columnId);
+            if (column) {
+                column.taskIds = tasks
+                .filter((task) => !task.parentTask) // Только задачи без parent_task
+                .sort((a, b) => a.position - b.position) // Сортируем задачи по позиции
+                .map((task) => task.id); // Сохраняем только ID задач
+            }
         }
     }
 })
 
-export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor } = kanbanSlice.actions;
+export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, setColumnTasks } = kanbanSlice.actions;
 export default kanbanSlice.reducer;
