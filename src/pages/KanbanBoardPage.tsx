@@ -176,6 +176,7 @@ const KanbanBoardPage: FC = () => {
                   id={column.id}
                   title={column.name}
                   colorHEX={column.colorHEX}
+                  tasksCount={column.tasksCount}
                   moveColumn={handleMoveColumn}
                   dropColumn={handleDropColumn}
                   onUpdateTitle={handleUpdateTitle}

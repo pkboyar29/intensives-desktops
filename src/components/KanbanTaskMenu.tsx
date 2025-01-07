@@ -102,7 +102,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         <li>
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Останавливаем всплытие
+              e.stopPropagation(); // Останавливаем всплытие ??
               onDelete();
               closeMenu();
             }}

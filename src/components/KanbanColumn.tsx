@@ -16,6 +16,7 @@ interface KanbanColumnProps {
   index: number;
   title: string;
   colorHEX: string;
+  tasksCount: number;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   dropColumn: (columnId: number, newIndex: number) => void;
   onUpdateTitle: (id: number, newTitle: string) => void;
@@ -28,6 +29,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   index,
   title,
   colorHEX,
+  tasksCount,
   moveColumn,
   dropColumn,
   onUpdateTitle,
@@ -42,8 +44,20 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   const [creatingTask, setCreatingTask] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание задачи
 
+  const [page, setPage] = useState(1); // Текущая страница
+  const pageSize = 20; // Размер страницы
+  const hasMore = useRef(true); // Есть ли ещё страницы для загрузки
+
   useEffect(() => {
-    getTasks(id);
+    const fetchTasks = async () => {
+      const { data } = await getTasks({ column: id, page: 1, pageSize});
+
+      if (data?.next === null) {
+        hasMore.current = false; // Если `next` равно null, страниц больше нет
+      }
+    };
+
+    fetchTasks();
   }, [id, getTasks]);
 
   // Получаем колонку по её ID
@@ -67,6 +81,30 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Устанавливаем высоту в зависимости от содержимого
     }
   }, [creatingTask]);
+
+  // Отслеживание прокрутки
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    /*
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+    if (scrollHeight - scrollTop <= clientHeight + 50) {
+      // Если пользователь почти дошёл до конца списка
+      loadMoreTasks();
+    }
+    */
+  };
+
+  // Загрузка следующей страницы
+  const loadMoreTasks = async () => {
+    if (!hasMore.current || isLoading) return; // Не загружаем, если нет данных или уже идёт загрузка
+
+    console.log("current page column ", page)
+    const { data } = await getTasks({ column: id, page: page + 1, pageSize });
+
+    if (data?.next === null) {
+      hasMore.current = false; // Если `next` равно null, страниц больше нет
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTitle(e.target.value);
@@ -197,7 +235,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
                 </h2>
 
                 <div className='text-sm ml-2 bg-gray rounded-full mt-1' title="Количество задач в колонке">
-                  <p>{tasks?.length}</p>
+                  <p>{tasksCount}</p>
                 </div>
               </div>
             )}
@@ -225,7 +263,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
         </div>
 
-        <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
+        <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden" onScroll={handleScroll}>
           {tasks && tasks.map((task) => (
             task && (
               <div>
@@ -238,8 +276,11 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
               </div>
             )
           ))}
-        </div>
 
+          {hasMore.current && (
+            <button className='w-full p-3 bg-blue text-white rounded-[10px] duration-300' onClick={loadMoreTasks}>Загрузить еще</button>
+          )}
+        </div>
     </div>
   );
 };

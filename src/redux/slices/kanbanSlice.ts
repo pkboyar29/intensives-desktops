@@ -122,14 +122,27 @@ const kanbanSlice = createSlice({
             tasks.forEach((task) => {
                 state.tasks![task.id] = task;
             });
-
+            
             // Обновляем список taskIds для данной колонки
             const column = state.columns.find((col) => col.id === columnId);
             if (column) {
-                column.taskIds = tasks
-                .filter((task) => !task.parentTask) // Только задачи без parent_task
-                .sort((a, b) => a.position - b.position) // Сортируем задачи по позиции
-                .map((task) => task.id); // Сохраняем только ID задач
+                // Просто добавляем новые задачи в конец списка taskIds
+                column.taskIds = [...column.taskIds, ...tasks
+                    .filter((task) => !task.parentTask) // Только задачи без parent_task
+                    .map((task) => task.id)] // Сохраняем только ID задач
+                    .sort((a, b) => state.tasks![a].position - state.tasks![b].position); // Сортируем по позиции
+
+                /*
+                const existingTaskIds = new Set(column.taskIds); // Уникальные ID уже существующих задач
+
+                const newTaskIds = tasks
+                    .filter((task) => !task.parentTask) // Только задачи без parent_task
+                    .map((task) => task.id); // Сохраняем только ID задач
+                
+                // Добавляем только уникальные задачи
+                column.taskIds = [...Array.from(existingTaskIds), ...newTaskIds]
+                    .sort((a, b) => state.tasks![a].position - state.tasks![b].position); // Сортируем по позиции
+                */
             }
         },
         addTask(state, action: PayloadAction<{ columnId: number; task: ITask }>) {

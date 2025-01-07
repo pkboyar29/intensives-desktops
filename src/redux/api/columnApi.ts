@@ -15,6 +15,7 @@ const mapColumn = (unmappedEvent: any): IColumn => {
     colorHEX: unmappedEvent.colorHEX,
     position: unmappedEvent.position,
     team: unmappedEvent.team,
+    tasksCount: unmappedEvent.tasks_count,
   };
 };
 

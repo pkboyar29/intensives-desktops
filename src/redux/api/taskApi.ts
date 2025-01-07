@@ -27,16 +27,23 @@ export const taskApi = createApi({
     reducerPath: 'taskApi',
     baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
-        getTasksColumn: builder.query<ITask[], number>({
-          query: (column) => `/tasks/?column=${column}`,
-          transformResponse: (response: any): ITask[] =>
-              response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
-          async onQueryStarted(column, {dispatch, queryFulfilled }) {
+        getTasksColumn: builder.query<
+        { results: ITask[]; count: Number; next: string | null, previous: string | null},
+        { column: number; page: number; pageSize: number }
+        >({
+          query: ({ column, page, pageSize }) => `/tasks/?column=${column}&page=${page}&page_size=${pageSize}`,
+          transformResponse: (response: any) => ({
+            results: response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
+            count: response.count,
+            next: response.next,
+            previous: response.previous,
+          }),
+          async onQueryStarted({ column }, {dispatch, queryFulfilled }) {
             try {
               const { data: columnTasks } = await queryFulfilled;
     
               // Диспатчим addColumnTasks для обновления состояния в slice kanban
-              dispatch(setColumnTasks({ columnId: column, tasks: columnTasks }));
+              dispatch(setColumnTasks({ columnId: column, tasks: columnTasks.results }));
             } catch (err) {
               console.error('Error by getting tasks column:', err);
             }
@@ -74,7 +81,7 @@ export const taskApi = createApi({
             }
           }
         }),
-    }),
+    })
 });
 
 export const {

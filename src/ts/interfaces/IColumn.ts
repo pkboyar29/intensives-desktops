@@ -4,6 +4,7 @@ export interface IColumn {
     colorHEX: string;
     position: number;
     team: number;
+    tasksCount: number;
 }
 
 export interface IColumnWithTasksIds extends IColumn {
