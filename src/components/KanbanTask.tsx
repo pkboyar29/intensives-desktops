@@ -29,11 +29,11 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 }) => {
   const [deleteTaskAPI] = useDeleteTaskMutation();
 
-  const renameColumn = () => {
+  const renameTask = () => {
     
   };
 
-  const deleteColumn = async () => {
+  const deleteTask = async () => {
     try{
       await deleteTaskAPI(id).unwrap();
       
@@ -61,7 +61,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
       {/* Правая часть (иконка или инициалы) */}
       <div>
-        <KanbanTaskMenu onRename={renameColumn} onDelete={deleteColumn} />
+        <KanbanTaskMenu onRename={renameTask} onDelete={deleteTask} />
         {assignee ? (
           <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
             {assignee}

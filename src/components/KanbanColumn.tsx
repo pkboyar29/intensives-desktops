@@ -152,7 +152,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   return (
     <div
       ref={(node) => dragRef(dropRef(node))}
-      className={`w-80 p-4 bg-white rounded-lg shadow-md border-t-4 ${
+      className={`w-100 p-4 bg-white rounded-lg shadow-md border-t-4 ${
         isDragging ? 'opacity-50' : ''
       }`}
       style={{ borderTopColor: colorHEX }}
@@ -173,12 +173,17 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
               className="w-full text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 "
             />
           ) : (
-            <h2
-              className="text-xl font-semibold text-gray-700 cursor-pointer"
-              onDoubleClick={renameColumn}
-            >
-              {currentTitle}
-            </h2>
+            <div className='flex flex-row items-center'>
+              <h2
+                className="text-xl font-semibold text-gray-700 cursor-pointer"
+                onDoubleClick={renameColumn}>
+                {currentTitle}
+              </h2>
+
+              <div className='text-sm ml-2 bg-gray rounded-full mt-1' title="Количество задач в колонке">
+                <p>{tasks?.length}</p>
+              </div>
+            </div>
           )}
         </div>
 
@@ -202,7 +207,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
           + Создать задачу
         </button>}
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
         {tasks && tasks.map((task) => (
           task && (
             <div>

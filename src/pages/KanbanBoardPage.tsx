@@ -150,7 +150,7 @@ const KanbanBoardPage: FC = () => {
           {columns &&
           columns
             .map((column, index) => (
-              <div key={column.id} className="flex-shrink-0 min-w-[250px]">
+              <div key={column.id} className="flex-shrink-0 min-w-[300px]">
                 <KanbanColumn
                   key={column.id}
                   index={index}
