@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import { ITask, ITaskCreate } from '../../ts/interfaces/ITask';
-import { setColumnTasks } from '../slices/kanbanSlice';
+import { addTask, setColumnTasks } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
   return {
@@ -36,7 +36,6 @@ export const taskApi = createApi({
                 const { data: columnTasks } = await queryFulfilled;
       
                 // Диспатчим addColumnTasks для обновления состояния в slice kanban
-                console.log(columnTasks)
                 dispatch(setColumnTasks({ columnId: column, tasks: columnTasks }));
               } catch (err) {
                 console.error('Error by getting tasks column:', err);
@@ -50,6 +49,15 @@ export const taskApi = createApi({
                 body: data,
             }),
             transformResponse: (response: any): ITask => mapTask(response),
+            async onQueryStarted(arg, {dispatch, queryFulfilled }) {
+              try {
+                const { data: newTask } = await queryFulfilled;
+      
+                dispatch(addTask({ columnId: newTask.column, task: newTask }));
+              } catch (err) {
+                console.error('Error by getting tasks column:', err);
+              }
+            }
         }),
     }),
 });

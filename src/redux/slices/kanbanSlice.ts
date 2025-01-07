@@ -60,14 +60,14 @@ const kanbanSlice = createSlice({
                     // Перемещение вправо
                     state.columns.forEach((column) => {
                         if (column.position > currentPosition && column.position <= newPosition) {
-                        column.position -= 1; // Сдвигаем на 1 влево
+                            column.position -= 1; // Сдвигаем на 1 влево
                         }
                     });
                 } else if (newPosition < currentPosition) {
                     // Перемещение влево
                     state.columns.forEach((column) => {
                         if (column.position < currentPosition && column.position >= newPosition) {
-                        column.position += 1; // Сдвигаем на 1 вправо
+                            column.position += 1; // Сдвигаем на 1 вправо
                         }
                     });
                 }
@@ -106,15 +106,6 @@ const kanbanSlice = createSlice({
 
             if (!state.columns) return;
 
-            // Убедимся, что tasks и subtasks инициализированы
-            if (!state.tasks) {
-                state.tasks = {};
-            }
-
-            if (!state.subtasks) {
-                state.subtasks = {};
-            }
-
             // Добавляем или обновляем задачи в tasks
             tasks.forEach((task) => {
                 state.tasks![task.id] = task;
@@ -128,9 +119,38 @@ const kanbanSlice = createSlice({
                 .sort((a, b) => a.position - b.position) // Сортируем задачи по позиции
                 .map((task) => task.id); // Сохраняем только ID задач
             }
+        },
+        addTask(state, action: PayloadAction<{ columnId: number; task: ITask }>) {
+            const { columnId, task } = action.payload;
+
+            if (!state.columns || !state.tasks) return;
+
+            // Добавляем задачу в tasks
+            state.tasks![task.id] = task;
+
+            const column = state.columns.find((col) => col.id === columnId);
+            if (column) {
+                
+                // Обновляем позиции всех задач в колонке
+                column.taskIds.forEach((id, index) => {
+                    const taskToUpdate = state.tasks![id];
+                    taskToUpdate.position = index + 1; // Новая позиция (с 1)
+                });
+
+                // Добавляем ID задачи в taskIds
+                column.taskIds.push(task.id);
+                
+
+                // Сортируем taskIds по позиции задачи
+                column.taskIds.sort((a, b) => {
+                    const taskA = state.tasks![a];
+                    const taskB = state.tasks![b];
+                    return taskA.position - taskB.position; // Сортировка по возрастанию позиции
+                });
+            }
         }
     }
 })
 
-export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, setColumnTasks } = kanbanSlice.actions;
+export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, setColumnTasks, addTask } = kanbanSlice.actions;
 export default kanbanSlice.reducer;
