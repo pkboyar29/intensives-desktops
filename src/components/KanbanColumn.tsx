@@ -207,8 +207,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
           task && (
             <div>
               <KanbanTask
-                key={task.idTask}
-                id={(task.idTask).toString()}
+                key={task.id}
+                id={task.id}
                 name={task.name}
                 isCompleted={task.isCompleted}
               />

@@ -1,7 +1,12 @@
 import { FC } from 'react';
+import KanbanTaskMenu from './KanbanTaskMenu';
+import {
+  useDeleteTaskMutation
+} from '../redux/api/taskApi';
+
 
 interface KanbanTaskProps {
-  id: string;
+  id: number;
   name: string;
   isCompleted: boolean;
   assignee?: string;
@@ -22,6 +27,22 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   deadlineEnd,
   onClick,
 }) => {
+  const [deleteTaskAPI] = useDeleteTaskMutation();
+
+  const renameColumn = () => {
+    
+  };
+
+  const deleteColumn = async () => {
+    try{
+      await deleteTaskAPI(id).unwrap();
+      
+    } catch(error) {
+      console.error("Error on deleting task:", error);
+    }
+  };
+
+
   return (
     <div
       className="flex items-center justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md"
@@ -40,6 +61,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
       {/* Правая часть (иконка или инициалы) */}
       <div>
+        <KanbanTaskMenu onRename={renameColumn} onDelete={deleteColumn} />
         {assignee ? (
           <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
             {assignee}

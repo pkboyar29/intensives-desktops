@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import { ITask, ITaskCreate } from '../../ts/interfaces/ITask';
-import { addTask, setColumnTasks } from '../slices/kanbanSlice';
+import { addTask, deleteTask, setColumnTasks } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
   return {
@@ -28,36 +28,51 @@ export const taskApi = createApi({
     baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
         getTasksColumn: builder.query<ITask[], number>({
-            query: (column) => `/tasks/?column=${column}`,
-            transformResponse: (response: any): ITask[] =>
-                response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
-            async onQueryStarted(column, {dispatch, queryFulfilled }) {
-              try {
-                const { data: columnTasks } = await queryFulfilled;
-      
-                // Диспатчим addColumnTasks для обновления состояния в slice kanban
-                dispatch(setColumnTasks({ columnId: column, tasks: columnTasks }));
-              } catch (err) {
-                console.error('Error by getting tasks column:', err);
-              }
+          query: (column) => `/tasks/?column=${column}`,
+          transformResponse: (response: any): ITask[] =>
+              response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
+          async onQueryStarted(column, {dispatch, queryFulfilled }) {
+            try {
+              const { data: columnTasks } = await queryFulfilled;
+    
+              // Диспатчим addColumnTasks для обновления состояния в slice kanban
+              dispatch(setColumnTasks({ columnId: column, tasks: columnTasks }));
+            } catch (err) {
+              console.error('Error by getting tasks column:', err);
             }
+          }
         }),
         createTask: builder.mutation<ITask, ITaskCreate>({
-            query: (data) => ({
-                url: '/tasks/',
-                method: 'POST',
-                body: data,
-            }),
-            transformResponse: (response: any): ITask => mapTask(response),
-            async onQueryStarted(arg, {dispatch, queryFulfilled }) {
-              try {
-                const { data: newTask } = await queryFulfilled;
-      
-                dispatch(addTask({ columnId: newTask.column, task: newTask }));
-              } catch (err) {
-                console.error('Error by getting tasks column:', err);
-              }
+          query: (data) => ({
+              url: '/tasks/',
+              method: 'POST',
+              body: data,
+          }),
+          transformResponse: (response: any): ITask => mapTask(response),
+          async onQueryStarted(arg, {dispatch, queryFulfilled }) {
+            try {
+              const { data: newTask } = await queryFulfilled;
+    
+              dispatch(addTask({ columnId: newTask.column, task: newTask }));
+            } catch (err) {
+              console.error('Error by getting tasks column:', err);
             }
+          }
+        }),
+        deleteTask: builder.mutation<void, number>({
+          query: (id) => ({
+            url: `/tasks/${id}/`,
+            method: 'DELETE',
+          }),
+          async onQueryStarted(id, { dispatch, queryFulfilled, getState }) {
+            try{
+              await queryFulfilled;
+              
+              dispatch(deleteTask(id));
+            } catch (err) {
+              console.error('Error deleting task:', err);
+            }
+          }
         }),
     }),
 });
@@ -65,4 +80,5 @@ export const taskApi = createApi({
 export const {
   useLazyGetTasksColumnQuery,
   useCreateTaskMutation,
+  useDeleteTaskMutation
 } = taskApi;
