@@ -14,9 +14,11 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { useAppSelector } from '../redux/store';
+import { useAppSelector, useAppDispatch } from '../redux/store';
+import { moveColumnTemporary } from '../redux/slices/kanbanSlice';
 
 const KanbanBoardPage: FC = () => {
+  const dispatch = useAppDispatch();
   const currentTeam = useAppSelector((state) => state.team.data);
   const columns = useAppSelector((state) => state.kanban.columns);
 
@@ -34,6 +36,9 @@ const KanbanBoardPage: FC = () => {
 
   const [deleteModal, setDeleteModal] = useState<number | null>(null);
 
+  // Локальное состояние для управления временным порядком колонок при dnd
+  const [localColumns, setLocalColumns] = useState(columns);
+
   useEffect(() => {
     if (currentTeam) {
       getColumns(currentTeam.index);
@@ -46,13 +51,17 @@ const KanbanBoardPage: FC = () => {
 
   useEffect(() => {
     console.log(columns)
+    setLocalColumns(columns);
   }, [columns])
 
 
   // Функция для обновления позиций после перемещения
-  const handleMoveColumn = (columnId: number, dragIndex: number, hoverIndex: number) => {
-    console.log('columnId: ' + columnId + 'dragIndex: ' + dragIndex + ' hoverIndex: ' + hoverIndex);
-    updateColumnPosition(columnId, hoverIndex);
+  const handleMoveColumn = (dragIndex: number, hoverIndex: number) => {
+    dispatch(moveColumnTemporary({ dragIndex, hoverIndex }));
+  };
+
+  const handleDropColumn = (columnId: number, newIndex: number) => {
+    updateColumnPosition(columnId, newIndex);
   };
 
   const updateColumnPosition = async (columnId: number, newPosition: number) => {
@@ -158,6 +167,7 @@ const KanbanBoardPage: FC = () => {
                   title={column.name}
                   colorHEX={column.colorHEX}
                   moveColumn={handleMoveColumn}
+                  dropColumn={handleDropColumn}
                   onUpdateTitle={handleUpdateTitle}
                   onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
                 />

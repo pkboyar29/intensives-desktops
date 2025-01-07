@@ -46,6 +46,18 @@ const kanbanSlice = createSlice({
                 state.columns = state.columns.filter((column) => column.id !== action.payload);
             }
         },
+        moveColumnTemporary(state, action: PayloadAction<{ dragIndex: number; hoverIndex: number }>) {
+            if (!state.columns) return;
+          
+            const { dragIndex, hoverIndex } = action.payload;
+          
+            // Перемещаем колонку временно (только для UI)
+            const columnsCopy = [...state.columns];
+            const [movedColumn] = columnsCopy.splice(dragIndex, 1);
+            columnsCopy.splice(hoverIndex, 0, movedColumn);
+          
+            state.columns = columnsCopy;
+        },
         moveColumn(state, action: PayloadAction<{columnId: number; newPosition: number}>) {
             if(state.columns) {
                 const { columnId, newPosition } = action.payload;
@@ -168,5 +180,16 @@ const kanbanSlice = createSlice({
     }
 })
 
-export const { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, setColumnTasks, addTask, deleteTask } = kanbanSlice.actions;
+export const {
+    setColumns,
+    addColumn,
+    deleteColumn,
+    moveColumnTemporary,
+    moveColumn,
+    renameColumn,
+    changeColumnColor,
+    setColumnTasks,
+    addTask,
+    deleteTask
+ } = kanbanSlice.actions;
 export default kanbanSlice.reducer;

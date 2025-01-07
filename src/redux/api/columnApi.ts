@@ -78,6 +78,7 @@ export const columnApi = createApi({
 
         try{
           await queryFulfilled; // Дождаться завершения запроса
+          console.log("update column position")
         } catch (err) {
           console.error("Ошибка синхронизации позиции:", err);
           // Откат к предыдущему состоянию при ошибке
