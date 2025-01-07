@@ -19,6 +19,7 @@ interface KanbanColumnProps {
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   dropColumn: (columnId: number, newIndex: number) => void;
   onUpdateTitle: (id: number, newTitle: string) => void;
+  onUpdateColor: (id: number, newColorHEX: string) => void;
   onDeleteColumn: (id: number) => void;
 }
 
@@ -30,6 +31,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   moveColumn,
   dropColumn,
   onUpdateTitle,
+  onUpdateColor,
   onDeleteColumn
 }) => {
   const [getTasks, { isLoading, isError }] = useLazyGetTasksColumnQuery();
@@ -201,7 +203,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
             )}
           </div>
 
-          <KanbanColumnMenu onRename={renameColumn} onDelete={deleteColumn} />
+          <KanbanColumnMenu onRename={renameColumn} onChangeColor={(color: string) => onUpdateColor(id, color)} onDelete={deleteColumn} />
         </div>
 
 

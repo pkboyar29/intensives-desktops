@@ -97,6 +97,8 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
           </button>
         </li>
 
+        <div className="border-t border-gray-300 my-2"></div>
+
         <li>
           <button
             onClick={(e) => {
@@ -106,7 +108,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
             }}
             className="block w-full px-4 py-2 text-left text-red hover:text-dark_red"
           >
-            Удалить
+            Удалить задачу
           </button>
         </li>
       </ul>

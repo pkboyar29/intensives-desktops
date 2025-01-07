@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import {
   useUpdateColumnPositionMutation,
   useUpdateColumnNameMutation,
+  useUpdateColumnColorMutation,
   useCreateColumnMutation,
   useLazyGetColumnsTeamQuery,
   useDeleteColumnMutation
@@ -27,6 +28,7 @@ const KanbanBoardPage: FC = () => {
   const [createColumnAPI] = useCreateColumnMutation();
   const [updateColumnPositionAPI] = useUpdateColumnPositionMutation();
   const [updateColumnNameAPI] = useUpdateColumnNameMutation();
+  const [updateColumnColorAPI] = useUpdateColumnColorMutation();
   const [deleteColumnAPI] = useDeleteColumnMutation();
 
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
@@ -76,6 +78,14 @@ const KanbanBoardPage: FC = () => {
     const { data: responseData } = await updateColumnNameAPI({
       id: id,
       name: newTitle,
+    });
+  };
+
+  // Функция для обновления цвета
+  const handleUpdateColor = async (id: number, newColorHEX: string) => {
+    const { data: responseData } = await updateColumnColorAPI({
+      id: id,
+      colorHEX: newColorHEX,
     });
   };
 
@@ -169,6 +179,7 @@ const KanbanBoardPage: FC = () => {
                   moveColumn={handleMoveColumn}
                   dropColumn={handleDropColumn}
                   onUpdateTitle={handleUpdateTitle}
+                  onUpdateColor={handleUpdateColor}
                   onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
                 />
               </div>

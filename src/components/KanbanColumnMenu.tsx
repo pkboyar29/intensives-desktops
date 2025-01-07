@@ -1,12 +1,15 @@
 import { FC, useState, useRef, useEffect } from 'react';
+import { KANBAN_COLORS } from '../helpers/kanbanHelpers';
 
 interface KanbanColumnMenuProps {
   onRename: () => void;
+  onChangeColor: (color: string) => void;
   onDelete: () => void;
 }
 
 const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
   onRename,
+  onChangeColor,
   onDelete,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +50,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
       {/* Меню */}
       {isOpen && (
         <div
-          className="absolute left-0 w-40 mt-2 bg-white border rounded shadow-lg"
+          className="absolute left-0 w-60 mt-2 bg-white border rounded shadow-lg"
           onBlur={closeMenu}
         >
           <ul className="py-1">
@@ -62,6 +65,27 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
                 Переименовать
               </button>
             </li>
+            
+            <div className="border-t border-gray-300 my-2"></div>
+
+            <li>
+            <h3 className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100">Цвет колонки</h3>
+              <div className="grid grid-cols-8 gap-1 px-4">
+                  {KANBAN_COLORS.map((color) => (
+                      <button
+                          key={color}
+                          className={`w-5 h-5 rounded-full border`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => {
+                              onChangeColor(color);
+                              closeMenu();
+                          }}
+                      />
+                ))}
+                </div>
+            </li>
+              
+            <div className="border-t border-gray-300 my-2"></div>
 
             <li>
               <button
@@ -71,7 +95,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
                 }}
                 className="block w-full px-4 py-2 text-left text-red hover:text-dark_red"
               >
-                Удалить
+                Удалить колонку
               </button>
             </li>
           </ul>
