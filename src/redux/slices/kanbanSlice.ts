@@ -131,18 +131,6 @@ const kanbanSlice = createSlice({
                     .filter((task) => !task.parentTask) // Только задачи без parent_task
                     .map((task) => task.id)] // Сохраняем только ID задач
                     .sort((a, b) => state.tasks![a].position - state.tasks![b].position); // Сортируем по позиции
-
-                /*
-                const existingTaskIds = new Set(column.taskIds); // Уникальные ID уже существующих задач
-
-                const newTaskIds = tasks
-                    .filter((task) => !task.parentTask) // Только задачи без parent_task
-                    .map((task) => task.id); // Сохраняем только ID задач
-                
-                // Добавляем только уникальные задачи
-                column.taskIds = [...Array.from(existingTaskIds), ...newTaskIds]
-                    .sort((a, b) => state.tasks![a].position - state.tasks![b].position); // Сортируем по позиции
-                */
             }
         },
         addTask(state, action: PayloadAction<{ columnId: number; task: ITask }>) {
@@ -155,6 +143,8 @@ const kanbanSlice = createSlice({
 
             const column = state.columns.find((col) => col.id === columnId);
             if (column) {
+                // +1 к количеству задач у колонки
+                column.tasksCount = column.tasksCount + 1;
 
                 // Обновляем позиции всех задач в колонке
                 column.taskIds.forEach((id, index) => {
@@ -186,9 +176,17 @@ const kanbanSlice = createSlice({
             const column = state.columns.find((col) => col.id === taskToRemove.column);
 
             if (column) {
+                // -1 к количеству задач у колонки
+                column.tasksCount = column.tasksCount - 1;
+                
                 // Удаляем ID задачи из списка taskIds этой колонки
                 column.taskIds = column.taskIds.filter((id) => id !== taskId);
             }
+        },
+        restoreKanbanState(state, action: PayloadAction<KanbanState>) {
+            state.columns = action.payload.columns;
+            state.tasks = action.payload.tasks;
+            state.subtasks = action.payload.subtasks;
         }
     }
 })
@@ -203,6 +201,7 @@ export const {
     changeColumnColor,
     setColumnTasks,
     addTask,
-    deleteTask
+    deleteTask,
+    restoreKanbanState,
  } = kanbanSlice.actions;
 export default kanbanSlice.reducer;

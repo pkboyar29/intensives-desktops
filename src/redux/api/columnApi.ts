@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { RootState } from '../store';
-import { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor } from '../slices/kanbanSlice';
+import { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, restoreKanbanState } from '../slices/kanbanSlice';
 import {
   IColumn,
   IColumnCreate,
@@ -71,21 +71,19 @@ export const columnApi = createApi({
       }),
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, position}, { dispatch, queryFulfilled, getState }) {
-         // Сохраняем предыдущее состояние
-        const previousColumns = (getState() as RootState).kanban.columns;
+        // Сохраняем предыдущее состояние
+        const previousState = (getState() as RootState).kanban;
 
         // Оптимистично обновляем позиции
         dispatch(moveColumn({ columnId: id, newPosition: position }));
 
         try{
           await queryFulfilled; // Дождаться завершения запроса
-          console.log("update column position")
+          
         } catch (err) {
           console.error("Ошибка синхронизации позиции:", err);
           // Откат к предыдущему состоянию при ошибке
-          if (previousColumns) {
-            dispatch(setColumns(previousColumns));
-          }
+          dispatch(restoreKanbanState(previousState));
         }
       }
     }),
@@ -115,13 +113,21 @@ export const columnApi = createApi({
       }),
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, colorHEX}, { dispatch, queryFulfilled, getState }) {
+        // Сохраняем предыдущее состояние
+        const previousState = (getState() as RootState).kanban;
+        
+        // Оптимистично обновляем позиции
+        if(id && colorHEX) {
+          dispatch(changeColumnColor({ columnId: id, newColorHEX: colorHEX}));
+        }
+
         try{
           await queryFulfilled;
-          if(id && colorHEX) {
-            dispatch(changeColumnColor({ columnId: id, newColorHEX: colorHEX}));
-          }
+
         } catch (err) {
           console.error('Error on changing color column:', err);
+          // Откат к предыдущему состоянию при ошибке
+          dispatch(restoreKanbanState(previousState));
         }
       }
     }),

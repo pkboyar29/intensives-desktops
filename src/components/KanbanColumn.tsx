@@ -54,6 +54,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
       if (data?.next === null) {
         hasMore.current = false; // Если `next` равно null, страниц больше нет
+      } else {
+        setPage(page + 1)
       }
     };
 
@@ -82,27 +84,17 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     }
   }, [creatingTask]);
 
-  // Отслеживание прокрутки
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    /*
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-
-    if (scrollHeight - scrollTop <= clientHeight + 50) {
-      // Если пользователь почти дошёл до конца списка
-      loadMoreTasks();
-    }
-    */
-  };
-
   // Загрузка следующей страницы
   const loadMoreTasks = async () => {
     if (!hasMore.current || isLoading) return; // Не загружаем, если нет данных или уже идёт загрузка
 
     console.log("current page column ", page)
-    const { data } = await getTasks({ column: id, page: page + 1, pageSize });
+    const { data } = await getTasks({ column: id, page: page, pageSize });
 
     if (data?.next === null) {
       hasMore.current = false; // Если `next` равно null, страниц больше нет
+    } else {
+      setPage(page + 1)
     }
   };
 
@@ -146,7 +138,9 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const handleKeyDownTask = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleBlurTask();
+      e.preventDefault(); // Предотвращает добавление переноса строки
+      createTask();
+      setCreatingTask('');
     }
   };
 
@@ -245,10 +239,10 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
         </div>
 
 
-        {creatingTask ? (
+        {creatingTask != null ? (
           <textarea
             ref={textareaRef}
-            defaultValue={' '}
+            value={creatingTask}
             onBlur={handleBlurTask}
             onKeyDown={handleKeyDownTask}
             onChange={(e) => setCreatingTask(e.target.value)}
@@ -263,7 +257,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
         </div>
 
-        <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden" onScroll={handleScroll}>
+        <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
           {tasks && tasks.map((task) => (
             task && (
               <div>

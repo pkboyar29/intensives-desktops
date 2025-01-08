@@ -13,7 +13,7 @@ export const KANBAN_COLORS = [
     '#f78fb3', // розовый
     '#4ca9ff', // голубой
     '#3a915f', // темно-зеленый
-    '#6c6c6c', // обновленный серый
+    '#8a8a8a', // обновленный серый
     '#d9d9d9', // светло-серый
 ];
 
@@ -26,4 +26,4 @@ export const validateKanban = (name: string): boolean => {
       return false;
     }
     return true;
-  };
+};

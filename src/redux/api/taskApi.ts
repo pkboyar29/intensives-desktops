@@ -41,7 +41,7 @@ export const taskApi = createApi({
           async onQueryStarted({ column }, {dispatch, queryFulfilled }) {
             try {
               const { data: columnTasks } = await queryFulfilled;
-    
+
               // Диспатчим addColumnTasks для обновления состояния в slice kanban
               dispatch(setColumnTasks({ columnId: column, tasks: columnTasks.results }));
             } catch (err) {
