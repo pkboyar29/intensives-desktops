@@ -21,6 +21,7 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     studentsInTeam: unmappedTeam.students_in_team.map((unmappedStudent: any) =>
       mapStudent(unmappedStudent.student)
     ),
+    teamleadId: unmappedTeam.teamlead_id
   };
 };
 

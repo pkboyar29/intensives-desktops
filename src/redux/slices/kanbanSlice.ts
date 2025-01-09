@@ -183,6 +183,22 @@ const kanbanSlice = createSlice({
                 column.taskIds = column.taskIds.filter((id) => id !== taskId);
             }
         },
+        addSubtask(state, action: PayloadAction<{ parentTaskId: number, subtask: ITask}>) {
+            const { parentTaskId, subtask } = action.payload;
+
+            if (!state.tasks || !state.subtasks) return;
+
+            // Добавляем подзадачу в tasks
+            state.tasks![subtask.id] = subtask;
+
+            // Если у родительской задачи ещё нет подзадач, инициализируем массив
+            if (!state.subtasks![parentTaskId]) {
+                state.subtasks![parentTaskId] = [];
+            }
+
+            // Добавляем ID подзадачи в массив подзадач
+            state.subtasks![parentTaskId].push(subtask.id);
+        },
         restoreKanbanState(state, action: PayloadAction<KanbanState>) {
             state.columns = action.payload.columns;
             state.tasks = action.payload.tasks;
@@ -202,6 +218,7 @@ export const {
     setColumnTasks,
     addTask,
     deleteTask,
+    addSubtask,
     restoreKanbanState,
  } = kanbanSlice.actions;
 export default kanbanSlice.reducer;

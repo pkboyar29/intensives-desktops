@@ -20,6 +20,7 @@ import { moveColumnTemporary } from '../redux/slices/kanbanSlice';
 
 const KanbanBoardPage: FC = () => {
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
   const columns = useAppSelector((state) => state.kanban.columns);
 
@@ -44,6 +45,8 @@ const KanbanBoardPage: FC = () => {
   useEffect(() => {
     if (currentTeam) {
       getColumns(currentTeam.index);
+      console.log(currentTeam)
+      console.log(currentUser)
     }
   }, [currentTeam]);
 
@@ -52,7 +55,7 @@ const KanbanBoardPage: FC = () => {
   });
 
   useEffect(() => {
-    console.log(columns)
+    //console.log(columns)
     setLocalColumns(columns);
   }, [columns])
 

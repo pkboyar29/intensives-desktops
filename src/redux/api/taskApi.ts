@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import { ITask, ITaskCreate } from '../../ts/interfaces/ITask';
-import { addTask, deleteTask, setColumnTasks } from '../slices/kanbanSlice';
+import { addSubtask, addTask, deleteTask, setColumnTasks } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
   return {
@@ -53,14 +53,24 @@ export const taskApi = createApi({
           query: (data) => ({
               url: '/tasks/',
               method: 'POST',
-              body: data,
+              body: {
+                name: data.name,
+                column: data?.column,
+                parent_task: data?.parentTask
+              },
           }),
           transformResponse: (response: any): ITask => mapTask(response),
-          async onQueryStarted(arg, {dispatch, queryFulfilled }) {
+          async onQueryStarted({ column, parentTask }, {dispatch, queryFulfilled }) {
             try {
               const { data: newTask } = await queryFulfilled;
-    
-              dispatch(addTask({ columnId: newTask.column, task: newTask }));
+              
+              if(column) {
+                // Если передан column, значит это обычная задача
+                dispatch(addTask({ columnId: newTask.column, task: newTask }));
+              } else if(parentTask) {
+                // Если передан parentTask, значит это подзадача
+                dispatch(addSubtask({ parentTaskId: newTask.column, subtask: newTask }));
+              }
             } catch (err) {
               console.error('Error by getting tasks column:', err);
             }
@@ -76,8 +86,13 @@ export const taskApi = createApi({
               await queryFulfilled;
               
               dispatch(deleteTask(id));
-            } catch (err) {
-              console.error('Error deleting task:', err);
+            } catch (err: any) {
+              if (err.error.status === 404) {
+                console.warn(`Задача не найдена.`);
+                dispatch(deleteTask(id)); // Удаляем задачу из состояния
+              } else {
+                console.error('Error deleting task:', err);
+              }
             }
           }
         }),

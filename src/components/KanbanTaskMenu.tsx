@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom';
 
 interface KanbanTaskMenuProps {
   onRename: () => void;
+  onCreateSubtask: () => void;
   onDelete: () => void;
 }
 
 const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
   onRename,
+  onCreateSubtask,
   onDelete,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +89,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         <li>
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Останавливаем всплытие
+              e.stopPropagation(); // Останавливаем всплытие ??
               onRename();
               closeMenu();
             }}
@@ -98,11 +100,26 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         </li>
 
         <div className="border-t border-gray-300 my-2"></div>
+          
+        <li>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onCreateSubtask();
+              closeMenu();
+            }}
+            className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+          >
+            Создать подзадачу
+          </button>
+        </li>
+          
+        <div className="border-t border-gray-300 my-2"></div>
 
         <li>
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Останавливаем всплытие ??
+              e.stopPropagation();
               onDelete();
               closeMenu();
             }}

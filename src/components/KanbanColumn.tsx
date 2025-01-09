@@ -45,7 +45,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание задачи
 
   const [page, setPage] = useState(1); // Текущая страница
-  const pageSize = 20; // Размер страницы
+  const pageSize = 100; // Размер страницы
   const hasMore = useRef(true); // Есть ли ещё страницы для загрузки
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     //console.log(tasks)
   }, [tasks]);
 
-   // Функция для автоматического изменения высоты
+  // Функция для автоматического изменения высоты textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"; // Сбрасываем высоту
@@ -152,7 +152,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
           name: creatingTask,
           column: id,
         }).unwrap();
-    }
+      }
     } catch(err) {
       console.error("Error on crating task:", err);
     }
@@ -260,9 +260,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
         <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
           {tasks && tasks.map((task) => (
             task && (
-              <div>
+              <div key={task.id}> {/* Добавляем key сюда так хочет реакт*/}
                 <KanbanTask
-                  key={task.id}
                   id={task.id}
                   name={task.name}
                   isCompleted={task.isCompleted}
