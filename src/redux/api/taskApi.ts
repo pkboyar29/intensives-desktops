@@ -41,7 +41,7 @@ export const taskApi = createApi({
           async onQueryStarted({ column }, {dispatch, queryFulfilled }) {
             try {
               const { data: columnTasks } = await queryFulfilled;
-              console.log(columnTasks)
+
               // Диспатчим addColumnTasks для обновления состояния в slice kanban
               dispatch(setColumnTasks({ columnId: column, tasks: columnTasks.results }));
             } catch (err) {
@@ -50,9 +50,9 @@ export const taskApi = createApi({
           }
         }),
         getSubtasks: builder.query<ITask[], number>({
-              query: (parentTaskId) => `/tasks/?parent_task=${parentTaskId}`,
+              query: (parentTaskId) => `/tasks/?parent_task=${parentTaskId}`, // (пока) без пагинации
               transformResponse: (response: any): ITask[] =>
-                response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
+                response.map((unmappedTask: any) => mapTask(unmappedTask)),
               async onQueryStarted(parentTaskId, {dispatch, queryFulfilled}) {
                 try{
                   const { data: subtasks } = await queryFulfilled;

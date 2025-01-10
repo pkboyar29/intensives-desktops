@@ -49,7 +49,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   }, [creatingSubtask]);
 
   // Получаем id подзадач
-  const subtasks = useAppSelector((state) => state.kanban.subtasks?.[id] || []);
+  const subtasks = useAppSelector((state) => state.kanban.subtasks?.[id] || []); // не нужен ??
 
   // Получаем данные подзадач
   const subtasksData = useAppSelector((state) =>
@@ -92,7 +92,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
         }).unwrap();
       }
     } catch(err) {
-      console.error("Error on crating task:", err);
+      console.error("Error on crating subtask:", err);
     }
   }
 
@@ -101,7 +101,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       await deleteTaskAPI(id).unwrap();
       
     } catch(error) {
-      console.error("Error on deleting task:", error);
+      console.error(`Error on deleting subtask id=${id}`, error);
     }
   };
 
@@ -159,7 +159,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       {/* Область с подзадачами */}
       <div className='flex flex-col bg-gray'>
         {displayedSubtaskCount ? (
-          <div className='flex flex-row space-x-2 justify-end mt-1 mb-4 cursor-pointer' onClick={expandedSubtasks}>
+          <div className='flex flex-row space-x-2 justify-end mt-1 mb-1 mr-1 cursor-pointer' onClick={expandedSubtasks}>
             <p className=''>{displayedSubtaskCount}</p>
             {isExpandedSubtasks ? <p>&#x25B2;</p> : <p>&#x25BC;</p>}
           </div>

@@ -182,22 +182,36 @@ const kanbanSlice = createSlice({
         deleteTask(state, action: PayloadAction<number>) {
             const taskId = action.payload;
 
-            if (!state.columns || !state.tasks) return;
+            if (!state.columns || !state.tasks || !state.subtasks) return;
 
             // Находим задачу по её ID
             const taskToRemove = state.tasks[taskId];
             if (!taskToRemove) return; // Если задача не найдена, ничего не делаем
 
-             // Получаем колонку, к которой относится задача
-            const column = state.columns.find((col) => col.id === taskToRemove.column);
+            if(taskToRemove.parentTask) {
+                // Удаляем подзадачу из массива subtasks родительской задачи
+                const parentTaskId = taskToRemove.parentTask;
+                state.subtasks[parentTaskId] = state.subtasks[parentTaskId].filter((id) => id !== taskId);
 
-            if (column) {
-                // -1 к количеству задач у колонки
-                column.tasksCount = column.tasksCount - 1;
-                
-                // Удаляем ID задачи из списка taskIds этой колонки
-                column.taskIds = column.taskIds.filter((id) => id !== taskId);
+                // Если массив подзадач стал пустым, можно удалить запись (опционально)
+                if (state.subtasks[parentTaskId].length === 0) {
+                    delete state.subtasks[parentTaskId];
+                }
+            } else { // Иначе удаляем задачу из колонки
+                // Получаем колонку, к которой относится задача
+                const column = state.columns.find((col) => col.id === taskToRemove.column);
+
+                if (column) {
+                    // -1 к количеству задач у колонки
+                    column.tasksCount = column.tasksCount - 1;
+                    
+                    // Удаляем ID задачи из списка taskIds этой колонки
+                    column.taskIds = column.taskIds.filter((id) => id !== taskId);
+                }
             }
+
+            // Удаляем задачу из общего списка задач
+            delete state.tasks[taskId];
         },
         addSubtask(state, action: PayloadAction<{ parentTaskId: number, subtask: ITask}>) {
             const { parentTaskId, subtask } = action.payload;

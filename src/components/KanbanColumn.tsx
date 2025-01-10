@@ -251,7 +251,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
             autoFocus
             className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
           />
-        ): <button className="text-left text-blue hover:text-dark_blue" onClick={() => setCreatingTask(" ")}>
+        ): <button className="text-left text-blue hover:text-dark_blue" onClick={() => setCreatingTask("")}>
             + Создать задачу
           </button>}
 
