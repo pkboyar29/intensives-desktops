@@ -133,6 +133,22 @@ const kanbanSlice = createSlice({
                     .sort((a, b) => state.tasks![a].position - state.tasks![b].position); // Сортируем по позиции
             }
         },
+        setSubtasks(state, action: PayloadAction<{ parentTaskId: number, subtasks: ITask[] }>) {
+            const { parentTaskId, subtasks } = action.payload;
+
+            if (!state.tasks || !state.subtasks) return;
+
+            subtasks.forEach((subtask) => {
+                state.tasks![subtask.id] = subtask;
+            });
+
+            // Если у родительской задачи ещё нет подзадач, инициализируем массив
+            //if (!state.subtasks[parentTaskId]) {
+            //    state.subtasks[parentTaskId] = [];
+            //}
+            
+            state.subtasks[parentTaskId] = subtasks.map((subtask) => subtask.id);
+        },
         addTask(state, action: PayloadAction<{ columnId: number; task: ITask }>) {
             const { columnId, task } = action.payload;
 
@@ -191,13 +207,23 @@ const kanbanSlice = createSlice({
             // Добавляем подзадачу в tasks
             state.tasks![subtask.id] = subtask;
 
-            // Если у родительской задачи ещё нет подзадач, инициализируем массив
+            // Если у родительской задачи ещё нет подзадач
             if (!state.subtasks![parentTaskId]) {
-                state.subtasks![parentTaskId] = [];
+                state.subtasks![parentTaskId] = []; // инициализируем массив подзадач 
             }
 
             // Добавляем ID подзадачи в массив подзадач
             state.subtasks![parentTaskId].push(subtask.id);
+
+            // Заnullяем поле так как теперь работаем с массивом subtasks
+            if (state.tasks![parentTaskId]) {
+                    state.tasks![parentTaskId] = {
+                    ...state.tasks![parentTaskId],
+                    initialSubtaskCount: null, // Явно изменяем значение
+                };
+            }
+            console.log(parentTaskId)
+            console.log(state.tasks![parentTaskId])
         },
         restoreKanbanState(state, action: PayloadAction<KanbanState>) {
             state.columns = action.payload.columns;
@@ -216,6 +242,7 @@ export const {
     renameColumn,
     changeColumnColor,
     setColumnTasks,
+    setSubtasks,
     addTask,
     deleteTask,
     addSubtask,

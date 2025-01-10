@@ -265,6 +265,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
                   id={task.id}
                   name={task.name}
                   isCompleted={task.isCompleted}
+                  initialSubtaskCount={task.initialSubtaskCount}
                 />
               </div>
             )

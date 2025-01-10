@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import { ITask, ITaskCreate } from '../../ts/interfaces/ITask';
-import { addSubtask, addTask, deleteTask, setColumnTasks } from '../slices/kanbanSlice';
+import { addSubtask, addTask, deleteTask, setColumnTasks, setSubtasks } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
   return {
@@ -19,7 +19,7 @@ const mapTask = (unmappedEvent: any): ITask => {
     deadlineEndDt: unmappedEvent.deadline_end_dt,
     position: unmappedEvent.position,
     isCompleted: unmappedEvent.is_completed,
-    subtasksCount: unmappedEvent.subtasks_count,
+    initialSubtaskCount: unmappedEvent.subtasks_count,
   };
 };
 
@@ -41,13 +41,26 @@ export const taskApi = createApi({
           async onQueryStarted({ column }, {dispatch, queryFulfilled }) {
             try {
               const { data: columnTasks } = await queryFulfilled;
-
+              console.log(columnTasks)
               // Диспатчим addColumnTasks для обновления состояния в slice kanban
               dispatch(setColumnTasks({ columnId: column, tasks: columnTasks.results }));
             } catch (err) {
               console.error('Error by getting tasks column:', err);
             }
           }
+        }),
+        getSubtasks: builder.query<ITask[], number>({
+              query: (parentTaskId) => `/tasks/?parent_task=${parentTaskId}`,
+              transformResponse: (response: any): ITask[] =>
+                response.results.map((unmappedTask: any) => mapTask(unmappedTask)),
+              async onQueryStarted(parentTaskId, {dispatch, queryFulfilled}) {
+                try{
+                  const { data: subtasks } = await queryFulfilled;
+                  dispatch(setSubtasks({ parentTaskId: parentTaskId, subtasks: subtasks }));
+                } catch (err) {
+                  console.error(`Error by getting subtasks for parentTask id=${parentTaskId}`, err);
+                }
+              }
         }),
         createTask: builder.mutation<ITask, ITaskCreate>({
           query: (data) => ({
@@ -64,12 +77,12 @@ export const taskApi = createApi({
             try {
               const { data: newTask } = await queryFulfilled;
               
-              if(column) {
+              if(newTask.parentTask) {
+                // Если передан parentTask, значит это подзадача
+                dispatch(addSubtask({ parentTaskId: newTask.parentTask, subtask: newTask }));
+              } else if(newTask.column) {
                 // Если передан column, значит это обычная задача
                 dispatch(addTask({ columnId: newTask.column, task: newTask }));
-              } else if(parentTask) {
-                // Если передан parentTask, значит это подзадача
-                dispatch(addSubtask({ parentTaskId: newTask.column, subtask: newTask }));
               }
             } catch (err) {
               console.error('Error by getting tasks column:', err);
@@ -101,6 +114,7 @@ export const taskApi = createApi({
 
 export const {
   useLazyGetTasksColumnQuery,
+  useLazyGetSubtasksQuery,
   useCreateTaskMutation,
   useDeleteTaskMutation
 } = taskApi;

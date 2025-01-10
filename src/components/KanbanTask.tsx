@@ -1,10 +1,12 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import KanbanTaskMenu from './KanbanTaskMenu';
 import {
+  useLazyGetSubtasksQuery,
   useCreateTaskMutation,
   useDeleteTaskMutation
 } from '../redux/api/taskApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
+import { useAppSelector } from '../redux/store';
 
 
 interface KanbanTaskProps {
@@ -12,7 +14,7 @@ interface KanbanTaskProps {
   name: string;
   isCompleted: boolean;
   assignee?: string;
-  subtasksCount?: number;
+  initialSubtaskCount?: number | null;
   deadlineStart?: string;
   deadlineEnd?: string;
   onClick?: () => void;
@@ -24,14 +26,16 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   name,
   isCompleted,
   assignee,
-  subtasksCount,
+  initialSubtaskCount,
   deadlineStart,
   deadlineEnd,
   onClick,
 }) => {
+  const [getSubtasks, { isLoading, isError }] = useLazyGetSubtasksQuery();
   const [createTaskAPI] = useCreateTaskMutation();
   const [deleteTaskAPI] = useDeleteTaskMutation();
 
+  const [isExpandedSubtasks, setIsExpandedSubtasks] = useState(false); // Состояние для раскрытия подзадач
   const [creatingSubtask, setCreatingSubtask] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание подзадачи
 
@@ -44,8 +48,22 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     }
   }, [creatingSubtask]);
 
+  // Получаем id подзадач
+  const subtasks = useAppSelector((state) => state.kanban.subtasks?.[id] || []);
+
+  // Получаем данные подзадач
+  const subtasksData = useAppSelector((state) =>
+    (state.kanban.subtasks?.[id] || []).map((subtaskId) => state.kanban.tasks?.[subtaskId])
+  );
+
+  // Получаем количество подзадач
+  const subtaskCount = useAppSelector((state) =>
+    state.kanban.subtasks?.[id]?.length || 0
+  );
+
   const renameTask = () => {
-    
+    console.log(subtaskCount)
+    console.log(initialSubtaskCount)
   };
 
   const handleBlurTask = async () => {
@@ -87,13 +105,28 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     }
   };
 
+  const expandedSubtasks = async () => {
+    if(!isExpandedSubtasks && subtaskCount === 0) {
+       // Загружаем подзадачи, если они ещё не загружены
+      await getSubtasks(id);
+    }
+    setIsExpandedSubtasks((prev) => !prev)
+  }
+
+  // Логика отображения количества подзадач
+  const displayedSubtaskCount =
+    (initialSubtaskCount !== null && initialSubtaskCount! > 0)
+      ? initialSubtaskCount // Показываем изначальное значение
+      : subtaskCount; // После подгрузки показываем актуальное значение
+
 
   return (
     <div
-      className="flex flex-col p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md"
+      className="flex flex-col mb-3 transition border border-gray-200 rounded-lg hover:shadow-md"
       onClick={onClick}
     >
-      <div className='flex flex-row justify-between items-center'>
+      <div className='flex p-3 flex-row justify-between items-center bg-white rounded-lg cursor-pointer'>
+
         {/* Левая часть с чекбоксом и названием */}
         <div className="flex space-x-2 items-down ml">
           <input type="checkbox" className="w-4 h-4 text-blue-500" />
@@ -107,7 +140,10 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
         {/* Правая часть (иконка или инициалы) */}
         <div>
-          <KanbanTaskMenu onRename={renameTask} onCreateSubtask={() => setCreatingSubtask(' ')} onDelete={deleteTask} />
+          <KanbanTaskMenu onRename={renameTask} onCreateSubtask={() => { 
+            setCreatingSubtask('');
+            setIsExpandedSubtasks(true) }}
+            onDelete={deleteTask} />
           {assignee ? (
             <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
               {assignee}
@@ -121,7 +157,14 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       </div>
 
       {/* Область с подзадачами */}
-      <div className=''>
+      <div className='flex flex-col bg-gray'>
+        {displayedSubtaskCount ? (
+          <div className='flex flex-row space-x-2 justify-end mt-1 mb-4 cursor-pointer' onClick={expandedSubtasks}>
+            <p className=''>{displayedSubtaskCount}</p>
+            {isExpandedSubtasks ? <p>&#x25B2;</p> : <p>&#x25BC;</p>}
+          </div>
+          ):(<></>)}
+
         {creatingSubtask != null ? (
           <textarea
             ref={textareaRef}
@@ -130,12 +173,36 @@ const KanbanTask: FC<KanbanTaskProps> = ({
             onKeyDown={handleKeyDownTask}
             onChange={(e) => setCreatingSubtask(e.target.value)}
             maxLength={500}
-            placeholder="Введите название задачи..."
+            placeholder="Введите название подзадачи..."
             autoFocus
             className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
           />
-          ):(<></>)}
+          ) : (
+            <button className="text-left text-blue hover:text-dark_blue" onClick={() => setCreatingSubtask("")}>
+            
+            </button>
+          )}
+
+          {isExpandedSubtasks && subtasksData.length > 0 && (
+            <div>
+              {subtasksData.map((subtask) => {
+                if (!subtask) return null;
+              
+              return (
+                <div key={subtask.id} className='ml-3 mr-1'>
+                  <KanbanTask
+                    id={subtask.id}
+                    name={subtask.name}
+                    isCompleted={subtask.isCompleted}
+                    initialSubtaskCount={subtask.initialSubtaskCount}
+                  />
+                </div>
+              );
+              })}
+            </div>
+          )}
       </div>
+
     </div>
   );
 };

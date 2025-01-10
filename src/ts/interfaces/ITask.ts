@@ -13,7 +13,7 @@ export interface ITask {
   deadlineEndDt: Date  | null;
   position: number;
   isCompleted: boolean;
-  subtasksCount: number | null;
+  initialSubtaskCount: number | null;
 }
 
 export interface ITaskCreate {
