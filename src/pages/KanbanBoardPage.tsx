@@ -143,7 +143,7 @@ const KanbanBoardPage: FC = () => {
         onCloseModal={() => setDeleteModal(null)}
       >
         <p className="text-lg text-bright_gray">
-          {`Вы уверены, что хотите удалить колонку? ВСЕ задачи в ней удалятся`}
+          {`Вы уверены, что хотите удалить колонку? ВСЕ задачи и подзадачи в ней удалятся!`}
         </p>
         <div className="flex justify-end gap-3 mt-6">
           <div>

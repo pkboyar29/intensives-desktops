@@ -177,7 +177,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const [, dropRef] = useDrop({
     accept: 'COLUMN',
-    hover: (item: { index:number, id: number }) => {
+    hover: (item: { index: number, id: number }) => {
       if (item.index !== index) {
         moveColumn(item.index, index); // Вызываем локальное обновление при перетаскивании
         item.index = index;
@@ -197,14 +197,15 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   return (
     <div
       ref={combinedRef} // Drop target и preview на всю колонку
-      className={`w-100 p-4 bg-white rounded-lg shadow-md border-t-4 ${
+      className={`w-100 bg-white rounded-lg shadow-md border-t-4 ${
         isDragging ? 'opacity-50' : ''
       }`}
       style={{ borderTopColor: colorHEX }}
     >
       <div
         ref={dragRef}
-        onMouseDown={preventDrag}>
+        onMouseDown={preventDrag}
+        className='p-4'>
         
         <div className="flex flex-row items-start justify-between">
           <div className="flex items-center justify-between mb-2 group">
@@ -257,12 +258,15 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
         </div>
 
-        <div className="mt-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
-          {tasks && tasks.map((task) => (
+        <div className="space-y-2 max-h-[calc(100vh-200px)] ml-4 mr-4 md-4 mt-2 overflow-y-auto overflow-x-hidden">
+          {tasks && tasks.map((task, index) => (
             task && (
               <div key={task.id}> {/* Добавляем key сюда так хочет реакт*/}
                 <KanbanTask
                   id={task.id}
+                  index={index}
+                  columnId={task.column}
+                  parentTaskId={task.parentTask}
                   name={task.name}
                   isCompleted={task.isCompleted}
                   initialSubtaskCount={task.initialSubtaskCount}

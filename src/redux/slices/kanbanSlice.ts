@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IColumn, IColumnWithTasksIds } from '../../ts/interfaces/IColumn';
 import { ITask } from '../../ts/interfaces/ITask';
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
 interface KanbanState {
     columns: IColumnWithTasksIds[] | null; // Колонки с taskIds
@@ -239,6 +241,81 @@ const kanbanSlice = createSlice({
             console.log(parentTaskId)
             console.log(state.tasks![parentTaskId])
         },
+        moveTaskTemporary(state, action: PayloadAction<{
+            taskId: number;
+            dragIndex: number,
+            hoverIndex: number,
+            fromColumnId: number | null;
+            fromParentTaskId: number | null;
+            toColumnId: number | null;
+            toParentTaskId: number | null;
+        }>) {
+            const { taskId, dragIndex, hoverIndex, fromColumnId, fromParentTaskId, toColumnId, toParentTaskId } = action.payload;
+
+            if (fromColumnId !== toColumnId && !fromParentTaskId && !toParentTaskId) {
+                // Задача перемещается между колонками
+
+                const fromColumn = state.columns?.find(col => col.id === fromColumnId);
+                const toColumn = state.columns?.find(col => col.id === toColumnId);
+                if (!fromColumn || !toColumn || !state.columns) return;
+
+                // Перемещаем задачу из одной колонки в другую
+                const fromColumnTasks = [...fromColumn.taskIds];
+                const [movedTask] = fromColumnTasks.splice(dragIndex, 1);
+                toColumn.taskIds.splice(hoverIndex, 0, movedTask);
+
+                // Обновляем позиции в колонках
+                state.columns = state.columns?.map(col => {
+                    if (col.id === fromColumnId) {
+                        return { ...col, taskIds: fromColumnTasks };
+                    } else if (col.id === toColumnId) {
+                        return { ...col, taskIds: toColumn.taskIds };
+                    }
+                    return col;
+                });
+            } else if (fromColumnId === toColumnId && !fromParentTaskId && !toParentTaskId) {
+                // Задача перемещается внутри одной колонки
+                const column = state.columns?.find(col => col.id === fromColumnId);
+                if (!column || !state.columns) return;
+                
+
+                // Перемещаем задачу внутри этой колонки
+                const tasksCopy = [...column.taskIds];
+                const [movedTask] = tasksCopy.splice(dragIndex, 1);
+                tasksCopy.splice(hoverIndex, 0, movedTask);
+
+                state.columns = state.columns?.map(col =>
+                    col.id === fromColumnId ? { ...col, taskIds: tasksCopy } : col
+                );
+            }
+        },
+        moveTask(state, action: PayloadAction<{
+            taskId: number;
+            sourceColumnId: number | null;
+            sourceParentTaskId: number | null;
+            targetColumnId: number | null;
+            targetParentTaskId: number | null;
+            targetIndex: number;
+        }>) {
+            const { taskId, sourceColumnId, sourceParentTaskId, targetColumnId, targetParentTaskId, targetIndex } = action.payload;
+
+            if (sourceColumnId !== targetColumnId && !sourceParentTaskId && !targetParentTaskId) {
+                // Сценарий 1: Задача перемещается между колонками
+                
+            } else if (sourceColumnId === targetColumnId && !sourceParentTaskId && !targetParentTaskId) {
+                // Сценарий 2: Задача перемещается внутри одной колонки
+                updatePositionInside(state.tasks!, targetColumnId!, state.tasks![taskId].position, targetIndex);
+                state.tasks![taskId].position = targetIndex;
+            } else if (!sourceParentTaskId && targetParentTaskId) {
+            // Сценарий 3: Задача перемещается в подзадачи
+            } else if (sourceParentTaskId && !targetParentTaskId) {
+            // Сценарий 4: Подзадача перемещается в колонку
+            } else if (sourceParentTaskId === targetParentTaskId) {
+            // Сценарий 5: Подзадача перемещается внутри одной задачи
+            } else if (sourceParentTaskId !== targetParentTaskId) {
+            // Сценарий 6: Подзадача перемещается между разными задачами
+            }
+        },
         restoreKanbanState(state, action: PayloadAction<KanbanState>) {
             state.columns = action.payload.columns;
             state.tasks = action.payload.tasks;
@@ -260,6 +337,92 @@ export const {
     addTask,
     deleteTask,
     addSubtask,
+    moveTaskTemporary,
+    moveTask,
     restoreKanbanState,
  } = kanbanSlice.actions;
+
 export default kanbanSlice.reducer;
+
+// Селектор для получения ID подзадач
+export const selectSubtaskIds = (state: RootState, id: number) =>
+  state.kanban.subtasks?.[id] || [];
+
+// Мемоизированный селектор для получения данных подзадач
+export const selectSubtaskData = createSelector(
+    [selectSubtaskIds, (state: RootState) => state.kanban.tasks],
+    (subtaskIds, tasks) =>
+      subtaskIds.map((subtaskId) => tasks?.[subtaskId]).filter(Boolean)
+);
+
+function updatePositionInside(
+tasks: { [taskId: number]: ITask },
+columnId: number,
+currentPosition: number,
+newPosition: number
+) {
+    if (newPosition > currentPosition) {
+        // Перемещение вправо
+        for (const taskId in tasks) {
+            if (tasks[taskId].column === columnId && tasks[taskId].position > currentPosition && tasks[taskId].position <= newPosition) {
+                tasks[taskId].position -= 1;  // Сдвигаем вправо
+            }
+        }
+    } else if (newPosition < currentPosition) {
+        // Перемещение влево
+        for (const taskId in tasks) {
+            if (tasks[taskId].column === columnId && tasks[taskId].position < currentPosition && tasks[taskId].position >= newPosition) {
+                tasks[taskId].position += 1;  // Сдвигаем влево
+            }
+        }
+    }
+}
+
+function updatePositionOutside(
+    tasks: { [taskId: number]: ITask },
+    subtasks: { [taskId: number]: number[] },
+    currentPosition: number,
+    newPosition: number,
+    filterFrom: { columnId?: number; parentTaskId?: number },
+    filterWhere: { columnId?: number; parentTaskId?: number }
+) {
+    // В колонке или подзадаче, откуда забираем задачу
+    if (filterFrom.columnId) {
+        for (const taskId in tasks) {
+            const task = tasks[taskId];
+            if (task.column === filterFrom.columnId && task.position >= currentPosition) {
+                task.position -= 1; // Сдвигаем задачи вправо
+            }
+        }
+    }
+
+    // В колонке или подзадаче, куда добавляем задачу
+    if (filterWhere.columnId) {
+        for (const taskId in tasks) {
+            const task = tasks[taskId];
+            if (task.column === filterWhere.columnId && task.position >= newPosition) {
+                task.position += 1; // Сдвигаем задачи влево
+            }
+        }
+    }
+
+    // Если это подзадача, обработаем для нее по аналогии
+    if (filterFrom.parentTaskId) {
+        for (const taskId in tasks) {
+            const task = tasks[taskId];
+            if (task.parentTask === filterFrom.parentTaskId && task.position >= currentPosition) {
+                task.position -= 1; // Сдвигаем подзадачи вправо
+            }
+        }
+    }
+
+    if (filterWhere.parentTaskId) {
+        for (const taskId in tasks) {
+            const task = tasks[taskId];
+            if (task.parentTask === filterWhere.parentTaskId && task.position >= newPosition) {
+                task.position += 1; // Сдвигаем подзадачи влево
+            }
+        }
+    }
+}
+  

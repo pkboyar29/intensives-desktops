@@ -138,7 +138,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
       <button
         ref={buttonRef}
         onClick={toggleMenu}
-        className="p-2 rounded-full hover:bg-gray-200"
+        className="p-2 rounded-full hover:text-blue"
       >
         &#x22EE; {/* Юникод для трех вертикальных точек */}
       </button>

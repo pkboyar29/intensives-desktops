@@ -6,11 +6,16 @@ import {
   useDeleteTaskMutation
 } from '../redux/api/taskApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
-import { useAppSelector } from '../redux/store';
+import { useAppSelector, useAppDispatch } from '../redux/store';
+import { selectSubtaskData, moveTask, moveTaskTemporary } from '../redux/slices/kanbanSlice';
+import { useDrag, useDrop } from 'react-dnd';
 
 
 interface KanbanTaskProps {
   id: number;
+  index: number;
+  columnId: number;
+  parentTaskId: number | null;
   name: string;
   isCompleted: boolean;
   assignee?: string;
@@ -23,6 +28,9 @@ interface KanbanTaskProps {
 
 const KanbanTask: FC<KanbanTaskProps> = ({
   id,
+  index,
+  columnId,
+  parentTaskId,
   name,
   isCompleted,
   assignee,
@@ -31,6 +39,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   deadlineEnd,
   onClick,
 }) => {
+  const dispatch = useAppDispatch();
   const [getSubtasks, { isLoading, isError }] = useLazyGetSubtasksQuery();
   const [createTaskAPI] = useCreateTaskMutation();
   const [deleteTaskAPI] = useDeleteTaskMutation();
@@ -48,13 +57,8 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     }
   }, [creatingSubtask]);
 
-  // Получаем id подзадач
-  const subtasks = useAppSelector((state) => state.kanban.subtasks?.[id] || []); // не нужен ??
-
   // Получаем данные подзадач
-  const subtasksData = useAppSelector((state) =>
-    (state.kanban.subtasks?.[id] || []).map((subtaskId) => state.kanban.tasks?.[subtaskId])
-  );
+  const subtasksData = useAppSelector((state) => selectSubtaskData(state, id));
 
   // Получаем количество подзадач
   const subtaskCount = useAppSelector((state) =>
@@ -113,19 +117,67 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     setIsExpandedSubtasks((prev) => !prev)
   }
 
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: 'TASK',
+    item: { id, index, columnId, parentTaskId },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, dropRef] = useDrop({
+    accept: 'TASK',
+    hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
+      dispatch(
+        moveTaskTemporary({
+          taskId: item.id,
+          dragIndex: item.index,
+          hoverIndex: index,
+          fromColumnId: item.columnId,
+          toColumnId: columnId,
+          fromParentTaskId: item.parentTaskId,
+          toParentTaskId: parentTaskId,
+        })
+      );
+    },
+    drop: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }, monitor) => {
+      if (item.columnId !== columnId && !item.parentTaskId && !parentTaskId) {
+        console.log(`Задача ${item.id} перемещена из колонки ${item.columnId} в колонку ${columnId} на позицию ${index}`);
+      } else if (item.columnId === columnId && !item.parentTaskId && !parentTaskId) {
+        console.log(`Задача ${item.id} перемещена внутри колонки ${columnId} с позиции ${item.index} на ${index}`);
+      } else if (!item.parentTaskId && parentTaskId) {
+        console.log(`Задача ${item.id} закинута в подзадачи род. задачи ${parentTaskId} на позицию ${index}`);
+      } else if (item.parentTaskId && !parentTaskId) {
+        console.log(`Подзадача ${item.id} выкинута из подзадач род. задачи ${item.parentTaskId} в колонку ${columnId} на позицию ${index}`);
+      } else if (item.parentTaskId === parentTaskId) {
+        console.log(`Подзадача ${item.id} перемещена внутри род. задачи ${parentTaskId} с позиции ${item.index} на ${index}`);
+      } else if (item.parentTaskId !== parentTaskId) {
+        console.log(`Подзадача ${item.id} перемещена из род. задачи ${item.parentTaskId} в род. задачу ${parentTaskId} на позицию ${index}`);
+      }
+    },
+  });
+
+  // Соединяем drag и dropRef
+  const combinedRef = (node: HTMLDivElement | null) => {
+    dragRef(node);
+    dropRef(node);
+  };
+
   // Логика отображения количества подзадач
   const displayedSubtaskCount =
     (initialSubtaskCount !== null && initialSubtaskCount! > 0)
       ? initialSubtaskCount // Показываем изначальное значение
       : subtaskCount; // После подгрузки показываем актуальное значение
 
-
+  
   return (
     <div
-      className="flex flex-col mb-3 transition border border-gray-200 rounded-lg hover:shadow-md"
+      className={`flex flex-col mb-3 transition-shadow border border-gray-200 rounded-lg hover:shadow-md hover:border-gray_3
+      ${isDragging ? 'opacity-50' : ''}`}
       onClick={onClick}
+      ref={previewRef}
     >
-      <div className='flex p-3 flex-row justify-between items-center bg-white rounded-lg cursor-pointer'>
+      <div className='flex p-3 flex-row justify-between items-center bg-white rounded-lg cursor-pointer' ref={combinedRef}>
 
         {/* Левая часть с чекбоксом и названием */}
         <div className="flex space-x-2 items-down ml">
@@ -185,13 +237,16 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
           {isExpandedSubtasks && subtasksData.length > 0 && (
             <div>
-              {subtasksData.map((subtask) => {
+              {subtasksData.map((subtask, index) => {
                 if (!subtask) return null;
               
               return (
                 <div key={subtask.id} className='ml-3 mr-1'>
                   <KanbanTask
                     id={subtask.id}
+                    columnId={subtask.column}
+                    parentTaskId={subtask.parentTask}
+                    index={index}
                     name={subtask.name}
                     isCompleted={subtask.isCompleted}
                     initialSubtaskCount={subtask.initialSubtaskCount}
