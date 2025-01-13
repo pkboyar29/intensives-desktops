@@ -265,8 +265,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
                 <KanbanTask
                   id={task.id}
                   index={index}
-                  columnId={task.column}
-                  parentTaskId={task.parentTask}
+                  columnId={id}
+                  parentTaskId={null}
                   name={task.name}
                   isCompleted={task.isCompleted}
                   initialSubtaskCount={task.initialSubtaskCount}

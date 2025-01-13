@@ -128,19 +128,67 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [, dropRef] = useDrop({
     accept: 'TASK',
     hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
-      dispatch(
-        moveTaskTemporary({
-          taskId: item.id,
-          dragIndex: item.index,
-          hoverIndex: index,
-          fromColumnId: item.columnId,
-          toColumnId: columnId,
-          fromParentTaskId: item.parentTaskId,
-          toParentTaskId: parentTaskId,
-        })
-      );
+      // Проверяем, действительно ли задача переместилась
+      //if (item.index === index && item.columnId === columnId && item.parentTaskId === parentTaskId) {
+      //  return; // Ничего не делаем, если положение задачи не изменилось
+      //}
+      // Локальные копии значений для сравнения
+      //const isSamePosition = item.index === index && item.columnId === columnId && item.parentTaskId === parentTaskId;
+      //console.log("just hover: item.index: "+ item.index+ " index: "+index)
+      //console.log("just hover: item.columnId: "+ item.columnId+ " columnId: "+columnId)
+
+      if(item.index !== index || item.columnId !== columnId || item.parentTaskId !== parentTaskId) {
+        //console.log("before dispatch: item.index: "+ item.index+ " index: "+index)
+        //console.log("before dispatch: item.columnId: "+ item.columnId+ " columnId: "+columnId)
+        //console.log("До dispatch:");
+        //console.log(`item.index: ${item.index}, index: ${index}`);
+        //console.log(`item.columnId: ${item.columnId}, columnId: ${columnId}`);
+        dispatch(
+          moveTaskTemporary({
+            taskId: item.id,
+            dragIndex: item.index,
+            hoverIndex: index,
+            fromColumnId: item.columnId,
+            toColumnId: columnId,
+            fromParentTaskId: item.parentTaskId,
+            toParentTaskId: parentTaskId,
+          })
+        );
+        
+        if (item.columnId !== columnId && !item.parentTaskId && !parentTaskId) {
+          console.log(`Задача ${item.id} перемещена из колонки ${item.columnId} в колонку ${columnId} на позицию ${index}`);
+        } else if (item.columnId === columnId && !item.parentTaskId && !parentTaskId) {
+          console.log(`Задача ${item.id} перемещена внутри колонки ${columnId} с позиции ${item.index} на ${index}`);
+        } else if (!item.parentTaskId && parentTaskId) {
+          console.log(`Задача ${item.id} закинута в подзадачи род. задачи ${parentTaskId} на позицию ${index}`);
+        } else if (item.parentTaskId && !parentTaskId) {
+          console.log(`Подзадача ${item.id} выкинута из подзадач род. задачи ${item.parentTaskId} в колонку ${columnId} на позицию ${index}`);
+        } else if (item.parentTaskId === parentTaskId) {
+          console.log(`Подзадача ${item.id} перемещена внутри род. задачи ${parentTaskId} с позиции ${item.index} на ${index}`);
+        } else if (item.parentTaskId !== parentTaskId) {
+          console.log(`Подзадача ${item.id} перемещена из род. задачи ${item.parentTaskId} в род. задачу ${parentTaskId} на позицию ${index}`);
+        }
+
+        //console.log("После dispatch:");
+        //console.log(`item.index: ${item.index}, index: ${index}`);
+        //console.log(`item.columnId: ${item.columnId}, columnId: ${columnId}`);
+
+        /*
+        console.log("after dipatch before eq:  item.index: "+ item.index+ " index: "+index)
+        console.log("after dipatch before eq: item.columnId: "+ item.columnId+ " columnId: "+columnId)
+        item.index = index;
+        item.columnId = columnId;
+        console.log("after eq: item.index: "+ item.index+ " index: "+index)
+        console.log("after eq: item.columnId: "+ item.columnId+ " columnId: "+columnId)
+        item.parentTaskId = parentTaskId;
+        */
+        item.index = index;
+        item.columnId = columnId;
+        item.parentTaskId = parentTaskId;
+      }
     },
     drop: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }, monitor) => {
+      /*
       if (item.columnId !== columnId && !item.parentTaskId && !parentTaskId) {
         console.log(`Задача ${item.id} перемещена из колонки ${item.columnId} в колонку ${columnId} на позицию ${index}`);
       } else if (item.columnId === columnId && !item.parentTaskId && !parentTaskId) {
@@ -154,6 +202,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       } else if (item.parentTaskId !== parentTaskId) {
         console.log(`Подзадача ${item.id} перемещена из род. задачи ${item.parentTaskId} в род. задачу ${parentTaskId} на позицию ${index}`);
       }
+        */
     },
   });
 
@@ -169,7 +218,6 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       ? initialSubtaskCount // Показываем изначальное значение
       : subtaskCount; // После подгрузки показываем актуальное значение
 
-  
   return (
     <div
       className={`flex flex-col mb-3 transition-shadow border border-gray-200 rounded-lg hover:shadow-md hover:border-gray_3
@@ -192,9 +240,9 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
         {/* Правая часть (иконка или инициалы) */}
         <div>
-          <KanbanTaskMenu onRename={renameTask} onCreateSubtask={() => { 
-            setCreatingSubtask('');
-            setIsExpandedSubtasks(true) }}
+          <KanbanTaskMenu onRename={renameTask} onCreateSubtask={() => {
+            expandedSubtasks(); 
+            setCreatingSubtask(''); }}
             onDelete={deleteTask} />
           {assignee ? (
             <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
@@ -245,7 +293,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
                   <KanbanTask
                     id={subtask.id}
                     columnId={subtask.column}
-                    parentTaskId={subtask.parentTask}
+                    parentTaskId={id}
                     index={index}
                     name={subtask.name}
                     isCompleted={subtask.isCompleted}

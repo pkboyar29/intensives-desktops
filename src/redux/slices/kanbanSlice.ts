@@ -143,13 +143,16 @@ const kanbanSlice = createSlice({
             subtasks.forEach((subtask) => {
                 state.tasks![subtask.id] = subtask;
             });
-
-            // Если у родительской задачи ещё нет подзадач, инициализируем массив
-            //if (!state.subtasks[parentTaskId]) {
-            //    state.subtasks[parentTaskId] = [];
-            //}
             
             state.subtasks[parentTaskId] = subtasks.map((subtask) => subtask.id);
+
+            // Заnullяем поле так как теперь работаем с массивом subtasks
+            if (state.tasks![parentTaskId]) {
+                state.tasks![parentTaskId] = {
+                ...state.tasks![parentTaskId],
+                initialSubtaskCount: null, // Явно изменяем значение
+            };
+        }
         },
         addTask(state, action: PayloadAction<{ columnId: number; task: ITask }>) {
             const { columnId, task } = action.payload;
@@ -238,8 +241,6 @@ const kanbanSlice = createSlice({
                     initialSubtaskCount: null, // Явно изменяем значение
                 };
             }
-            console.log(parentTaskId)
-            console.log(state.tasks![parentTaskId])
         },
         moveTaskTemporary(state, action: PayloadAction<{
             taskId: number;
@@ -252,32 +253,47 @@ const kanbanSlice = createSlice({
         }>) {
             const { taskId, dragIndex, hoverIndex, fromColumnId, fromParentTaskId, toColumnId, toParentTaskId } = action.payload;
 
-            if (fromColumnId !== toColumnId && !fromParentTaskId && !toParentTaskId) {
+            if(fromColumnId !== toColumnId && !fromParentTaskId && !toParentTaskId) {
                 // Задача перемещается между колонками
-
                 const fromColumn = state.columns?.find(col => col.id === fromColumnId);
                 const toColumn = state.columns?.find(col => col.id === toColumnId);
+                
                 if (!fromColumn || !toColumn || !state.columns) return;
+
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= fromColumn.taskIds.length || 
+                    hoverIndex < 0 || hoverIndex >= toColumn.taskIds.length) {
+                    console.warn("Индексы задач выходят за пределы массива");
+                    return;
+                }
 
                 // Перемещаем задачу из одной колонки в другую
                 const fromColumnTasks = [...fromColumn.taskIds];
                 const [movedTask] = fromColumnTasks.splice(dragIndex, 1);
-                toColumn.taskIds.splice(hoverIndex, 0, movedTask);
+
+                const toColumnTasks = [...toColumn.taskIds];
+                toColumnTasks.splice(hoverIndex, 0, movedTask);
 
                 // Обновляем позиции в колонках
                 state.columns = state.columns?.map(col => {
                     if (col.id === fromColumnId) {
                         return { ...col, taskIds: fromColumnTasks };
                     } else if (col.id === toColumnId) {
-                        return { ...col, taskIds: toColumn.taskIds };
+                        return { ...col, taskIds: toColumnTasks };
                     }
                     return col;
                 });
-            } else if (fromColumnId === toColumnId && !fromParentTaskId && !toParentTaskId) {
+            } else if(fromColumnId === toColumnId && !fromParentTaskId && !toParentTaskId) {
                 // Задача перемещается внутри одной колонки
                 const column = state.columns?.find(col => col.id === fromColumnId);
-                if (!column || !state.columns) return;
-                
+                if (!column || !state.columns) return;   
+
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= column.taskIds.length || 
+                    hoverIndex < 0 || hoverIndex >= column.taskIds.length) {
+                    console.warn("Индексы задач выходят за пределы массива");
+                    return;
+                }
 
                 // Перемещаем задачу внутри этой колонки
                 const tasksCopy = [...column.taskIds];
@@ -287,6 +303,116 @@ const kanbanSlice = createSlice({
                 state.columns = state.columns?.map(col =>
                     col.id === fromColumnId ? { ...col, taskIds: tasksCopy } : col
                 );
+
+            } else if (!fromParentTaskId && toParentTaskId) {
+                // Задача из колонки перемещается в подзадачи
+                const fromColumn = state.columns?.find(col => col.id === fromColumnId);
+
+                if(!state.columns || !state.subtasks ||
+                    !fromColumn || !toParentTaskId ||
+                    !state.subtasks[toParentTaskId]) return;
+
+                const subtasks = state.subtasks[toParentTaskId]
+
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= fromColumn.taskIds.length || 
+                    hoverIndex < 0 || hoverIndex > subtasks.length) { // Здесь допускаем hoverIndex === subtasks.length для добавления в конец
+                    console.warn("Индексы задач выходят за пределы массива");
+                    return;
+                }
+
+                // Удаляем задачу из колонки
+                const fromColumnTasks = [...fromColumn.taskIds];
+                const [movedTask] = fromColumnTasks.splice(dragIndex, 1);
+
+                // Добавляем задачу в подзадачи
+                const subtasksCopy = [...subtasks];
+                subtasksCopy.splice(hoverIndex, 0, movedTask);
+
+                // Обновляем состояния
+                // 1. Обновляем колонку
+                state.columns = state.columns.map((col) => 
+                    col.id === fromColumnId ? { ...col, taskIds: fromColumnTasks } : col
+                );
+                
+                // 2. Обновляем подзадачи
+                state.subtasks[toParentTaskId] = subtasksCopy;
+                
+            } else if(fromParentTaskId && !toParentTaskId) {
+                // Подзадача перемещается в колонку
+                const toColumn = state.columns?.find((col) => col.id === toColumnId);
+
+                if(!state.columns || !state.subtasks ||
+                    !toColumn || !fromParentTaskId ||
+                    !state.subtasks[fromParentTaskId]) return;
+
+                const subtasks = state.subtasks[fromParentTaskId]
+                
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= subtasks.length || 
+                    hoverIndex < 0 || hoverIndex > toColumn.taskIds.length) { // Здесь допускаем hoverIndex === subtasks.length для добавления в конец
+                    console.warn("Индексы задач выходят за пределы массива");
+                    return;
+                }
+
+                // Удаляем задачу из подзадач
+                const subtasksCopy = [...subtasks];
+                const [movedSubtask] = subtasksCopy.splice(dragIndex, 1);
+
+                // Добавляем задачу в колонку
+                const toColumnTasks = [...toColumn.taskIds];
+                toColumnTasks.splice(hoverIndex, 0, movedSubtask);
+
+                // Обновляем состояния
+                // 1.Обновляем подзадачи
+                state.subtasks[fromParentTaskId] = subtasksCopy;
+                
+                // 2. Обновляем колонку
+                state.columns = state.columns.map((col) => 
+                    col.id === fromColumnId ? { ...col, taskIds: toColumnTasks } : col
+                );
+
+            } else if(fromParentTaskId === toParentTaskId) {
+                // Подзадача перемещается внутри одной задачи
+                if(!state.subtasks || !fromParentTaskId || !state.subtasks[fromParentTaskId]) return;
+
+                const subtasks = state.subtasks[fromParentTaskId]
+
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= subtasks.length || hoverIndex < 0 || hoverIndex >= subtasks.length) {
+                    console.warn("Индексы подзадач выходят за пределы массива");
+                    return;
+                }
+
+                const subtasksCopy = [...subtasks];
+                const [movedSubtask] = subtasksCopy.splice(dragIndex, 1);
+                subtasksCopy.splice(hoverIndex, 0, movedSubtask);
+
+                // Обновляем массив подзадач для родительской задачи
+                state.subtasks[fromParentTaskId] = subtasksCopy
+            } else if(fromParentTaskId !== toParentTaskId) {
+                // Подзадача перемещается между разными задачами
+                if(!state.subtasks || !fromParentTaskId || !state.subtasks[fromParentTaskId] ||
+                    !toParentTaskId || !state.subtasks[toParentTaskId]) return;
+
+                const fromSubtasks = state.subtasks[fromParentTaskId]
+                const toSubtasks = state.subtasks[toParentTaskId]
+
+                // Проверяем границы индексов
+                if (dragIndex < 0 || dragIndex >= fromSubtasks.length || hoverIndex < 0 || hoverIndex > toSubtasks.length) {
+                    console.warn("Индексы подзадач выходят за пределы массива");
+                    return;
+                }
+
+                // Удаляем подзадачу из изначальной задачи
+                const [movedSubtask] = fromSubtasks.splice(dragIndex, 1);
+
+                // Добавляем задачу в другую задачу
+                toSubtasks.splice(hoverIndex, 0, movedSubtask);
+
+                // Обновляем состояния
+                state.subtasks[fromParentTaskId] = [...fromSubtasks];
+                state.subtasks[toParentTaskId] = [...toSubtasks];
             }
         },
         moveTask(state, action: PayloadAction<{
