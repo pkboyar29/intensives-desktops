@@ -21,3 +21,10 @@ export interface ITaskCreate {
   column?: number;
   parentTask?: number;
 }
+
+export interface ITaskPositionUpdate {
+  id: number;
+  position: number;
+  column?: number;
+  parentTask?: number;
+}

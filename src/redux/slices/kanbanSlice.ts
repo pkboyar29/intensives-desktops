@@ -11,14 +11,17 @@ interface KanbanState {
     } | null;
     subtasks: {
         [taskId: number]: number[]; // "id задачи : массив id её подзадач"
-    } | null
+    } | null;
+    previousState: KanbanState | null;
 }
 
 const initialState: KanbanState = {
     columns: null,
     tasks: {},
-    subtasks: {}
+    subtasks: {},
+    previousState: null,
 }
+
 
 const kanbanSlice = createSlice({
     name: "kanban",
@@ -415,37 +418,17 @@ const kanbanSlice = createSlice({
                 state.subtasks[toParentTaskId] = [...toSubtasks];
             }
         },
-        moveTask(state, action: PayloadAction<{
-            taskId: number;
-            sourceColumnId: number | null;
-            sourceParentTaskId: number | null;
-            targetColumnId: number | null;
-            targetParentTaskId: number | null;
-            targetIndex: number;
-        }>) {
-            const { taskId, sourceColumnId, sourceParentTaskId, targetColumnId, targetParentTaskId, targetIndex } = action.payload;
-
-            if (sourceColumnId !== targetColumnId && !sourceParentTaskId && !targetParentTaskId) {
-                // Сценарий 1: Задача перемещается между колонками
-                
-            } else if (sourceColumnId === targetColumnId && !sourceParentTaskId && !targetParentTaskId) {
-                // Сценарий 2: Задача перемещается внутри одной колонки
-                updatePositionInside(state.tasks!, targetColumnId!, state.tasks![taskId].position, targetIndex);
-                state.tasks![taskId].position = targetIndex;
-            } else if (!sourceParentTaskId && targetParentTaskId) {
-            // Сценарий 3: Задача перемещается в подзадачи
-            } else if (sourceParentTaskId && !targetParentTaskId) {
-            // Сценарий 4: Подзадача перемещается в колонку
-            } else if (sourceParentTaskId === targetParentTaskId) {
-            // Сценарий 5: Подзадача перемещается внутри одной задачи
-            } else if (sourceParentTaskId !== targetParentTaskId) {
-            // Сценарий 6: Подзадача перемещается между разными задачами
-            }
+        savePreviousState(state) {
+            state.previousState = JSON.parse(JSON.stringify(state)); // Глубокая копия текущего состояния
         },
-        restoreKanbanState(state, action: PayloadAction<KanbanState>) {
-            state.columns = action.payload.columns;
-            state.tasks = action.payload.tasks;
-            state.subtasks = action.payload.subtasks;
+        restoreKanbanState(state) {
+            //state.columns = action.payload.columns;
+            //state.tasks = action.payload.tasks;
+            //state.subtasks = action.payload.subtasks;
+            if (state.previousState) {
+                return state.previousState; // Восстанавливаем предыдущее состояние
+            }
+            return state;
         }
     }
 })
@@ -464,7 +447,7 @@ export const {
     deleteTask,
     addSubtask,
     moveTaskTemporary,
-    moveTask,
+    savePreviousState,
     restoreKanbanState,
  } = kanbanSlice.actions;
 
@@ -480,75 +463,4 @@ export const selectSubtaskData = createSelector(
     (subtaskIds, tasks) =>
       subtaskIds.map((subtaskId) => tasks?.[subtaskId]).filter(Boolean)
 );
-
-function updatePositionInside(
-tasks: { [taskId: number]: ITask },
-columnId: number,
-currentPosition: number,
-newPosition: number
-) {
-    if (newPosition > currentPosition) {
-        // Перемещение вправо
-        for (const taskId in tasks) {
-            if (tasks[taskId].column === columnId && tasks[taskId].position > currentPosition && tasks[taskId].position <= newPosition) {
-                tasks[taskId].position -= 1;  // Сдвигаем вправо
-            }
-        }
-    } else if (newPosition < currentPosition) {
-        // Перемещение влево
-        for (const taskId in tasks) {
-            if (tasks[taskId].column === columnId && tasks[taskId].position < currentPosition && tasks[taskId].position >= newPosition) {
-                tasks[taskId].position += 1;  // Сдвигаем влево
-            }
-        }
-    }
-}
-
-function updatePositionOutside(
-    tasks: { [taskId: number]: ITask },
-    subtasks: { [taskId: number]: number[] },
-    currentPosition: number,
-    newPosition: number,
-    filterFrom: { columnId?: number; parentTaskId?: number },
-    filterWhere: { columnId?: number; parentTaskId?: number }
-) {
-    // В колонке или подзадаче, откуда забираем задачу
-    if (filterFrom.columnId) {
-        for (const taskId in tasks) {
-            const task = tasks[taskId];
-            if (task.column === filterFrom.columnId && task.position >= currentPosition) {
-                task.position -= 1; // Сдвигаем задачи вправо
-            }
-        }
-    }
-
-    // В колонке или подзадаче, куда добавляем задачу
-    if (filterWhere.columnId) {
-        for (const taskId in tasks) {
-            const task = tasks[taskId];
-            if (task.column === filterWhere.columnId && task.position >= newPosition) {
-                task.position += 1; // Сдвигаем задачи влево
-            }
-        }
-    }
-
-    // Если это подзадача, обработаем для нее по аналогии
-    if (filterFrom.parentTaskId) {
-        for (const taskId in tasks) {
-            const task = tasks[taskId];
-            if (task.parentTask === filterFrom.parentTaskId && task.position >= currentPosition) {
-                task.position -= 1; // Сдвигаем подзадачи вправо
-            }
-        }
-    }
-
-    if (filterWhere.parentTaskId) {
-        for (const taskId in tasks) {
-            const task = tasks[taskId];
-            if (task.parentTask === filterWhere.parentTaskId && task.position >= newPosition) {
-                task.position += 1; // Сдвигаем подзадачи влево
-            }
-        }
-    }
-}
   

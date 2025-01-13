@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { RootState } from '../store';
-import { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, restoreKanbanState } from '../slices/kanbanSlice';
+import { setColumns, addColumn, deleteColumn, moveColumn, renameColumn, changeColumnColor, restoreKanbanState, savePreviousState } from '../slices/kanbanSlice';
 import {
   IColumn,
   IColumnCreate,
@@ -31,6 +31,7 @@ export const columnApi = createApi({
       async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try{
           const { data: columns } = await queryFulfilled;
+          console.log(columns)
           dispatch(setColumns(columns));
         } catch (err) {
           console.error('Error by getting column:', err);
@@ -72,8 +73,9 @@ export const columnApi = createApi({
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, position}, { dispatch, queryFulfilled, getState }) {
         // Сохраняем предыдущее состояние
-        const previousState = (getState() as RootState).kanban;
-
+        //const previousState = (getState() as RootState).kanban;
+        dispatch(savePreviousState());
+        
         // Оптимистично обновляем позиции
         dispatch(moveColumn({ columnId: id, newPosition: position }));
 
@@ -83,7 +85,8 @@ export const columnApi = createApi({
         } catch (err) {
           console.error("Ошибка синхронизации позиции:", err);
           // Откат к предыдущему состоянию при ошибке
-          dispatch(restoreKanbanState(previousState));
+          //dispatch(restoreKanbanState(previousState));
+          dispatch(restoreKanbanState())
         }
       }
     }),
@@ -114,8 +117,9 @@ export const columnApi = createApi({
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, colorHEX}, { dispatch, queryFulfilled, getState }) {
         // Сохраняем предыдущее состояние
-        const previousState = (getState() as RootState).kanban;
-        
+        //const previousState = (getState() as RootState).kanban;
+        dispatch(savePreviousState());
+
         // Оптимистично обновляем позиции
         if(id && colorHEX) {
           dispatch(changeColumnColor({ columnId: id, newColorHEX: colorHEX}));
@@ -127,7 +131,8 @@ export const columnApi = createApi({
         } catch (err) {
           console.error('Error on changing color column:', err);
           // Откат к предыдущему состоянию при ошибке
-          dispatch(restoreKanbanState(previousState));
+          //dispatch(restoreKanbanState(previousState));
+          dispatch(restoreKanbanState());
         }
       }
     }),

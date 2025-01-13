@@ -1,8 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { ITask, ITaskCreate } from '../../ts/interfaces/ITask';
-import { addSubtask, addTask, deleteTask, setColumnTasks, setSubtasks } from '../slices/kanbanSlice';
+import { ITask, ITaskCreate, ITaskPositionUpdate } from '../../ts/interfaces/ITask';
+import { addSubtask, addTask, deleteTask, setColumnTasks, setSubtasks, restoreKanbanState } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
   return {
@@ -50,7 +50,7 @@ export const taskApi = createApi({
           }
         }),
         getSubtasks: builder.query<ITask[], number>({
-              query: (parentTaskId) => `/tasks/?parent_task=${parentTaskId}`, // (пока) без пагинации
+              query: (parentTaskId) => `/tasks/?parent_task=${parentTaskId}`, // подзадачи (пока) без пагинации
               transformResponse: (response: any): ITask[] =>
                 response.map((unmappedTask: any) => mapTask(unmappedTask)),
               async onQueryStarted(parentTaskId, {dispatch, queryFulfilled}) {
@@ -89,6 +89,30 @@ export const taskApi = createApi({
             }
           }
         }),
+        updateTaskPosition: builder.mutation<ITask, ITaskPositionUpdate>({
+          query: (data) => ({
+            url: `/tasks/${data.id}/`,
+            method: 'PATCH',
+            body: {
+              position: data.position,
+              ...(data.column !== undefined && { column: data.column }), // Добавляем только если колонка изменилась
+              ...(data.parentTask !== undefined && { parent_task: data.parentTask }), // Добавляем только если родитель изменился
+            }
+          }),
+          transformResponse: (response: any): ITask => mapTask(response),
+          async onQueryStarted({id, position}, { dispatch, queryFulfilled, getState }) {
+    
+            try{
+              await queryFulfilled;
+              
+            } catch (err) {
+              console.error("Ошибка синхронизации позиции:", err);
+              // Откат к предыдущему состоянию при ошибке
+              //dispatch(restoreKanbanState(previousState));
+              dispatch(restoreKanbanState());
+            }
+          }
+        }),
         deleteTask: builder.mutation<void, number>({
           query: (id) => ({
             url: `/tasks/${id}/`,
@@ -116,5 +140,6 @@ export const {
   useLazyGetTasksColumnQuery,
   useLazyGetSubtasksQuery,
   useCreateTaskMutation,
+  useUpdateTaskPositionMutation,
   useDeleteTaskMutation
 } = taskApi;

@@ -3,11 +3,12 @@ import KanbanTaskMenu from './KanbanTaskMenu';
 import {
   useLazyGetSubtasksQuery,
   useCreateTaskMutation,
+  useUpdateTaskPositionMutation,
   useDeleteTaskMutation
 } from '../redux/api/taskApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
-import { selectSubtaskData, moveTask, moveTaskTemporary } from '../redux/slices/kanbanSlice';
+import { selectSubtaskData, moveTaskTemporary } from '../redux/slices/kanbanSlice';
 import { useDrag, useDrop } from 'react-dnd';
 
 
@@ -42,6 +43,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const dispatch = useAppDispatch();
   const [getSubtasks, { isLoading, isError }] = useLazyGetSubtasksQuery();
   const [createTaskAPI] = useCreateTaskMutation();
+  const [updateTaskPositionAPI] = useUpdateTaskPositionMutation();
   const [deleteTaskAPI] = useDeleteTaskMutation();
 
   const [isExpandedSubtasks, setIsExpandedSubtasks] = useState(false); // Состояние для раскрытия подзадач
@@ -100,6 +102,22 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     }
   }
 
+  const updateTaskPosition = async (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
+    const payload = {
+      id: item.id,
+      position: index, // Новая позиция
+      column: columnId,
+      parentTask: item.parentTaskId !== parentTaskId ?
+        (parentTaskId !== null ? parentTaskId : undefined) : undefined, // Только если родитель изменился
+    };
+    console.log(payload)
+    try{
+      await updateTaskPositionAPI(payload)
+    } catch(err) {
+      console.error("Error on updating position subtask:", err);
+    }
+  }
+
   const deleteTask = async () => {
     try{
       await deleteTaskAPI(id).unwrap();
@@ -128,21 +146,8 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [, dropRef] = useDrop({
     accept: 'TASK',
     hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
-      // Проверяем, действительно ли задача переместилась
-      //if (item.index === index && item.columnId === columnId && item.parentTaskId === parentTaskId) {
-      //  return; // Ничего не делаем, если положение задачи не изменилось
-      //}
-      // Локальные копии значений для сравнения
-      //const isSamePosition = item.index === index && item.columnId === columnId && item.parentTaskId === parentTaskId;
-      //console.log("just hover: item.index: "+ item.index+ " index: "+index)
-      //console.log("just hover: item.columnId: "+ item.columnId+ " columnId: "+columnId)
 
       if(item.index !== index || item.columnId !== columnId || item.parentTaskId !== parentTaskId) {
-        //console.log("before dispatch: item.index: "+ item.index+ " index: "+index)
-        //console.log("before dispatch: item.columnId: "+ item.columnId+ " columnId: "+columnId)
-        //console.log("До dispatch:");
-        //console.log(`item.index: ${item.index}, index: ${index}`);
-        //console.log(`item.columnId: ${item.columnId}, columnId: ${columnId}`);
         dispatch(
           moveTaskTemporary({
             taskId: item.id,
@@ -155,54 +160,14 @@ const KanbanTask: FC<KanbanTaskProps> = ({
           })
         );
         
-        if (item.columnId !== columnId && !item.parentTaskId && !parentTaskId) {
-          console.log(`Задача ${item.id} перемещена из колонки ${item.columnId} в колонку ${columnId} на позицию ${index}`);
-        } else if (item.columnId === columnId && !item.parentTaskId && !parentTaskId) {
-          console.log(`Задача ${item.id} перемещена внутри колонки ${columnId} с позиции ${item.index} на ${index}`);
-        } else if (!item.parentTaskId && parentTaskId) {
-          console.log(`Задача ${item.id} закинута в подзадачи род. задачи ${parentTaskId} на позицию ${index}`);
-        } else if (item.parentTaskId && !parentTaskId) {
-          console.log(`Подзадача ${item.id} выкинута из подзадач род. задачи ${item.parentTaskId} в колонку ${columnId} на позицию ${index}`);
-        } else if (item.parentTaskId === parentTaskId) {
-          console.log(`Подзадача ${item.id} перемещена внутри род. задачи ${parentTaskId} с позиции ${item.index} на ${index}`);
-        } else if (item.parentTaskId !== parentTaskId) {
-          console.log(`Подзадача ${item.id} перемещена из род. задачи ${item.parentTaskId} в род. задачу ${parentTaskId} на позицию ${index}`);
-        }
-
-        //console.log("После dispatch:");
-        //console.log(`item.index: ${item.index}, index: ${index}`);
-        //console.log(`item.columnId: ${item.columnId}, columnId: ${columnId}`);
-
-        /*
-        console.log("after dipatch before eq:  item.index: "+ item.index+ " index: "+index)
-        console.log("after dipatch before eq: item.columnId: "+ item.columnId+ " columnId: "+columnId)
-        item.index = index;
-        item.columnId = columnId;
-        console.log("after eq: item.index: "+ item.index+ " index: "+index)
-        console.log("after eq: item.columnId: "+ item.columnId+ " columnId: "+columnId)
-        item.parentTaskId = parentTaskId;
-        */
         item.index = index;
         item.columnId = columnId;
         item.parentTaskId = parentTaskId;
       }
     },
     drop: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }, monitor) => {
-      /*
-      if (item.columnId !== columnId && !item.parentTaskId && !parentTaskId) {
-        console.log(`Задача ${item.id} перемещена из колонки ${item.columnId} в колонку ${columnId} на позицию ${index}`);
-      } else if (item.columnId === columnId && !item.parentTaskId && !parentTaskId) {
-        console.log(`Задача ${item.id} перемещена внутри колонки ${columnId} с позиции ${item.index} на ${index}`);
-      } else if (!item.parentTaskId && parentTaskId) {
-        console.log(`Задача ${item.id} закинута в подзадачи род. задачи ${parentTaskId} на позицию ${index}`);
-      } else if (item.parentTaskId && !parentTaskId) {
-        console.log(`Подзадача ${item.id} выкинута из подзадач род. задачи ${item.parentTaskId} в колонку ${columnId} на позицию ${index}`);
-      } else if (item.parentTaskId === parentTaskId) {
-        console.log(`Подзадача ${item.id} перемещена внутри род. задачи ${parentTaskId} с позиции ${item.index} на ${index}`);
-      } else if (item.parentTaskId !== parentTaskId) {
-        console.log(`Подзадача ${item.id} перемещена из род. задачи ${item.parentTaskId} в род. задачу ${parentTaskId} на позицию ${index}`);
-      }
-        */
+      console.log("item.columnId:" + item.columnId + "columnId: "+columnId)
+      updateTaskPosition(item)
     },
   });
 
