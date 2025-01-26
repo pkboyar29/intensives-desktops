@@ -108,7 +108,6 @@ export const taskApi = createApi({
             } catch (err) {
               console.error("Ошибка синхронизации позиции:", err);
               // Откат к предыдущему состоянию при ошибке
-              //dispatch(restoreKanbanState(previousState));
               dispatch(restoreKanbanState());
             }
           }

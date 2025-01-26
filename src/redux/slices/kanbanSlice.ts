@@ -265,7 +265,7 @@ const kanbanSlice = createSlice({
 
                 // Проверяем границы индексов
                 if (dragIndex < 0 || dragIndex >= fromColumn.taskIds.length || 
-                    hoverIndex < 0 || hoverIndex >= toColumn.taskIds.length) {
+                    hoverIndex < 0 || hoverIndex > toColumn.taskIds.length) {
                     console.warn("Индексы задач выходят за пределы массива");
                     return;
                 }

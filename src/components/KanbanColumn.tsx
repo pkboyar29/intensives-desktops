@@ -8,8 +8,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import KanbanColumnMenu from './KanbanColumnMenu';
 import KanbanTask from './KanbanTask';
 import { validateKanban } from '../helpers/kanbanHelpers';
-import { useAppSelector } from '../redux/store';
-
+import { useAppSelector, useAppDispatch } from '../redux/store';
+import { selectSubtaskData, moveTaskTemporary, savePreviousState } from '../redux/slices/kanbanSlice';
 
 interface KanbanColumnProps {
   id: number;
@@ -36,6 +36,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   onUpdateColor,
   onDeleteColumn
 }) => {
+  const dispatch = useAppDispatch();
   const [getTasks, { isLoading, isError }] = useLazyGetTasksColumnQuery();
   const [createTaskAPI] = useCreateTaskMutation();
 
@@ -188,15 +189,48 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     }
   });
 
+  const [, dropTaskRef] = useDrop({
+      accept: 'TASK',
+      hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
+        dispatch(savePreviousState());
+        
+        if(item.index !== 0 || item.columnId !== id) {
+          dispatch(
+            moveTaskTemporary({
+              taskId: item.id,
+              dragIndex: item.index,
+              hoverIndex: 0,
+              fromColumnId: item.columnId,
+              toColumnId: id,
+              fromParentTaskId: item.parentTaskId,
+              toParentTaskId: null,
+            })
+          );
+          
+          item.index = 0;
+          item.columnId = id;
+        }
+      },
+      drop: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }, monitor) => {
+        console.log("item.columnId:" + item.columnId + "columnId: "+id)
+        //updateTaskPosition(item)
+      },
+  });
+
   // Соединяем previewRef и dropRef
-  const combinedRef = (node: HTMLDivElement | null) => {
+  const previewRefDropRef = (node: HTMLDivElement | null) => {
     previewRef(node); // Отвечает за то как визуально выглядит перетаскиваемый объект
     dropRef(node);
   };
 
+  const dragRefDropTaskRef = (node: HTMLDivElement | null) => {
+    dragRef(node);
+    dropTaskRef(node);
+  }
+
   return (
     <div
-      ref={combinedRef} // Drop target и preview на всю колонку
+      ref={previewRefDropRef} // Drop target и preview на всю колонку
       className={`w-100 bg-white rounded-lg shadow-md border-t-4 ${
         isDragging ? 'opacity-50' : ''
       }`}

@@ -73,7 +73,6 @@ export const columnApi = createApi({
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, position}, { dispatch, queryFulfilled, getState }) {
         // Сохраняем предыдущее состояние
-        //const previousState = (getState() as RootState).kanban;
         dispatch(savePreviousState());
         
         // Оптимистично обновляем позиции
@@ -85,7 +84,6 @@ export const columnApi = createApi({
         } catch (err) {
           console.error("Ошибка синхронизации позиции:", err);
           // Откат к предыдущему состоянию при ошибке
-          //dispatch(restoreKanbanState(previousState));
           dispatch(restoreKanbanState())
         }
       }
@@ -117,7 +115,6 @@ export const columnApi = createApi({
       transformResponse: (response: any): IColumn => mapColumn(response),
       async onQueryStarted({id, colorHEX}, { dispatch, queryFulfilled, getState }) {
         // Сохраняем предыдущее состояние
-        //const previousState = (getState() as RootState).kanban;
         dispatch(savePreviousState());
 
         // Оптимистично обновляем позиции
@@ -131,7 +128,6 @@ export const columnApi = createApi({
         } catch (err) {
           console.error('Error on changing color column:', err);
           // Откат к предыдущему состоянию при ошибке
-          //dispatch(restoreKanbanState(previousState));
           dispatch(restoreKanbanState());
         }
       }

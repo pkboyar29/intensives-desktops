@@ -8,7 +8,7 @@ import {
 } from '../redux/api/taskApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
-import { selectSubtaskData, moveTaskTemporary } from '../redux/slices/kanbanSlice';
+import { selectSubtaskData, moveTaskTemporary, savePreviousState } from '../redux/slices/kanbanSlice';
 import { useDrag, useDrop } from 'react-dnd';
 
 
@@ -106,9 +106,8 @@ const KanbanTask: FC<KanbanTaskProps> = ({
     const payload = {
       id: item.id,
       position: index, // Новая позиция
-      column: columnId,
-      parentTask: item.parentTaskId !== parentTaskId ?
-        (parentTaskId !== null ? parentTaskId : undefined) : undefined, // Только если родитель изменился
+      column: (parentTaskId !== null ? undefined: columnId), // Если есть подзадача не отправляем колонку (нет смысла)
+      parentTask: (parentTaskId !== null ? parentTaskId : undefined),
     };
     console.log(payload)
     try{
@@ -146,7 +145,8 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [, dropRef] = useDrop({
     accept: 'TASK',
     hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
-
+      dispatch(savePreviousState());
+      
       if(item.index !== index || item.columnId !== columnId || item.parentTaskId !== parentTaskId) {
         dispatch(
           moveTaskTemporary({
