@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import userReducer from './slices/userSlice';
 import intensiveReducer from './slices/intensiveSlice';
 import teamReducer from './slices/teamSlice';
+import kanbanSlice from './slices/kanbanSlice';
 
 import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
@@ -19,6 +20,7 @@ import { flowApi } from './api/flowApi';
 import { columnApi } from './api/columnApi';
 import { markStrategyApi } from './api/markStrategyApi';
 import { criteriaApi } from './api/criteriaApi';
+import { taskApi } from './api/taskApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -27,6 +29,7 @@ export const store = configureStore({
     user: userReducer,
     intensive: intensiveReducer,
     team: teamReducer,
+    kanban: kanbanSlice,
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
     [eventApi.reducerPath]: eventApi.reducer,
@@ -39,6 +42,7 @@ export const store = configureStore({
     [audienceApi.reducerPath]: audienceApi.reducer,
     [flowApi.reducerPath]: flowApi.reducer,
     [columnApi.reducerPath]: columnApi.reducer,
+    [taskApi.reducerPath]: taskApi.reducer,
     [markStrategyApi.reducerPath]: markStrategyApi.reducer,
     [criteriaApi.reducerPath]: criteriaApi.reducer,
   },
@@ -58,6 +62,7 @@ export const store = configureStore({
       audienceApi.middleware,
       flowApi.middleware,
       columnApi.middleware,
+      taskApi.middleware,
       markStrategyApi.middleware,
       criteriaApi.middleware
     ),
