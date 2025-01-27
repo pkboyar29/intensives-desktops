@@ -22,6 +22,11 @@ export interface ITeamCreate {
   studentIds: number[];
 }
 
+export interface ITeamsSupportMembersUpdate {
+  teams: ITeamSupportMembersUpdate[];
+  intensiveId: number;
+}
+
 export interface ITeamSupportMembersUpdate {
   id: number;
   tutorId: number | null;

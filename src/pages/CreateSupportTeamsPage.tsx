@@ -134,13 +134,14 @@ const CreateSupportTeamsPage: FC = () => {
 
   const onSubmit = async () => {
     try {
-      await updateSupportMembers(
-        teams.map((team) => ({
+      await updateSupportMembers({
+        teams: teams.map((team) => ({
           id: team.index,
           tutorId: team.tutor?.id || null,
           mentorId: team.mentor?.id || null,
-        }))
-      );
+        })),
+        intensiveId: Number(intensiveId),
+      });
 
       setSaveModal(true);
     } catch (e) {

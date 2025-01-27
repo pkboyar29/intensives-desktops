@@ -8,6 +8,7 @@ import {
   ITeamsCreate,
   ITeamSupportMembersUpdate,
   ITeam,
+  ITeamsSupportMembersUpdate,
 } from '../../ts/interfaces/ITeam';
 
 export const mapTeam = (unmappedTeam: any): ITeam => {
@@ -52,21 +53,17 @@ export const teamApi = createApi({
       transformResponse: (response: any) =>
         response.map((unmappedTeam: any) => mapTeam(unmappedTeam)),
     }),
-    // изменить на PUT запрос
-    updateSupportMembers: builder.mutation<string, ITeamSupportMembersUpdate[]>(
-      {
-        query: (data) => ({
-          url: `/teams/update_support_members/`,
-          method: 'PATCH',
-          body: data.map((team) => ({
-            id: team.id,
-            mentor_id: team.mentorId,
-            tutor_id: team.tutorId,
-          })),
-        }),
-        // transformResponse: (response: any) =>
-      }
-    ),
+    updateSupportMembers: builder.mutation<string, ITeamsSupportMembersUpdate>({
+      query: (data) => ({
+        url: `/teams/update_support_members/?intensive_id=${data.intensiveId}`,
+        method: 'PUT',
+        body: data.teams.map((team) => ({
+          id: team.id,
+          mentor_id: team.mentorId,
+          tutor_id: team.tutorId,
+        })),
+      }),
+    }),
     getMyTeam: builder.query<ITeam, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
