@@ -60,6 +60,7 @@ const ManageIntensiveForm: FC = () => {
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
+  const [files, setFiles] = useState<File[]>([]);
 
   const {
     register,
@@ -118,6 +119,7 @@ const ManageIntensiveForm: FC = () => {
             teacherIds,
             roleIds,
             isOpen: true,
+            files:files,
           });
 
         if (responseData) {
@@ -153,6 +155,13 @@ const ManageIntensiveForm: FC = () => {
       }
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const handleFilesChange = (newFiles: FileList | null) => {
+    if (newFiles) {
+      setFiles(Array.from(newFiles)); // Преобразуем FileList в File[]
+      console.log("Выбранные файлы:", Array.from(newFiles).map(file => file.name));
     }
   };
 
@@ -432,7 +441,7 @@ const ManageIntensiveForm: FC = () => {
           </div>
 
           <div className="my-3">
-            <FileUpload />
+            <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
           <div className="flex my-5 gap-7">

@@ -1,6 +1,18 @@
 import { FC } from 'react';
 
-const FileInput: FC = () => {
+interface FileInputProps {
+  onFilesChange?: (files: FileList | null) => void;
+}
+
+const FileInput: FC<FileInputProps> = ({ onFilesChange }) => {
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files; // Получаем файлы из инпута
+    if(onFilesChange) {
+      onFilesChange(files); // Передаем файлы через колбэк
+    }
+  };
+
   return (
     <div>
       <div className="text-lg font-bold">Файлы для студентов</div>
@@ -18,6 +30,7 @@ const FileInput: FC = () => {
           type="file"
           className="block text-sm cursor-pointer text-gray_3 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-bright_blue file:text-blue"
           multiple
+          onChange={handleFileChange}
         />
       </div>
     </div>

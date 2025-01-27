@@ -64,20 +64,29 @@ export const intensiveApi = createApi({
     updateIntensive: builder.mutation<IIntensive, IIntensiveUpdate>({
       query: (data) => {
         const { id: intensiveId } = data;
+        const formData = new FormData();
+
+        // Добавляем обычные поля
+        formData.append('name', data.name);
+        if (data.description) {
+          formData.append("description", data.description);
+        }
+        formData.append('is_open', data.isOpen.toString());
+        formData.append('open_dt', data.openDate);
+        formData.append('close_dt', data.closeDate);
+        data.teacherIds.forEach((id) => formData.append("teachers", String(id)));
+        data.flowIds.forEach((id) => formData.append("flows", String(id)));
+        data.roleIds.forEach((id) => formData.append("roles", String(id)));
+
+        // Добавляем файлы
+        if (data.files) {
+          data.files.forEach((file) => formData.append('files', file));
+        }
 
         return {
           url: `/intensives/${intensiveId}/`,
           method: 'PUT',
-          body: {
-            name: data.name,
-            description: data.description,
-            is_open: data.isOpen,
-            open_dt: data.openDate,
-            close_dt: data.closeDate,
-            teachers: data.teacherIds,
-            flows: data.flowIds,
-            roles: data.roleIds,
-          },
+          body: formData,
         };
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
