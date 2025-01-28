@@ -6,7 +6,6 @@ import { mapTeacher } from './teacherApi';
 
 import {
   ITeamsCreate,
-  ITeamSupportMembersUpdate,
   ITeam,
   ITeamsSupportMembersUpdate,
 } from '../../ts/interfaces/ITeam';
@@ -22,7 +21,7 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     studentsInTeam: unmappedTeam.students_in_team.map((unmappedStudent: any) =>
       mapStudent(unmappedStudent.student)
     ),
-    teamleadId: unmappedTeam.teamlead_id
+    teamleadId: unmappedTeam.teamlead_id,
   };
 };
 

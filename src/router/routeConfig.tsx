@@ -11,9 +11,6 @@ import EventsPage from '../pages/EventsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
-import StudentTasksBoardPage from '../pages/StudentTasksBoardPage';
-import StudentTasksPage from '../pages/StudentTasksPage';
-import StudentTaskAnswerPage from '../pages/StudentTaskAnswerPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
 
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
@@ -25,7 +22,7 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
-import AddTestPage from '../pages/AddTextPage';
+import AddTestPage from '../pages/AddTestPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -84,14 +81,6 @@ const routeConfig: RouteType[] = [
       {
         path: 'events/:eventId',
         element: <EventPage />,
-      },
-      {
-        path: 'tasks',
-        element: <StudentTasksPage />,
-      },
-      {
-        path: 'task/:taskId',
-        element: <StudentTaskAnswerPage />,
       },
       {
         path: 'kanban',
