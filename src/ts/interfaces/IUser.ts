@@ -1,3 +1,4 @@
+// TODO: вместо teacher_id и student_id юзать teacherId и studentId
 export interface IUser {
   id: number;
   teacher_id: number | null;

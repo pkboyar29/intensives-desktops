@@ -6,6 +6,7 @@ import { useAppSelector } from '../redux/store';
 import TeamIcon from './icons/TeamIcon';
 import EnterIcon from './icons/EnterIcon';
 import Tag from './common/Tag';
+import Tooltip from './common/Tooltip';
 
 interface TeamCardProps {
   team: ITeam;
@@ -27,9 +28,14 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
         {currentUser &&
           currentUser.roleNames.includes('Преподаватель') &&
           currentUser.teacher_id === team.tutor?.id && (
-            <div className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer">
-              <EnterIcon />
-            </div>
+            <Tooltip
+              tooltipText="Войти как тьютор"
+              tooltipClasses="bg-gray_5 p-1 rounded"
+            >
+              <div className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer">
+                <EnterIcon />
+              </div>
+            </Tooltip>
           )}
       </div>
 
