@@ -78,6 +78,7 @@ const CreateTeamsPage: FC = () => {
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
+                teamlead: null,
               },
               {
                 id: null,
@@ -86,6 +87,7 @@ const CreateTeamsPage: FC = () => {
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
+                teamlead: null,
               },
             ];
 
@@ -173,6 +175,7 @@ const CreateTeamsPage: FC = () => {
             studentsInTeam: [],
             tutor: null,
             mentor: null,
+            teamlead: null,
           });
         }
         setTeams((prevState) => [...prevState, ...newTeams]);
@@ -202,10 +205,7 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
-  const handleStudentMove = (
-    team: ITeam,
-    droppedStudent: IStudent
-  ) => {
+  const handleStudentMove = (team: ITeam, droppedStudent: IStudent) => {
     const sourceTeam: ITeam | undefined = teams.find((team) =>
       team.studentsInTeam.some((student) => student.id === droppedStudent.id)
     );
@@ -231,10 +231,7 @@ const CreateTeamsPage: FC = () => {
     updateStudentsInTeam(team.index, newStudentsInTeam);
   };
 
-  const handleStudentDelete = (
-    team: ITeam,
-    studentToDelete: IStudent
-  ) => {
+  const handleStudentDelete = (team: ITeam, studentToDelete: IStudent) => {
     const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
       (student) => student.id !== studentToDelete.id
     );

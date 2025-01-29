@@ -10,7 +10,7 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import TeamCard from '../components/TeamCard';
 
-const ManagerTeamsPage: FC = () => {
+const TeamsPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
 
   const navigate = useNavigate();
@@ -68,4 +68,4 @@ const ManagerTeamsPage: FC = () => {
   );
 };
 
-export default ManagerTeamsPage;
+export default TeamsPage;

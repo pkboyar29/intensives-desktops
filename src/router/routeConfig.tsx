@@ -12,12 +12,13 @@ import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
-
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
 import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
-import ManagerTeamsPage from '../pages/ManagerTeamsPage';
+import TeamsPage from '../pages/TeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
+import ChangeTeamleadPage from '../pages/ChangeTeamleadPage';
+import ChangeStudentRolesPage from '../pages/ChangeStudentRolesPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
@@ -39,7 +40,7 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'teams',
-        element: <ManagerTeamsPage />,
+        element: <TeamsPage />,
       },
       {
         // TODO: переименовать на schedule
@@ -64,11 +65,11 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'change-teamlead',
-        element: <KanbanBoardPage />,
+        element: <ChangeTeamleadPage />,
       },
       {
         path: 'change-roles',
-        element: <KanbanBoardPage />,
+        element: <ChangeStudentRolesPage />,
       },
     ],
     requiredAuth: false,
@@ -83,7 +84,7 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'teams',
-        element: <ManagerTeamsPage />,
+        element: <TeamsPage />,
       },
       {
         path: 'team-overview',
@@ -119,7 +120,7 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'teams',
-        element: <ManagerTeamsPage />,
+        element: <TeamsPage />,
       },
       {
         path: 'createTeams',
