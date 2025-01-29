@@ -1,3 +1,4 @@
+import { IFile } from './IFile';
 import { IFlow } from './IFlow';
 import { IStudentRole } from './IStudentRole';
 import { ITeacher } from './ITeacher';
@@ -12,6 +13,7 @@ export interface IIntensive {
   flows: IFlow[];
   teachers: ITeacher[];
   roles: IStudentRole[];
+  files: IFile[];
 }
 
 export interface IIntensiveCreate {

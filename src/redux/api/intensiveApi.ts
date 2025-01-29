@@ -9,6 +9,7 @@ import {
 
 import { mapTeacher } from './teacherApi';
 import { mapStudentRole } from './studentRoleApi';
+import { mapFile } from './fileApi';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -23,6 +24,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
       mapTeacher(teacher)
     ),
     roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
+    files: unmappedIntensive.files.map((file: any) => mapFile(file)),
   };
 };
 
@@ -33,10 +35,11 @@ export const intensiveApi = createApi({
     getIntensives: builder.query<IIntensive[], void>({
       query: () => '/intensives/',
       transformResponse: (response: any): IIntensive[] => {
+        console.log(response)
         const mappedIntensives: IIntensive[] = response.map(
           (unmappedIntensive: any) => mapIntensive(unmappedIntensive)
         );
-
+        console.log(mappedIntensives)
         return mappedIntensives;
       },
     }),
