@@ -41,6 +41,10 @@ export const teamApi = createApi({
         return teams;
       },
     }),
+    getTeam: builder.query<ITeam, number>({
+      query: (teamId) => `teams/${teamId}`,
+      transformResponse: (response: any): ITeam => mapTeam(response),
+    }),
     changeAllTeams: builder.mutation<ITeam[], ITeamsCreate>({
       query: (data) => ({
         url: `/teams/change_all_teams/?intensive_id=${data.intensiveId}`,
@@ -78,4 +82,5 @@ export const {
   useChangeAllTeamsMutation,
   useUpdateSupportMembersMutation,
   useLazyGetMyTeamQuery,
+  useLazyGetTeamQuery,
 } = teamApi;

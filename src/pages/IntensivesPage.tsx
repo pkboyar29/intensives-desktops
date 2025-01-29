@@ -148,6 +148,7 @@ const IntensivesPage: FC = () => {
     } else if (currentUser?.roleNames.includes('Организатор')) {
       navigate(`/manager/${id}/overview`);
     } else if (currentUser?.roleNames.includes('Преподаватель')) {
+      localStorage.removeItem('tutorTeamId');
       navigate(`/teacher/${id}/overview`);
     }
   };
