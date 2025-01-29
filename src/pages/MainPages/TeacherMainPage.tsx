@@ -25,6 +25,7 @@ const TeacherMainPage: FC = () => {
   );
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
@@ -59,6 +60,24 @@ const TeacherMainPage: FC = () => {
                 <SidebarLink to="teams" text="Команды" />
                 <SidebarLink to="events" text="Мероприятия" />
               </div>
+
+              {currentTeam && (
+                <div className="my-3">
+                  <div className="text-xl font-bold text-black_2">
+                    {currentTeam.name}
+                  </div>
+
+                  <div className="flex flex-col gap-4 my-3">
+                    <SidebarLink to="team-overview" text="Просмотр команды" />
+                    <SidebarLink
+                      to="change-teamlead"
+                      text="Изменение тимлида"
+                    />
+                    <SidebarLink to="change-roles" text="Изменение ролей" />
+                    <SidebarLink to="kanban" text="Ведение задач" />
+                  </div>
+                </div>
+              )}
 
               <PrimaryButton
                 children="Вернуться к списку интенсивов"

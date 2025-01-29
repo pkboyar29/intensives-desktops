@@ -11,14 +11,14 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import TeamCard from '../components/TeamCard';
 
 const ManagerTeamsPage: FC = () => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
   const { data: teams, isLoading } = useGetTeamsQuery(Number(intensiveId), {
     refetchOnMountOrArgChange: true,
   });
-
-  const currentUser = useAppSelector((state) => state.user.data);
 
   return (
     <div>

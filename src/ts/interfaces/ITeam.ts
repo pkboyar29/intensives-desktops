@@ -8,7 +8,7 @@ export interface ITeam {
   studentsInTeam: IStudent[];
   tutor: ITeacher | null;
   mentor: IStudent | null;
-  teamleadId?: number;
+  teamlead: IStudent | null;
 }
 
 export interface ITeamsCreate {

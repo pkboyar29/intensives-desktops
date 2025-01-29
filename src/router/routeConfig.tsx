@@ -54,6 +54,22 @@ const routeConfig: RouteType[] = [
         path: 'team-evaluation/:eventId/:teamId',
         element: <TeamEvaluationPage />,
       },
+      {
+        path: 'team-overview',
+        element: <TeamOverviewPage />,
+      },
+      {
+        path: 'kanban',
+        element: <KanbanBoardPage />,
+      },
+      {
+        path: 'change-teamlead',
+        element: <KanbanBoardPage />,
+      },
+      {
+        path: 'change-roles',
+        element: <KanbanBoardPage />,
+      },
     ],
     requiredAuth: false,
   },
