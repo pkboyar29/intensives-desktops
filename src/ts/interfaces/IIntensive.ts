@@ -30,4 +30,5 @@ export interface IIntensiveCreate {
 
 export interface IIntensiveUpdate extends IIntensiveCreate {
   id: number;
+  fileIds?: number[];
 }

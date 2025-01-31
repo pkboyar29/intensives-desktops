@@ -20,6 +20,7 @@ import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
+import { IFile } from '../../ts/interfaces/IFile';
 
 interface Item {
   id: number;
@@ -34,6 +35,7 @@ interface ManageIntensiveFields {
   flows: Item[];
   teachers: Item[];
   roles: Item[];
+  files?: IFile[];
 }
 
 const ManageIntensiveForm: FC = () => {
@@ -60,7 +62,7 @@ const ManageIntensiveForm: FC = () => {
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
-  const [files, setFiles] = useState<File[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const {
     register,
@@ -83,6 +85,7 @@ const ManageIntensiveForm: FC = () => {
         flows: currentIntensive.flows,
         teachers: currentIntensive.teachers,
         roles: currentIntensive.roles,
+        files: currentIntensive?.files,
       });
     }
   }, [intensiveId, currentIntensive]);
@@ -109,7 +112,11 @@ const ManageIntensiveForm: FC = () => {
       const roleIds: number[] = data.roles
         ? data.roles.map((role) => role.id)
         : [];
+      const fileIds: number[] = data.files
+        ? data.files.map((file: IFile) => file.id)
+        : [];
 
+      console.log(fileIds)
       if (intensiveId) {
         const { data: responseData, error: responseError } =
           await updateIntensive({
@@ -119,7 +126,8 @@ const ManageIntensiveForm: FC = () => {
             teacherIds,
             roleIds,
             isOpen: true,
-            files:files,
+            fileIds: fileIds,
+            files: newFiles,
           });
 
         if (responseData) {
@@ -140,6 +148,7 @@ const ManageIntensiveForm: FC = () => {
             teacherIds,
             roleIds,
             isOpen: true,
+            files: newFiles,
           });
 
         if (responseData) {
@@ -160,7 +169,7 @@ const ManageIntensiveForm: FC = () => {
 
   const handleFilesChange = (newFiles: FileList | null) => {
     if (newFiles) {
-      setFiles(Array.from(newFiles)); // Преобразуем FileList в File[]
+      setNewFiles(Array.from(newFiles)); // Преобразуем FileList в File[]
       console.log("Выбранные файлы:", Array.from(newFiles).map(file => file.name));
     }
   };
