@@ -138,7 +138,11 @@ const ManagerIntensiveOverviewPage: FC = () => {
 
               {currentIntensive?.files && (
                 <div>
-                  <AttachedFileList files={currentIntensive?.files} onFileClick={(id:number) => console.log("clicked file id "+ id)} />
+                  <AttachedFileList
+                    context={'intensives'}
+                    contextId={currentIntensive.id}
+                    files={currentIntensive?.files} 
+                    onFileClick={(id:number) => console.log("clicked file id "+ id)} />
                 </div>
               )}
 

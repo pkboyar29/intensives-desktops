@@ -2,14 +2,17 @@ import { FC, useState, useEffect, useRef } from 'react';
 import { IFile } from '../ts/interfaces/IFile';
 import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
 import { formatSize } from '../helpers/fileHelpers';
+import DownloadFileItem from './DownloadFileItem';
 
 
 interface AttachedFileListProps {
+    context: string;
+    contextId: number;
     files: IFile[];
     onFileClick: (id: number) => void;
 }
 
-const AttachedFileList: FC<AttachedFileListProps> = ({ files, onFileClick }) => {
+const AttachedFileList: FC<AttachedFileListProps> = ({ context, contextId, files, onFileClick }) => {
 
     return(
     <div className="max-w mx-auto bg-white shadow-md rounded-lg p-4">
@@ -19,15 +22,21 @@ const AttachedFileList: FC<AttachedFileListProps> = ({ files, onFileClick }) => 
             files.map((file) => (
                 <li
                 key={file.id}
-                onClick={() => onFileClick(file.id)}
                 className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100 rounded-md transition"
                 >
-                <div className="flex flex-col">
+                <DownloadFileItem
+                    context={context}
+                    contextId={contextId}
+                    fileId={file.id}
+                    filename={file.name}
+                >
+                    <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-900">{file.name}</span>
                     <span className="text-xs text-gray-500">
                     {formatSize(file.size)} • {file.createdDt ? getISODateTimeInUTC3(file.createdDt) : "Неизвестная дата"}
                     </span>
                 </div>
+                </DownloadFileItem>
                 </li>
             ))
             ) : (
