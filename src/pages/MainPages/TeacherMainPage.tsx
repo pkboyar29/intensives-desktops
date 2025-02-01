@@ -86,10 +86,6 @@ const TeacherMainPage: FC = () => {
 
                   <div className="flex flex-col gap-4 my-3">
                     <SidebarLink to="team-overview" text="Просмотр команды" />
-                    <SidebarLink
-                      to="change-teamlead"
-                      text="Изменение тимлида"
-                    />
                     <SidebarLink to="change-roles" text="Изменение ролей" />
                     <SidebarLink to="kanban" text="Ведение задач" />
                   </div>

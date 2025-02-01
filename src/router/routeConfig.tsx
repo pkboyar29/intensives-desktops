@@ -17,7 +17,6 @@ import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage'
 import TeamsPage from '../pages/TeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
-import ChangeTeamleadPage from '../pages/ChangeTeamleadPage';
 import ChangeStudentRolesPage from '../pages/ChangeStudentRolesPage';
 import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
@@ -62,10 +61,6 @@ const routeConfig: RouteType[] = [
       {
         path: 'kanban',
         element: <KanbanBoardPage />,
-      },
-      {
-        path: 'change-teamlead',
-        element: <ChangeTeamleadPage />,
       },
       {
         path: 'change-roles',

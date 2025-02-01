@@ -8,6 +8,7 @@ import {
   ITeamsCreate,
   ITeam,
   ITeamsSupportMembersUpdate,
+  ITeamleadChange,
 } from '../../ts/interfaces/ITeam';
 
 export const mapTeam = (unmappedTeam: any): ITeam => {
@@ -69,6 +70,15 @@ export const teamApi = createApi({
         })),
       }),
     }),
+    changeTeamlead: builder.mutation<string, ITeamleadChange>({
+      query: (data) => ({
+        url: `/teams/${data.teamId}/update_teamlead/`,
+        method: 'PUT',
+        body: {
+          teamlead_id: data.teamleadId,
+        },
+      }),
+    }),
     getMyTeam: builder.query<ITeam, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
@@ -81,6 +91,7 @@ export const {
   useLazyGetTeamsQuery,
   useChangeAllTeamsMutation,
   useUpdateSupportMembersMutation,
+  useChangeTeamleadMutation,
   useLazyGetMyTeamQuery,
   useLazyGetTeamQuery,
 } = teamApi;

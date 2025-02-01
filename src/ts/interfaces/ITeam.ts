@@ -32,3 +32,8 @@ export interface ITeamSupportMembersUpdate {
   tutorId: number | null;
   mentorId: number | null;
 }
+
+export interface ITeamleadChange {
+  teamId: number;
+  teamleadId: number | null;
+}

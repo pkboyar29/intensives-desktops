@@ -73,7 +73,7 @@ const CreateSupportTeamsPage: FC = () => {
   }, []);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrentTeamId(parseInt(event.target.value));
+    setCurrentTeamId(Number(event.target.value));
   };
 
   const updateTeamSupportMembers = (
