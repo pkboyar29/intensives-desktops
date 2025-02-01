@@ -71,18 +71,33 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
         </div>
       )}
 
+      {team.teamlead && (
+        <div className="flex gap-3 h-9">
+          <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
+            ТЛ
+          </div>
+          <Tag
+            content={team.teamlead.nameWithGroup}
+            shouldHaveCrossIcon={false}
+          />
+        </div>
+      )}
+
       {!team.tutor && <div className="text-bright_gray">Нет тьютора</div>}
       {!team.mentor && <div className="text-bright_gray">Нет наставника</div>}
+      {!team.teamlead && <div className="text-bright_gray">Нет тимлида</div>}
 
       <div className="flex flex-col gap-3">
         {team.studentsInTeam.length > 0 ? (
-          team.studentsInTeam.map((studentInTeam) => (
-            <Tag
-              key={studentInTeam.id}
-              content={studentInTeam.nameWithGroup}
-              shouldHaveCrossIcon={false}
-            />
-          ))
+          team.studentsInTeam
+            .filter((student) => team.teamlead?.id !== student.id)
+            .map((studentInTeam) => (
+              <Tag
+                key={studentInTeam.id}
+                content={studentInTeam.nameWithGroup}
+                shouldHaveCrossIcon={false}
+              />
+            ))
         ) : (
           <div className="text-bright_gray">Нет участников</div>
         )}

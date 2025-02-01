@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { resetUserState } from '../redux/slices/userSlice';
 import { resetIntensiveState } from '../redux/slices/intensiveSlice';
+import { resetTeamState } from '../redux/slices/teamSlice';
 
 import PrimaryButton from './common/PrimaryButton';
 import Modal from './common/modals/Modal';
@@ -22,6 +23,7 @@ const Header: FC = () => {
 
     dispatch(resetUserState());
     dispatch(resetIntensiveState());
+    dispatch(resetTeamState());
 
     setLogOutModal(false);
 
