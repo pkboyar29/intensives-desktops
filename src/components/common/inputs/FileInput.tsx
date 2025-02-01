@@ -15,8 +15,6 @@ const FileInput: FC<FileInputProps> = ({ onFilesChange }) => {
 
   return (
     <div>
-      <div className="text-lg font-bold">Файлы для студентов</div>
-
       <div className="border-2 border-dashed border-gray_2 rounded-md p-4 text-gray_3 flex flex-col items-center justify-center h-[20vh] my-3">
         <label
           htmlFor="fileUpload"

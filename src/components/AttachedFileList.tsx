@@ -1,7 +1,7 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { IFile } from '../ts/interfaces/IFile';
 import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
-import { formatSize } from '../helpers/fileHelpers';
+import { formatFileSize } from '../helpers/fileHelpers';
 import DownloadFileItem from './DownloadFileItem';
 
 
@@ -22,7 +22,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({ context, contextId, files
             files.map((file) => (
                 <li
                 key={file.id}
-                className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100 rounded-md transition"
+                className="flex items-center justify-between p-3 hover:bg-gray-100 rounded-md transition"
                 >
                 <DownloadFileItem
                     context={context}
@@ -33,7 +33,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({ context, contextId, files
                     <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-900">{file.name}</span>
                     <span className="text-xs text-gray-500">
-                    {formatSize(file.size)} • {file.createdDt ? getISODateTimeInUTC3(file.createdDt) : "Неизвестная дата"}
+                    {formatFileSize(file.size)} • {file.createdDt ? getISODateTimeInUTC3(file.createdDt) : "Неизвестная дата"}
                     </span>
                 </div>
                 </DownloadFileItem>

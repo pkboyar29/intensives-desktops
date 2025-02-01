@@ -11,6 +11,7 @@ import {
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
+import { useUploadFileMutation } from '../../redux/api/fileApi';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 
@@ -21,6 +22,7 @@ import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
 import { IFile } from '../../ts/interfaces/IFile';
+import EditableFileList from '../EditableFileList';
 
 interface Item {
   id: number;
@@ -56,6 +58,7 @@ const ManageIntensiveForm: FC = () => {
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
+  const [uploadFile] = useUploadFileMutation();
 
   // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery();
@@ -167,10 +170,14 @@ const ManageIntensiveForm: FC = () => {
     }
   };
 
-  const handleFilesChange = (newFiles: FileList | null) => {
+  const handleFilesChange = async (newFiles: FileList | null) => {
     if (newFiles) {
       setNewFiles(Array.from(newFiles)); // Преобразуем FileList в File[]
       console.log("Выбранные файлы:", Array.from(newFiles).map(file => file.name));
+
+      const { data: responseData, error: responseError } = await uploadFile(Array.from(newFiles))
+      console.log(responseData)
+      
     }
   };
 
@@ -448,8 +455,11 @@ const ManageIntensiveForm: FC = () => {
               />
             )}
           </div>
-
-          <div className="my-3">
+          
+          <div className="my-3 max-w mx-auto bg-white shadow-md rounded-lg p-4">
+            <div className="text-lg font-bold">Файлы для студентов</div>
+            {currentIntensive?.files &&
+              <EditableFileList files={currentIntensive.files} onFileDelete={(id) => console.log("delete "+id)}/> }
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 

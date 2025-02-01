@@ -43,7 +43,7 @@ const DownloadFileItem: FC<DownloadFileItemProps> = ({
   };
 
   return(
-    <div onClick={handleClick}>
+    <div className='cursor-pointer hover:text-dark_blue duration-50' onClick={handleClick}>
       {children}
     </div>
   )

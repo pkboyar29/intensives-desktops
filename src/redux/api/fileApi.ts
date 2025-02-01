@@ -31,9 +31,25 @@ export const fileApi = createApi({
       }),
       transformResponse: (response: Blob) => response,
     }),
+    uploadFile: builder.mutation<IFile[], File[]>({
+      query: (data) => {
+        const formData = new FormData();
+        
+        data.forEach((file) => formData.append('files', file));
+
+        return {
+          url: `/intensives/files/upload/`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: any): IFile[] =>
+        response.map((unmappedColumn: any) => mapFile(unmappedColumn)),
+    }),
   }),
 });
 
 export const {
   useLazyDownloadFileQuery,
+  useUploadFileMutation,
 } = fileApi;
