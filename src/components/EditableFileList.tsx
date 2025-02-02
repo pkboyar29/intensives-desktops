@@ -27,10 +27,7 @@ const EditableFileList: FC<EditableFileListProps> = ({ files, onFileDelete }) =>
                             {file.name}
                         </span>
                         <span className="text-xs text-gray-500">
-                            {formatFileSize(file.size)} •{' '}
-                            {file.createdDt
-                            ? getISODateTimeInUTC3(file.createdDt)
-                            : 'Неизвестная дата'}
+                            {formatFileSize(file.size)}
                         </span>
                     </div>
                     <button

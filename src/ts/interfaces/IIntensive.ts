@@ -25,10 +25,9 @@ export interface IIntensiveCreate {
   flowIds: number[];
   roleIds: number[];
   isOpen: boolean;
-  files?: File[];
+  fileIds?: number[];
 }
 
 export interface IIntensiveUpdate extends IIntensiveCreate {
   id: number;
-  fileIds?: number[];
 }

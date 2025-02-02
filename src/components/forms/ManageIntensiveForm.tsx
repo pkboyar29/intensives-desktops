@@ -65,7 +65,7 @@ const ManageIntensiveForm: FC = () => {
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
-  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<IFile[]>([]);
 
   const {
     register,
@@ -73,6 +73,8 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
@@ -130,7 +132,6 @@ const ManageIntensiveForm: FC = () => {
             roleIds,
             isOpen: true,
             fileIds: fileIds,
-            files: newFiles,
           });
 
         if (responseData) {
@@ -150,8 +151,7 @@ const ManageIntensiveForm: FC = () => {
             flowIds,
             teacherIds,
             roleIds,
-            isOpen: true,
-            files: newFiles,
+            isOpen: true
           });
 
         if (responseData) {
@@ -172,14 +172,31 @@ const ManageIntensiveForm: FC = () => {
 
   const handleFilesChange = async (newFiles: FileList | null) => {
     if (newFiles) {
-      setNewFiles(Array.from(newFiles)); // Преобразуем FileList в File[]
       console.log("Выбранные файлы:", Array.from(newFiles).map(file => file.name));
 
       const { data: responseData, error: responseError } = await uploadFile(Array.from(newFiles))
       console.log(responseData)
-      
+      if(responseData) {
+        // Получаем текущие файлы
+        const currentFiles = getValues('files') || [];
+
+        // Объединяем текущие файлы с новыми
+        const updatedFiles = [...currentFiles, ...responseData];
+
+        // Обновляем значение поля files
+        setValue('files', updatedFiles);
+      }
     }
   };
+
+  const handleFileDelete = (fileId: number) => {
+    const files = getValues('files') || [];
+
+    // Удаляем файл с указанным id
+    const updatedFiles = files.filter((file) => file.id !== fileId);
+
+    setValue('files', updatedFiles)
+  }
 
   return (
     <>
@@ -458,8 +475,11 @@ const ManageIntensiveForm: FC = () => {
           
           <div className="my-3 max-w mx-auto bg-white shadow-md rounded-lg p-4">
             <div className="text-lg font-bold">Файлы для студентов</div>
-            {currentIntensive?.files &&
-              <EditableFileList files={currentIntensive.files} onFileDelete={(id) => console.log("delete "+id)}/> }
+            {(() => {
+                const files = getValues('files'); // Локальная переменная
+                return files &&
+                  <EditableFileList files={files} onFileDelete={handleFileDelete}/>;
+            })()}
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
