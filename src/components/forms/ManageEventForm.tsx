@@ -243,7 +243,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.finishDate,
+            data.startDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -276,7 +276,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.finishDate,
+            data.startDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -480,34 +480,19 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-2.5">
+            <div>
               <InputDescription
                 fieldName="startDate"
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно для заполнения',
                 }}
-                description="Дата начала"
-                placeholder="Дата начала"
+                description="Дата проведения"
+                placeholder="Дата проведения"
                 type="date"
                 errorMessage={
                   typeof errors.startDate?.message === 'string'
                     ? errors.startDate.message
-                    : ''
-                }
-              />
-              <InputDescription
-                fieldName="finishDate"
-                register={register}
-                registerOptions={{
-                  required: 'Поле обязательно для заполнения',
-                }}
-                description="Дата окончания"
-                placeholder="Дата окончания"
-                type="date"
-                errorMessage={
-                  typeof errors.finishDate?.message === 'string'
-                    ? errors.finishDate.message
                     : ''
                 }
               />
