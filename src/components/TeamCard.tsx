@@ -8,6 +8,7 @@ import { setTeam } from '../redux/slices/teamSlice';
 import TeamIcon from './icons/TeamIcon';
 import EnterIcon from './icons/EnterIcon';
 import Tag from './common/Tag';
+import Chip from './common/Chip';
 import Tooltip from './common/Tooltip';
 
 interface TeamCardProps {
@@ -55,6 +56,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
             Т
           </div>
+          {/* <Chip label={team.tutor.name} /> */}
           <Tag content={team.tutor.name} shouldHaveCrossIcon={false} />
         </div>
       )}
@@ -64,6 +66,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
             Н
           </div>
+          {/* <Chip label={team.mentor.nameWithGroup} /> */}
           <Tag
             content={team.mentor.nameWithGroup}
             shouldHaveCrossIcon={false}
@@ -76,6 +79,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           <div className="flex items-center justify-center p-3 text-base font-bold leading-none rounded-lg w-9 bg-gray_5">
             ТЛ
           </div>
+          {/* <Chip label={team.teamlead.nameWithGroup} /> */}
           <Tag
             content={team.teamlead.nameWithGroup}
             shouldHaveCrossIcon={false}
@@ -90,11 +94,17 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
       <div className="flex flex-col gap-3">
         {team.studentsInTeam.length > 0 ? (
           team.studentsInTeam
-            .filter((student) => team.teamlead?.id !== student.id)
+            .filter(
+              (studentInTeam) => team.teamlead?.id !== studentInTeam.student.id
+            )
             .map((studentInTeam) => (
+              // <Chip
+              //   key={studentInTeam.id}
+              //   label={studentInTeam.nameWithGroup}
+              // />
               <Tag
-                key={studentInTeam.id}
-                content={studentInTeam.nameWithGroup}
+                key={studentInTeam.student.id}
+                content={studentInTeam.student.nameWithGroup}
                 shouldHaveCrossIcon={false}
               />
             ))

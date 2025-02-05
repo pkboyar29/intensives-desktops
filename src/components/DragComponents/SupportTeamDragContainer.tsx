@@ -97,10 +97,10 @@ const SupportTeamDragContainer = <
         )}
 
         <div className="flex flex-col gap-[6px]">
-          {team.studentsInTeam.map((student) => (
+          {team.studentsInTeam.map((studentInTeam) => (
             <Tag
-              key={student.id}
-              content={student.nameWithGroup}
+              key={studentInTeam.student.id}
+              content={studentInTeam.student.nameWithGroup}
               shouldHaveCrossIcon={false}
             />
           ))}

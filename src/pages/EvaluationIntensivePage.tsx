@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import Title from '../components/common/Title';
 import EvaluationElem from '../components/EvaluationElem';
-import OverviewContent from '../components/OverviewContent';
 
 const EvaluationIntensivePage: FC = () => {
   function handleCurrentValue(id: number, evaluate: number) {}

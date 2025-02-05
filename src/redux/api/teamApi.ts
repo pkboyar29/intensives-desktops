@@ -3,12 +3,14 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import { mapStudent } from './studentApi';
 import { mapTeacher } from './teacherApi';
+import { mapStudentRole } from './studentRoleApi';
 
 import {
   ITeamsCreate,
   ITeam,
   ITeamsSupportMembersUpdate,
   ITeamleadChange,
+  IStudentsRolesChange,
 } from '../../ts/interfaces/ITeam';
 
 export const mapTeam = (unmappedTeam: any): ITeam => {
@@ -19,8 +21,13 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     tutor: unmappedTeam.tutor === null ? null : mapTeacher(unmappedTeam.tutor),
     mentor:
       unmappedTeam.mentor === null ? null : mapStudent(unmappedTeam.mentor),
-    studentsInTeam: unmappedTeam.students_in_team.map((unmappedStudent: any) =>
-      mapStudent(unmappedStudent.student)
+    studentsInTeam: unmappedTeam.students_in_team.map(
+      (unmappedStudent: any) => ({
+        student: mapStudent(unmappedStudent.student),
+        roles: unmappedStudent.roles.map((unmappedRole: any) =>
+          mapStudentRole(unmappedRole)
+        ),
+      })
     ),
     teamlead:
       unmappedTeam.teamlead === null ? null : mapStudent(unmappedTeam.teamlead),
@@ -79,6 +86,16 @@ export const teamApi = createApi({
         },
       }),
     }),
+    changeStudentRoles: builder.mutation<string, IStudentsRolesChange>({
+      query: (data) => ({
+        url: `/teams/${data.teamId}/change_student_roles/`,
+        method: 'PUT',
+        body: data.studentsInTeam.map((studentInTeam) => ({
+          student_id: studentInTeam.studentId,
+          student_roles: studentInTeam.roleIds,
+        })),
+      }),
+    }),
     getMyTeam: builder.query<ITeam, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
@@ -92,6 +109,7 @@ export const {
   useChangeAllTeamsMutation,
   useUpdateSupportMembersMutation,
   useChangeTeamleadMutation,
+  useChangeStudentRolesMutation,
   useLazyGetMyTeamQuery,
   useLazyGetTeamQuery,
 } = teamApi;

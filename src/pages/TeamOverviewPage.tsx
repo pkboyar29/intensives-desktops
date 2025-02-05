@@ -2,27 +2,44 @@ import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import { useAppDispatch } from '../redux/store';
 
-import { useChangeTeamleadMutation } from '../redux/api/teamApi';
+import {
+  useChangeTeamleadMutation,
+  useChangeStudentRolesMutation,
+} from '../redux/api/teamApi';
 import { setTeam } from '../redux/slices/teamSlice';
 
-import { IStudent } from '../ts/interfaces/IStudent';
+import { IStudentInTeam } from '../ts/interfaces/ITeam';
+import { IStudentRole } from '../ts/interfaces/IStudentRole';
 
 import Title from '../components/common/Title';
-import OverviewContent from '../components/OverviewContent';
 import Skeleton from 'react-loading-skeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Tag from '../components/common/Tag';
 
 // если студентов в команде не будет, как все это будет отображаться
 
+// TODO: при успешной отправке запроса на изменение тимлида отображать временное модальное окно сверху
+// TODO: при успешной отправке запроса на распределение ролей отображать временное модальное окно сверху
+// TODO: при любой серверной ошибке отображать временное модальное окно сверху
+
 const TeamOverviewPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
   const currentUser = useAppSelector((state) => state.user.data);
 
   const dispatch = useAppDispatch();
 
   const [changeTeamlead] = useChangeTeamleadMutation();
+  const [changeStudentRoles] = useChangeStudentRolesMutation();
+
   const [changeTeamleadMode, setChangeTeamleadMode] = useState<boolean>(false);
   const [currentTeamleadId, setCurrentTeamleadId] = useState<number>(0);
+
+  const [currentStudentsInTeam, setCurrentStudentsInTeam] = useState<
+    IStudentInTeam[]
+  >([]);
+  const [saveRoleAssignmentMode, setSaveRoleAssignmentMode] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (currentTeam) {
@@ -30,19 +47,64 @@ const TeamOverviewPage: FC = () => {
     }
   }, [currentTeam]);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  useEffect(() => {
+    if (currentTeam) {
+      setCurrentStudentsInTeam(currentTeam.studentsInTeam);
+    }
+  }, [currentTeam]);
+
+  const handleTeamleadSelectChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setCurrentTeamleadId(Number(event.target.value));
+  };
+
+  const handleRoleSelectChange = (studentId: number, role: IStudentRole) => {
+    const newCurrentStudentsInTeam: IStudentInTeam[] =
+      currentStudentsInTeam.map((studentInTeam) => {
+        if (studentInTeam.student.id === studentId) {
+          return {
+            student: studentInTeam.student,
+            roles: [...studentInTeam.roles, role],
+          };
+        } else {
+          return studentInTeam;
+        }
+      });
+    setCurrentStudentsInTeam(newCurrentStudentsInTeam);
+
+    if (!saveRoleAssignmentMode) {
+      setSaveRoleAssignmentMode(true);
+    }
+  };
+
+  const handleRoleCrossClick = (studentId: number, roleId: number) => {
+    const newCurrentStudentsInTeam: IStudentInTeam[] =
+      currentStudentsInTeam.map((studentInTeam) => {
+        if (studentInTeam.student.id === studentId) {
+          return {
+            student: studentInTeam.student,
+            roles: studentInTeam.roles.filter((role) => role.id !== roleId),
+          };
+        } else {
+          return studentInTeam;
+        }
+      });
+    setCurrentStudentsInTeam(newCurrentStudentsInTeam);
+
+    if (!saveRoleAssignmentMode) {
+      setSaveRoleAssignmentMode(true);
+    }
   };
 
   const onChangeTeamleadSubmit = () => {
     if (currentTeam) {
-      // TODO: отображать серверные ошибки
       changeTeamlead({
         teamId: currentTeam.index,
         teamleadId: currentTeamleadId === 0 ? null : currentTeamleadId,
       });
 
-      // TODO: все последующее делать только при успешном запросе?
+      // TODO: все последующее делать только при успешном запросе, иначе отображать серверную ошибку
       dispatch(
         setTeam({
           ...currentTeam,
@@ -53,15 +115,37 @@ const TeamOverviewPage: FC = () => {
                   id: currentTeamleadId,
                   nameWithGroup: (
                     currentTeam.studentsInTeam.find(
-                      (student) => student.id === currentTeamleadId
-                    ) as IStudent
-                  ).nameWithGroup,
+                      (studentInTeam) =>
+                        studentInTeam.student.id === currentTeamleadId
+                    ) as IStudentInTeam
+                  ).student.nameWithGroup,
                 },
         })
       );
     }
 
     setChangeTeamleadMode(false);
+  };
+
+  const onChangeStudentRolesSubmit = () => {
+    if (currentTeam) {
+      changeStudentRoles({
+        teamId: currentTeam.index,
+        studentsInTeam: currentStudentsInTeam.map((studentInTeam) => ({
+          studentId: studentInTeam.student.id,
+          roleIds: studentInTeam.roles.map((role) => role.id),
+        })),
+      });
+
+      // TODO: все последующее делать только при успешном запросе, иначе отображать серверную ошибку
+      dispatch(
+        setTeam({
+          ...currentTeam,
+          studentsInTeam: currentStudentsInTeam,
+        })
+      );
+      setSaveRoleAssignmentMode(false);
+    }
   };
 
   return (
@@ -73,17 +157,73 @@ const TeamOverviewPage: FC = () => {
           <Title text={currentTeam.name} />
 
           <div className="mt-5">
-            <OverviewContent>
-              <div className="font-sans text-xl font-bold text-black">
-                Участники команды
+            <div className="flex flex-col gap-5">
+              <div className="flex items-center gap-5">
+                <div className="font-sans text-xl font-bold text-black">
+                  Участники команды
+                </div>
+
+                {saveRoleAssignmentMode && (
+                  <div>
+                    <PrimaryButton onClick={onChangeStudentRolesSubmit}>
+                      Сохранить распределение ролей
+                    </PrimaryButton>
+                  </div>
+                )}
               </div>
+
               <div className="flex flex-col gap-2">
-                {currentTeam.studentsInTeam.map((studentInTeam) => (
-                  <div
-                    className="font-sans text-base text-bright_gray"
-                    key={studentInTeam.id}
-                  >
-                    {studentInTeam.nameWithGroup}
+                {currentStudentsInTeam?.map((studentInTeam) => (
+                  <div key={studentInTeam.student.id}>
+                    <div className="font-sans text-base text-bright_gray">
+                      {studentInTeam.student.nameWithGroup}
+                    </div>
+
+                    <div className="flex items-center gap-3 mt-3 ml-3">
+                      {studentInTeam.roles.length > 0
+                        ? studentInTeam.roles.map((role) => (
+                            <div key={role.id} className="w-fit">
+                              <Tag
+                                content={role.name}
+                                shouldHaveCrossIcon={true}
+                                deleteHandler={() =>
+                                  handleRoleCrossClick(
+                                    studentInTeam.student.id,
+                                    role.id
+                                  )
+                                }
+                              />
+                            </div>
+                          ))
+                        : 'Нету ролей'}
+
+                      <select
+                        onChange={(e) =>
+                          handleRoleSelectChange(
+                            studentInTeam.student.id,
+                            currentIntensive?.roles.find(
+                              (role) => role.id === Number(e.target.value)
+                            )!
+                          )
+                        }
+                        value=""
+                        className="px-3 py-1 text-base bg-gray_5 rounded-xl"
+                      >
+                        <option value="">Добавить роль</option>
+                        {currentIntensive?.roles
+                          .filter(
+                            (role) =>
+                              !studentInTeam.roles
+                                .map((role) => role.id)
+                                .includes(role.id)
+                          )
+                          .map((role) => (
+                            <option key={role.id} value={role.id}>
+                              {role.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -96,14 +236,17 @@ const TeamOverviewPage: FC = () => {
                   {changeTeamleadMode === true ? (
                     <>
                       <select
-                        onChange={handleSelectChange}
+                        onChange={handleTeamleadSelectChange}
                         value={currentTeamleadId}
-                        className="p-1.5 bg-another_white rounded-xl"
+                        className="p-1.5 bg-gray_5 rounded-xl"
                       >
                         <option value={0}>Нету</option>
-                        {currentTeam.studentsInTeam.map((student) => (
-                          <option key={student.id} value={student.id}>
-                            {student.nameWithGroup}
+                        {currentTeam.studentsInTeam.map((studentInTeam) => (
+                          <option
+                            key={studentInTeam.student.id}
+                            value={studentInTeam.student.id}
+                          >
+                            {studentInTeam.student.nameWithGroup}
                           </option>
                         ))}
                       </select>
@@ -154,7 +297,7 @@ const TeamOverviewPage: FC = () => {
                   {currentTeam.tutor ? currentTeam.tutor.name : 'Нету'}
                 </div>
               </div>
-            </OverviewContent>
+            </div>
           </div>
         </>
       )}
