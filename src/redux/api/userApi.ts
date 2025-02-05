@@ -19,8 +19,8 @@ export const userApi = createApi({
       transformResponse: (response: any): IUser => {
         return {
           id: response.id,
-          teacher_id: response.teacher_id,
-          student_id: response.student_id,
+          teacherId: response.teacher_id,
+          studentId: response.student_id,
           firstName: response.first_name,
           lastName: response.last_name,
           patronymic: response.patronymic,

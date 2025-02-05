@@ -66,7 +66,7 @@ const TeamOverviewPage: FC = () => {
         setIsAllowedToChangeTeamlead(true);
       }
       if (currentUser.roleNames.includes('Студент')) {
-        if (currentUser.student_id === currentTeam.teamlead?.id) {
+        if (currentUser.studentId === currentTeam.teamlead?.id) {
           setIsAllowedToChangeStudentRoles(true);
         }
       }
