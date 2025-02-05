@@ -35,7 +35,7 @@ const TeamsPage: FC = () => {
       ) : teams && teams.length > 0 ? (
         <div className="flex flex-wrap gap-6 mt-7">
           {teams.map((team) => (
-            <TeamCard key={team.index} team={team} />
+            <TeamCard key={team.id} team={team} />
           ))}
         </div>
       ) : (

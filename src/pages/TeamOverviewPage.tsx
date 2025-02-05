@@ -120,7 +120,7 @@ const TeamOverviewPage: FC = () => {
   const onChangeTeamleadSubmit = () => {
     if (currentTeam) {
       changeTeamlead({
-        teamId: currentTeam.index,
+        teamId: currentTeam.id,
         teamleadId: currentTeamleadId === 0 ? null : currentTeamleadId,
       });
 
@@ -150,7 +150,7 @@ const TeamOverviewPage: FC = () => {
   const onChangeStudentRolesSubmit = () => {
     if (currentTeam) {
       changeStudentRoles({
-        teamId: currentTeam.index,
+        teamId: currentTeam.id,
         studentsInTeam: currentStudentsInTeam.map((studentInTeam) => ({
           studentId: studentInTeam.student.id,
           roleIds: studentInTeam.roles.map((role) => role.id),

@@ -33,7 +33,7 @@ const CreateSupportTeamsPage: FC = () => {
   // TODO: предположить, что тут может быть рандомная цифра?
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
-    () => teams.find((team) => team.index === currentTeamId),
+    () => teams.find((team) => team.id === currentTeamId),
     [teams, currentTeamId]
   );
 
@@ -86,7 +86,7 @@ const CreateSupportTeamsPage: FC = () => {
   ) => {
     setTeams((teams) =>
       teams.map((team) => {
-        if (currentTeamId !== team.index) {
+        if (currentTeamId !== team.id) {
           return team;
         }
 
@@ -115,7 +115,7 @@ const CreateSupportTeamsPage: FC = () => {
   ) => {
     setTeams((teams) =>
       teams.map((team) => {
-        if (currentTeamId !== team.index) {
+        if (currentTeamId !== team.id) {
           return team;
         }
 
@@ -136,7 +136,7 @@ const CreateSupportTeamsPage: FC = () => {
     try {
       await updateSupportMembers({
         teams: teams.map((team) => ({
-          id: team.index,
+          id: team.id,
           tutorId: team.tutor?.id || null,
           mentorId: team.mentor?.id || null,
         })),
@@ -237,7 +237,7 @@ const CreateSupportTeamsPage: FC = () => {
               className="mt-3 bg-another_white rounded-xl p-2.5"
             >
               {teams.map((team) => (
-                <option key={team.index} value={team.index.toString()}>
+                <option key={team.id} value={team.id.toString()}>
                   {team.name}
                 </option>
               ))}

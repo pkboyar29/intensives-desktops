@@ -20,7 +20,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
   const dispatch = useAppDispatch();
 
   const onEnterButtonClick = (team: ITeam) => {
-    localStorage.setItem('tutorTeamId', team.index.toString());
+    localStorage.setItem('tutorTeamId', team.id.toString());
     dispatch(setTeam(team));
   };
 

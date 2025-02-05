@@ -16,7 +16,6 @@ import {
 export const mapTeam = (unmappedTeam: any): ITeam => {
   return {
     id: unmappedTeam.id,
-    index: unmappedTeam.id,
     name: unmappedTeam.name,
     tutor: unmappedTeam.tutor === null ? null : mapTeacher(unmappedTeam.tutor),
     mentor:

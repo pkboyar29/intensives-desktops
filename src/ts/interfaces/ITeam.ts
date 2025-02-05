@@ -3,8 +3,7 @@ import { ITeacher } from './ITeacher';
 import { IStudentRole } from './IStudentRole';
 
 export interface ITeam {
-  id: number | null;
-  index: number;
+  id: number;
   name: string;
   studentsInTeam: IStudentInTeam[];
   tutor: ITeacher | null;
@@ -13,8 +12,10 @@ export interface ITeam {
 }
 
 // TODO: использовать свойство index только в ITeamForManager (супер логично) и тогда id тут будет number | null, а в ITeam просто number
-export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam'> {
+export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
   studentsInTeam: IStudent[];
+  index: number;
+  id: number | null;
 }
 
 export interface ITeamsCreate {

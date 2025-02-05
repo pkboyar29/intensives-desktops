@@ -37,7 +37,6 @@ const TeamEvaluationPage: FC = () => {
     tutor: null,
     mentor: null,
     teamleadId: 1,
-  
   };
 
   const currentEvent: IEvent | undefined = {
@@ -48,14 +47,14 @@ const TeamEvaluationPage: FC = () => {
     finishDate: new Date(123),
     audience: {
       id: 1,
-      name: ''
+      name: '',
     },
     stageId: null,
     teams: [],
     teachers: [],
     markStrategy: null,
     criterias: [],
-    visibility: true,  
+    visibility: true,
   };
 
   useEffect(() => {
@@ -206,13 +205,7 @@ const TeamEvaluationPage: FC = () => {
                   <div className="text-base font-normal text-black font-inter">
                     {criteria.name}
                   </div>
-                  <div>
-                    {' '}
-                    {renderMarkContent(
-                      1,
-                      index
-                    )}{' '}
-                  </div>
+                  <div> {renderMarkContent(1, index)} </div>
                 </div>
               ))}
             </>

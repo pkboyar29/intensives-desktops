@@ -156,7 +156,7 @@ const ManageEventForm: FC = () => {
             name: criteria.name,
           })),
           teams: event.teams.map((team) => ({
-            id: team.index,
+            id: team.id,
             name: team.name,
           })),
           teachers: event.teachers.map((teacher) => ({
@@ -564,7 +564,7 @@ const ManageEventForm: FC = () => {
                   <MultipleSelectInput
                     description="Команды"
                     items={teamsToChoose.map((team) => ({
-                      id: team.index,
+                      id: team.id,
                       name: team.name,
                     }))}
                     selectedItems={field.value || []}

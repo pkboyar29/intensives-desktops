@@ -74,7 +74,7 @@ const SchedulePage: FC = () => {
       description: event.description,
       startDate: event.startDate.toISOString(),
       finishDate: event.finishDate.toISOString(),
-      teamIds: event.teams.map((team) => team.index),
+      teamIds: event.teams.map((team) => team.id),
       teacherIds: event.teachers.map((teacher) => teacher.id),
       audienceId: event.audience.id,
       stageId: event.stageId ? event.stageId : null,

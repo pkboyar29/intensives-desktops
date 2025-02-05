@@ -71,6 +71,7 @@ const CreateTeamsPage: FC = () => {
             setTeams(
               teamsResponse.map((team) => ({
                 ...team,
+                index: team.id,
                 studentsInTeam: team.studentsInTeam.map(
                   (studentInTeam) => studentInTeam.student
                 ),
