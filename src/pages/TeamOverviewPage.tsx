@@ -27,6 +27,11 @@ const TeamOverviewPage: FC = () => {
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const currentUser = useAppSelector((state) => state.user.data);
 
+  const [isAllowedToChangeStudentRoles, setIsAllowedToChangeStudentRoles] =
+    useState<boolean>(false);
+  const [isAllowedToChangeTeamlead, setIsAllowedToChangeTeamlead] =
+    useState<boolean>(false);
+
   const dispatch = useAppDispatch();
 
   const [changeTeamlead] = useChangeTeamleadMutation();
@@ -52,6 +57,21 @@ const TeamOverviewPage: FC = () => {
       setCurrentStudentsInTeam(currentTeam.studentsInTeam);
     }
   }, [currentTeam]);
+
+  useEffect(() => {
+    if (currentUser && currentTeam) {
+      // TODO: когда появится текущая роль, то сравнивать ее
+      if (currentUser.roleNames.includes('Преподаватель')) {
+        setIsAllowedToChangeStudentRoles(true);
+        setIsAllowedToChangeTeamlead(true);
+      }
+      if (currentUser.roleNames.includes('Студент')) {
+        if (currentUser.student_id === currentTeam.teamlead?.id) {
+          setIsAllowedToChangeStudentRoles(true);
+        }
+      }
+    }
+  }, [currentUser, currentTeam]);
 
   const handleTeamleadSelectChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -185,7 +205,9 @@ const TeamOverviewPage: FC = () => {
                             <div key={role.id} className="w-fit">
                               <Tag
                                 content={role.name}
-                                shouldHaveCrossIcon={true}
+                                shouldHaveCrossIcon={
+                                  isAllowedToChangeStudentRoles
+                                }
                                 deleteHandler={() =>
                                   handleRoleCrossClick(
                                     studentInTeam.student.id,
@@ -197,32 +219,34 @@ const TeamOverviewPage: FC = () => {
                           ))
                         : 'Нету ролей'}
 
-                      <select
-                        onChange={(e) =>
-                          handleRoleSelectChange(
-                            studentInTeam.student.id,
-                            currentIntensive?.roles.find(
-                              (role) => role.id === Number(e.target.value)
-                            )!
-                          )
-                        }
-                        value=""
-                        className="px-3 py-1 text-base bg-gray_5 rounded-xl"
-                      >
-                        <option value="">Добавить роль</option>
-                        {currentIntensive?.roles
-                          .filter(
-                            (role) =>
-                              !studentInTeam.roles
-                                .map((role) => role.id)
-                                .includes(role.id)
-                          )
-                          .map((role) => (
-                            <option key={role.id} value={role.id}>
-                              {role.name}
-                            </option>
-                          ))}
-                      </select>
+                      {isAllowedToChangeStudentRoles && (
+                        <select
+                          onChange={(e) =>
+                            handleRoleSelectChange(
+                              studentInTeam.student.id,
+                              currentIntensive?.roles.find(
+                                (role) => role.id === Number(e.target.value)
+                              )!
+                            )
+                          }
+                          value=""
+                          className="px-3 py-1 text-base bg-gray_5 rounded-xl"
+                        >
+                          <option value="">Добавить роль</option>
+                          {currentIntensive?.roles
+                            .filter(
+                              (role) =>
+                                !studentInTeam.roles
+                                  .map((role) => role.id)
+                                  .includes(role.id)
+                            )
+                            .map((role) => (
+                              <option key={role.id} value={role.id}>
+                                {role.name}
+                              </option>
+                            ))}
+                        </select>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -263,7 +287,7 @@ const TeamOverviewPage: FC = () => {
                           ? currentTeam.teamlead.nameWithGroup
                           : 'Нету'}
                       </div>
-                      {currentUser?.roleNames.includes('Преподаватель') && (
+                      {isAllowedToChangeTeamlead && (
                         <div>
                           <PrimaryButton
                             buttonColor="gray"
