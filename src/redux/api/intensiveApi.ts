@@ -5,10 +5,13 @@ import {
   IIntensive,
   IIntensiveCreate,
   IIntensiveUpdate,
+  IIntensiveUploadFiles,
 } from '../../ts/interfaces/IIntensive';
 
 import { mapTeacher } from './teacherApi';
 import { mapStudentRole } from './studentRoleApi';
+import { mapFile } from './fileApi';
+import { IFile } from '../../ts/interfaces/IFile';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -23,6 +26,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
       mapTeacher(teacher)
     ),
     roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
+    files: unmappedIntensive.files.map((file: any) => mapFile(file)),
   };
 };
 
@@ -77,10 +81,25 @@ export const intensiveApi = createApi({
             teachers: data.teacherIds,
             flows: data.flowIds,
             roles: data.roleIds,
+            file_ids: data.fileIds
           },
         };
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
+    }),
+    uploadFiles: builder.mutation<IFile[], IIntensiveUploadFiles>({
+      query: ({ id, files}) => {
+        const formData = new FormData();
+        files.forEach((file) => formData.append('files', file));
+
+        return {
+          url: `intensives/${id}/files/upload/`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: any): IFile[] =>
+        response.map((unmappedColumn: any) => mapFile(unmappedColumn)),
     }),
     deleteIntensive: builder.mutation<void, number>({
       query: (id) => ({
@@ -97,5 +116,6 @@ export const {
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
+  useUploadFilesMutation,
   useDeleteIntensiveMutation,
 } = intensiveApi;
