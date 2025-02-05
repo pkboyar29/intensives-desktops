@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { IFile, IDownloadFileParams } from '../../ts/interfaces/IFile';
+import { IFile, IDownloadFile, IUploadFile } from '../../ts/interfaces/IFile';
 
 
 export const mapFile = (unmappedFile: any): IFile => {
@@ -17,7 +17,7 @@ export const fileApi = createApi({
   reducerPath: 'fileApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    downloadFile: builder.query<Blob, IDownloadFileParams>({
+    downloadFile: builder.query<Blob, IDownloadFile>({
       /**
        * Формируем URL вида:
        * /{context}/{contextId}/files/{fileId}/download
@@ -31,14 +31,14 @@ export const fileApi = createApi({
       }),
       transformResponse: (response: Blob) => response,
     }),
-    uploadFile: builder.mutation<IFile[], File[]>({
-      query: (data) => {
+    uploadFile: builder.mutation<IFile[], IUploadFile>({
+      query: ({ context, contextId, files}) => {
         const formData = new FormData();
         
-        data.forEach((file) => formData.append('files', file));
+        files.forEach((file) => formData.append('files', file));
 
         return {
-          url: `/intensives/files/upload/`,
+          url: `${context}/${contextId}/files/upload/`,
           method: 'POST',
           body: formData,
         };

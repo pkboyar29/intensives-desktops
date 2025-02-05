@@ -40,6 +40,15 @@ const intensiveSlice = createSlice({
         }
       )
       .addMatcher(
+        intensiveApi.endpoints.uploadFiles.matchFulfilled,
+        (state, { payload }) => {
+          if(state.data) {
+            // Добавляем загруженные файлы к текущим в состоянии
+            state.data.files = [...state.data.files, ...payload]
+          }
+        }
+      )
+      .addMatcher(
         intensiveApi.endpoints.deleteIntensive.matchFulfilled,
         (state) => {
           state.data = null;

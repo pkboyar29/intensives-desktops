@@ -22,9 +22,8 @@ const DownloadFileItem: FC<DownloadFileItemProps> = ({
 
   // Эффект, который отслеживает появление данных и запускает скачивание
   useEffect(() => {
-    console.log("downloading file")
     if (data) {
-      console.log("data")
+      console.log("downloading file")
       // Создаём URL для Blob-объекта
       const url = window.URL.createObjectURL(data);
       const link = document.createElement('a');

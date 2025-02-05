@@ -11,6 +11,9 @@ const FileInput: FC<FileInputProps> = ({ onFilesChange }) => {
     if(onFilesChange) {
       onFilesChange(files); // Передаем файлы через колбэк
     }
+
+    // Очищаем значение инпута, чтобы убрать названия загруженных файлов
+    event.target.value = "";
   };
 
   return (

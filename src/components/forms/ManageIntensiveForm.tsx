@@ -7,13 +7,14 @@ import { useAppSelector } from '../../redux/store';
 import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
+  useUploadFilesMutation
 } from '../../redux/api/intensiveApi';
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
-import { useUploadFileMutation } from '../../redux/api/fileApi';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
+import { getUniqueFiles } from '../../helpers/fileHelpers';
 
 import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
@@ -21,7 +22,7 @@ import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
-import { IFile } from '../../ts/interfaces/IFile';
+import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
 
 interface Item {
@@ -58,14 +59,16 @@ const ManageIntensiveForm: FC = () => {
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
-  const [uploadFile] = useUploadFileMutation();
+  const [uploadFiles] = useUploadFilesMutation();
 
   // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery();
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
-  const [attachedFiles, setAttachedFiles] = useState<IFile[]>([]);
+  
+  const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
+  const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
 
   const {
     register,
@@ -73,12 +76,14 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
-    setValue,
-    getValues,
     formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
+
+  useEffect(() => {
+    console.log(currentIntensive)
+  }, [intensiveId])
 
   useEffect(() => {
     if (intensiveId && currentIntensive) {
@@ -89,9 +94,15 @@ const ManageIntensiveForm: FC = () => {
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
         flows: currentIntensive.flows,
         teachers: currentIntensive.teachers,
-        roles: currentIntensive.roles,
-        files: currentIntensive?.files,
+        roles: currentIntensive.roles
       });
+
+      // Записываем в отображаемый список файлов реальный текущий список
+      if(attachedFilesList.length === 0) {
+        setAttachedFilesList((prevFiles) => [...prevFiles, ...currentIntensive.files])
+      }
+
+      console.log(currentIntensive)
     }
   }, [intensiveId, currentIntensive]);
 
@@ -117,11 +128,11 @@ const ManageIntensiveForm: FC = () => {
       const roleIds: number[] = data.roles
         ? data.roles.map((role) => role.id)
         : [];
-      const fileIds: number[] = data.files
-        ? data.files.map((file: IFile) => file.id)
+      const fileIds: number[] = attachedFilesList
+        ? attachedFilesList.filter(file=> file.id > 0).map((file: IFile) => file.id)
         : [];
 
-      console.log(fileIds)
+      //console.log(fileIds)
       if (intensiveId) {
         const { data: responseData, error: responseError } =
           await updateIntensive({
@@ -133,6 +144,24 @@ const ManageIntensiveForm: FC = () => {
             isOpen: true,
             fileIds: fileIds,
           });
+        
+        if (responseError) {
+          setErrorModal(true);
+          return;
+        }
+
+        if (responseData && newFiles.length > 0) {
+          const { error: responseError } = await uploadFiles({
+            id: Number(intensiveId),
+            files: newFiles.map((array) => array.file)
+          });
+
+          if(responseError) {
+            console.log("Ошибка при загрузке файлов")
+            setErrorModal(true)
+            return;
+          }
+        }
 
         if (responseData) {
           setSuccessfulSaveModal({
@@ -140,10 +169,7 @@ const ManageIntensiveForm: FC = () => {
             intensiveId: Number(intensiveId),
           });
         }
-
-        if (responseError) {
-          setErrorModal(true);
-        }
+        
       } else {
         const { data: responseData, error: responseError } =
           await createIntensive({
@@ -153,6 +179,24 @@ const ManageIntensiveForm: FC = () => {
             roleIds,
             isOpen: true
           });
+        
+        if (responseError) {
+          setErrorModal(true);
+          return;
+        }
+
+        if (responseData && newFiles.length > 0) {
+          const { error: responseError } = await uploadFiles({
+            id: Number(responseData.id),
+            files: newFiles.map((array) => array.file)
+          });
+
+          if(responseError) {
+            console.log("Ошибка при загрузке файлов")
+            setErrorModal(true)
+            return;
+          }
+        }
 
         if (responseData) {
           setSuccessfulSaveModal({
@@ -160,42 +204,59 @@ const ManageIntensiveForm: FC = () => {
             intensiveId: Number(responseData.id),
           });
         }
-
-        if (responseError) {
-          setErrorModal(true);
-        }
       }
     } catch (e) {
       console.log(e);
     }
   };
 
-  const handleFilesChange = async (newFiles: FileList | null) => {
-    if (newFiles) {
-      console.log("Выбранные файлы:", Array.from(newFiles).map(file => file.name));
+  const handleFilesChange = async (fileList: FileList | null) => {
+    if (fileList) {
+      const selectedFiles: File[] = Array.from(fileList)
+      console.log("Выбранные файлы:", selectedFiles.map(file => file.name));
 
-      const { data: responseData, error: responseError } = await uploadFile(Array.from(newFiles))
-      console.log(responseData)
-      if(responseData) {
-        // Получаем текущие файлы
-        const currentFiles = getValues('files') || [];
+      const uniqueFiles = getUniqueFiles(selectedFiles, newFiles)
 
-        // Объединяем текущие файлы с новыми
-        const updatedFiles = [...currentFiles, ...responseData];
-
-        // Обновляем значение поля files
-        setValue('files', updatedFiles);
+      console.log(uniqueFiles)
+      // Если какие-то файлы оказались дубликатами, можно уведомить пользователя
+      if (uniqueFiles.length < selectedFiles.length) {
+        alert("Один или несколько файлов уже прикреплены");
       }
+
+       // Если нет новых файлов после фильтрации, выходим
+      if (uniqueFiles.length === 0) return;
+
+      // Генерируем ID один раз и создаём сразу оба массива
+      const newFilesData = uniqueFiles.map((file, index) => {
+        // Генерируем временный ID файла для списка в UI и массива newFiles
+        // Отрицательное значение означает временный ID
+        const tempId = (Date.now() + index) * -1;
+
+        return {
+          attachedFile: {
+            id: tempId,
+            name: file.name,
+            size: file.size,
+          },
+          newFileObject: {
+            file,
+            id: tempId,
+          },
+        };
+      });
+
+      // Добавляем к существующим файлам в списке файлов (просто UI)
+      setAttachedFilesList((prev) => [...prev, ...newFilesData.map((item) => item.attachedFile)]);
+
+      // Добавляем сами объекты файлов в newFiles (для отправки)
+      setNewFiles((prev) => [...prev, ...newFilesData.map((item) => item.newFileObject)]);
     }
   };
 
-  const handleFileDelete = (fileId: number) => {
-    const files = getValues('files') || [];
-
-    // Удаляем файл с указанным id
-    const updatedFiles = files.filter((file) => file.id !== fileId);
-
-    setValue('files', updatedFiles)
+  const handleFileDelete = (id: number) => {
+    // Удаляем файл из массива для UI и массива с файлами
+    setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
+    setNewFiles((prev) => prev.filter((file) => file.id !== id));
   }
 
   return (
@@ -475,11 +536,7 @@ const ManageIntensiveForm: FC = () => {
           
           <div className="my-3 max-w mx-auto bg-white shadow-md rounded-lg p-4">
             <div className="text-lg font-bold">Файлы для студентов</div>
-            {(() => {
-                const files = getValues('files'); // Локальная переменная
-                return files &&
-                  <EditableFileList files={files} onFileDelete={handleFileDelete}/>;
-            })()}
+            {attachedFilesList && <EditableFileList files={attachedFilesList} onFileDelete={handleFileDelete}/>}
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
