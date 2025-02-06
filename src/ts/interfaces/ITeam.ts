@@ -11,7 +11,6 @@ export interface ITeam {
   teamlead: IStudent | null;
 }
 
-// TODO: использовать свойство index только в ITeamForManager (супер логично) и тогда id тут будет number | null, а в ITeam просто number
 export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
   studentsInTeam: IStudent[];
   index: number;

@@ -15,12 +15,9 @@ import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Tag from '../components/common/Tag';
+import { ToastContainer, toast } from 'react-toastify';
 
 // если студентов в команде не будет, как все это будет отображаться
-
-// TODO: при успешной отправке запроса на изменение тимлида отображать временное модальное окно сверху
-// TODO: при успешной отправке запроса на распределение ролей отображать временное модальное окно сверху
-// TODO: при любой серверной ошибке отображать временное модальное окно сверху
 
 const TeamOverviewPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
@@ -117,59 +114,86 @@ const TeamOverviewPage: FC = () => {
     }
   };
 
-  const onChangeTeamleadSubmit = () => {
+  const onChangeTeamleadSubmit = async () => {
     if (currentTeam) {
-      changeTeamlead({
-        teamId: currentTeam.id,
-        teamleadId: currentTeamleadId === 0 ? null : currentTeamleadId,
-      });
-
-      // TODO: все последующее делать только при успешном запросе, иначе отображать серверную ошибку
-      dispatch(
-        setTeam({
-          ...currentTeam,
-          teamlead:
-            currentTeamleadId === 0
-              ? null
-              : {
-                  id: currentTeamleadId,
-                  nameWithGroup: (
-                    currentTeam.studentsInTeam.find(
-                      (studentInTeam) =>
-                        studentInTeam.student.id === currentTeamleadId
-                    ) as IStudentInTeam
-                  ).student.nameWithGroup,
-                },
-        })
+      const { data: responseData, error: responseError } = await changeTeamlead(
+        {
+          teamId: currentTeam.id,
+          teamleadId: currentTeamleadId === 0 ? null : currentTeamleadId,
+        }
       );
-    }
 
-    setChangeTeamleadMode(false);
+      if (responseData) {
+        toast('Тимлид был успешно изменен', {
+          type: 'info',
+        });
+
+        dispatch(
+          setTeam({
+            ...currentTeam,
+            teamlead:
+              currentTeamleadId === 0
+                ? null
+                : {
+                    id: currentTeamleadId,
+                    nameWithGroup: (
+                      currentTeam.studentsInTeam.find(
+                        (studentInTeam) =>
+                          studentInTeam.student.id === currentTeamleadId
+                      ) as IStudentInTeam
+                    ).student.nameWithGroup,
+                  },
+          })
+        );
+
+        setChangeTeamleadMode(false);
+      }
+
+      if (responseError) {
+        toast('Произошла серверная ошибка', {
+          type: 'error',
+        });
+      }
+    }
   };
 
-  const onChangeStudentRolesSubmit = () => {
+  const onChangeStudentRolesSubmit = async () => {
     if (currentTeam) {
-      changeStudentRoles({
-        teamId: currentTeam.id,
-        studentsInTeam: currentStudentsInTeam.map((studentInTeam) => ({
-          studentId: studentInTeam.student.id,
-          roleIds: studentInTeam.roles.map((role) => role.id),
-        })),
-      });
+      const { data: responseData, error: responseError } =
+        await changeStudentRoles({
+          teamId: currentTeam.id,
+          studentsInTeam: currentStudentsInTeam.map((studentInTeam) => ({
+            studentId: studentInTeam.student.id,
+            roleIds: studentInTeam.roles.map((role) => role.id),
+          })),
+        });
 
-      // TODO: все последующее делать только при успешном запросе, иначе отображать серверную ошибку
-      dispatch(
-        setTeam({
-          ...currentTeam,
-          studentsInTeam: currentStudentsInTeam,
-        })
-      );
-      setSaveRoleAssignmentMode(false);
+      if (responseData) {
+        toast('Роли студентов были успешно изменены', {
+          type: 'info',
+        });
+
+        dispatch(
+          setTeam({
+            ...currentTeam,
+            studentsInTeam: currentStudentsInTeam,
+          })
+        );
+        setSaveRoleAssignmentMode(false);
+      }
+
+      if (responseError) {
+        toast('Произошла серверная ошибка', {
+          type: 'error',
+        });
+      }
     }
   };
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {!currentTeam ? (
         <Skeleton />
       ) : (
