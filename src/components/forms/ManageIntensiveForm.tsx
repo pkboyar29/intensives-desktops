@@ -7,7 +7,7 @@ import { useAppSelector } from '../../redux/store';
 import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
-  useUploadFilesMutation
+  useUploadFilesMutation,
 } from '../../redux/api/intensiveApi';
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
@@ -66,7 +66,7 @@ const ManageIntensiveForm: FC = () => {
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
-  
+
   const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
   const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
 
@@ -82,10 +82,6 @@ const ManageIntensiveForm: FC = () => {
   });
 
   useEffect(() => {
-    console.log(currentIntensive)
-  }, [intensiveId])
-
-  useEffect(() => {
     if (intensiveId && currentIntensive) {
       reset({
         name: currentIntensive.name,
@@ -94,153 +90,141 @@ const ManageIntensiveForm: FC = () => {
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
         flows: currentIntensive.flows,
         teachers: currentIntensive.teachers,
-        roles: currentIntensive.roles
+        roles: currentIntensive.roles,
       });
 
       // Записываем в отображаемый список файлов реальный текущий список
-      if(attachedFilesList.length === 0) {
-        setAttachedFilesList((prevFiles) => [...prevFiles, ...currentIntensive.files])
+      if (attachedFilesList.length === 0) {
+        setAttachedFilesList((prevFiles) => [
+          ...prevFiles,
+          ...currentIntensive.files,
+        ]);
       }
-
-      console.log(currentIntensive)
     }
   }, [intensiveId, currentIntensive]);
 
   const onSubmit = async (data: ManageIntensiveFields) => {
-    try {
-      if (!data.flows || data.flows.length === 0) {
-        setError('flows', {
-          type: 'custom',
-          message: 'Необходимо выбрать как минимум один поток',
+    if (!data.flows || data.flows.length === 0) {
+      setError('flows', {
+        type: 'custom',
+        message: 'Необходимо выбрать как минимум один поток',
+      });
+      return;
+    }
+    if (!data.teachers || data.teachers.length === 0) {
+      setError('teachers', {
+        type: 'custom',
+        message: 'Необходимо выбрать как минимум одного преподавателя',
+      });
+      return;
+    }
+
+    const flowIds: number[] = data.flows.map((flow) => flow.id);
+    const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
+    const roleIds: number[] = data.roles
+      ? data.roles.map((role) => role.id)
+      : [];
+    const fileIds: number[] = attachedFilesList
+      ? attachedFilesList
+          .filter((file) => file.id > 0)
+          .map((file: IFile) => file.id)
+      : [];
+
+    if (intensiveId) {
+      const { data: responseData, error: responseError } =
+        await updateIntensive({
+          id: Number(intensiveId),
+          ...data,
+          flowIds,
+          teacherIds,
+          roleIds,
+          isOpen: true,
+          fileIds: fileIds,
         });
-        return;
-      }
-      if (!data.teachers || data.teachers.length === 0) {
-        setError('teachers', {
-          type: 'custom',
-          message: 'Необходимо выбрать как минимум одного преподавателя',
+
+      if (responseError) {
+        toast('Произошла серверная ошибка', {
+          type: 'error',
         });
-        return;
       }
 
-      const flowIds: number[] = data.flows.map((flow) => flow.id);
-      const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
-      const roleIds: number[] = data.roles
-        ? data.roles.map((role) => role.id)
-        : [];
-      const fileIds: number[] = attachedFilesList
-        ? attachedFilesList.filter(file=> file.id > 0).map((file: IFile) => file.id)
-        : [];
+      if (responseData && newFiles.length > 0) {
+        const { error: responseError } = await uploadFiles({
+          id: Number(intensiveId),
+          files: newFiles.map((array) => array.file),
+        });
 
-      if (intensiveId) {
-        const { data: responseData, error: responseError } =
-          await updateIntensive({
-            id: Number(intensiveId),
-            ...data,
-            flowIds,
-            teacherIds,
-            roleIds,
-            isOpen: true,
-            fileIds: fileIds,
-          });
-        
         if (responseError) {
-          toast('Произошла серверная ошибка', {
+          toast('Ошибка при загрузке файлов', {
             type: 'error',
           });
           return;
         }
+      }
 
-        if (responseData && newFiles.length > 0) {
-          const { error: responseError } = await uploadFiles({
-            id: Number(intensiveId),
-            files: newFiles.map((array) => array.file)
-          });
+      if (responseData) {
+        setSuccessfulSaveModal({
+          status: true,
+          intensiveId: Number(intensiveId),
+        });
+      }
+    } else {
+      const { data: responseData, error: responseError } =
+        await createIntensive({
+          ...data,
+          flowIds,
+          teacherIds,
+          roleIds,
+          isOpen: true,
+        });
 
-          if(responseError) {
-            toast('Ошибка при загрузке файлов', {
-            type: 'error',
-          });
-            return;
-          }
-        }
+      if (responseError) {
+        toast('Произошла серверная ошибка', {
+          type: 'error',
+        });
+        return;
+      }
 
-        if (responseData) {
-          setSuccessfulSaveModal({
-            status: true,
-            intensiveId: Number(intensiveId),
-          });
-        }
+      if (responseData && newFiles.length > 0) {
+        const { error: responseError } = await uploadFiles({
+          id: Number(responseData.id),
+          files: newFiles.map((array) => array.file),
+        });
 
         if (responseError) {
-          toast('Произошла серверная ошибка', {
-            type: 'error',
-          });
-        }
-
-      } else {
-        const { data: responseData, error: responseError } =
-          await createIntensive({
-            ...data,
-            flowIds,
-            teacherIds,
-            roleIds,
-            isOpen: true
-          });
-        
-        if (responseError) {
-          toast('Произошла серверная ошибка', {
+          toast('Ошибка при загрузке файлов', {
             type: 'error',
           });
           return;
         }
-
-        if (responseData && newFiles.length > 0) {
-          const { error: responseError } = await uploadFiles({
-            id: Number(responseData.id),
-            files: newFiles.map((array) => array.file)
-          });
-
-          if(responseError) {
-            toast('Ошибка при загрузке файлов', {
-            type: 'error',
-          });
-            return;
-          }
-        }
-
-        if (responseData) {
-          setSuccessfulSaveModal({
-            status: true,
-            intensiveId: Number(responseData.id),
-          });
-        }
-
-        if (responseError) {
-          toast('Произошла серверная ошибка', {
-            type: 'error',
-          });
-        }
       }
-    } catch (e) {
-      console.log(e);
+
+      if (responseData) {
+        setSuccessfulSaveModal({
+          status: true,
+          intensiveId: Number(responseData.id),
+        });
+      }
     }
   };
 
   const handleFilesChange = async (fileList: FileList | null) => {
     if (fileList) {
-      const selectedFiles: File[] = Array.from(fileList)
-      console.log("Выбранные файлы:", selectedFiles.map(file => file.name));
+      const selectedFiles: File[] = Array.from(fileList);
+      console.log(
+        'Выбранные файлы:',
+        selectedFiles.map((file) => file.name)
+      );
 
-      const uniqueFiles = getUniqueFiles(selectedFiles, newFiles)
+      const uniqueFiles = getUniqueFiles(selectedFiles, newFiles);
 
-      console.log(uniqueFiles)
+      console.log(uniqueFiles);
       // Если какие-то файлы оказались дубликатами, можно уведомить пользователя
       if (uniqueFiles.length < selectedFiles.length) {
-        alert("Один или несколько файлов уже прикреплены");
+        alert('Один или несколько файлов уже прикреплены');
       }
 
-       // Если нет новых файлов после фильтрации, выходим
+      // Если нет новых файлов после фильтрации, выходим
       if (uniqueFiles.length === 0) return;
 
       // Генерируем ID один раз и создаём сразу оба массива
@@ -263,10 +247,16 @@ const ManageIntensiveForm: FC = () => {
       });
 
       // Добавляем к существующим файлам в списке файлов (просто UI)
-      setAttachedFilesList((prev) => [...prev, ...newFilesData.map((item) => item.attachedFile)]);
+      setAttachedFilesList((prev) => [
+        ...prev,
+        ...newFilesData.map((item) => item.attachedFile),
+      ]);
 
       // Добавляем сами объекты файлов в newFiles (для отправки)
-      setNewFiles((prev) => [...prev, ...newFilesData.map((item) => item.newFileObject)]);
+      setNewFiles((prev) => [
+        ...prev,
+        ...newFilesData.map((item) => item.newFileObject),
+      ]);
     }
   };
 
@@ -274,7 +264,7 @@ const ManageIntensiveForm: FC = () => {
     // Удаляем файл из массива для UI и массива с файлами
     setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
     setNewFiles((prev) => prev.filter((file) => file.id !== id));
-  }
+  };
 
   return (
     <>
@@ -519,10 +509,15 @@ const ManageIntensiveForm: FC = () => {
               />
             )}
           </div>
-          
-          <div className="my-3 max-w mx-auto bg-white shadow-md rounded-lg p-4">
+
+          <div className="p-4 mx-auto my-3 bg-white rounded-lg shadow-md max-w">
             <div className="text-lg font-bold">Файлы для студентов</div>
-            {attachedFilesList && <EditableFileList files={attachedFilesList} onFileDelete={handleFileDelete}/>}
+            {attachedFilesList && (
+              <EditableFileList
+                files={attachedFilesList}
+                onFileDelete={handleFileDelete}
+              />
+            )}
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
