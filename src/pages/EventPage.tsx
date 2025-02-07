@@ -13,11 +13,12 @@ import BackArrowIcon from '../components/icons/BackArrowIcon';
 import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/common/Chip';
+import { ToastContainer, toast } from 'react-toastify';
 
 import { getTimeFromDate } from '../helpers/dateHelpers';
 
 const EventPage: FC = () => {
-  const [deleteEvent] = useDeleteEventMutation();
+  const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const EventPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {deleteModal && (
         <Modal
           title="Удаление мероприятия"
@@ -72,10 +75,16 @@ const EventPage: FC = () => {
             <div>
               <PrimaryButton
                 clickHandler={async () => {
+                  const { error: responseError } = await deleteEvent(
+                    Number(params.eventId)
+                  );
                   setDeleteModal(false);
-                  await deleteEvent(Number(params.eventId));
 
-                  navigate(`/manager/${params.intensiveId}/schedule`);
+                  if (responseError) {
+                    toast('Произошла серверная ошибка', { type: 'error' });
+                  } else {
+                    navigate(`/manager/${params.intensiveId}/schedule`);
+                  }
                 }}
                 children="Удалить"
               />

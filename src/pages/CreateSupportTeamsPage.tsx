@@ -16,6 +16,7 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
 import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
+import { ToastContainer, toast } from 'react-toastify';
 
 import { ITeam } from '../ts/interfaces/ITeam';
 
@@ -33,7 +34,7 @@ const CreateSupportTeamsPage: FC = () => {
   // TODO: предположить, что тут может быть рандомная цифра?
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
-    () => teams.find((team) => team.index === currentTeamId),
+    () => teams.find((team) => team.id === currentTeamId),
     [teams, currentTeamId]
   );
 
@@ -73,7 +74,7 @@ const CreateSupportTeamsPage: FC = () => {
   }, []);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrentTeamId(parseInt(event.target.value));
+    setCurrentTeamId(Number(event.target.value));
   };
 
   const updateTeamSupportMembers = (
@@ -86,7 +87,7 @@ const CreateSupportTeamsPage: FC = () => {
   ) => {
     setTeams((teams) =>
       teams.map((team) => {
-        if (currentTeamId !== team.index) {
+        if (currentTeamId !== team.id) {
           return team;
         }
 
@@ -115,7 +116,7 @@ const CreateSupportTeamsPage: FC = () => {
   ) => {
     setTeams((teams) =>
       teams.map((team) => {
-        if (currentTeamId !== team.index) {
+        if (currentTeamId !== team.id) {
           return team;
         }
 
@@ -134,16 +135,23 @@ const CreateSupportTeamsPage: FC = () => {
 
   const onSubmit = async () => {
     try {
-      await updateSupportMembers({
-        teams: teams.map((team) => ({
-          id: team.index,
-          tutorId: team.tutor?.id || null,
-          mentorId: team.mentor?.id || null,
-        })),
-        intensiveId: Number(intensiveId),
-      });
+      const { data: responseData, error: responseError } =
+        await updateSupportMembers({
+          teams: teams.map((team) => ({
+            id: team.id,
+            tutorId: team.tutor?.id || null,
+            mentorId: team.mentor?.id || null,
+          })),
+          intensiveId: Number(intensiveId),
+        });
 
-      setSaveModal(true);
+      if (responseData) {
+        setSaveModal(true);
+      }
+
+      if (responseError) {
+        toast('Произошла серверная ошибка', { type: 'error' });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -151,6 +159,8 @@ const CreateSupportTeamsPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {cancelModal && (
         <Modal
           title="Вы уверены, что хотите прекратить редактирование?"
@@ -176,7 +186,7 @@ const CreateSupportTeamsPage: FC = () => {
                     navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                children="Да"
+                children="Отменить"
               />
             </div>
           </div>
@@ -237,7 +247,7 @@ const CreateSupportTeamsPage: FC = () => {
               className="mt-3 bg-another_white rounded-xl p-2.5"
             >
               {teams.map((team) => (
-                <option key={team.index} value={team.index.toString()}>
+                <option key={team.id} value={team.id.toString()}>
                   {team.name}
                 </option>
               ))}

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { teamApi } from '../api/teamApi';
 
 import { ITeam } from '../../ts/interfaces/ITeam';
@@ -15,6 +15,9 @@ const teamSlice = createSlice({
   name: 'currentTeam',
   initialState,
   reducers: {
+    setTeam: (state, action: PayloadAction<ITeam>) => {
+      state.data = action.payload;
+    },
     reset: () => {
       return initialState;
     },
@@ -29,5 +32,5 @@ const teamSlice = createSlice({
   },
 });
 
-export const { reset: resetTeamState } = teamSlice.actions;
+export const { reset: resetTeamState, setTeam } = teamSlice.actions;
 export default teamSlice.reducer;

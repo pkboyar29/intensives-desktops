@@ -29,6 +29,7 @@ import PrimaryButton from '../common/PrimaryButton';
 import Modal from '../common/modals/Modal';
 import FileUpload from '../common/inputs/FileInput';
 import InputRadio from '../common/inputs/InputRadio';
+import { ToastContainer, toast } from 'react-toastify';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 
@@ -120,7 +121,6 @@ const ManageEventForm: FC = () => {
     status: false,
     eventId: null,
   });
-  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (markStrategies) {
@@ -156,7 +156,7 @@ const ManageEventForm: FC = () => {
             name: criteria.name,
           })),
           teams: event.teams.map((team) => ({
-            id: team.index,
+            id: team.id,
             name: team.name,
           })),
           teachers: event.teachers.map((teacher) => ({
@@ -178,18 +178,20 @@ const ManageEventForm: FC = () => {
       start_dt?: string[];
       finish_dt?: string[];
     };
-    if (errorData.start_dt) {
+    if (errorData && errorData.start_dt) {
       setError('startDate', {
         type: 'custom',
         message: errorData.start_dt[0],
       });
-    } else if (errorData.finish_dt) {
+    } else if (errorData && errorData.finish_dt) {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
       });
     } else {
-      setErrorModal(true);
+      toast('Произошла серверная ошибка', {
+        type: 'error',
+      });
     }
   };
 
@@ -243,7 +245,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.finishDate,
+            data.startDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -276,7 +278,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.finishDate,
+            data.startDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -309,6 +311,8 @@ const ManageEventForm: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {cancelModal && (
         <Modal
           title="Вы уверены, что хотите прекратить редактирование?"
@@ -372,32 +376,6 @@ const ManageEventForm: FC = () => {
                     status: false,
                     eventId: null,
                   });
-                }}
-                children="Закрыть"
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {errorModal && (
-        <Modal
-          title={`Произошла серверная ошибка`}
-          onCloseModal={() => {
-            setErrorModal(false);
-          }}
-        >
-          <div className="flex justify-end gap-3 mt-6">
-            <div>
-              <PrimaryButton
-                buttonColor="red"
-                clickHandler={() => {
-                  setErrorModal(false);
-                  navigate(
-                    `/manager/${intensiveId}/schedule/${searchParams.get(
-                      'eventId'
-                    )}`
-                  );
                 }}
                 children="Закрыть"
               />
@@ -480,34 +458,19 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-2.5">
+            <div>
               <InputDescription
                 fieldName="startDate"
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно для заполнения',
                 }}
-                description="Дата начала"
-                placeholder="Дата начала"
+                description="Дата проведения"
+                placeholder="Дата проведения"
                 type="date"
                 errorMessage={
                   typeof errors.startDate?.message === 'string'
                     ? errors.startDate.message
-                    : ''
-                }
-              />
-              <InputDescription
-                fieldName="finishDate"
-                register={register}
-                registerOptions={{
-                  required: 'Поле обязательно для заполнения',
-                }}
-                description="Дата окончания"
-                placeholder="Дата окончания"
-                type="date"
-                errorMessage={
-                  typeof errors.finishDate?.message === 'string'
-                    ? errors.finishDate.message
                     : ''
                 }
               />
@@ -579,7 +542,7 @@ const ManageEventForm: FC = () => {
                   <MultipleSelectInput
                     description="Команды"
                     items={teamsToChoose.map((team) => ({
-                      id: team.index,
+                      id: team.id,
                       name: team.name,
                     }))}
                     selectedItems={field.value || []}

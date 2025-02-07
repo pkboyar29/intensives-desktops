@@ -10,15 +10,15 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import TeamCard from '../components/TeamCard';
 
-const ManagerTeamsPage: FC = () => {
+const TeamsPage: FC = () => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
   const { data: teams, isLoading } = useGetTeamsQuery(Number(intensiveId), {
     refetchOnMountOrArgChange: true,
   });
-
-  const currentUser = useAppSelector((state) => state.user.data);
 
   return (
     <div>
@@ -35,7 +35,7 @@ const ManagerTeamsPage: FC = () => {
       ) : teams && teams.length > 0 ? (
         <div className="flex flex-wrap gap-6 mt-7">
           {teams.map((team) => (
-            <TeamCard key={team.index} team={team} />
+            <TeamCard key={team.id} team={team} />
           ))}
         </div>
       ) : (
@@ -68,4 +68,4 @@ const ManagerTeamsPage: FC = () => {
   );
 };
 
-export default ManagerTeamsPage;
+export default TeamsPage;

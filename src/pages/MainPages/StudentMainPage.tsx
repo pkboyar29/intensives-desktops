@@ -78,13 +78,13 @@ const StudentMainPage: FC = () => {
                     <div className="text-xl font-bold text-black_2">
                       {currentTeam?.name}
                     </div>
+
+                    <div className="flex flex-col gap-4 my-3">
+                      <SidebarLink to="team-overview" text="Просмотр команды" />
+                      <SidebarLink to="kanban" text="Ведение задач" />
+                    </div>
                   </>
                 )}
-              </div>
-
-              <div className="flex flex-col gap-4 my-3">
-                <SidebarLink to="team-overview" text="Просмотр команды" />
-                <SidebarLink to="kanban" text="Ведение задач" />
               </div>
 
               <PrimaryButton

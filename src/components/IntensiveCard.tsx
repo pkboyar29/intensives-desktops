@@ -1,15 +1,12 @@
 import { FC } from 'react';
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
-interface IntensiveListCardProps {
+interface IntensiveCardProps {
   intensive: IIntensive;
   onClick: (intensiveId: number) => void;
 }
 
-const IntensiveListCard: FC<IntensiveListCardProps> = ({
-  intensive,
-  onClick,
-}) => {
+const IntensiveCard: FC<IntensiveCardProps> = ({ intensive, onClick }) => {
   return (
     <div
       onClick={() => onClick(intensive.id)}
@@ -34,4 +31,4 @@ const IntensiveListCard: FC<IntensiveListCardProps> = ({
   );
 };
 
-export default IntensiveListCard;
+export default IntensiveCard;

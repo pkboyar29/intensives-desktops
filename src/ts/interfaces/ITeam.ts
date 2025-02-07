@@ -1,14 +1,20 @@
 import { IStudent } from './IStudent';
 import { ITeacher } from './ITeacher';
+import { IStudentRole } from './IStudentRole';
 
 export interface ITeam {
-  id: number | null;
-  index: number;
+  id: number;
   name: string;
-  studentsInTeam: IStudent[];
+  studentsInTeam: IStudentInTeam[];
   tutor: ITeacher | null;
   mentor: IStudent | null;
-  teamleadId?: number;
+  teamlead: IStudent | null;
+}
+
+export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
+  studentsInTeam: IStudent[];
+  index: number;
+  id: number | null;
 }
 
 export interface ITeamsCreate {
@@ -31,4 +37,24 @@ export interface ITeamSupportMembersUpdate {
   id: number;
   tutorId: number | null;
   mentorId: number | null;
+}
+
+export interface ITeamleadChange {
+  teamId: number;
+  teamleadId: number | null;
+}
+
+export interface IStudentInTeam {
+  student: IStudent;
+  roles: IStudentRole[];
+}
+
+export interface IStudentRolesChange {
+  studentId: number;
+  roleIds: number[];
+}
+
+export interface IStudentsRolesChange {
+  studentsInTeam: IStudentRolesChange[];
+  teamId: number;
 }

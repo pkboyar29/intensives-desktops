@@ -22,6 +22,7 @@ import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
+import { ToastContainer, toast } from 'react-toastify';
 import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
 
@@ -55,7 +56,6 @@ const ManageIntensiveForm: FC = () => {
     status: false,
     intensiveId: null,
   });
-  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
@@ -132,7 +132,6 @@ const ManageIntensiveForm: FC = () => {
         ? attachedFilesList.filter(file=> file.id > 0).map((file: IFile) => file.id)
         : [];
 
-      //console.log(fileIds)
       if (intensiveId) {
         const { data: responseData, error: responseError } =
           await updateIntensive({
@@ -146,7 +145,9 @@ const ManageIntensiveForm: FC = () => {
           });
         
         if (responseError) {
-          setErrorModal(true);
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
           return;
         }
 
@@ -157,8 +158,9 @@ const ManageIntensiveForm: FC = () => {
           });
 
           if(responseError) {
-            console.log("Ошибка при загрузке файлов")
-            setErrorModal(true)
+            toast('Ошибка при загрузке файлов', {
+            type: 'error',
+          });
             return;
           }
         }
@@ -169,7 +171,13 @@ const ManageIntensiveForm: FC = () => {
             intensiveId: Number(intensiveId),
           });
         }
-        
+
+        if (responseError) {
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
+        }
+
       } else {
         const { data: responseData, error: responseError } =
           await createIntensive({
@@ -181,7 +189,9 @@ const ManageIntensiveForm: FC = () => {
           });
         
         if (responseError) {
-          setErrorModal(true);
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
           return;
         }
 
@@ -192,8 +202,9 @@ const ManageIntensiveForm: FC = () => {
           });
 
           if(responseError) {
-            console.log("Ошибка при загрузке файлов")
-            setErrorModal(true)
+            toast('Ошибка при загрузке файлов', {
+            type: 'error',
+          });
             return;
           }
         }
@@ -202,6 +213,12 @@ const ManageIntensiveForm: FC = () => {
           setSuccessfulSaveModal({
             status: true,
             intensiveId: Number(responseData.id),
+          });
+        }
+
+        if (responseError) {
+          toast('Произошла серверная ошибка', {
+            type: 'error',
           });
         }
       }
@@ -261,6 +278,8 @@ const ManageIntensiveForm: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {cancelModal && (
         <Modal
           title="Вы уверены, что хотите прекратить редактирование?"
@@ -320,39 +339,6 @@ const ManageIntensiveForm: FC = () => {
                     status: false,
                     intensiveId: null,
                   });
-                }}
-                children="Закрыть"
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {errorModal && (
-        <Modal
-          title={`Произошла серверная ошибка`}
-          onCloseModal={() => {
-            if (intensiveId) {
-              navigate(`/manager/${intensiveId}/overview`);
-            } else {
-              navigate(`/intensives`);
-            }
-
-            setErrorModal(false);
-          }}
-        >
-          <div className="flex justify-end gap-3 mt-6">
-            <div>
-              <PrimaryButton
-                buttonColor="red"
-                clickHandler={() => {
-                  if (intensiveId) {
-                    navigate(`/manager/${intensiveId}/overview`);
-                  } else {
-                    navigate(`/intensives`);
-                  }
-
-                  setErrorModal(false);
                 }}
                 children="Закрыть"
               />

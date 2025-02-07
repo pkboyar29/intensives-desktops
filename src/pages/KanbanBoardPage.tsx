@@ -5,7 +5,7 @@ import {
   useUpdateColumnColorMutation,
   useCreateColumnMutation,
   useLazyGetColumnsTeamQuery,
-  useDeleteColumnMutation
+  useDeleteColumnMutation,
 } from '../redux/api/columnApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { IColumn } from '../ts/interfaces/IColumn';
@@ -35,7 +35,8 @@ const KanbanBoardPage: FC = () => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
 
   const [isColumnCreating, setColumnCreating] = useState(false);
-  const [currentColumnCreatingName, setCurrentColumnCreatingName] = useState('');
+  const [currentColumnCreatingName, setCurrentColumnCreatingName] =
+    useState('');
 
   const [deleteModal, setDeleteModal] = useState<number | null>(null);
 
@@ -44,21 +45,18 @@ const KanbanBoardPage: FC = () => {
 
   useEffect(() => {
     if (currentTeam) {
-      getColumns(currentTeam.index);
-      console.log(currentTeam)
-      console.log(currentUser)
+      getColumns(currentTeam.id);
+      console.log(currentTeam);
+      console.log(currentUser);
     }
   }, [currentTeam]);
 
-  useEffect(() => {
-
-  });
+  useEffect(() => {});
 
   useEffect(() => {
     //console.log(columns)
     setLocalColumns(columns);
-  }, [columns])
-
+  }, [columns]);
 
   // Функция для обновления позиций после перемещения
   const handleMoveColumn = (dragIndex: number, hoverIndex: number) => {
@@ -69,7 +67,10 @@ const KanbanBoardPage: FC = () => {
     updateColumnPosition(columnId, newIndex);
   };
 
-  const updateColumnPosition = async (columnId: number, newPosition: number) => {
+  const updateColumnPosition = async (
+    columnId: number,
+    newPosition: number
+  ) => {
     const { data: responseData } = await updateColumnPositionAPI({
       id: columnId,
       position: newPosition,
@@ -93,20 +94,18 @@ const KanbanBoardPage: FC = () => {
   };
 
   const createColumn = async () => {
-
-    if(validateKanban(currentColumnCreatingName) && currentTeam) {
-        try{
-          await createColumnAPI({
-              name: currentColumnCreatingName,
-              team: Number(currentTeam.id),
-          }).unwrap();
-          
-        } catch(error){
-          console.error("Error during column creation:", error);
-        }
+    if (validateKanban(currentColumnCreatingName) && currentTeam) {
+      try {
+        await createColumnAPI({
+          name: currentColumnCreatingName,
+          team: Number(currentTeam.id),
+        }).unwrap();
+      } catch (error) {
+        console.error('Error during column creation:', error);
+      }
     }
 
-    setCurrentColumnCreatingName("") // обнуляем хук с названием
+    setCurrentColumnCreatingName(''); // обнуляем хук с названием
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,90 +125,88 @@ const KanbanBoardPage: FC = () => {
   };
 
   const handleDeleteColumn = async (id: number) => {
-    
-    try{
+    try {
       await deleteColumnAPI(id).unwrap();
-      
-    } catch(error) {
-      console.error("Error on deleting column:", error);
+    } catch (error) {
+      console.error('Error on deleting column:', error);
     }
-  }
+  };
 
   return (
     <>
-    {deleteModal && (
-      <Modal
-        title="Удаление колонки"
-        onCloseModal={() => setDeleteModal(null)}
-      >
-        <p className="text-lg text-bright_gray">
-          {`Вы уверены, что хотите удалить колонку? ВСЕ задачи и подзадачи в ней удалятся!`}
-        </p>
-        <div className="flex justify-end gap-3 mt-6">
-          <div>
-            <PrimaryButton
-              buttonColor="gray"
-              clickHandler={() => setDeleteModal(null)}
-              children="Отмена"
-            />
+      {deleteModal && (
+        <Modal
+          title="Удаление колонки"
+          onCloseModal={() => setDeleteModal(null)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Вы уверены, что хотите удалить колонку? ВСЕ задачи и подзадачи в ней удалятся!`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setDeleteModal(null)}
+                children="Отмена"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setDeleteModal(null);
+                  handleDeleteColumn(deleteModal);
+                }}
+                children="Удалить"
+              />
+            </div>
           </div>
-          <div>
-            <PrimaryButton
-              clickHandler={() => {
-                setDeleteModal(null)
-                handleDeleteColumn(deleteModal);
-              }}
-              children="Удалить"
-            />
-          </div>
-        </div>
-      </Modal>
-    )}
-      
-    <div className='w-full'>
-      <DndProvider backend={HTML5Backend}>
-        <div className="flex items-start space-x-4">
-          {columns &&
-          columns
-            .map((column, index) => (
-              <div key={column.id} className="flex-shrink-0 min-w-[300px]">
-                <KanbanColumn
-                  key={column.id}
-                  index={index}
-                  id={column.id}
-                  title={column.name}
-                  colorHEX={column.colorHEX}
-                  tasksCount={column.tasksCount}
-                  moveColumn={handleMoveColumn}
-                  dropColumn={handleDropColumn}
-                  onUpdateTitle={handleUpdateTitle}
-                  onUpdateColor={handleUpdateColor}
-                  onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
-                />
-              </div>
-          ))}
+        </Modal>
+      )}
 
-          {isColumnCreating ? (
-            <input
-              type="text"
-              defaultValue={''}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              onChange={handleInputChange}
-              maxLength={50}
-              autoFocus
-              className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
-            />
-          ) : (
-            <button
-              className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
-              onClick={() => setColumnCreating(true)}>
-              Создать колонку
-            </button>
-          )}
-        </div>
-      </DndProvider>
-    </div>
+      <div className="w-full">
+        <DndProvider backend={HTML5Backend}>
+          <div className="flex items-start space-x-4">
+            {columns &&
+              columns.map((column, index) => (
+                <div key={column.id} className="flex-shrink-0 min-w-[300px]">
+                  <KanbanColumn
+                    key={column.id}
+                    index={index}
+                    id={column.id}
+                    title={column.name}
+                    colorHEX={column.colorHEX}
+                    tasksCount={column.tasksCount}
+                    moveColumn={handleMoveColumn}
+                    dropColumn={handleDropColumn}
+                    onUpdateTitle={handleUpdateTitle}
+                    onUpdateColor={handleUpdateColor}
+                    onDeleteColumn={(idColumn) => setDeleteModal(idColumn)}
+                  />
+                </div>
+              ))}
+
+            {isColumnCreating ? (
+              <input
+                type="text"
+                defaultValue={''}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                onChange={handleInputChange}
+                maxLength={50}
+                autoFocus
+                className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
+              />
+            ) : (
+              <button
+                className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
+                onClick={() => setColumnCreating(true)}
+              >
+                Создать колонку
+              </button>
+            )}
+          </div>
+        </DndProvider>
+      </div>
     </>
   );
 };

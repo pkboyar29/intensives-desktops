@@ -7,17 +7,18 @@ import {
   useLazyGetTeamsQuery,
 } from '../redux/api/teamApi';
 
-import TeamDragElement from '../components/DragComponents/TeamDragElement';
+import TeamDragElement from '../components/DragComponents/BaseDragElement';
 import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
+import { ToastContainer, toast } from 'react-toastify';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamCreate, ITeam } from '../ts/interfaces/ITeam';
+import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const CreateTeamsPage: FC = () => {
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
-  const [teams, setTeams] = useState<ITeam[]>([]);
+  const [teams, setTeams] = useState<ITeamForManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
@@ -68,9 +69,17 @@ const CreateTeamsPage: FC = () => {
 
           if (teamsResponse && teamsResponse.length > 0) {
             setTeamsCount(teamsResponse.length);
-            setTeams(teamsResponse);
+            setTeams(
+              teamsResponse.map((team) => ({
+                ...team,
+                index: team.id,
+                studentsInTeam: team.studentsInTeam.map(
+                  (studentInTeam) => studentInTeam.student
+                ),
+              }))
+            );
           } else {
-            const initialTeamData: ITeam[] = [
+            const initialTeamData: ITeamForManager[] = [
               {
                 id: null,
                 index: 1,
@@ -78,6 +87,7 @@ const CreateTeamsPage: FC = () => {
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
+                teamlead: null,
               },
               {
                 id: null,
@@ -86,6 +96,7 @@ const CreateTeamsPage: FC = () => {
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
+                teamlead: null,
               },
             ];
 
@@ -164,7 +175,7 @@ const CreateTeamsPage: FC = () => {
       if (prevTeamsCount < teamsCount) {
         // teams count will increase
 
-        const newTeams: ITeam[] = [];
+        const newTeams: ITeamForManager[] = [];
         for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
           newTeams.push({
             id: null,
@@ -173,6 +184,7 @@ const CreateTeamsPage: FC = () => {
             studentsInTeam: [],
             tutor: null,
             mentor: null,
+            teamlead: null,
           });
         }
         setTeams((prevState) => [...prevState, ...newTeams]);
@@ -181,7 +193,7 @@ const CreateTeamsPage: FC = () => {
 
         setTeams((prevTeams) => {
           const reducedStudentsInTeam: IStudent[] = [];
-          const remainingTeams: ITeam[] = [];
+          const remainingTeams: ITeamForManager[] = [];
 
           for (let i = 0; i < prevTeamsCount; i++) {
             if (i <= teamsCount - 1) {
@@ -203,10 +215,10 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentMove = (
-    team: ITeam,
+    team: ITeamForManager,
     droppedStudent: IStudent
   ) => {
-    const sourceTeam: ITeam | undefined = teams.find((team) =>
+    const sourceTeam: ITeamForManager | undefined = teams.find((team) =>
       team.studentsInTeam.some((student) => student.id === droppedStudent.id)
     );
     if (sourceTeam) {
@@ -232,7 +244,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentDelete = (
-    team: ITeam,
+    team: ITeamForManager,
     studentToDelete: IStudent
   ) => {
     const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
@@ -254,12 +266,21 @@ const CreateTeamsPage: FC = () => {
       }));
 
       try {
-        await changeAllTeams({
-          intensiveId: parseInt(intensiveId),
-          teams: teamsForRequest,
-        });
+        const { data: responseData, error: responseError } =
+          await changeAllTeams({
+            intensiveId: parseInt(intensiveId),
+            teams: teamsForRequest,
+          });
 
-        setSaveModal(true);
+        if (responseData) {
+          setSaveModal(true);
+        }
+
+        if (responseError) {
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
+        }
       } catch (e) {
         console.log(e);
       }
@@ -268,6 +289,8 @@ const CreateTeamsPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {teamsCountModal && (
         <Modal
           title={'Изменение количества команд'}
@@ -328,7 +351,7 @@ const CreateTeamsPage: FC = () => {
                     navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                children="Да"
+                children="Отменить"
               />
             </div>
           </div>

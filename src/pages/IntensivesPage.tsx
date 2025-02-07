@@ -8,7 +8,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 import { IIntensive } from '../ts/interfaces/IIntensive';
 
 import SearchIcon from '../components/icons/SearchIcon';
-import IntensiveListCard from '../components/IntensiveListCard';
+import IntensiveCard from '../components/IntensiveCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -148,6 +148,7 @@ const IntensivesPage: FC = () => {
     } else if (currentUser?.roleNames.includes('Организатор')) {
       navigate(`/manager/${id}/overview`);
     } else if (currentUser?.roleNames.includes('Преподаватель')) {
+      localStorage.removeItem('tutorTeamId');
       navigate(`/teacher/${id}/overview`);
     }
   };
@@ -242,7 +243,7 @@ const IntensivesPage: FC = () => {
                 ) : (
                   <div className="flex flex-col gap-4">
                     {sortedIntensives.map((intensive) => (
-                      <IntensiveListCard
+                      <IntensiveCard
                         key={intensive.id}
                         intensive={intensive}
                         onClick={intensiveClickHandler}
