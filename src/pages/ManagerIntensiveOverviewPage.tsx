@@ -11,6 +11,7 @@ import Skeleton from 'react-loading-skeleton';
 import TrashIcon from '../components/icons/TrashIcon';
 import Modal from '../components/common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
+import AttachedFileList from '../components/AttachedFileList';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const navigate = useNavigate();
@@ -143,6 +144,16 @@ const ManagerIntensiveOverviewPage: FC = () => {
                   <Skeleton />
                 )}
               </div>
+
+              {currentIntensive?.files && (
+                <div>
+                  <AttachedFileList
+                    context={'intensives'}
+                    contextId={currentIntensive.id}
+                    files={currentIntensive?.files} 
+                    onFileClick={(id:number) => console.log("clicked file id "+ id)} />
+                </div>
+              )}
 
               {currentUser?.roleNames.includes('Организатор') && (
                 <div className="flex items-center mt-10 text-lg font-bold gap-7">

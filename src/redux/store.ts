@@ -21,6 +21,7 @@ import { columnApi } from './api/columnApi';
 import { markStrategyApi } from './api/markStrategyApi';
 import { criteriaApi } from './api/criteriaApi';
 import { taskApi } from './api/taskApi';
+import { fileApi } from './api/fileApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -45,6 +46,7 @@ export const store = configureStore({
     [taskApi.reducerPath]: taskApi.reducer,
     [markStrategyApi.reducerPath]: markStrategyApi.reducer,
     [criteriaApi.reducerPath]: criteriaApi.reducer,
+    [fileApi.reducerPath]: fileApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -64,7 +66,8 @@ export const store = configureStore({
       columnApi.middleware,
       taskApi.middleware,
       markStrategyApi.middleware,
-      criteriaApi.middleware
+      criteriaApi.middleware,
+      fileApi.middleware
     ),
 });
 
