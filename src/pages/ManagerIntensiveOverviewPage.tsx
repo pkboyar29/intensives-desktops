@@ -10,6 +10,7 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 import TrashIcon from '../components/icons/TrashIcon';
 import Modal from '../components/common/modals/Modal';
+import { ToastContainer, toast } from 'react-toastify';
 
 const ManagerIntensiveOverviewPage: FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const ManagerIntensiveOverviewPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {deleteModal && currentIntensive && (
         <Modal
           title="Удаление интенсива"
@@ -42,10 +45,16 @@ const ManagerIntensiveOverviewPage: FC = () => {
             <div>
               <PrimaryButton
                 clickHandler={async () => {
+                  const { error: responseError } = await deleteIntensive(
+                    currentIntensive.id
+                  );
                   setDeleteModal(false);
-                  await deleteIntensive(currentIntensive.id);
 
-                  navigate(`/intensives`);
+                  if (responseError) {
+                    toast('Произошла серверная ошибка', { type: 'error' });
+                  } else {
+                    navigate(`/intensives`);
+                  }
                 }}
                 children="Удалить"
               />

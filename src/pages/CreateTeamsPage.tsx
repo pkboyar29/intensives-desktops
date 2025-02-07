@@ -12,6 +12,7 @@ import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
+import { ToastContainer, toast } from 'react-toastify';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
@@ -265,12 +266,21 @@ const CreateTeamsPage: FC = () => {
       }));
 
       try {
-        await changeAllTeams({
-          intensiveId: parseInt(intensiveId),
-          teams: teamsForRequest,
-        });
+        const { data: responseData, error: responseError } =
+          await changeAllTeams({
+            intensiveId: parseInt(intensiveId),
+            teams: teamsForRequest,
+          });
 
-        setSaveModal(true);
+        if (responseData) {
+          setSaveModal(true);
+        }
+
+        if (responseError) {
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
+        }
       } catch (e) {
         console.log(e);
       }
@@ -279,6 +289,8 @@ const CreateTeamsPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {teamsCountModal && (
         <Modal
           title={'Изменение количества команд'}
@@ -339,7 +351,7 @@ const CreateTeamsPage: FC = () => {
                     navigate(`/manager/${intensiveId}/teams`);
                   }
                 }}
-                children="Да"
+                children="Отменить"
               />
             </div>
           </div>

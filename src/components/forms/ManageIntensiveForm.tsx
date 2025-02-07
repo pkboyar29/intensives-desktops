@@ -20,6 +20,7 @@ import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Item {
   id: number;
@@ -50,7 +51,6 @@ const ManageIntensiveForm: FC = () => {
     status: false,
     intensiveId: null,
   });
-  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
@@ -128,7 +128,9 @@ const ManageIntensiveForm: FC = () => {
         }
 
         if (responseError) {
-          setErrorModal(true);
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
         }
       } else {
         const { data: responseData, error: responseError } =
@@ -148,7 +150,9 @@ const ManageIntensiveForm: FC = () => {
         }
 
         if (responseError) {
-          setErrorModal(true);
+          toast('Произошла серверная ошибка', {
+            type: 'error',
+          });
         }
       }
     } catch (e) {
@@ -158,6 +162,8 @@ const ManageIntensiveForm: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {cancelModal && (
         <Modal
           title="Вы уверены, что хотите прекратить редактирование?"
@@ -217,39 +223,6 @@ const ManageIntensiveForm: FC = () => {
                     status: false,
                     intensiveId: null,
                   });
-                }}
-                children="Закрыть"
-              />
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {errorModal && (
-        <Modal
-          title={`Произошла серверная ошибка`}
-          onCloseModal={() => {
-            if (intensiveId) {
-              navigate(`/manager/${intensiveId}/overview`);
-            } else {
-              navigate(`/intensives`);
-            }
-
-            setErrorModal(false);
-          }}
-        >
-          <div className="flex justify-end gap-3 mt-6">
-            <div>
-              <PrimaryButton
-                buttonColor="red"
-                clickHandler={() => {
-                  if (intensiveId) {
-                    navigate(`/manager/${intensiveId}/overview`);
-                  } else {
-                    navigate(`/intensives`);
-                  }
-
-                  setErrorModal(false);
                 }}
                 children="Закрыть"
               />

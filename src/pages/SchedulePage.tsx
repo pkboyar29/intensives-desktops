@@ -10,6 +10,7 @@ import Modal from '../components/common/modals/Modal';
 import Title from '../components/common/Title';
 import DisplaySelect from '../components/common/DisplaySelect';
 import Skeleton from 'react-loading-skeleton';
+import { ToastContainer, toast } from 'react-toastify';
 
 import StageInSchedule from '../components/schedule/StageInSchedule';
 import EventInSchedule from '../components/schedule/EventInSchedule';
@@ -66,7 +67,7 @@ const SchedulePage: FC = () => {
   };
 
   const toggleEventVisibility = async (event: IEvent) => {
-    const { data: responseData } = await updateEventAPI({
+    const { data: responseData, error: responseError } = await updateEventAPI({
       visibility: !event.visibility,
       eventId: event.id,
       intensiveId: Number(intensiveId),
@@ -81,6 +82,12 @@ const SchedulePage: FC = () => {
       markStrategyId: event.markStrategy ? event.markStrategy.id : null,
       criteriaIds: event.criterias.map((criteria) => criteria.id),
     });
+
+    if (responseError) {
+      toast('Произошла серверная ошибка', {
+        type: 'error',
+      });
+    }
 
     if (responseData && schedule) {
       setSchedule({
@@ -101,25 +108,29 @@ const SchedulePage: FC = () => {
 
   const deleteStage = async (stageId: number) => {
     try {
-      await deleteStageAPI(stageId);
-
-      refetch();
-      // TODO: раскоментить?
-      // if (schedule) {
-      //   setSchedule({
-      //     eventsWithoutStage: schedule.eventsWithoutStage,
-      //     stages: schedule.stages.map((stage) => {
-      //       if (stage.id !== stageId) {
-      //         return stage;
-      //       }
-      //     }),
-      //   });
-      // }
+      const { error: responseError } = await deleteStageAPI(stageId);
 
       setDeleteStageModal({
         status: false,
         stageId: null,
       });
+
+      if (responseError) {
+        toast('Произошла серверная ошибка', { type: 'error' });
+      } else {
+        refetch();
+        // TODO: раскоментить?
+        // if (schedule) {
+        //   setSchedule({
+        //     eventsWithoutStage: schedule.eventsWithoutStage,
+        //     stages: schedule.stages.map((stage) => {
+        //       if (stage.id !== stageId) {
+        //         return stage;
+        //       }
+        //     }),
+        //   });
+        // }
+      }
     } catch (e) {
       console.log(e);
     }
@@ -127,6 +138,8 @@ const SchedulePage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {stageModal.status && (
         <StageModal
           stage={stageModal.stage}
