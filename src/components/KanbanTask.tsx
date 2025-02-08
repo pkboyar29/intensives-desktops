@@ -4,13 +4,16 @@ import {
   useLazyGetSubtasksQuery,
   useCreateTaskMutation,
   useUpdateTaskPositionMutation,
-  useDeleteTaskMutation
+  useDeleteTaskMutation,
 } from '../redux/api/taskApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
-import { selectSubtaskData, moveTaskTemporary, savePreviousState } from '../redux/slices/kanbanSlice';
+import {
+  selectSubtaskData,
+  moveTaskTemporary,
+  savePreviousState,
+} from '../redux/slices/kanbanSlice';
 import { useDrag, useDrop } from 'react-dnd';
-
 
 interface KanbanTaskProps {
   id: number;
@@ -50,11 +53,10 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [creatingSubtask, setCreatingSubtask] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание подзадачи
 
-
   // Функция для автоматического изменения высоты textarea
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Сбрасываем высоту
+      textareaRef.current.style.height = 'auto'; // Сбрасываем высоту
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Устанавливаем высоту в зависимости от содержимого
     }
   }, [creatingSubtask]);
@@ -63,76 +65,80 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const subtasksData = useAppSelector((state) => selectSubtaskData(state, id));
 
   // Получаем количество подзадач
-  const subtaskCount = useAppSelector((state) =>
-    state.kanban.subtasks?.[id]?.length || 0
+  const subtaskCount = useAppSelector(
+    (state) => state.kanban.subtasks?.[id]?.length || 0
   );
 
   const renameTask = () => {
-    console.log(subtaskCount)
-    console.log(initialSubtaskCount)
+    console.log(subtaskCount);
+    console.log(initialSubtaskCount);
   };
 
   const handleBlurTask = async () => {
-      //валидация названия задачи
-      if (creatingSubtask && validateKanban(creatingSubtask)) {
-        createSubtask();
-      }
-  
-      setCreatingSubtask(null);
+    //валидация названия задачи
+    if (creatingSubtask && validateKanban(creatingSubtask)) {
+      createSubtask();
+    }
+
+    setCreatingSubtask(null);
   };
-  
-    const handleKeyDownTask = (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // Предотвращает добавление переноса строки
-        createSubtask();
-        setCreatingSubtask('');
-      }
+
+  const handleKeyDownTask = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Предотвращает добавление переноса строки
+      createSubtask();
+      setCreatingSubtask('');
+    }
   };
 
   const createSubtask = async () => {
-    try{
-      if(creatingSubtask) {
+    try {
+      if (creatingSubtask) {
         await createTaskAPI({
           name: creatingSubtask,
-          parentTask: id
+          parentTask: id,
         }).unwrap();
       }
-    } catch(err) {
-      console.error("Error on crating subtask:", err);
+    } catch (err) {
+      console.error('Error on crating subtask:', err);
     }
-  }
+  };
 
-  const updateTaskPosition = async (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
+  const updateTaskPosition = async (item: {
+    id: number;
+    index: number;
+    columnId: number | null;
+    parentTaskId: number | null;
+  }) => {
     const payload = {
       id: item.id,
       position: index, // Новая позиция
-      column: (parentTaskId !== null ? undefined: columnId), // Если есть подзадача не отправляем колонку (нет смысла)
-      parentTask: (parentTaskId !== null ? parentTaskId : undefined),
+      column: parentTaskId !== null ? undefined : columnId, // Если есть подзадача не отправляем колонку (нет смысла)
+      parentTask: parentTaskId !== null ? parentTaskId : undefined,
     };
-    console.log(payload)
-    try{
-      await updateTaskPositionAPI(payload)
-    } catch(err) {
-      console.error("Error on updating position subtask:", err);
+    console.log(payload);
+    try {
+      await updateTaskPositionAPI(payload);
+    } catch (err) {
+      console.error('Error on updating position subtask:', err);
     }
-  }
+  };
 
   const deleteTask = async () => {
-    try{
+    try {
       await deleteTaskAPI(id).unwrap();
-      
-    } catch(error) {
+    } catch (error) {
       console.error(`Error on deleting subtask id=${id}`, error);
     }
   };
 
   const expandedSubtasks = async () => {
-    if(!isExpandedSubtasks && subtaskCount === 0) {
-       // Загружаем подзадачи, если они ещё не загружены
+    if (!isExpandedSubtasks && subtaskCount === 0) {
+      // Загружаем подзадачи, если они ещё не загружены
       await getSubtasks(id);
     }
-    setIsExpandedSubtasks((prev) => !prev)
-  }
+    setIsExpandedSubtasks((prev) => !prev);
+  };
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
     type: 'TASK',
@@ -144,10 +150,19 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
   const [, dropRef] = useDrop({
     accept: 'TASK',
-    hover: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }) => {
+    hover: (item: {
+      id: number;
+      index: number;
+      columnId: number | null;
+      parentTaskId: number | null;
+    }) => {
       dispatch(savePreviousState());
-      
-      if(item.index !== index || item.columnId !== columnId || item.parentTaskId !== parentTaskId) {
+
+      if (
+        item.index !== index ||
+        item.columnId !== columnId ||
+        item.parentTaskId !== parentTaskId
+      ) {
         dispatch(
           moveTaskTemporary({
             taskId: item.id,
@@ -159,15 +174,23 @@ const KanbanTask: FC<KanbanTaskProps> = ({
             toParentTaskId: parentTaskId,
           })
         );
-        
+
         item.index = index;
         item.columnId = columnId;
         item.parentTaskId = parentTaskId;
       }
     },
-    drop: (item: { id: number; index: number; columnId: number | null; parentTaskId: number | null }, monitor) => {
-      console.log("item.columnId:" + item.columnId + "columnId: "+columnId)
-      updateTaskPosition(item)
+    drop: (
+      item: {
+        id: number;
+        index: number;
+        columnId: number | null;
+        parentTaskId: number | null;
+      },
+      monitor
+    ) => {
+      console.log('item.columnId:' + item.columnId + 'columnId: ' + columnId);
+      updateTaskPosition(item);
     },
   });
 
@@ -179,7 +202,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
   // Логика отображения количества подзадач
   const displayedSubtaskCount =
-    (initialSubtaskCount !== null && initialSubtaskCount! > 0)
+    initialSubtaskCount !== null && initialSubtaskCount! > 0
       ? initialSubtaskCount // Показываем изначальное значение
       : subtaskCount; // После подгрузки показываем актуальное значение
 
@@ -190,8 +213,10 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       onClick={onClick}
       ref={previewRef}
     >
-      <div className='flex p-3 flex-row justify-between items-center bg-white rounded-lg cursor-pointer' ref={combinedRef}>
-
+      <div
+        className="flex flex-row items-center justify-between p-3 bg-white rounded-lg cursor-pointer"
+        ref={combinedRef}
+      >
         {/* Левая часть с чекбоксом и названием */}
         <div className="flex space-x-2 items-down ml">
           <input type="checkbox" className="w-4 h-4 text-blue-500" />
@@ -205,10 +230,14 @@ const KanbanTask: FC<KanbanTaskProps> = ({
 
         {/* Правая часть (иконка или инициалы) */}
         <div>
-          <KanbanTaskMenu onRename={renameTask} onCreateSubtask={() => {
-            expandedSubtasks(); 
-            setCreatingSubtask(''); }}
-            onDelete={deleteTask} />
+          <KanbanTaskMenu
+            onRename={renameTask}
+            onCreateSubtask={() => {
+              expandedSubtasks();
+              setCreatingSubtask('');
+            }}
+            onDelete={deleteTask}
+          />
           {assignee ? (
             <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
               {assignee}
@@ -222,13 +251,18 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       </div>
 
       {/* Область с подзадачами */}
-      <div className='flex flex-col bg-gray'>
+      <div className="flex flex-col bg-gray">
         {displayedSubtaskCount ? (
-          <div className='flex flex-row space-x-2 justify-end mt-1 mb-1 mr-1 cursor-pointer' onClick={expandedSubtasks}>
-            <p className=''>{displayedSubtaskCount}</p>
+          <div
+            className="flex flex-row justify-end mt-1 mb-1 mr-1 space-x-2 cursor-pointer"
+            onClick={expandedSubtasks}
+          >
+            <p className="">{displayedSubtaskCount}</p>
             {isExpandedSubtasks ? <p>&#x25B2;</p> : <p>&#x25BC;</p>}
           </div>
-          ):(<></>)}
+        ) : (
+          <></>
+        )}
 
         {creatingSubtask != null ? (
           <textarea
@@ -242,19 +276,20 @@ const KanbanTask: FC<KanbanTaskProps> = ({
             autoFocus
             className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
           />
-          ) : (
-            <button className="text-left text-blue hover:text-dark_blue" onClick={() => setCreatingSubtask("")}>
-            
-            </button>
-          )}
+        ) : (
+          <button
+            className="text-left text-blue hover:text-dark_blue"
+            onClick={() => setCreatingSubtask('')}
+          ></button>
+        )}
 
-          {isExpandedSubtasks && subtasksData.length > 0 && (
-            <div>
-              {subtasksData.map((subtask, index) => {
-                if (!subtask) return null;
-              
+        {isExpandedSubtasks && subtasksData.length > 0 && (
+          <div>
+            {subtasksData.map((subtask, index) => {
+              if (!subtask) return null;
+
               return (
-                <div key={subtask.id} className='ml-3 mr-1'>
+                <div key={subtask.id} className="ml-3 mr-1">
                   <KanbanTask
                     id={subtask.id}
                     columnId={subtask.column}
@@ -266,11 +301,10 @@ const KanbanTask: FC<KanbanTaskProps> = ({
                   />
                 </div>
               );
-              })}
-            </div>
-          )}
+            })}
+          </div>
+        )}
       </div>
-
     </div>
   );
 };

@@ -47,4 +47,9 @@ const getISODateTimeInUTC3 = (date: string | Date): string => {
     .replace(',', ''); // Удаляем запятую между датой и временем
 };
 
-export { transformSeparateDateAndTimeToISO, getISODateInUTC3, getISODateTimeInUTC3, getTimeFromDate };
+export {
+  transformSeparateDateAndTimeToISO,
+  getISODateInUTC3,
+  getISODateTimeInUTC3,
+  getTimeFromDate,
+};

@@ -24,20 +24,22 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
     if (!isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
-        top: rect.bottom + window.scrollY -20, // Верхняя координата
+        top: rect.bottom + window.scrollY - 20, // Верхняя координата
         left: rect.left + window.scrollX, // Левая координата
       });
     }
-  }
+  };
   const closeMenu = () => setIsOpen(false);
 
   // Закрытие меню при клике вне области
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-          menuRef.current &&
-          !menuRef.current.contains(event.target as Node) && // Если клик не внутри меню
-          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) && // Если клик не внутри меню
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         closeMenu();
       }
     };
@@ -99,8 +101,8 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
           </button>
         </li>
 
-        <div className="border-t border-gray-300 my-2"></div>
-          
+        <div className="my-2 border-t border-gray-300"></div>
+
         <li>
           <button
             onClick={(e) => {
@@ -113,8 +115,8 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
             Создать подзадачу
           </button>
         </li>
-          
-        <div className="border-t border-gray-300 my-2"></div>
+
+        <div className="my-2 border-t border-gray-300"></div>
 
         <li>
           <button

@@ -50,7 +50,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
       {/* Меню */}
       {isOpen && (
         <div
-          className="absolute left-0 w-60 mt-2 bg-white border rounded shadow-lg"
+          className="absolute left-0 mt-2 bg-white border rounded shadow-lg w-60"
           onBlur={closeMenu}
         >
           <ul className="py-1">
@@ -65,27 +65,29 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
                 Переименовать
               </button>
             </li>
-            
-            <div className="border-t border-gray-300 my-2"></div>
+
+            <div className="my-2 border-t border-gray-300"></div>
 
             <li>
-            <h3 className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100">Цвет колонки</h3>
+              <h3 className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100">
+                Цвет колонки
+              </h3>
               <div className="grid grid-cols-8 gap-1 px-4">
-                  {KANBAN_COLORS.map((color) => (
-                      <button
-                          key={color}
-                          className={`w-5 h-5 rounded-full border`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => {
-                              onChangeColor(color);
-                              closeMenu();
-                          }}
-                      />
+                {KANBAN_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    className={`w-5 h-5 rounded-full border`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => {
+                      onChangeColor(color);
+                      closeMenu();
+                    }}
+                  />
                 ))}
-                </div>
+              </div>
             </li>
-              
-            <div className="border-t border-gray-300 my-2"></div>
+
+            <div className="my-2 border-t border-gray-300"></div>
 
             <li>
               <button

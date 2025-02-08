@@ -18,6 +18,6 @@ export interface IUploadFile {
 }
 
 export interface INewFileObject {
-  file: File;  // Стандартный тип для файлов
-  id: number;  // Уникальный идентификатор
+  file: File; // Стандартный тип для файлов
+  id: number; // Уникальный идентификатор
 }
