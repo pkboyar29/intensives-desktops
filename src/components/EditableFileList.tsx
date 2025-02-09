@@ -14,15 +14,15 @@ const EditableFileList: FC<EditableFileListProps> = ({
   onFileDelete,
 }) => {
   return (
-    <div className="max-w mx-auto bg-white rounded-lg pt-4 py-2">
-      <h2 className="font-semibold mb-3">📂 Список файлов</h2>
-      <div className="max-h-60 overflow-y-auto">
+    <div className="py-2 pt-4 mx-auto bg-white rounded-lg max-w">
+      <h2 className="mb-3 font-semibold">📂 Список файлов</h2>
+      <div className="overflow-y-auto max-h-60">
         {files.length > 0 ? (
           <ul className="divide-y divide-gray-200">
             {files.map((file) => (
               <li
                 key={file.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-100 rounded-md transition"
+                className="flex items-center justify-between p-3 transition rounded-md hover:bg-gray-100"
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-gray-900">
@@ -43,7 +43,7 @@ const EditableFileList: FC<EditableFileListProps> = ({
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 text-sm text-center py-4">
+          <p className="py-4 text-sm text-center text-gray-500">
             Нет доступных файлов
           </p>
         )}

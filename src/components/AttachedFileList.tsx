@@ -18,9 +18,9 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
   onFileClick,
 }) => {
   return (
-    <div className="max-w mx-auto bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-lg font-semibold mb-3">📂 Список файлов</h2>
-      <div className="max-h-60 overflow-y-auto">
+    <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
+      <h2 className="mb-3 text-lg font-semibold">📂 Список файлов</h2>
+      <div className="overflow-y-auto max-h-60">
         {' '}
         {/* Ограничение высоты и скролл */}
         <ul className="divide-y divide-gray-200">
@@ -28,7 +28,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
             files.map((file) => (
               <li
                 key={file.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-100 rounded-md transition"
+                className="flex items-center justify-between p-3 transition rounded-md hover:bg-gray-100"
               >
                 <DownloadFileItem
                   context={context}
@@ -51,7 +51,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
               </li>
             ))
           ) : (
-            <p className="text-gray-500 text-sm text-center py-4">
+            <p className="py-4 text-sm text-center text-gray-500">
               Нет доступных файлов
             </p>
           )}

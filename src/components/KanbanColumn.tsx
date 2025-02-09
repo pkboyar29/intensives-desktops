@@ -276,7 +276,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
                 </h2>
 
                 <div
-                  className="text-sm ml-2 bg-gray rounded-full mt-1"
+                  className="mt-1 ml-2 text-sm rounded-full bg-gray"
                   title="Количество задач в колонке"
                 >
                   <p>{tasksCount}</p>
