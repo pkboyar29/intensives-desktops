@@ -40,7 +40,7 @@ export const intensiveApi = createApi({
         const mappedIntensives: IIntensive[] = response.map(
           (unmappedIntensive: any) => mapIntensive(unmappedIntensive)
         );
-        console.log(mappedIntensives);
+
         return mappedIntensives;
       },
     }),
@@ -90,7 +90,11 @@ export const intensiveApi = createApi({
     uploadFiles: builder.mutation<IFile[], IIntensiveUploadFiles>({
       query: ({ id, files }) => {
         const formData = new FormData();
-        files.forEach((file) => formData.append('files', file));
+        if (Array.isArray(files)) {
+          files.forEach((file) => formData.append('files', file));
+        } else {
+          formData.append('files', files);
+        }
 
         return {
           url: `intensives/${id}/files/upload/`,

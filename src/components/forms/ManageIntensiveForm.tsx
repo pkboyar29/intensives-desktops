@@ -130,82 +130,94 @@ const ManageIntensiveForm: FC = () => {
           .map((file: IFile) => file.id)
       : [];
 
+    let responseData;
+    let responseError;
+
     if (intensiveId) {
-      const { data: responseData, error: responseError } =
-        await updateIntensive({
-          id: Number(intensiveId),
-          ...data,
-          flowIds,
-          teacherIds,
-          roleIds,
-          isOpen: true,
-          fileIds: fileIds,
-        });
+      ({ data: responseData, error: responseError } = await updateIntensive({
+        id: Number(intensiveId),
+        ...data,
+        flowIds,
+        teacherIds,
+        roleIds,
+        isOpen: true,
+        fileIds: fileIds,
+      }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка', {
+        toast('Произошла серверная ошибка при сохранении изменений', {
           type: 'error',
         });
-      }
-
-      if (responseData && newFiles.length > 0) {
-        const { error: responseError } = await uploadFiles({
-          id: Number(intensiveId),
-          files: newFiles.map((array) => array.file),
-        });
-
-        if (responseError) {
-          toast('Ошибка при загрузке файлов', {
-            type: 'error',
-          });
-          return;
-        }
-      }
-
-      if (responseData) {
-        setSuccessfulSaveModal({
-          status: true,
-          intensiveId: Number(intensiveId),
-        });
+        return;
       }
     } else {
-      const { data: responseData, error: responseError } =
-        await createIntensive({
-          ...data,
-          flowIds,
-          teacherIds,
-          roleIds,
-          isOpen: true,
-        });
+      ({ data: responseData, error: responseError } = await createIntensive({
+        ...data,
+        flowIds,
+        teacherIds,
+        roleIds,
+        isOpen: true,
+      }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка', {
+        toast('Произошла серверная ошибка при создании', {
           type: 'error',
         });
         return;
       }
 
-      if (responseData && newFiles.length > 0) {
-        const { error: responseError } = await uploadFiles({
-          id: Number(responseData.id),
-          files: newFiles.map((array) => array.file),
-        });
+      //intensiveId = responseData?.id; Нужно делать что то типо такого
 
-        if (responseError) {
-          toast('Ошибка при загрузке файлов', {
-            type: 'error',
-          });
-          return;
-        }
-      }
+      toast('Интенсив успешно создан', {
+        type: 'success',
+      });
+    }
 
-      if (responseData) {
+    if (responseData) {
+      // Загрузка файлов после успешного создания/обновления интенсива
+      const filesError = await uploadAllFiles(
+        Number(responseData.id || intensiveId)
+      );
+
+      if (filesError === 0) {
         setSuccessfulSaveModal({
           status: true,
-          intensiveId: Number(responseData.id),
+          intensiveId: Number(responseData.id || intensiveId),
         });
       }
     }
+  };
+
+  const uploadAllFiles = async (intensiveId: number) => {
+    let filesError = 0;
+
+    if (newFiles.length === 0) return filesError;
+
+    for (const newFile of newFiles) {
+      // Показываем уведомление загрузки
+      const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
+
+      const { error: responseError } = await uploadFiles({
+        id: Number(intensiveId),
+        files: newFile.file,
+      });
+
+      if (responseError) {
+        filesError++;
+        toast.update(toastId, {
+          render: `Ошибка загрузки: ${newFile.file.name}`,
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000,
+        });
+        continue; // Переход к следующему файлу
+      }
+
+      // Просто скрываем toast загрузки при успехе
+      toast.dismiss(toastId);
+    }
+
+    return filesError;
   };
 
   const handleFilesChange = async (fileList: FileList | null) => {
@@ -218,10 +230,13 @@ const ManageIntensiveForm: FC = () => {
 
       const uniqueFiles = getUniqueFiles(selectedFiles, newFiles);
 
-      console.log(uniqueFiles);
-      // Если какие-то файлы оказались дубликатами, можно уведомить пользователя
+      // Если какие-то файлы оказались дубликатами уведомляем
       if (uniqueFiles.length < selectedFiles.length) {
-        alert('Один или несколько файлов уже прикреплены');
+        toast.warning('Ошибка загрузки файла!', {
+          draggable: true, // Позволяет смахивать
+          closeOnClick: true, // Закрытие по нажатию
+          autoClose: 3000,
+        });
       }
 
       // Если нет новых файлов после фильтрации, выходим
