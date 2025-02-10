@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { userApi } from '../api/userApi';
 
-import { IUser } from '../../ts/interfaces/IUser';
+import { IUser, UserRole } from '../../ts/interfaces/IUser';
 
 interface UserState {
   data: IUser | null;
@@ -18,6 +18,14 @@ const userSlice = createSlice({
     reset: () => {
       return initialState;
     },
+    setCurrentRole: (state, action: PayloadAction<UserRole>) => {
+      if (state.data) {
+        state.data = {
+          ...state.data,
+          currentRole: action.payload,
+        };
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -29,5 +37,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { reset: resetUserState } = userSlice.actions;
+export const { reset: resetUserState, setCurrentRole } = userSlice.actions;
 export default userSlice.reducer;

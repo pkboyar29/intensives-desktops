@@ -150,12 +150,15 @@ const ManagerIntensiveOverviewPage: FC = () => {
                   <AttachedFileList
                     context={'intensives'}
                     contextId={currentIntensive.id}
-                    files={currentIntensive?.files} 
-                    onFileClick={(id:number) => console.log("clicked file id "+ id)} />
+                    files={currentIntensive?.files}
+                    onFileClick={(id: number) =>
+                      console.log('clicked file id ' + id)
+                    }
+                  />
                 </div>
               )}
 
-              {currentUser?.roleNames.includes('Организатор') && (
+              {currentUser?.roles.includes('Организатор') && (
                 <div className="flex items-center mt-10 text-lg font-bold gap-7">
                   <PrimaryButton
                     children="Редактировать"

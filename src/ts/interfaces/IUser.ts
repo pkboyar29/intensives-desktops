@@ -6,8 +6,16 @@ export interface IUser {
   lastName: string;
   patronymic: string;
   email: string;
-  roleNames: ('Студент' | 'Администратор' | 'Преподаватель' | 'Организатор')[];
+  roles: UserRole[];
+  currentRole: UserRole | null;
 }
+
+export type UserRole =
+  | 'Студент'
+  | 'Администратор'
+  | 'Преподаватель'
+  | 'Организатор'
+  | 'Наставник';
 
 export interface ISignIn {
   email: string;

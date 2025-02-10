@@ -56,7 +56,7 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (currentUser?.roleNames.includes('Организатор')) {
+      if (currentUser?.roles.includes('Организатор')) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -143,11 +143,11 @@ const IntensivesPage: FC = () => {
 
   // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roleNames.includes('Студент')) {
+    if (currentUser?.roles.includes('Студент')) {
       navigate(`/student/${id}/overview`);
-    } else if (currentUser?.roleNames.includes('Организатор')) {
+    } else if (currentUser?.roles.includes('Организатор')) {
       navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roleNames.includes('Преподаватель')) {
+    } else if (currentUser?.roles.includes('Преподаватель')) {
       localStorage.removeItem('tutorTeamId');
       navigate(`/teacher/${id}/overview`);
     }
@@ -159,7 +159,7 @@ const IntensivesPage: FC = () => {
         <Title text="Интенсивы" />
 
         <div className="mt-10">
-          {currentUser?.roleNames.includes('Организатор') && (
+          {currentUser?.roles.includes('Организатор') && (
             <div className="flex justify-end">
               <div className="ml-auto">
                 <PrimaryButton
@@ -183,7 +183,7 @@ const IntensivesPage: FC = () => {
 
         <div className="flex items-center justify-between gap-8 mt-5">
           <div className="flex gap-8">
-            {currentUser?.roleNames.includes('Организатор') && (
+            {currentUser?.roles.includes('Организатор') && (
               <Filter
                 onFilterOptionClick={(filterOption) =>
                   setOpenness(filterOption as 'all' | 'opened' | 'closed')
@@ -234,7 +234,7 @@ const IntensivesPage: FC = () => {
           ) : (
             <>
               {sortedIntensives.length !== 0 ? (
-                currentUser?.roleNames.includes('Организатор') ? (
+                currentUser?.roles.includes('Организатор') ? (
                   <Table
                     onClick={intensiveClickHandler}
                     columns={columns}

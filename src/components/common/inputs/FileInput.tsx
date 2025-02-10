@@ -5,15 +5,14 @@ interface FileInputProps {
 }
 
 const FileInput: FC<FileInputProps> = ({ onFilesChange }) => {
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files; // Получаем файлы из инпута
-    if(onFilesChange) {
+    if (onFilesChange) {
       onFilesChange(files); // Передаем файлы через колбэк
     }
 
     // Очищаем значение инпута, чтобы убрать названия загруженных файлов
-    event.target.value = "";
+    event.target.value = '';
   };
 
   return (
@@ -29,7 +28,7 @@ const FileInput: FC<FileInputProps> = ({ onFilesChange }) => {
           id="fileUpload"
           name="fileUpload"
           type="file"
-          accept='.docx, .pdf'
+          accept=".docx, .pdf"
           className="block text-sm cursor-pointer text-gray_3 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-bright_blue file:text-blue"
           multiple
           onChange={handleFileChange}

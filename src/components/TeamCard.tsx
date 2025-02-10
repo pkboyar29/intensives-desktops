@@ -35,7 +35,7 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
         </div>
 
         {currentUser &&
-          currentUser.roleNames.includes('Преподаватель') &&
+          currentUser.roles.includes('Преподаватель') &&
           currentUser.teacherId === team.tutor?.id && (
             <Tooltip
               tooltipText="Войти как тьютор"
