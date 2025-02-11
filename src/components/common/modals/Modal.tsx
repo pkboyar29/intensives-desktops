@@ -45,7 +45,7 @@ const Modal: FC<ModalProps> = ({ children, title, onCloseModal }) => {
     <div
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-modal_eclipse"
+      className="fixed top-0 left-0 z-[200] flex items-center justify-center w-full h-full bg-modal_eclipse"
     >
       <div
         ref={modalRef}

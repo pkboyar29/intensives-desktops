@@ -5,14 +5,18 @@ import Cookies from 'js-cookie';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
+import UserIcon from '../components/icons/UserIcon';
 
 import { ISignIn, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppSelector } from '../redux/store';
+import { useAppSelector, useAppDispatch } from '../redux/store';
 import { setCurrentRole } from '../redux/slices/userSlice';
 
 const SignInPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
   const currentUser = useAppSelector((state) => state.user.data);
@@ -20,8 +24,6 @@ const SignInPage: FC = () => {
   const [rolesToChoose, setRolesToChoose] = useState<UserRole[]>([]);
   const [chosenRole, setChosenRole] = useState<UserRole | null>(null);
   const [roleError, setRoleError] = useState<boolean>(false);
-
-  const navigate = useNavigate();
 
   const {
     handleSubmit,
@@ -75,7 +77,7 @@ const SignInPage: FC = () => {
       return;
     }
 
-    setCurrentRole(chosenRole);
+    dispatch(setCurrentRole(chosenRole));
     localStorage.setItem('currentRole', chosenRole);
 
     if (chosenRole === 'Администратор') {
@@ -98,14 +100,18 @@ const SignInPage: FC = () => {
               <div className="flex flex-wrap justify-center gap-4">
                 {rolesToChoose.map((roleToChoose, index) => (
                   <div
-                    className={`select-none flex items-center justify-center text-lg transition duration-300 ease-in-out rounded-lg cursor-pointer w-36 h-36 hover:text-white bg-another_white hover:bg-blue ${
+                    className={`group select-none flex flex-col gap-4 items-center justify-center text-lg transition duration-300 ease-in-out rounded-lg cursor-pointer w-36 h-36 hover:text-white bg-another_white hover:bg-blue ${
                       roleToChoose === chosenRole &&
                       `border-solid border-2 border-blue`
                     }`}
                     key={index}
                     onClick={() => onRoleClick(roleToChoose)}
                   >
-                    {roleToChoose}
+                    <UserIcon
+                      className="w-10 h-10"
+                      pathClassName="transition duration-300 ease-in-out fill-black group-hover:fill-white"
+                    />
+                    <div>{roleToChoose}</div>
                   </div>
                 ))}
               </div>
