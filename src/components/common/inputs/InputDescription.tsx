@@ -31,6 +31,7 @@ const InputDescription: FC<InputDescriptionProps> = ({
           type={type ? type : 'text'}
           placeholder={placeholder}
           {...register(fieldName, registerOptions)}
+          autoComplete={type === 'password' ? 'current-password' : ''}
           className="p-2.5 rounded-[10px] bg-another_white text-bright_gray"
         />
       ) : (

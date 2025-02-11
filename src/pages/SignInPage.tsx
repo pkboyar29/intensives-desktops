@@ -1,22 +1,29 @@
-import { FC, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
+import UserIcon from '../components/icons/UserIcon';
 
-import { ISignIn } from '../ts/interfaces/IUser';
+import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppSelector } from '../redux/store';
+import { useAppDispatch } from '../redux/store';
+import { setCurrentUser } from '../redux/slices/userSlice';
 
 const SignInPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
-  const currentUser = useAppSelector((state) => state.user.data);
 
-  const navigate = useNavigate();
+  const [localCurrentUser, setLocalCurrentUser] = useState<IUser | null>(null);
+  const [rolesToChoose, setRolesToChoose] = useState<UserRole[]>([]);
+  const [chosenRole, setChosenRole] = useState<UserRole | null>(null);
+  const [roleError, setRoleError] = useState<boolean>(false);
 
   const {
     handleSubmit,
@@ -28,75 +35,163 @@ const SignInPage: FC = () => {
   });
 
   useEffect(() => {
-    if (currentUser) {
-      navigate('/intensives');
+    if (localCurrentUser) {
+      if (localCurrentUser.roles.includes('Студент')) {
+        setRolesToChoose([...localCurrentUser.roles, 'Наставник']);
+      } else {
+        if (localCurrentUser.roles.length === 1) {
+          setCurrentRoleEverywhere(localCurrentUser.roles[0]);
+          redirectAccordingToRole(localCurrentUser.roles[0]);
+        } else {
+          setRolesToChoose(localCurrentUser.roles);
+        }
+      }
     }
-  }, [currentUser]);
+  }, [localCurrentUser]);
 
   const onSubmit = async (data: ISignIn) => {
-      const {data: responseData, error: responseError } = await signIn(data);
+    const { data: responseData, error: responseError } = await signIn(data);
 
-      if (responseData) {
-        Cookies.set('access', responseData.access, {
-          expires: 1,
-        });
-        Cookies.set('refresh', responseData.refresh, {
-          expires: 15,
-        });
-  
-        getUserInfo();  
-      }
+    if (responseData) {
+      Cookies.set('access', responseData.access, {
+        expires: 1,
+      });
+      Cookies.set('refresh', responseData.refresh, {
+        expires: 15,
+      });
 
-      if (responseError) {
-        setError('password', {
-          type: 'custom',
-          message: 'Email или пароль неверны!',
-        });
+      const { data: userData } = await getUserInfo();
+      if (userData) {
+        setLocalCurrentUser(userData);
       }
+    }
+
+    if (responseError) {
+      setError('password', {
+        type: 'custom',
+        message: 'Email или пароль неверны!',
+      });
+    }
+  };
+
+  const onRoleClick = (role: UserRole) => {
+    setChosenRole(role);
+    if (roleError === true) {
+      setRoleError(false);
+    }
+  };
+
+  const onContinueButtonClick = () => {
+    if (chosenRole === null) {
+      setRoleError(true);
+      return;
+    }
+    setCurrentRoleEverywhere(chosenRole);
+    redirectAccordingToRole(chosenRole);
+  };
+
+  const setCurrentRoleEverywhere = (role: UserRole) => {
+    if (localCurrentUser) {
+      dispatch(
+        setCurrentUser({
+          ...localCurrentUser,
+          currentRole: role,
+        })
+      );
+      localStorage.setItem('currentRole', role);
+    }
+  };
+
+  const redirectAccordingToRole = (role: UserRole) => {
+    if (role === 'Администратор') {
+      navigate('/admin');
+    } else {
+      navigate('/intensives');
+    }
   };
 
   return (
     <>
       <div className="flex justify-center mt-20">
-        <div className="flex flex-col">
-          <div className="py-3 text-[28px] font-bold">Авторизация</div>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 w-[480px] mt-3"
-          >
-            <InputDescription
-              register={register}
-              registerOptions={{
-                required: 'Поле обязательно для заполнения',
-              }}
-              fieldName="email"
-              placeholder="Введите email"
-              description="Email"
-              errorMessage={
-                typeof errors.email?.message === 'string'
-                  ? errors.email.message
-                  : ''
-              }
-            />
+        <div className="flex flex-col gap-6 w-[480px]">
+          {rolesToChoose.length > 0 ? (
+            <>
+              <div className="mx-auto text-[28px] font-bold">
+                Выбор роли пользователя
+              </div>
 
-            <InputDescription
-              register={register}
-              registerOptions={{
-                required: 'Поле обязательно для заполнения',
-              }}
-              fieldName="password"
-              placeholder="Введите пароль"
-              description="Пароль"
-              type="password"
-              errorMessage={
-                typeof errors.password?.message === 'string'
-                  ? errors.password.message
-                  : ''
-              }
-            />
+              <div className="flex flex-wrap justify-center gap-4">
+                {rolesToChoose.map((roleToChoose, index) => (
+                  <div
+                    className={`group select-none flex flex-col gap-4 items-center justify-center text-lg transition duration-300 ease-in-out rounded-lg cursor-pointer w-36 h-36 hover:text-white bg-another_white hover:bg-blue ${
+                      roleToChoose === chosenRole &&
+                      `border-solid border-2 border-blue`
+                    }`}
+                    key={index}
+                    onClick={() => onRoleClick(roleToChoose)}
+                  >
+                    <UserIcon
+                      className="w-10 h-10"
+                      pathClassName="transition duration-300 ease-in-out fill-black group-hover:fill-white"
+                    />
+                    <div>{roleToChoose}</div>
+                  </div>
+                ))}
+              </div>
 
-            <PrimaryButton children="Войти в систему" type="submit" />
-          </form>
+              {roleError && (
+                <div className="mx-auto text-base text-red">
+                  Необходимо выбрать роль
+                </div>
+              )}
+
+              <PrimaryButton
+                children="Продолжить"
+                onClick={onContinueButtonClick}
+              />
+            </>
+          ) : (
+            <>
+              <div className="mx-auto text-[28px] font-bold">Авторизация</div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="flex flex-col gap-4"
+              >
+                <InputDescription
+                  register={register}
+                  registerOptions={{
+                    required: 'Поле обязательно для заполнения',
+                  }}
+                  fieldName="email"
+                  placeholder="Введите email"
+                  description="Email"
+                  errorMessage={
+                    typeof errors.email?.message === 'string'
+                      ? errors.email.message
+                      : ''
+                  }
+                />
+
+                <InputDescription
+                  register={register}
+                  registerOptions={{
+                    required: 'Поле обязательно для заполнения',
+                  }}
+                  fieldName="password"
+                  placeholder="Введите пароль"
+                  description="Пароль"
+                  type="password"
+                  errorMessage={
+                    typeof errors.password?.message === 'string'
+                      ? errors.password.message
+                      : ''
+                  }
+                />
+
+                <PrimaryButton children="Войти в систему" type="submit" />
+              </form>
+            </>
+          )}
         </div>
       </div>
     </>

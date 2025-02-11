@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { userApi } from '../api/userApi';
 
-import { IUser } from '../../ts/interfaces/IUser';
+import { IUser, UserRole } from '../../ts/interfaces/IUser';
 
 interface UserState {
   data: IUser | null;
@@ -18,16 +18,32 @@ const userSlice = createSlice({
     reset: () => {
       return initialState;
     },
-  },
-  extraReducers: (builder) => {
-    builder.addMatcher(
-      userApi.endpoints.getUser.matchFulfilled,
-      (state, { payload }) => {
-        state.data = payload;
+    // TODO: delete?
+    setCurrentRole: (state, action: PayloadAction<UserRole>) => {
+      if (state.data) {
+        state.data = {
+          ...state.data,
+          currentRole: action.payload,
+        };
       }
-    );
+    },
+    setCurrentUser: (state, action: PayloadAction<IUser>) => {
+      state.data = action.payload;
+    },
   },
+  // extraReducers: (builder) => {
+  //   builder.addMatcher(
+  //     userApi.endpoints.getUser.matchFulfilled,
+  //     (state, { payload }) => {
+  //       state.data = payload;
+  //     }
+  //   );
+  // },
 });
 
-export const { reset: resetUserState } = userSlice.actions;
+export const {
+  reset: resetUserState,
+  setCurrentRole,
+  setCurrentUser,
+} = userSlice.actions;
 export default userSlice.reducer;

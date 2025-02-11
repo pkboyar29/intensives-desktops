@@ -22,12 +22,18 @@ import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
 import AddTestPage from '../pages/AddTestPage';
+import AdminPage from '../pages/AdminPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
 };
 
 const routeConfig: RouteType[] = [
+  {
+    path: '/admin',
+    element: <AdminPage />,
+    requiredAuth: false,
+  },
   {
     path: '/teacher/:intensiveId',
     element: <TeacherMainPage />,
