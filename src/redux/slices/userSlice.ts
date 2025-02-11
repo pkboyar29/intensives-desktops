@@ -18,6 +18,7 @@ const userSlice = createSlice({
     reset: () => {
       return initialState;
     },
+    // TODO: delete?
     setCurrentRole: (state, action: PayloadAction<UserRole>) => {
       if (state.data) {
         state.data = {
@@ -26,16 +27,23 @@ const userSlice = createSlice({
         };
       }
     },
+    setCurrentUser: (state, action: PayloadAction<IUser>) => {
+      state.data = action.payload;
+    },
   },
-  extraReducers: (builder) => {
-    builder.addMatcher(
-      userApi.endpoints.getUser.matchFulfilled,
-      (state, { payload }) => {
-        state.data = payload;
-      }
-    );
-  },
+  // extraReducers: (builder) => {
+  //   builder.addMatcher(
+  //     userApi.endpoints.getUser.matchFulfilled,
+  //     (state, { payload }) => {
+  //       state.data = payload;
+  //     }
+  //   );
+  // },
 });
 
-export const { reset: resetUserState, setCurrentRole } = userSlice.actions;
+export const {
+  reset: resetUserState,
+  setCurrentRole,
+  setCurrentUser,
+} = userSlice.actions;
 export default userSlice.reducer;

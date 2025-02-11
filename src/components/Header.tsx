@@ -42,7 +42,7 @@ const Header: FC = () => {
   }, [isOpen]);
 
   const logOut = () => {
-    // TODO: убирать из local storage currentRole?
+    localStorage.removeItem('currentRole');
     Cookies.remove('access');
     Cookies.remove('refresh');
 
@@ -80,7 +80,11 @@ const Header: FC = () => {
         </Modal>
       )}
 
-      <header className="sticky top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray">
+      <header
+        className={`${
+          currentUser && currentUser.currentRole ? `sticky` : `hidden`
+        } top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
+      >
         <div className="container relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

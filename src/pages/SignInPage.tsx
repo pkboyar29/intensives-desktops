@@ -7,11 +7,11 @@ import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
 import UserIcon from '../components/icons/UserIcon';
 
-import { ISignIn, UserRole } from '../ts/interfaces/IUser';
+import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppSelector, useAppDispatch } from '../redux/store';
-import { setCurrentRole } from '../redux/slices/userSlice';
+import { useAppDispatch } from '../redux/store';
+import { setCurrentUser } from '../redux/slices/userSlice';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -19,8 +19,8 @@ const SignInPage: FC = () => {
 
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
-  const currentUser = useAppSelector((state) => state.user.data);
 
+  const [localCurrentUser, setLocalCurrentUser] = useState<IUser | null>(null);
   const [rolesToChoose, setRolesToChoose] = useState<UserRole[]>([]);
   const [chosenRole, setChosenRole] = useState<UserRole | null>(null);
   const [roleError, setRoleError] = useState<boolean>(false);
@@ -35,14 +35,19 @@ const SignInPage: FC = () => {
   });
 
   useEffect(() => {
-    if (currentUser) {
-      if (currentUser.roles.includes('Студент')) {
-        setRolesToChoose([...currentUser.roles, 'Наставник']);
+    if (localCurrentUser) {
+      if (localCurrentUser.roles.includes('Студент')) {
+        setRolesToChoose([...localCurrentUser.roles, 'Наставник']);
       } else {
-        setRolesToChoose(currentUser.roles);
+        if (localCurrentUser.roles.length === 1) {
+          setCurrentRoleEverywhere(localCurrentUser.roles[0]);
+          redirectAccordingToRole(localCurrentUser.roles[0]);
+        } else {
+          setRolesToChoose(localCurrentUser.roles);
+        }
       }
     }
-  }, [currentUser]);
+  }, [localCurrentUser]);
 
   const onSubmit = async (data: ISignIn) => {
     const { data: responseData, error: responseError } = await signIn(data);
@@ -55,7 +60,10 @@ const SignInPage: FC = () => {
         expires: 15,
       });
 
-      getUserInfo();
+      const { data: userData } = await getUserInfo();
+      if (userData) {
+        setLocalCurrentUser(userData);
+      }
     }
 
     if (responseError) {
@@ -68,7 +76,9 @@ const SignInPage: FC = () => {
 
   const onRoleClick = (role: UserRole) => {
     setChosenRole(role);
-    setRoleError(false);
+    if (roleError === true) {
+      setRoleError(false);
+    }
   };
 
   const onContinueButtonClick = () => {
@@ -76,11 +86,24 @@ const SignInPage: FC = () => {
       setRoleError(true);
       return;
     }
+    setCurrentRoleEverywhere(chosenRole);
+    redirectAccordingToRole(chosenRole);
+  };
 
-    dispatch(setCurrentRole(chosenRole));
-    localStorage.setItem('currentRole', chosenRole);
+  const setCurrentRoleEverywhere = (role: UserRole) => {
+    if (localCurrentUser) {
+      dispatch(
+        setCurrentUser({
+          ...localCurrentUser,
+          currentRole: role,
+        })
+      );
+      localStorage.setItem('currentRole', role);
+    }
+  };
 
-    if (chosenRole === 'Администратор') {
+  const redirectAccordingToRole = (role: UserRole) => {
+    if (role === 'Администратор') {
       navigate('/admin');
     } else {
       navigate('/intensives');

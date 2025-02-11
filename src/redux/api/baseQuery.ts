@@ -53,9 +53,11 @@ export const baseQueryWithReauth: BaseQueryFn<
     } else {
       console.log('refresh token is invalid, logout');
 
+      localStorage.removeItem('currentRole');
       Cookies.remove('access');
       Cookies.remove('refresh');
 
+      // TODO: delete this weird code
       if (window.location.pathname === '/addTest') {
         console.log('hi');
       } else {
