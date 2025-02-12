@@ -20,15 +20,20 @@ const App: FC = () => {
   useEffect(() => {
     const fetchCurrentUserInfo = async () => {
       if (requiredAuth) {
-        const { data: currentUser } = await getUser();
+        const { data: userData } = await getUser();
 
-        // TODO: валидация currentRole (его спокойно могут изменить или стереть или убрать весь local storage item)
-        // , иначе отображать окно с выбором роли, чтобы снова заполнить currentRole
+        // TODO: валидация currentRole (его спокойно могут изменить или стереть или убрать весь local storage item),
+        // иначе отображать окно с выбором роли, чтобы снова заполнить currentRole
         const currentRole = localStorage.getItem('currentRole');
-        if (currentUser && currentRole) {
+        if (userData && currentRole) {
+          const updatedRoles: UserRole[] = userData.roles.includes('Студент')
+            ? [...userData.roles, 'Наставник']
+            : userData.roles;
+
           dispatch(
             setCurrentUser({
-              ...currentUser,
+              ...userData,
+              roles: updatedRoles,
               currentRole: currentRole as UserRole,
             })
           );

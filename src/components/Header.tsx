@@ -1,7 +1,7 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
-import { resetUserState } from '../redux/slices/userSlice';
+import { resetUserState, setCurrentRole } from '../redux/slices/userSlice';
 import { resetIntensiveState } from '../redux/slices/intensiveSlice';
 import { resetTeamState } from '../redux/slices/teamSlice';
 
@@ -12,11 +12,18 @@ import SettingsIcon from './icons/SettingsIcon';
 import LogoutIcon from './icons/LogoutIcon';
 
 import Cookies from 'js-cookie';
+import { UserRole } from '../ts/interfaces/IUser';
+import { redirectByRole } from '../helpers/urlHelpers';
 
 const Header: FC = () => {
   const navigate = useNavigate();
   const [logOutModal, setLogOutModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [changeRoleModal, setChangeRoleModal] = useState<{
+    status: boolean;
+    role: UserRole | null;
+  }>({ status: false, role: null });
 
   const currentUser = useAppSelector((state) => state.user.data);
   const dispatch = useAppDispatch();
@@ -55,6 +62,16 @@ const Header: FC = () => {
     navigate('/sign-in');
   };
 
+  const changeRole = (role: UserRole) => {
+    dispatch(setCurrentRole(role));
+    localStorage.setItem('currentRole', role);
+    redirectByRole(role);
+  };
+
+  const disableChangeRoleModal = () => {
+    setChangeRoleModal({ status: false, role: null });
+  };
+
   return (
     <>
       {logOutModal && (
@@ -75,6 +92,42 @@ const Header: FC = () => {
             </div>
             <div>
               <PrimaryButton clickHandler={logOut} children="Выйти" />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {changeRoleModal.status && (
+        <Modal
+          title="Смена роли пользователя"
+          onCloseModal={disableChangeRoleModal}
+        >
+          <p className="text-lg text-bright_gray">
+            Текущая роль:{' '}
+            <span className="font-bold text-black">
+              {currentUser?.currentRole}
+            </span>
+            . Роль будет сменена на:{' '}
+            <span className="font-bold text-black">{changeRoleModal.role}</span>
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={disableChangeRoleModal}
+                children="Отмена"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  if (changeRoleModal.role) {
+                    changeRole(changeRoleModal.role);
+                  }
+                  disableChangeRoleModal();
+                }}
+                children="Сменить роль"
+              />
             </div>
           </div>
         </Modal>
@@ -121,6 +174,14 @@ const Header: FC = () => {
                           className={`font-bold cursor-pointer transition duration-300 ease-in-out hover:text-blue ${
                             currentUser.currentRole === role && 'text-blue'
                           }`}
+                          onClick={() => {
+                            if (currentUser.currentRole !== role) {
+                              if (isOpen) {
+                                setIsOpen(false);
+                              }
+                              setChangeRoleModal({ status: true, role });
+                            }
+                          }}
                         >
                           {role}
                         </div>

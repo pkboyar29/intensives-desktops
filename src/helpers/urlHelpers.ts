@@ -1,3 +1,5 @@
+import { UserRole } from '../ts/interfaces/IUser';
+
 const replaceLastURLSegment = (segment: string): string => {
   const pathSegments = location.pathname.split('/');
   pathSegments.pop();
@@ -6,4 +8,8 @@ const replaceLastURLSegment = (segment: string): string => {
   return newPath;
 };
 
-export { replaceLastURLSegment };
+const redirectByRole = (role: UserRole) => {
+  window.location.assign(role === 'Администратор' ? '/admin' : '/intensives');
+};
+
+export { replaceLastURLSegment, redirectByRole };

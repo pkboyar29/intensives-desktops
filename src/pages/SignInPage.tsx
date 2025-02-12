@@ -1,17 +1,18 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
-import UserIcon from '../components/icons/UserIcon';
+import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 
 import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
 import { useAppDispatch } from '../redux/store';
 import { setCurrentUser } from '../redux/slices/userSlice';
+import { redirectByRole } from '../helpers/urlHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -20,10 +21,7 @@ const SignInPage: FC = () => {
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
 
-  const [localCurrentUser, setLocalCurrentUser] = useState<IUser | null>(null);
-  const [rolesToChoose, setRolesToChoose] = useState<UserRole[]>([]);
-  const [chosenRole, setChosenRole] = useState<UserRole | null>(null);
-  const [roleError, setRoleError] = useState<boolean>(false);
+  const [tempUser, setTempUser] = useState<IUser | null>(null);
 
   const {
     handleSubmit,
@@ -33,21 +31,6 @@ const SignInPage: FC = () => {
   } = useForm<ISignIn>({
     mode: 'onBlur',
   });
-
-  useEffect(() => {
-    if (localCurrentUser) {
-      if (localCurrentUser.roles.includes('Студент')) {
-        setRolesToChoose([...localCurrentUser.roles, 'Наставник']);
-      } else {
-        if (localCurrentUser.roles.length === 1) {
-          setCurrentRoleEverywhere(localCurrentUser.roles[0]);
-          redirectAccordingToRole(localCurrentUser.roles[0]);
-        } else {
-          setRolesToChoose(localCurrentUser.roles);
-        }
-      }
-    }
-  }, [localCurrentUser]);
 
   const onSubmit = async (data: ISignIn) => {
     const { data: responseData, error: responseError } = await signIn(data);
@@ -62,7 +45,25 @@ const SignInPage: FC = () => {
 
       const { data: userData } = await getUserInfo();
       if (userData) {
-        setLocalCurrentUser(userData);
+        const updatedRoles: UserRole[] = userData.roles.includes('Студент')
+          ? [...userData.roles, 'Наставник']
+          : userData.roles;
+
+        if (
+          updatedRoles.length === 1 ||
+          (updatedRoles.includes('Студент') && updatedRoles.length === 2)
+        ) {
+          setUserWithCurrentRole(
+            { ...userData, roles: updatedRoles },
+            userData.roles[0]
+          );
+          redirectByRole(userData.roles[0]);
+        } else {
+          setTempUser({
+            ...userData,
+            roles: updatedRoles,
+          });
+        }
       }
     }
 
@@ -74,80 +75,36 @@ const SignInPage: FC = () => {
     }
   };
 
-  const onRoleClick = (role: UserRole) => {
-    setChosenRole(role);
-    if (roleError === true) {
-      setRoleError(false);
+  const onContinueButtonClick = (role: UserRole) => {
+    if (tempUser) {
+      setUserWithCurrentRole(tempUser, role);
+      redirectByRole(role);
     }
   };
 
-  const onContinueButtonClick = () => {
-    if (chosenRole === null) {
-      setRoleError(true);
-      return;
-    }
-    setCurrentRoleEverywhere(chosenRole);
-    redirectAccordingToRole(chosenRole);
-  };
-
-  const setCurrentRoleEverywhere = (role: UserRole) => {
-    if (localCurrentUser) {
-      dispatch(
-        setCurrentUser({
-          ...localCurrentUser,
-          currentRole: role,
-        })
-      );
-      localStorage.setItem('currentRole', role);
-    }
-  };
-
-  const redirectAccordingToRole = (role: UserRole) => {
-    if (role === 'Администратор') {
-      navigate('/admin');
-    } else {
-      navigate('/intensives');
-    }
+  const setUserWithCurrentRole = (tempUser: IUser, currentRole: UserRole) => {
+    dispatch(
+      setCurrentUser({
+        ...tempUser,
+        currentRole: currentRole,
+      })
+    );
+    localStorage.setItem('currentRole', currentRole);
   };
 
   return (
     <>
       <div className="flex justify-center mt-20">
         <div className="flex flex-col gap-6 w-[480px]">
-          {rolesToChoose.length > 0 ? (
+          {tempUser ? (
             <>
               <div className="mx-auto text-[28px] font-bold">
                 Выбор роли пользователя
               </div>
 
-              <div className="flex flex-wrap justify-center gap-4">
-                {rolesToChoose.map((roleToChoose, index) => (
-                  <div
-                    className={`group select-none flex flex-col gap-4 items-center justify-center text-lg transition duration-300 ease-in-out rounded-lg cursor-pointer w-36 h-36 hover:text-white bg-another_white hover:bg-blue ${
-                      roleToChoose === chosenRole &&
-                      `border-solid border-2 border-blue`
-                    }`}
-                    key={index}
-                    onClick={() => onRoleClick(roleToChoose)}
-                  >
-                    <UserIcon
-                      className="w-10 h-10"
-                      pathClassName="transition duration-300 ease-in-out fill-black group-hover:fill-white"
-                    />
-                    <div>{roleToChoose}</div>
-                  </div>
-                ))}
-              </div>
-
-              {roleError && (
-                <div className="mx-auto text-base text-red">
-                  Необходимо выбрать роль
-                </div>
-              )}
-
-              <PrimaryButton
-                children="Продолжить"
-                onClick={onContinueButtonClick}
+              <ChoosingRoleComponent
+                rolesToChoose={tempUser.roles}
+                onContinueButtonClick={onContinueButtonClick}
               />
             </>
           ) : (
