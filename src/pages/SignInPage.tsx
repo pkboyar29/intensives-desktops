@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
+import { motion } from 'framer-motion';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -16,7 +16,6 @@ import { redirectByRole } from '../helpers/urlHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
@@ -95,9 +94,15 @@ const SignInPage: FC = () => {
   return (
     <>
       <div className="flex justify-center mt-20">
-        <div className="flex flex-col gap-6 w-[480px]">
+        <div className="w-[480px]">
           {tempUser ? (
-            <>
+            <motion.div
+              className="flex flex-col gap-6"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
               <div className="mx-auto text-[28px] font-bold">
                 Выбор роли пользователя
               </div>
@@ -106,9 +111,9 @@ const SignInPage: FC = () => {
                 rolesToChoose={tempUser.roles}
                 onContinueButtonClick={onContinueButtonClick}
               />
-            </>
+            </motion.div>
           ) : (
-            <>
+            <div className="flex flex-col gap-6">
               <div className="mx-auto text-[28px] font-bold">Авторизация</div>
               <form
                 onSubmit={handleSubmit(onSubmit)}
@@ -147,7 +152,7 @@ const SignInPage: FC = () => {
 
                 <PrimaryButton children="Войти в систему" type="submit" />
               </form>
-            </>
+            </div>
           )}
         </div>
       </div>
