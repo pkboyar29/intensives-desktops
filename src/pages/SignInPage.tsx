@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
@@ -10,12 +10,13 @@ import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppDispatch } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
 import { setCurrentUser } from '../redux/slices/userSlice';
 import { redirectByRole } from '../helpers/urlHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.user.data);
 
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
@@ -30,6 +31,12 @@ const SignInPage: FC = () => {
   } = useForm<ISignIn>({
     mode: 'onBlur',
   });
+
+  useEffect(() => {
+    if (currentUser && currentUser.currentRole) {
+      redirectByRole(currentUser.currentRole);
+    }
+  }, [currentUser]);
 
   const onSubmit = async (data: ISignIn) => {
     const { data: responseData, error: responseError } = await signIn(data);
@@ -56,7 +63,6 @@ const SignInPage: FC = () => {
             { ...userData, roles: updatedRoles },
             userData.roles[0]
           );
-          redirectByRole(userData.roles[0]);
         } else {
           setTempUser({
             ...userData,
@@ -77,7 +83,6 @@ const SignInPage: FC = () => {
   const onContinueButtonClick = (role: UserRole) => {
     if (tempUser) {
       setUserWithCurrentRole(tempUser, role);
-      redirectByRole(role);
     }
   };
 

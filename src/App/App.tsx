@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 import { IUser, UserRole } from '../ts/interfaces/IUser';
 import { useLazyGetUserQuery } from '../redux/api/userApi';
@@ -18,8 +19,8 @@ const App: FC = () => {
   const dispatch = useAppDispatch();
 
   const location = useLocation();
-  const nonRequiredAuthRoutes = ['/sign-in', '/not-found'];
-  const requiredAuth = !nonRequiredAuthRoutes.includes(location.pathname);
+  const publicRoutes = ['/sign-in'];
+  const requiredAuth = !publicRoutes.includes(location.pathname);
 
   const [chooseRoleModal, setChooseRoleModal] = useState<{
     status: boolean;
@@ -27,46 +28,50 @@ const App: FC = () => {
   }>({ status: false, tempUser: null });
 
   useEffect(() => {
-    const fetchCurrentUserInfo = async () => {
-      if (requiredAuth) {
-        const { data: userData } = await getUser();
-
-        const currentRole = localStorage.getItem('currentRole');
-        if (userData) {
-          const userRoles: UserRole[] = userData.roles.includes('Студент')
-            ? [...userData.roles, 'Наставник']
-            : userData.roles;
-
-          const validUserRoles: UserRole[] = [
-            'Администратор',
-            'Организатор',
-            'Преподаватель',
-            'Студент',
-            'Наставник',
-          ];
-          if (currentRole && validUserRoles.includes(currentRole as UserRole)) {
-            dispatch(
-              setCurrentUser({
-                ...userData,
-                roles: userRoles,
-                currentRole: currentRole as UserRole,
-              })
-            );
-          } else {
-            setChooseRoleModal({
-              status: true,
-              tempUser: {
-                ...userData,
-                roles: userRoles,
-              },
-            });
-          }
-        }
+    if (requiredAuth) {
+      fetchCurrentUserInfo();
+    } else {
+      if (Cookies.get('refresh')) {
+        fetchCurrentUserInfo();
       }
-    };
-
-    fetchCurrentUserInfo();
+    }
   }, []);
+
+  const fetchCurrentUserInfo = async () => {
+    const { data: userData } = await getUser();
+
+    const currentRole = localStorage.getItem('currentRole');
+    if (userData) {
+      const userRoles: UserRole[] = userData.roles.includes('Студент')
+        ? [...userData.roles, 'Наставник']
+        : userData.roles;
+
+      const validUserRoles: UserRole[] = [
+        'Администратор',
+        'Организатор',
+        'Преподаватель',
+        'Студент',
+        'Наставник',
+      ];
+      if (currentRole && validUserRoles.includes(currentRole as UserRole)) {
+        dispatch(
+          setCurrentUser({
+            ...userData,
+            roles: userRoles,
+            currentRole: currentRole as UserRole,
+          })
+        );
+      } else {
+        setChooseRoleModal({
+          status: true,
+          tempUser: {
+            ...userData,
+            roles: userRoles,
+          },
+        });
+      }
+    }
+  };
 
   const disableChooseRoleModal = () => {
     setChooseRoleModal({ status: false, tempUser: null });
