@@ -59,7 +59,7 @@ const Header: FC = () => {
 
     setLogOutModal(false);
 
-    navigate('/sign-in');
+    navigate('/sign-in', { replace: true });
   };
 
   const changeRole = (role: UserRole) => {
@@ -138,16 +138,16 @@ const Header: FC = () => {
           currentUser && currentUser.currentRole ? `sticky` : `hidden`
         } top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
       >
-        <div className="container relative">
+        <div className="container md:relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="font-sans text-2xl font-bold">LOGO</div>
-              <div className="font-sans text-base">
+              <div className="hidden font-sans text-base md:block">
                 Костромской государственный университет
               </div>
             </div>
             {currentUser && (
-              <div className="relative">
+              <div>
                 <button
                   onClick={() => setIsOpen((isOpen) => !isOpen)}
                   className="p-4 transition duration-300 ease-in-out rounded-xl bg-another_white hover:bg-black_gray"
@@ -157,21 +157,21 @@ const Header: FC = () => {
 
                 <div
                   ref={menuRef}
-                  className={`absolute z-50 w-52 top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
+                  className={`absolute z-50 w-full md:w-80 top-15 md:top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
                     isOpen ? 'block' : 'hidden'
                   }`}
                 >
                   <div className="flex flex-col items-start gap-2">
-                    <div className="text-base font-bold">{`${currentUser.firstName} ${currentUser.lastName} ${currentUser.patronymic}`}</div>
+                    <div className="text-base font-bold md:text-lg">{`${currentUser.firstName} ${currentUser.lastName} ${currentUser.patronymic}`}</div>
 
                     <div className="w-full border-b border-solid border-black_gray"></div>
 
-                    <div className="text-lg">Доступные роли</div>
+                    <div className="text-lg md:text-xl">Доступные роли</div>
                     <div className="flex flex-col w-full gap-4">
                       {currentUser.roles.map((role, index) => (
                         <div
                           key={index}
-                          className={`font-bold cursor-pointer transition duration-300 ease-in-out hover:text-blue ${
+                          className={`md:text-lg text-base font-bold cursor-pointer transition duration-300 ease-in-out hover:text-blue ${
                             currentUser.currentRole === role && 'text-blue'
                           }`}
                           onClick={() => {
