@@ -134,9 +134,7 @@ const Header: FC = () => {
       )}
 
       <header
-        className={`${
-          currentUser && currentUser.currentRole ? `sticky` : `hidden`
-        } top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
+        className={`sticky top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
       >
         <div className="container md:relative">
           <div className="flex items-center justify-between">

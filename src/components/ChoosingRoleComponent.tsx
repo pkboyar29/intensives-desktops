@@ -25,7 +25,7 @@ const ChoosingRoleComponent: FC<ChoosingRoleComponentProps> = ({
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <div className="flex flex-wrap justify-center gap-4">
         {rolesToChoose.map((roleToChoose, index) => (
           <div
@@ -61,7 +61,7 @@ const ChoosingRoleComponent: FC<ChoosingRoleComponentProps> = ({
           onContinueButtonClick(chosenRole);
         }}
       />
-    </>
+    </div>
   );
 };
 

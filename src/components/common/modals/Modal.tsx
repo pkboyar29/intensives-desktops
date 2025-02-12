@@ -6,9 +6,15 @@ interface ModalProps {
   children: ReactNode;
   title: ReactNode;
   onCloseModal: () => void;
+  shouldHaveCrossIcon?: boolean;
 }
 
-const Modal: FC<ModalProps> = ({ children, title, onCloseModal }) => {
+const Modal: FC<ModalProps> = ({
+  children,
+  title,
+  onCloseModal,
+  shouldHaveCrossIcon = true,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const isMouseDownInside = useRef<boolean>(false);
 
@@ -53,9 +59,11 @@ const Modal: FC<ModalProps> = ({ children, title, onCloseModal }) => {
       >
         <div className="flex items-center justify-between mb-5">
           <div className="text-xl font-bold">{title}</div>
-          <button onClick={onCloseModal}>
-            <CrossIcon />
-          </button>
+          {shouldHaveCrossIcon && (
+            <button onClick={onCloseModal}>
+              <CrossIcon />
+            </button>
+          )}
         </div>
         {children}
       </div>

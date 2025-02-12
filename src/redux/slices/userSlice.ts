@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { userApi } from '../api/userApi';
 
 import { IUser, UserRole } from '../../ts/interfaces/IUser';
 
