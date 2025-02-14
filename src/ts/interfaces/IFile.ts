@@ -11,8 +11,12 @@ export interface IDownloadFile {
   fileId: number;
 }
 
-export interface IUploadFile {
+export interface IUploadFileContext {
   context: string;
+  contextId: number;
+  files: File[];
+}
+export interface IUploadFile {
   contextId: number;
   files: File[];
 }

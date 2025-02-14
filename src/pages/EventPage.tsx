@@ -239,6 +239,9 @@ const EventPage: FC = () => {
                     </div>
                   </div>
                 )}
+                {currentUser?.roles.find(
+                  (roleName) => roleName === 'Студент'
+                ) && <div>Студент</div>}
               </>
             )
           )}

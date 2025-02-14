@@ -1,7 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { IFile, IDownloadFile, IUploadFile } from '../../ts/interfaces/IFile';
+import {
+  IFile,
+  IDownloadFile,
+  IUploadFile,
+  IUploadFileContext,
+} from '../../ts/interfaces/IFile';
 
 export const mapFile = (unmappedFile: any): IFile => {
   return {
@@ -30,7 +35,7 @@ export const fileApi = createApi({
       }),
       transformResponse: (response: Blob) => response,
     }),
-    uploadFile: builder.mutation<IFile[], IUploadFile>({
+    uploadFile: builder.mutation<IFile[], IUploadFileContext>({
       query: ({ context, contextId, files }) => {
         const formData = new FormData();
 
