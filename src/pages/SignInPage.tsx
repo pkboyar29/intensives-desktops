@@ -97,71 +97,69 @@ const SignInPage: FC = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-center mt-20">
-        <div className="w-[480px]">
-          {tempUser ? (
-            <motion.div
-              className="flex flex-col gap-6"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            >
-              <div className="mx-auto text-[28px] font-bold">
-                Выбор роли пользователя
-              </div>
-
-              <ChoosingRoleComponent
-                rolesToChoose={tempUser.roles}
-                onContinueButtonClick={onContinueButtonClick}
-              />
-            </motion.div>
-          ) : (
-            <div className="flex flex-col gap-6">
-              <div className="mx-auto text-[28px] font-bold">Авторизация</div>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <InputDescription
-                  register={register}
-                  registerOptions={{
-                    required: 'Поле обязательно для заполнения',
-                  }}
-                  fieldName="email"
-                  placeholder="Введите email"
-                  description="Email"
-                  errorMessage={
-                    typeof errors.email?.message === 'string'
-                      ? errors.email.message
-                      : ''
-                  }
-                />
-
-                <InputDescription
-                  register={register}
-                  registerOptions={{
-                    required: 'Поле обязательно для заполнения',
-                  }}
-                  fieldName="password"
-                  placeholder="Введите пароль"
-                  description="Пароль"
-                  type="password"
-                  errorMessage={
-                    typeof errors.password?.message === 'string'
-                      ? errors.password.message
-                      : ''
-                  }
-                />
-
-                <PrimaryButton children="Войти в систему" type="submit" />
-              </form>
+    <div className="w-full px-3 mt-20 md:flex md:justify-center">
+      <div className="md:w-[480px]">
+        {tempUser ? (
+          <motion.div
+            className="flex flex-col gap-6"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <div className="text-center text-[28px] font-bold">
+              Выбор роли пользователя
             </div>
-          )}
-        </div>
+
+            <ChoosingRoleComponent
+              rolesToChoose={tempUser.roles}
+              onContinueButtonClick={onContinueButtonClick}
+            />
+          </motion.div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            <div className="mx-auto text-[28px] font-bold">Авторизация</div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              <InputDescription
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                fieldName="email"
+                placeholder="Введите email"
+                description="Email"
+                errorMessage={
+                  typeof errors.email?.message === 'string'
+                    ? errors.email.message
+                    : ''
+                }
+              />
+
+              <InputDescription
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                fieldName="password"
+                placeholder="Введите пароль"
+                description="Пароль"
+                type="password"
+                errorMessage={
+                  typeof errors.password?.message === 'string'
+                    ? errors.password.message
+                    : ''
+                }
+              />
+
+              <PrimaryButton children="Войти в систему" type="submit" />
+            </form>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
