@@ -198,7 +198,7 @@ const ManageIntensiveForm: FC = () => {
       const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
 
       const { error: responseError } = await uploadFiles({
-        id: Number(intensiveId),
+        contextId: Number(intensiveId),
         files: newFile.file,
       });
 

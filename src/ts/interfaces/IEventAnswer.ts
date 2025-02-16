@@ -1,7 +1,7 @@
 import { IFile } from './IFile';
 import { IStudent } from './IStudent';
 
-export interface IEvenetAnswer {
+export interface IEventAnswer {
   id: number;
   text: string;
   student: IStudent;
@@ -9,8 +9,14 @@ export interface IEvenetAnswer {
   files: IFile[];
 }
 
-export interface IEvenetAnswerCreate {
+export interface IEventAnswerCreate {
   event: number;
   text: string;
   team?: number;
+}
+
+export interface IEventAnswerUpdate {
+  id: number;
+  text: string;
+  fileIds?: number[];
 }

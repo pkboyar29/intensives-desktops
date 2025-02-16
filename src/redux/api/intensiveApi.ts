@@ -97,7 +97,7 @@ export const intensiveApi = createApi({
         }
 
         return {
-          url: `intensives/${contextId}/files/upload/`,
+          url: `/intensives/${contextId}/files/upload/`,
           method: 'POST',
           body: formData,
         };

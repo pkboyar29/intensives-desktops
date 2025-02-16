@@ -18,7 +18,7 @@ export interface IUploadFileContext {
 }
 export interface IUploadFile {
   contextId: number;
-  files: File[];
+  files: File | File[];
 }
 
 export interface INewFileObject {
