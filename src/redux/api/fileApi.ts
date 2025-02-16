@@ -1,15 +1,19 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { IFile, IDownloadFile, IUploadFile } from '../../ts/interfaces/IFile';
-
+import {
+  IFile,
+  IDownloadFile,
+  IUploadFile,
+  IUploadFileContext,
+} from '../../ts/interfaces/IFile';
 
 export const mapFile = (unmappedFile: any): IFile => {
   return {
     id: unmappedFile.id,
     name: unmappedFile.name,
-    size: unmappedFile.size,
-    createdDt: unmappedFile.created_at
+    size: unmappedFile.file_size,
+    createdDt: unmappedFile.created_at,
   };
 };
 
@@ -22,7 +26,7 @@ export const fileApi = createApi({
        * Формируем URL вида:
        * /{context}/{contextId}/files/{fileId}/download
        * Например: /intensives/123/files/456/download
-      */
+       */
       query: ({ context, contextId, fileId }) => ({
         url: `${context}/${contextId}/files/${fileId}/download`,
         method: 'GET',
@@ -31,10 +35,10 @@ export const fileApi = createApi({
       }),
       transformResponse: (response: Blob) => response,
     }),
-    uploadFile: builder.mutation<IFile[], IUploadFile>({
-      query: ({ context, contextId, files}) => {
+    uploadFile: builder.mutation<IFile[], IUploadFileContext>({
+      query: ({ context, contextId, files }) => {
         const formData = new FormData();
-        
+
         files.forEach((file) => formData.append('files', file));
 
         return {
@@ -49,7 +53,4 @@ export const fileApi = createApi({
   }),
 });
 
-export const {
-  useLazyDownloadFileQuery,
-  useUploadFileMutation,
-} = fileApi;
+export const { useLazyDownloadFileQuery, useUploadFileMutation } = fileApi;

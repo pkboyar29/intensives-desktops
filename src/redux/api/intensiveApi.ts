@@ -11,7 +11,7 @@ import {
 import { mapTeacher } from './teacherApi';
 import { mapStudentRole } from './studentRoleApi';
 import { mapFile } from './fileApi';
-import { IFile } from '../../ts/interfaces/IFile';
+import { IFile, IUploadFile } from '../../ts/interfaces/IFile';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -81,19 +81,23 @@ export const intensiveApi = createApi({
             teachers: data.teacherIds,
             flows: data.flowIds,
             roles: data.roleIds,
-            file_ids: data.fileIds
+            file_ids: data.fileIds,
           },
         };
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
-    uploadFiles: builder.mutation<IFile[], IIntensiveUploadFiles>({
-      query: ({ id, files}) => {
+    uploadFiles: builder.mutation<IFile[], IUploadFile>({
+      query: ({ contextId, files }) => {
         const formData = new FormData();
-        files.forEach((file) => formData.append('files', file));
+        if (Array.isArray(files)) {
+          files.forEach((file) => formData.append('files', file));
+        } else {
+          formData.append('files', files);
+        }
 
         return {
-          url: `intensives/${id}/files/upload/`,
+          url: `intensives/${contextId}/files/upload/`,
           method: 'POST',
           body: formData,
         };

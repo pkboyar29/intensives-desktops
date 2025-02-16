@@ -11,7 +11,10 @@ export const baseQuery = fetchBaseQuery({
   credentials: 'same-origin',
   prepareHeaders: async (headers) => {
     headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-
+    headers.set(
+      `X-Active-Role`,
+      encodeURIComponent(localStorage.getItem('currentRole')!)
+    );
     return headers;
   },
   mode: 'cors',

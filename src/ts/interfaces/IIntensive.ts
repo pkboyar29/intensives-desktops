@@ -25,7 +25,7 @@ export interface IIntensiveCreate {
   flowIds: number[];
   roleIds: number[];
   isOpen: boolean;
-  fileIds?: number[];
+  fileIds?: number[]; // можно убрать
 }
 
 export interface IIntensiveUpdate extends IIntensiveCreate {
@@ -34,5 +34,5 @@ export interface IIntensiveUpdate extends IIntensiveCreate {
 
 export interface IIntensiveUploadFiles {
   id: number;
-  files: File[];
+  files: File | File[];
 }
