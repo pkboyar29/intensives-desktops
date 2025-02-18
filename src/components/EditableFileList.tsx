@@ -6,16 +6,20 @@ import DownloadFileItem from './DownloadFileItem';
 
 interface EditableFileListProps {
   files: IFile[];
+  nameFileList?: string;
   onFileDelete: (id: number) => void;
 }
 
 const EditableFileList: FC<EditableFileListProps> = ({
   files,
+  nameFileList,
   onFileDelete,
 }) => {
   return (
     <div className="py-2 pt-4 mx-auto bg-white rounded-lg max-w">
-      <h2 className="mb-3 font-semibold">📂 Список файлов</h2>
+      <h2 className="mb-3 text-lg font-semibold">{`📂 Список файлов ${
+        nameFileList ? nameFileList : ''
+      }`}</h2>
       <div className="overflow-y-auto max-h-60">
         {files.length > 0 ? (
           <ul className="divide-y divide-gray-200">

@@ -24,15 +24,20 @@ export const eventAnswerApi = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getEventAnswers: builder.query<IEventAnswer[], number>({
-      query: (eventId) => `/event_answer/?event=${eventId}`,
+      query: (eventId) => `/event_answers/?event=${eventId}`,
       transformResponse: (response: any): IEventAnswer[] =>
         response.results.map((unmappedEventAnswer: any) =>
           mapEventAnswer(unmappedEventAnswer)
         ),
     }),
+    getEventAnswer: builder.query<IEventAnswer, number>({
+      query: (eventAnswerId) => `/event_answers/${eventAnswerId}`,
+      transformResponse: (response: any): IEventAnswer =>
+        mapEventAnswer(response),
+    }),
     createEventAnswer: builder.mutation<IEventAnswer, IEventAnswerCreate>({
       query: (data) => ({
-        url: '/event_answer/',
+        url: '/event_answers/',
         method: 'POST',
         body: {
           event: data.event,
@@ -44,7 +49,7 @@ export const eventAnswerApi = createApi({
     }),
     updateEventAnswer: builder.mutation<IEventAnswer, IEventAnswerUpdate>({
       query: (data) => ({
-        url: `/event_answer/${data.id}`,
+        url: `/event_answers/${data.id}/`,
         method: 'PATCH',
         body: {
           text: data.text,
@@ -56,7 +61,7 @@ export const eventAnswerApi = createApi({
     }),
     deleteEventAnswer: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/event_answer/${id}/`,
+        url: `/event_answers/${id}/`,
         method: 'DELETE',
       }),
     }),
@@ -70,7 +75,7 @@ export const eventAnswerApi = createApi({
         }
 
         return {
-          url: `/event_answer/${contextId}/files/upload/`,
+          url: `/event_answers/${contextId}/files/upload/`,
           method: 'POST',
           body: formData,
         };
@@ -82,7 +87,8 @@ export const eventAnswerApi = createApi({
 });
 
 export const {
-  useGetEventAnswersQuery,
+  useLazyGetEventAnswersQuery,
+  useLazyGetEventAnswerQuery,
   useCreateEventAnswerMutation,
   useUpdateEventAnswerMutation,
   useDeleteEventAnswerMutation,

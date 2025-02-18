@@ -6,25 +6,29 @@ import DownloadFileItem from './DownloadFileItem';
 
 interface AttachedFileListProps {
   context: string;
-  contextId: number;
-  files: IFile[];
-  onFileClick: (id: number) => void;
+  contextId?: number;
+  files?: IFile[];
+  nameFileList?: string;
+  onFileClick?: (id: number) => void;
 }
 
 const AttachedFileList: FC<AttachedFileListProps> = ({
   context,
   contextId,
   files,
+  nameFileList,
   onFileClick,
 }) => {
   return (
     <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
-      <h2 className="mb-3 text-lg font-semibold">📂 Список файлов</h2>
+      <h2 className="mb-3 text-lg font-semibold">{`📂 Список файлов ${
+        nameFileList ? nameFileList : ''
+      }`}</h2>
       <div className="overflow-y-auto max-h-60">
         {' '}
         {/* Ограничение высоты и скролл */}
         <ul className="divide-y divide-gray-200">
-          {files.length > 0 ? (
+          {files && contextId && files.length > 0 ? (
             files.map((file) => (
               <li
                 key={file.id}

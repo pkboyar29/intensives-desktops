@@ -276,7 +276,7 @@ const ManageIntensiveForm: FC = () => {
   };
 
   const handleFileDelete = (id: number) => {
-    // Удаляем файл из массива для UI и массива с файлами
+    // Удаляем файл из массива для UI и массива с файлами (если файл новый)
     setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
     setNewFiles((prev) => prev.filter((file) => file.id !== id));
   };
