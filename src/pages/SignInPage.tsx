@@ -13,6 +13,7 @@ import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
 import { useAppDispatch, useAppSelector } from '../redux/store';
 import { setCurrentUser } from '../redux/slices/userSlice';
 import { redirectByRole } from '../helpers/urlHelpers';
+import { isUserStudent } from '../helpers/userHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -51,13 +52,14 @@ const SignInPage: FC = () => {
 
       const { data: userData } = await getUserInfo();
       if (userData) {
-        const updatedRoles: UserRole[] = userData.roles.includes('Студент')
-          ? [...userData.roles, 'Наставник']
+        const updatedRoles: UserRole[] = isUserStudent(userData)
+          ? [...userData.roles, { name: 'Mentor', displayName: 'Наставник' }]
           : userData.roles;
 
         if (
           updatedRoles.length === 1 ||
-          (updatedRoles.includes('Студент') && updatedRoles.length === 2)
+          (updatedRoles.includes({ name: 'Student', displayName: 'Студент' }) &&
+            updatedRoles.length === 2)
         ) {
           setUserWithCurrentRole(
             { ...userData, roles: updatedRoles },
@@ -93,7 +95,7 @@ const SignInPage: FC = () => {
         currentRole: currentRole,
       })
     );
-    localStorage.setItem('currentRole', currentRole);
+    localStorage.setItem('currentRole', currentRole.name);
   };
 
   return (

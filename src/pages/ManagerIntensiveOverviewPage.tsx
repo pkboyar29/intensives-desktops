@@ -1,7 +1,8 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { useAppSelector } from '../redux/store';
+import { isUserManager } from '../helpers/userHelpers';
+
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
 import Title from '../components/common/Title';
@@ -158,7 +159,7 @@ const ManagerIntensiveOverviewPage: FC = () => {
                 </div>
               )}
 
-              {currentUser?.roles.includes('Организатор') && (
+              {currentUser && isUserManager(currentUser) && (
                 <div className="flex items-center mt-10 text-lg font-bold gap-7">
                   <PrimaryButton
                     children="Редактировать"

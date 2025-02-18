@@ -39,7 +39,7 @@ const ChoosingRoleComponent: FC<ChoosingRoleComponentProps> = ({
               className="w-10 h-10"
               pathClassName="transition duration-300 ease-in-out fill-black group-hover:fill-white"
             />
-            <div>{roleToChoose}</div>
+            <div>{roleToChoose.displayName}</div>
           </div>
         ))}
       </div>

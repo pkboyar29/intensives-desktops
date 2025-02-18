@@ -9,7 +9,7 @@ const replaceLastURLSegment = (segment: string): string => {
 };
 
 const redirectByRole = (role: UserRole) => {
-  window.location.assign(role === 'Администратор' ? '/admin' : '/intensives');
+  window.location.assign(role.name === 'Admin' ? '/admin' : '/intensives');
 };
 
 export { replaceLastURLSegment, redirectByRole };

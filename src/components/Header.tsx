@@ -64,7 +64,7 @@ const Header: FC = () => {
 
   const changeRole = (role: UserRole) => {
     dispatch(setCurrentRole(role));
-    localStorage.setItem('currentRole', role);
+    localStorage.setItem('currentRole', role.name);
     redirectByRole(role);
   };
 
@@ -105,10 +105,12 @@ const Header: FC = () => {
           <p className="text-lg text-bright_gray">
             Текущая роль:{' '}
             <span className="font-bold text-black">
-              {currentUser?.currentRole}
+              {currentUser?.currentRole?.displayName}
             </span>
             . Роль будет сменена на:{' '}
-            <span className="font-bold text-black">{changeRoleModal.role}</span>
+            <span className="font-bold text-black">
+              {changeRoleModal.role?.displayName}
+            </span>
           </p>
           <div className="flex justify-end gap-3 mt-6">
             <div>
@@ -181,7 +183,7 @@ const Header: FC = () => {
                             }
                           }}
                         >
-                          {role}
+                          {role.displayName}
                         </div>
                       ))}
                     </div>

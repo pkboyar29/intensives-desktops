@@ -6,6 +6,11 @@ import { useAppSelector } from '../redux/store';
 import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
+import {
+  isUserManager,
+  isUserStudent,
+  isUserTeacher,
+} from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import IntensiveCard from '../components/IntensiveCard';
@@ -56,7 +61,7 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (currentUser?.roles.includes('Организатор')) {
+      if (currentUser && isUserManager(currentUser)) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -142,14 +147,17 @@ const IntensivesPage: FC = () => {
   ];
 
   // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
+  // TODO: в таком случае утилитарные методы не нужны будут?
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roles.includes('Студент')) {
-      navigate(`/student/${id}/overview`);
-    } else if (currentUser?.roles.includes('Организатор')) {
-      navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roles.includes('Преподаватель')) {
-      localStorage.removeItem('tutorTeamId');
-      navigate(`/teacher/${id}/overview`);
+    if (currentUser) {
+      if (isUserStudent(currentUser)) {
+        navigate(`/student/${id}/overview`);
+      } else if (isUserManager(currentUser)) {
+        navigate(`/manager/${id}/overview`);
+      } else if (isUserTeacher(currentUser)) {
+        localStorage.removeItem('tutorTeamId');
+        navigate(`/teacher/${id}/overview`);
+      }
     }
   };
 
@@ -159,7 +167,7 @@ const IntensivesPage: FC = () => {
         <Title text="Интенсивы" />
 
         <div className="mt-10">
-          {currentUser?.roles.includes('Организатор') && (
+          {currentUser && isUserManager(currentUser) && (
             <div className="flex justify-end">
               <div className="ml-auto">
                 <PrimaryButton
@@ -183,7 +191,7 @@ const IntensivesPage: FC = () => {
 
         <div className="flex items-center justify-between gap-8 mt-5">
           <div className="flex gap-8">
-            {currentUser?.roles.includes('Организатор') && (
+            {currentUser && isUserManager(currentUser) && (
               <Filter
                 onFilterOptionClick={(filterOption) =>
                   setOpenness(filterOption as 'all' | 'opened' | 'closed')
@@ -234,7 +242,7 @@ const IntensivesPage: FC = () => {
           ) : (
             <>
               {sortedIntensives.length !== 0 ? (
-                currentUser?.roles.includes('Организатор') ? (
+                currentUser && isUserManager(currentUser) ? (
                   <Table
                     onClick={intensiveClickHandler}
                     columns={columns}

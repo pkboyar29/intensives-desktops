@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
 import { useAppSelector } from '../redux/store';
+import { isUserStudent, isUserManager } from '../helpers/userHelpers';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
@@ -199,10 +199,8 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* TODO: эту роль очевидно потом поменять на роль организатора (ну только кнопку назад отображать для всех) */}
-                {currentUser?.roles.find(
-                  (roleName) => roleName === 'Организатор'
-                ) && (
+                {/* TODO: кнопку "назад" отображать для всех */}
+                {currentUser && isUserManager(currentUser) && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <div>
                       <PrimaryButton
@@ -239,9 +237,9 @@ const EventPage: FC = () => {
                     </div>
                   </div>
                 )}
-                {currentUser?.roles.find(
-                  (roleName) => roleName === 'Студент'
-                ) && <div>Студент</div>}
+                {currentUser && isUserStudent(currentUser) && (
+                  <div>Студент</div>
+                )}
               </>
             )
           )}
