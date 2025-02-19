@@ -16,6 +16,7 @@ import Chip from '../components/common/Chip';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { getTimeFromDate } from '../helpers/dateHelpers';
+import EventAnswer from '../components/EventAnswer';
 
 const EventPage: FC = () => {
   const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
@@ -239,7 +240,7 @@ const EventPage: FC = () => {
                     </div>
                   )}
                 {currentUser?.currentRole &&
-                  isUserStudent(currentUser.currentRole) && <div>Студент</div>}
+                  isUserStudent(currentUser.currentRole) && <EventAnswer eventAnswerId={19} />}
               </>
             )
           )}

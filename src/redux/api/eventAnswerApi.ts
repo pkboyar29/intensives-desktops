@@ -2,13 +2,14 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
-  IEvenetAnswer,
-  IEvenetAnswerCreate,
+  IEventAnswer,
+  IEventAnswerCreate,
+  IEventAnswerUpdate,
 } from '../../ts/interfaces/IEventAnswer';
 import { IFile, IUploadFile } from '../../ts/interfaces/IFile';
 import { mapFile } from './fileApi';
 
-export const mapEventAnswer = (unmappedEventAnswer: any): IEvenetAnswer => {
+export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
   return {
     id: unmappedEventAnswer.id,
     text: unmappedEventAnswer.text,
@@ -22,24 +23,47 @@ export const eventAnswerApi = createApi({
   reducerPath: 'eventAnswerApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getEventAnswers: builder.query<IEvenetAnswer[], number>({
-      query: (eventId) => `'/event_answer/?event=${eventId}'`,
-      transformResponse: (response: any): IEvenetAnswer[] =>
+    getEventAnswers: builder.query<IEventAnswer[], number>({
+      query: (eventId) => `/event_answers/?event=${eventId}`,
+      transformResponse: (response: any): IEventAnswer[] =>
         response.results.map((unmappedEventAnswer: any) =>
           mapEventAnswer(unmappedEventAnswer)
         ),
     }),
-    createEventAnswer: builder.mutation<IEvenetAnswer, IEvenetAnswerCreate>({
+    getEventAnswer: builder.query<IEventAnswer, number>({
+      query: (eventAnswerId) => `/event_answers/${eventAnswerId}`,
+      transformResponse: (response: any): IEventAnswer =>
+        mapEventAnswer(response),
+    }),
+    createEventAnswer: builder.mutation<IEventAnswer, IEventAnswerCreate>({
       query: (data) => ({
-        url: '/event_answer/',
+        url: '/event_answers/',
         method: 'POST',
         body: {
           event: data.event,
           text: data.text,
         },
       }),
-      transformResponse: (response: any): IEvenetAnswer =>
+      transformResponse: (response: any): IEventAnswer =>
         mapEventAnswer(response),
+    }),
+    updateEventAnswer: builder.mutation<IEventAnswer, IEventAnswerUpdate>({
+      query: (data) => ({
+        url: `/event_answers/${data.id}/`,
+        method: 'PATCH',
+        body: {
+          text: data.text,
+          fileIds: data.fileIds,
+        },
+      }),
+      transformResponse: (response: any): IEventAnswer =>
+        mapEventAnswer(response),
+    }),
+    deleteEventAnswer: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/event_answers/${id}/`,
+        method: 'DELETE',
+      }),
     }),
     uploadFiles: builder.mutation<IFile[], IUploadFile>({
       query: ({ contextId, files }) => {
@@ -51,7 +75,7 @@ export const eventAnswerApi = createApi({
         }
 
         return {
-          url: `event_answer/${contextId}/files/upload/`,
+          url: `/event_answers/${contextId}/files/upload/`,
           method: 'POST',
           body: formData,
         };
@@ -63,7 +87,10 @@ export const eventAnswerApi = createApi({
 });
 
 export const {
-  useGetEventAnswersQuery,
+  useLazyGetEventAnswersQuery,
+  useLazyGetEventAnswerQuery,
   useCreateEventAnswerMutation,
+  useUpdateEventAnswerMutation,
+  useDeleteEventAnswerMutation,
   useUploadFilesMutation,
 } = eventAnswerApi;
