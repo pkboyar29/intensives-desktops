@@ -242,7 +242,7 @@ const EventPage: FC = () => {
                 )}
                 {currentUser?.roles.find(
                   (roleName) => roleName === 'Студент'
-                ) && <EventAnswer eventAnswerId={9} />}
+                ) && <EventAnswer eventAnswerId={19} />}
               </>
             )
           )}

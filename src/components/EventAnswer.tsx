@@ -1,10 +1,15 @@
 import { FC, useState, useEffect } from 'react';
-import { useLazyGetEventAnswerQuery } from '../redux/api/eventAnswerApi';
+import {
+  useLazyGetEventAnswerQuery,
+  useUpdateEventAnswerMutation,
+} from '../redux/api/eventAnswerApi';
 import AttachedFileList from './AttachedFileList';
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 import EditableFileList from './EditableFileList';
 import FileInput from './common/inputs/FileInput';
 import PrimaryButton from './common/PrimaryButton';
+import { ToastContainer, toast } from 'react-toastify';
+import { useUploadFileMutation } from '../redux/api/fileApi';
 
 interface EventAnswerProps {
   eventAnswerId?: number;
@@ -13,6 +18,8 @@ interface EventAnswerProps {
 const EventAnswer: FC<EventAnswerProps> = ({ eventAnswerId }) => {
   const [eventAnswer, { data, isLoading, error }] =
     useLazyGetEventAnswerQuery();
+  const [updateEventAnswer] = useUpdateEventAnswerMutation();
+  const [uploadFile] = useUploadFileMutation();
 
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
   const [editedText, setEditedText] = useState('');
@@ -38,9 +45,45 @@ const EventAnswer: FC<EventAnswerProps> = ({ eventAnswerId }) => {
     setEditedText(event.target.value);
   };
 
-  const handleEditClick = () => {
-    if (isEditing) {
-      console.log('Сохранить изменения:', editedText);
+  const handleEditClick = async () => {
+    if (!isEditing) {
+      setIsEditing((prev) => !prev);
+      return;
+    }
+
+    const fileIds: number[] = attachedFilesList
+      ? attachedFilesList
+          .filter((file) => file.id > 0)
+          .map((file: IFile) => file.id)
+      : [];
+
+    let responseData;
+    let responseError;
+
+    if (eventAnswerId) {
+      ({ data: responseData, error: responseError } = await updateEventAnswer({
+        id: Number(eventAnswerId),
+        text: editedText,
+        fileIds: fileIds,
+      }));
+
+      if (responseError) {
+        toast('Произошла серверная ошибка при сохранении изменений', {
+          type: 'error',
+        });
+        return;
+      }
+    } else {
+    }
+
+    if (responseData) {
+      // Загрузка файлов после успешного создания/обновления ответа
+      const filesError = await uploadAllFiles(
+        Number(responseData.id || eventAnswerId)
+      );
+
+      if (filesError === 0) {
+      }
     }
     setIsEditing((prev) => !prev);
   };
@@ -52,6 +95,40 @@ const EventAnswer: FC<EventAnswerProps> = ({ eventAnswerId }) => {
   };
 
   const handleFilesChange = async (fileList: FileList | null) => {};
+
+  const uploadAllFiles = async (intensiveId: number) => {
+    let filesError = 0;
+
+    if (newFiles.length === 0) return filesError;
+
+    for (const newFile of newFiles) {
+      // Показываем уведомление загрузки
+      const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
+
+      const { error: responseError } = await uploadFile({
+        context: 'event_answer',
+        contextId: Number(intensiveId),
+        files: newFile.file,
+      });
+
+      if (responseError) {
+        filesError++;
+        toast.update(toastId, {
+          render: `Ошибка загрузки: ${newFile.file.name}`,
+          type: 'error',
+          isLoading: false,
+          autoClose: 3000,
+        });
+        continue; // Переход к следующему файлу
+      }
+
+      // Просто скрываем toast загрузки при успехе
+      toast.dismiss(toastId);
+    }
+
+    return filesError;
+  };
+
   return (
     <div className="w-[100%] pt-5">
       <p className="mb-3 text-xl font-bold text-black_2">
@@ -62,7 +139,7 @@ const EventAnswer: FC<EventAnswerProps> = ({ eventAnswerId }) => {
       {eventAnswerId || (!eventAnswerId && isEditing) ? (
         <>
           <textarea
-            className="w-full p-3 border-2 rounded-md border-gray_3 focus:outline-none focus:ring-1 focus:ring-blue"
+            className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:ring-1 focus:ring-blue"
             value={editedText}
             onChange={handleTextChange}
             rows={4}

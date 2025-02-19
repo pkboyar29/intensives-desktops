@@ -39,7 +39,11 @@ export const fileApi = createApi({
       query: ({ context, contextId, files }) => {
         const formData = new FormData();
 
-        files.forEach((file) => formData.append('files', file));
+        if (Array.isArray(files)) {
+          files.forEach((file) => formData.append('files', file));
+        } else {
+          formData.append('files', files);
+        }
 
         return {
           url: `${context}/${contextId}/files/upload/`,
@@ -48,7 +52,7 @@ export const fileApi = createApi({
         };
       },
       transformResponse: (response: any): IFile[] =>
-        response.map((unmappedColumn: any) => mapFile(unmappedColumn)),
+        response.map((unmappedFile: any) => mapFile(unmappedFile)),
     }),
   }),
 });
