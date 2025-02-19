@@ -159,28 +159,29 @@ const ManagerIntensiveOverviewPage: FC = () => {
                 </div>
               )}
 
-              {currentUser && isUserManager(currentUser) && (
-                <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                  <PrimaryButton
-                    children="Редактировать"
-                    clickHandler={() => {
-                      navigate(
-                        `/manager/${currentIntensive?.id}/editIntensive`
-                      );
-                    }}
-                  />
-
-                  <div>
+              {currentUser?.currentRole &&
+                isUserManager(currentUser.currentRole) && (
+                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <PrimaryButton
-                      buttonColor="gray"
-                      children={<TrashIcon />}
-                      onClick={() => {
-                        setDeleteModal(true);
+                      children="Редактировать"
+                      clickHandler={() => {
+                        navigate(
+                          `/manager/${currentIntensive?.id}/editIntensive`
+                        );
                       }}
                     />
+
+                    <div>
+                      <PrimaryButton
+                        buttonColor="gray"
+                        children={<TrashIcon />}
+                        onClick={() => {
+                          setDeleteModal(true);
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>

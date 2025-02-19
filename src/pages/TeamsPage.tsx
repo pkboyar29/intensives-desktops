@@ -25,7 +25,7 @@ const TeamsPage: FC = () => {
       <Title text="Команды" />
 
       <h2 className="text-lg font-bold mt-7">
-        {currentUser && isUserManager(currentUser)
+        {currentUser?.currentRole && isUserManager(currentUser.currentRole)
           ? 'Созданные команды'
           : 'Существующие команды'}
       </h2>
@@ -44,7 +44,7 @@ const TeamsPage: FC = () => {
         </div>
       )}
 
-      {currentUser && isUserManager(currentUser) && (
+      {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
         <div className="flex gap-5 mt-10">
           <div>
             <PrimaryButton

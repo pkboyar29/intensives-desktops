@@ -27,6 +27,7 @@ const IntensivesPage: FC = () => {
 
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
+    skip: !currentUser,
   });
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
@@ -61,7 +62,7 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (currentUser && isUserManager(currentUser)) {
+      if (currentUser?.currentRole && isUserManager(currentUser.currentRole)) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -146,15 +147,13 @@ const IntensivesPage: FC = () => {
     }),
   ];
 
-  // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
-  // TODO: в таком случае утилитарные методы не нужны будут?
   const intensiveClickHandler = (id: number) => {
-    if (currentUser) {
-      if (isUserStudent(currentUser)) {
+    if (currentUser && currentUser.currentRole) {
+      if (isUserStudent(currentUser.currentRole)) {
         navigate(`/student/${id}/overview`);
-      } else if (isUserManager(currentUser)) {
+      } else if (isUserManager(currentUser.currentRole)) {
         navigate(`/manager/${id}/overview`);
-      } else if (isUserTeacher(currentUser)) {
+      } else if (isUserTeacher(currentUser.currentRole)) {
         localStorage.removeItem('tutorTeamId');
         navigate(`/teacher/${id}/overview`);
       }
@@ -167,16 +166,17 @@ const IntensivesPage: FC = () => {
         <Title text="Интенсивы" />
 
         <div className="mt-10">
-          {currentUser && isUserManager(currentUser) && (
-            <div className="flex justify-end">
-              <div className="ml-auto">
-                <PrimaryButton
-                  children="Создать интенсив"
-                  clickHandler={() => navigate(`/createIntensive`)}
-                />
+          {currentUser?.currentRole &&
+            isUserManager(currentUser.currentRole) && (
+              <div className="flex justify-end">
+                <div className="ml-auto">
+                  <PrimaryButton
+                    children="Создать интенсив"
+                    clickHandler={() => navigate(`/createIntensive`)}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
@@ -191,19 +191,20 @@ const IntensivesPage: FC = () => {
 
         <div className="flex items-center justify-between gap-8 mt-5">
           <div className="flex gap-8">
-            {currentUser && isUserManager(currentUser) && (
-              <Filter
-                onFilterOptionClick={(filterOption) =>
-                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
-                }
-                activeFilterOption={openness}
-                filterList={[
-                  { label: 'Открытые', value: 'opened' },
-                  { label: 'Закрытые', value: 'closed' },
-                  { label: 'Все', value: 'all' },
-                ]}
-              />
-            )}
+            {currentUser?.currentRole &&
+              isUserManager(currentUser.currentRole) && (
+                <Filter
+                  onFilterOptionClick={(filterOption) =>
+                    setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                  }
+                  activeFilterOption={openness}
+                  filterList={[
+                    { label: 'Открытые', value: 'opened' },
+                    { label: 'Закрытые', value: 'closed' },
+                    { label: 'Все', value: 'all' },
+                  ]}
+                />
+              )}
 
             <Filter
               onFilterOptionClick={(filterOption) =>
@@ -242,7 +243,8 @@ const IntensivesPage: FC = () => {
           ) : (
             <>
               {sortedIntensives.length !== 0 ? (
-                currentUser && isUserManager(currentUser) ? (
+                currentUser?.currentRole &&
+                isUserManager(currentUser.currentRole) ? (
                   <Table
                     onClick={intensiveClickHandler}
                     columns={columns}

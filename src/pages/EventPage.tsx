@@ -200,46 +200,46 @@ const EventPage: FC = () => {
                 </div>
 
                 {/* TODO: кнопку "назад" отображать для всех */}
-                {currentUser && isUserManager(currentUser) && (
-                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                    <div>
+                {currentUser?.currentRole &&
+                  isUserManager(currentUser.currentRole) && (
+                    <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                      <div>
+                        <PrimaryButton
+                          buttonColor="gray"
+                          children={
+                            <div className="flex items-center gap-2">
+                              <BackArrowIcon />
+                              <p>Назад</p>
+                            </div>
+                          }
+                          onClick={() => {
+                            navigate(`/manager/${params.intensiveId}/schedule`);
+                          }}
+                        />
+                      </div>
+
                       <PrimaryButton
-                        buttonColor="gray"
-                        children={
-                          <div className="flex items-center gap-2">
-                            <BackArrowIcon />
-                            <p>Назад</p>
-                          </div>
-                        }
-                        onClick={() => {
-                          navigate(`/manager/${params.intensiveId}/schedule`);
+                        children="Редактировать"
+                        clickHandler={() => {
+                          navigate(
+                            `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
+                          );
                         }}
                       />
-                    </div>
 
-                    <PrimaryButton
-                      children="Редактировать"
-                      clickHandler={() => {
-                        navigate(
-                          `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
-                        );
-                      }}
-                    />
-
-                    <div>
-                      <PrimaryButton
-                        buttonColor="gray"
-                        children={<TrashIcon />}
-                        onClick={() => {
-                          setDeleteModal(true);
-                        }}
-                      />
+                      <div>
+                        <PrimaryButton
+                          buttonColor="gray"
+                          children={<TrashIcon />}
+                          onClick={() => {
+                            setDeleteModal(true);
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-                {currentUser && isUserStudent(currentUser) && (
-                  <div>Студент</div>
-                )}
+                  )}
+                {currentUser?.currentRole &&
+                  isUserStudent(currentUser.currentRole) && <div>Студент</div>}
               </>
             )
           )}

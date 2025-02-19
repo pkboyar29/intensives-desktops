@@ -11,11 +11,7 @@ export const baseQuery = fetchBaseQuery({
   credentials: 'same-origin',
   prepareHeaders: (headers) => {
     headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-    headers.set(
-      `X-Active-Role`,
-      // TODO: delete encodeURIComponent
-      encodeURIComponent(localStorage.getItem('currentRole')!)
-    );
+    headers.set(`X-Active-Role`, localStorage.getItem('currentRole')!);
     return headers;
   },
   mode: 'cors',
@@ -60,13 +56,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       localStorage.removeItem('currentRole');
       Cookies.remove('access');
       Cookies.remove('refresh');
-
-      // TODO: delete this weird code
-      if (window.location.pathname === '/addTest') {
-        console.log('hi');
-      } else {
-        window.location.href = '/sign-in';
-      }
+      window.location.href = '/sign-in';
     }
   }
 

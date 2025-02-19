@@ -7,7 +7,6 @@ import { useLazyGetUserQuery } from '../redux/api/userApi';
 import { useAppDispatch, useAppSelector } from '../redux/store';
 import { setCurrentUser } from '../redux/slices/userSlice';
 import { redirectByRole } from '../helpers/urlHelpers';
-import { isUserStudent } from '../helpers/userHelpers';
 
 import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 import Modal from '../components/common/modals/Modal';
@@ -42,8 +41,9 @@ const App: FC = () => {
     const { data: userData } = await getUser();
 
     if (userData) {
-      // TODO: заменить isUserStudent, так как впоследствии я избавлюсь от этой утилсы
-      const userRoles: UserRole[] = isUserStudent(userData)
+      const userRoles: UserRole[] = userData.roles.some(
+        (role) => role.name === 'Student'
+      )
         ? [...userData.roles, { name: 'Mentor', displayName: 'Наставник' }]
         : userData.roles;
 

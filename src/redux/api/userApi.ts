@@ -22,6 +22,20 @@ const mapRoleName = (roleName: string): UserRole => {
   };
 };
 
+const mapUser = (unmappedUser: any): IUser => {
+  return {
+    id: unmappedUser.id,
+    teacherId: unmappedUser.teacher_id,
+    studentId: unmappedUser.student_id,
+    firstName: unmappedUser.first_name,
+    lastName: unmappedUser.last_name,
+    patronymic: unmappedUser.patronymic,
+    email: unmappedUser.email,
+    roles: unmappedUser.roles.map((role: any) => mapRoleName(role.name)),
+    currentRole: null,
+  };
+};
+
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: baseQueryWithReauth,
@@ -35,20 +49,7 @@ export const userApi = createApi({
     }),
     getUser: builder.query<IUser, void>({
       query: () => '/users/me',
-      transformResponse: (response: any): IUser => {
-        console.log(response);
-        return {
-          id: response.id,
-          teacherId: response.teacher_id,
-          studentId: response.student_id,
-          firstName: response.first_name,
-          lastName: response.last_name,
-          patronymic: response.patronymic,
-          email: response.email,
-          roles: response.roles.map((role: any) => mapRoleName(role.name)),
-          currentRole: null,
-        };
-      },
+      transformResponse: (response: any): IUser => mapUser(response),
     }),
   }),
 });

@@ -57,13 +57,13 @@ const TeamOverviewPage: FC = () => {
   }, [currentTeam]);
 
   useEffect(() => {
-    if (currentUser && currentTeam) {
+    if (currentUser?.currentRole && currentTeam) {
       // TODO: когда появится текущая роль, то сравнивать ее
-      if (isUserTeacher(currentUser)) {
+      if (isUserTeacher(currentUser.currentRole)) {
         setIsAllowedToChangeStudentRoles(true);
         setIsAllowedToChangeTeamlead(true);
       }
-      if (isUserStudent(currentUser)) {
+      if (isUserStudent(currentUser.currentRole)) {
         if (currentUser.studentId === currentTeam.teamlead?.id) {
           setIsAllowedToChangeStudentRoles(true);
         }
