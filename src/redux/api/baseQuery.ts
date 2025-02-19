@@ -9,9 +9,11 @@ import Cookies from 'js-cookie';
 export const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
   credentials: 'same-origin',
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, { endpoint }) => {
     headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-    headers.set(`X-Active-Role`, localStorage.getItem('currentRole')!);
+    if (endpoint !== 'getUser') {
+      headers.set(`X-Active-Role`, localStorage.getItem('currentRole')!);
+    }
     return headers;
   },
   mode: 'cors',
