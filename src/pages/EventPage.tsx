@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
 import { useAppSelector } from '../redux/store';
+import { isUserStudent, isUserManager } from '../helpers/userHelpers';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
@@ -200,49 +200,47 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* TODO: эту роль очевидно потом поменять на роль организатора (ну только кнопку назад отображать для всех) */}
-                {currentUser?.roles.find(
-                  (roleName) => roleName === 'Организатор'
-                ) && (
-                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                    <div>
+                {/* TODO: кнопку "назад" отображать для всех */}
+                {currentUser?.currentRole &&
+                  isUserManager(currentUser.currentRole) && (
+                    <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                      <div>
+                        <PrimaryButton
+                          buttonColor="gray"
+                          children={
+                            <div className="flex items-center gap-2">
+                              <BackArrowIcon />
+                              <p>Назад</p>
+                            </div>
+                          }
+                          onClick={() => {
+                            navigate(`/manager/${params.intensiveId}/schedule`);
+                          }}
+                        />
+                      </div>
+
                       <PrimaryButton
-                        buttonColor="gray"
-                        children={
-                          <div className="flex items-center gap-2">
-                            <BackArrowIcon />
-                            <p>Назад</p>
-                          </div>
-                        }
-                        onClick={() => {
-                          navigate(`/manager/${params.intensiveId}/schedule`);
+                        children="Редактировать"
+                        clickHandler={() => {
+                          navigate(
+                            `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
+                          );
                         }}
                       />
-                    </div>
 
-                    <PrimaryButton
-                      children="Редактировать"
-                      clickHandler={() => {
-                        navigate(
-                          `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
-                        );
-                      }}
-                    />
-
-                    <div>
-                      <PrimaryButton
-                        buttonColor="gray"
-                        children={<TrashIcon />}
-                        onClick={() => {
-                          setDeleteModal(true);
-                        }}
-                      />
+                      <div>
+                        <PrimaryButton
+                          buttonColor="gray"
+                          children={<TrashIcon />}
+                          onClick={() => {
+                            setDeleteModal(true);
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-                {currentUser?.roles.find(
-                  (roleName) => roleName === 'Студент'
-                ) && <EventAnswer eventAnswerId={19} />}
+                  )}
+                {currentUser?.currentRole &&
+                  isUserStudent(currentUser.currentRole) && <EventAnswer eventAnswerId={19} />}
               </>
             )
           )}

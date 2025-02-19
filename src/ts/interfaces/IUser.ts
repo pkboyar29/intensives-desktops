@@ -10,12 +10,18 @@ export interface IUser {
   currentRole: UserRole | null;
 }
 
-export type UserRole =
-  | 'Студент'
-  | 'Администратор'
-  | 'Преподаватель'
-  | 'Организатор'
-  | 'Наставник';
+export const UserRoleMap = {
+  Admin: 'Администратор',
+  Manager: 'Организатор',
+  Teacher: 'Преподаватель',
+  Student: 'Студент',
+  Mentor: 'Наставник',
+} as const;
+
+export type UserRole = {
+  name: keyof typeof UserRoleMap;
+  displayName: (typeof UserRoleMap)[keyof typeof UserRoleMap];
+};
 
 export interface ISignIn {
   email: string;

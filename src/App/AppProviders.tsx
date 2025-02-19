@@ -12,9 +12,9 @@ interface AppProvidersProps {
 
 const AppProviders: FC<AppProvidersProps> = ({ children }) => {
   return (
-          <Provider store={store}>
-            <DndProvider backend={HTML5Backend}>{children}</DndProvider>
-          </Provider>
+    <Provider store={store}>
+      <DndProvider backend={HTML5Backend}>{children}</DndProvider>
+    </Provider>
   );
 };
 

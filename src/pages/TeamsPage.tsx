@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
+import { isUserManager } from '../helpers/userHelpers';
 
 import { useGetTeamsQuery } from '../redux/api/teamApi';
-
-import { useAppSelector } from '../redux/store';
 
 import Skeleton from 'react-loading-skeleton';
 import Title from '../components/common/Title';
@@ -25,7 +25,7 @@ const TeamsPage: FC = () => {
       <Title text="Команды" />
 
       <h2 className="text-lg font-bold mt-7">
-        {currentUser?.roles.includes('Организатор')
+        {currentUser?.currentRole && isUserManager(currentUser.currentRole)
           ? 'Созданные команды'
           : 'Существующие команды'}
       </h2>
@@ -44,7 +44,7 @@ const TeamsPage: FC = () => {
         </div>
       )}
 
-      {currentUser?.roles.includes('Организатор') && (
+      {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
         <div className="flex gap-5 mt-10">
           <div>
             <PrimaryButton

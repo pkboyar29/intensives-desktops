@@ -9,12 +9,9 @@ import Cookies from 'js-cookie';
 export const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
   credentials: 'same-origin',
-  prepareHeaders: async (headers) => {
+  prepareHeaders: (headers) => {
     headers.set(`Authorization`, `Bearer ${Cookies.get('access')}`);
-    headers.set(
-      `X-Active-Role`,
-      encodeURIComponent(localStorage.getItem('currentRole')!)
-    );
+    headers.set(`X-Active-Role`, localStorage.getItem('currentRole')!);
     return headers;
   },
   mode: 'cors',
@@ -59,13 +56,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       localStorage.removeItem('currentRole');
       Cookies.remove('access');
       Cookies.remove('refresh');
-
-      // TODO: delete this weird code
-      if (window.location.pathname === '/addTest') {
-        console.log('hi');
-      } else {
-        window.location.href = '/sign-in';
-      }
+      window.location.href = '/sign-in';
     }
   }
 

@@ -6,6 +6,11 @@ import { useAppSelector } from '../redux/store';
 import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
+import {
+  isUserManager,
+  isUserStudent,
+  isUserTeacher,
+} from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import IntensiveCard from '../components/IntensiveCard';
@@ -22,6 +27,7 @@ const IntensivesPage: FC = () => {
 
   const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
     refetchOnMountOrArgChange: true,
+    skip: !currentUser,
   });
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
@@ -56,7 +62,7 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (currentUser?.roles.includes('Организатор')) {
+      if (currentUser?.currentRole && isUserManager(currentUser.currentRole)) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -141,15 +147,16 @@ const IntensivesPage: FC = () => {
     }),
   ];
 
-  // TODO: мы же изначально будем текущую роль пользователя знать? значит надо будет сранивать с ней, а не просто с существующими ролями
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.roles.includes('Студент')) {
-      navigate(`/student/${id}/overview`);
-    } else if (currentUser?.roles.includes('Организатор')) {
-      navigate(`/manager/${id}/overview`);
-    } else if (currentUser?.roles.includes('Преподаватель')) {
-      localStorage.removeItem('tutorTeamId');
-      navigate(`/teacher/${id}/overview`);
+    if (currentUser && currentUser.currentRole) {
+      if (isUserStudent(currentUser.currentRole)) {
+        navigate(`/student/${id}/overview`);
+      } else if (isUserManager(currentUser.currentRole)) {
+        navigate(`/manager/${id}/overview`);
+      } else if (isUserTeacher(currentUser.currentRole)) {
+        localStorage.removeItem('tutorTeamId');
+        navigate(`/teacher/${id}/overview`);
+      }
     }
   };
 
@@ -159,16 +166,17 @@ const IntensivesPage: FC = () => {
         <Title text="Интенсивы" />
 
         <div className="mt-10">
-          {currentUser?.roles.includes('Организатор') && (
-            <div className="flex justify-end">
-              <div className="ml-auto">
-                <PrimaryButton
-                  children="Создать интенсив"
-                  clickHandler={() => navigate(`/createIntensive`)}
-                />
+          {currentUser?.currentRole &&
+            isUserManager(currentUser.currentRole) && (
+              <div className="flex justify-end">
+                <div className="ml-auto">
+                  <PrimaryButton
+                    children="Создать интенсив"
+                    clickHandler={() => navigate(`/createIntensive`)}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
@@ -183,19 +191,20 @@ const IntensivesPage: FC = () => {
 
         <div className="flex items-center justify-between gap-8 mt-5">
           <div className="flex gap-8">
-            {currentUser?.roles.includes('Организатор') && (
-              <Filter
-                onFilterOptionClick={(filterOption) =>
-                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
-                }
-                activeFilterOption={openness}
-                filterList={[
-                  { label: 'Открытые', value: 'opened' },
-                  { label: 'Закрытые', value: 'closed' },
-                  { label: 'Все', value: 'all' },
-                ]}
-              />
-            )}
+            {currentUser?.currentRole &&
+              isUserManager(currentUser.currentRole) && (
+                <Filter
+                  onFilterOptionClick={(filterOption) =>
+                    setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                  }
+                  activeFilterOption={openness}
+                  filterList={[
+                    { label: 'Открытые', value: 'opened' },
+                    { label: 'Закрытые', value: 'closed' },
+                    { label: 'Все', value: 'all' },
+                  ]}
+                />
+              )}
 
             <Filter
               onFilterOptionClick={(filterOption) =>
@@ -234,7 +243,8 @@ const IntensivesPage: FC = () => {
           ) : (
             <>
               {sortedIntensives.length !== 0 ? (
-                currentUser?.roles.includes('Организатор') ? (
+                currentUser?.currentRole &&
+                isUserManager(currentUser.currentRole) ? (
                   <Table
                     onClick={intensiveClickHandler}
                     columns={columns}

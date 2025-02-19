@@ -1,29 +1,27 @@
 import { FC, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
+import { motion } from 'framer-motion';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
-import UserIcon from '../components/icons/UserIcon';
+import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 
 import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
 
 import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppDispatch } from '../redux/store';
+import { useAppDispatch, useAppSelector } from '../redux/store';
 import { setCurrentUser } from '../redux/slices/userSlice';
+import { redirectByRole } from '../helpers/urlHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const currentUser = useAppSelector((state) => state.user.data);
 
   const [signIn] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
 
-  const [localCurrentUser, setLocalCurrentUser] = useState<IUser | null>(null);
-  const [rolesToChoose, setRolesToChoose] = useState<UserRole[]>([]);
-  const [chosenRole, setChosenRole] = useState<UserRole | null>(null);
-  const [roleError, setRoleError] = useState<boolean>(false);
+  const [tempUser, setTempUser] = useState<IUser | null>(null);
 
   const {
     handleSubmit,
@@ -35,19 +33,10 @@ const SignInPage: FC = () => {
   });
 
   useEffect(() => {
-    if (localCurrentUser) {
-      if (localCurrentUser.roles.includes('Студент')) {
-        setRolesToChoose([...localCurrentUser.roles, 'Наставник']);
-      } else {
-        if (localCurrentUser.roles.length === 1) {
-          setCurrentRoleEverywhere(localCurrentUser.roles[0]);
-          redirectAccordingToRole(localCurrentUser.roles[0]);
-        } else {
-          setRolesToChoose(localCurrentUser.roles);
-        }
-      }
+    if (currentUser && currentUser.currentRole) {
+      redirectByRole(currentUser.currentRole);
     }
-  }, [localCurrentUser]);
+  }, [currentUser]);
 
   const onSubmit = async (data: ISignIn) => {
     const { data: responseData, error: responseError } = await signIn(data);
@@ -62,7 +51,31 @@ const SignInPage: FC = () => {
 
       const { data: userData } = await getUserInfo();
       if (userData) {
-        setLocalCurrentUser(userData);
+        let updatedRoles: UserRole[] = userData.roles;
+        let isUserOnlyStudent: boolean = false;
+
+        if (userData.roles.some((role) => role.name === 'Student')) {
+          updatedRoles = [
+            ...userData.roles,
+            { name: 'Mentor', displayName: 'Наставник' },
+          ];
+          isUserOnlyStudent = true;
+        }
+
+        if (
+          updatedRoles.length === 1 ||
+          (updatedRoles.length === 2 && isUserOnlyStudent)
+        ) {
+          setUserWithCurrentRole(
+            { ...userData, roles: updatedRoles },
+            userData.roles[0]
+          );
+        } else {
+          setTempUser({
+            ...userData,
+            roles: updatedRoles,
+          });
+        }
       }
     }
 
@@ -74,127 +87,86 @@ const SignInPage: FC = () => {
     }
   };
 
-  const onRoleClick = (role: UserRole) => {
-    setChosenRole(role);
-    if (roleError === true) {
-      setRoleError(false);
+  const onContinueButtonClick = (role: UserRole) => {
+    if (tempUser) {
+      setUserWithCurrentRole(tempUser, role);
     }
   };
 
-  const onContinueButtonClick = () => {
-    if (chosenRole === null) {
-      setRoleError(true);
-      return;
-    }
-    setCurrentRoleEverywhere(chosenRole);
-    redirectAccordingToRole(chosenRole);
-  };
-
-  const setCurrentRoleEverywhere = (role: UserRole) => {
-    if (localCurrentUser) {
-      dispatch(
-        setCurrentUser({
-          ...localCurrentUser,
-          currentRole: role,
-        })
-      );
-      localStorage.setItem('currentRole', role);
-    }
-  };
-
-  const redirectAccordingToRole = (role: UserRole) => {
-    if (role === 'Администратор') {
-      navigate('/admin');
-    } else {
-      navigate('/intensives');
-    }
+  const setUserWithCurrentRole = (tempUser: IUser, currentRole: UserRole) => {
+    dispatch(
+      setCurrentUser({
+        ...tempUser,
+        currentRole: currentRole,
+      })
+    );
+    localStorage.setItem('currentRole', currentRole.name);
   };
 
   return (
-    <>
-      <div className="flex justify-center mt-20">
-        <div className="flex flex-col gap-6 w-[480px]">
-          {rolesToChoose.length > 0 ? (
-            <>
-              <div className="mx-auto text-[28px] font-bold">
-                Выбор роли пользователя
-              </div>
+    <div className="w-full px-3 mt-20 md:flex md:justify-center">
+      <div className="md:w-[480px]">
+        {tempUser ? (
+          <motion.div
+            className="flex flex-col gap-6"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <div className="text-center text-[28px] font-bold">
+              Выбор роли пользователя
+            </div>
 
-              <div className="flex flex-wrap justify-center gap-4">
-                {rolesToChoose.map((roleToChoose, index) => (
-                  <div
-                    className={`group select-none flex flex-col gap-4 items-center justify-center text-lg transition duration-300 ease-in-out rounded-lg cursor-pointer w-36 h-36 hover:text-white bg-another_white hover:bg-blue ${
-                      roleToChoose === chosenRole &&
-                      `border-solid border-2 border-blue`
-                    }`}
-                    key={index}
-                    onClick={() => onRoleClick(roleToChoose)}
-                  >
-                    <UserIcon
-                      className="w-10 h-10"
-                      pathClassName="transition duration-300 ease-in-out fill-black group-hover:fill-white"
-                    />
-                    <div>{roleToChoose}</div>
-                  </div>
-                ))}
-              </div>
-
-              {roleError && (
-                <div className="mx-auto text-base text-red">
-                  Необходимо выбрать роль
-                </div>
-              )}
-
-              <PrimaryButton
-                children="Продолжить"
-                onClick={onContinueButtonClick}
+            <ChoosingRoleComponent
+              rolesToChoose={tempUser.roles}
+              onContinueButtonClick={onContinueButtonClick}
+            />
+          </motion.div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            <div className="mx-auto text-[28px] font-bold">Авторизация</div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              <InputDescription
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                fieldName="email"
+                placeholder="Введите email"
+                description="Email"
+                errorMessage={
+                  typeof errors.email?.message === 'string'
+                    ? errors.email.message
+                    : ''
+                }
               />
-            </>
-          ) : (
-            <>
-              <div className="mx-auto text-[28px] font-bold">Авторизация</div>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <InputDescription
-                  register={register}
-                  registerOptions={{
-                    required: 'Поле обязательно для заполнения',
-                  }}
-                  fieldName="email"
-                  placeholder="Введите email"
-                  description="Email"
-                  errorMessage={
-                    typeof errors.email?.message === 'string'
-                      ? errors.email.message
-                      : ''
-                  }
-                />
 
-                <InputDescription
-                  register={register}
-                  registerOptions={{
-                    required: 'Поле обязательно для заполнения',
-                  }}
-                  fieldName="password"
-                  placeholder="Введите пароль"
-                  description="Пароль"
-                  type="password"
-                  errorMessage={
-                    typeof errors.password?.message === 'string'
-                      ? errors.password.message
-                      : ''
-                  }
-                />
+              <InputDescription
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                fieldName="password"
+                placeholder="Введите пароль"
+                description="Пароль"
+                type="password"
+                errorMessage={
+                  typeof errors.password?.message === 'string'
+                    ? errors.password.message
+                    : ''
+                }
+              />
 
-                <PrimaryButton children="Войти в систему" type="submit" />
-              </form>
-            </>
-          )}
-        </div>
+              <PrimaryButton children="Войти в систему" type="submit" />
+            </form>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
