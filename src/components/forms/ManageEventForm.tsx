@@ -76,10 +76,12 @@ const ManageEventForm: FC = () => {
   const { intensiveId } = useParams();
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const currentUser = useAppSelector((state) => state.user.data);
 
   const {
     register,
     handleSubmit,
+    setValue,
     setError,
     reset,
     watch,
@@ -88,30 +90,38 @@ const ManageEventForm: FC = () => {
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
-  const formValues = watch();
+  const { startDate, scoreType, markStrategy } = watch();
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
 
   const { data: event } = useGetEventQuery(
     Number(searchParams.get('eventId')) || skipToken,
-    { refetchOnMountOrArgChange: true }
+    { refetchOnMountOrArgChange: true, skip: !currentUser }
   );
 
   const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
     refetchOnMountOrArgChange: true,
+    skip: !currentUser,
   });
   const teachersToChoose = currentIntensive?.teachers;
   const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
     Number(intensiveId),
     {
       refetchOnMountOrArgChange: true,
+      skip: !currentUser,
     }
   );
   // TODO: начать получать аудитории университета интенсива
-  const { data: audiencesToChoose } = useGetAudiencesQuery();
-  const { data: markStrategies } = useGetMarkStrategiesQuery();
-  const { data: criterias } = useGetCriteriasQuery();
+  const { data: audiencesToChoose } = useGetAudiencesQuery(undefined, {
+    skip: !currentUser,
+  });
+  const { data: markStrategies } = useGetMarkStrategiesQuery(undefined, {
+    skip: !currentUser,
+  });
+  const { data: criterias } = useGetCriteriasQuery(undefined, {
+    skip: !currentUser,
+  });
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [successfulSaveModal, setSuccessfulSaveModal] = useState<{
@@ -172,6 +182,12 @@ const ManageEventForm: FC = () => {
       }
     }
   }, [event, markStrategies]);
+
+  useEffect(() => {
+    if (startDate && !event) {
+      setValue('finishDate', startDate);
+    }
+  }, [startDate]);
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
@@ -245,7 +261,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.startDate,
+            data.finishDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -278,7 +294,7 @@ const ManageEventForm: FC = () => {
             data.startTime
           ),
           finishDate: transformSeparateDateAndTimeToISO(
-            data.startDate,
+            data.finishDate,
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
@@ -458,19 +474,34 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div>
+            <div className="flex justify-between gap-2.5">
               <InputDescription
                 fieldName="startDate"
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно для заполнения',
                 }}
-                description="Дата проведения"
-                placeholder="Дата проведения"
+                description="Дата начала"
+                placeholder="Дата начала"
                 type="date"
                 errorMessage={
                   typeof errors.startDate?.message === 'string'
                     ? errors.startDate.message
+                    : ''
+                }
+              />
+              <InputDescription
+                fieldName="finishDate"
+                register={register}
+                registerOptions={{
+                  required: 'Поле обязательно для заполнения',
+                }}
+                description="Дата окончания"
+                placeholder="Дата окончания"
+                type="date"
+                errorMessage={
+                  typeof errors.finishDate?.message === 'string'
+                    ? errors.finishDate.message
                     : ''
                 }
               />
@@ -574,34 +605,26 @@ const ManageEventForm: FC = () => {
                 register={register}
                 fieldName="scoreType"
                 value="withoutMarkStrategy"
-                currentValue={formValues.scoreType}
+                currentValue={scoreType}
                 description="Без оценивания"
               />
               <InputRadio
                 register={register}
                 fieldName="scoreType"
                 value="withMarkStrategy"
-                currentValue={formValues.scoreType}
+                currentValue={scoreType}
                 description="Оценивание по шкале"
               >
-                {renderMarkStrategies(
-                  markStrategies,
-                  register,
-                  formValues.markStrategy
-                )}
+                {renderMarkStrategies(markStrategies, register, markStrategy)}
               </InputRadio>
               <InputRadio
                 register={register}
                 value="withCriterias"
                 fieldName="scoreType"
-                currentValue={formValues.scoreType}
+                currentValue={scoreType}
                 description="Оценивание по шкале с критериями"
               >
-                {renderMarkStrategies(
-                  markStrategies,
-                  register,
-                  formValues.markStrategy
-                )}
+                {renderMarkStrategies(markStrategies, register, markStrategy)}
 
                 {criterias && (
                   <div className="mt-3">
