@@ -9,6 +9,12 @@ export interface IEventAnswer {
   files: IFile[];
 }
 
+export interface IEventAnswerShort {
+  id: number;
+  createdDt: Date;
+  hasMarks: boolean;
+}
+
 export interface IEventAnswerCreate {
   event: number;
   text: string;
