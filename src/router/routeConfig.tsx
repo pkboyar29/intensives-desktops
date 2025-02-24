@@ -13,7 +13,7 @@ import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
-import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
+import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
@@ -40,7 +40,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'teams',
@@ -76,7 +76,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'teams',
@@ -108,7 +108,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'editIntensive',

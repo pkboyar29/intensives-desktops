@@ -16,6 +16,21 @@ const getTimeFromDate = (date: Date): string => {
   return `${hours}:${minutes}`;
 };
 
+const getEventDateDisplayString = (
+  startDate: Date,
+  finishDate: Date
+): string => {
+  if (startDate.getDate() === finishDate.getDate()) {
+    return `${getTimeFromDate(startDate)} - ${getTimeFromDate(
+      finishDate
+    )} ${startDate.toLocaleDateString()}`;
+  } else {
+    return `${startDate.toLocaleDateString()}  ${getTimeFromDate(
+      startDate
+    )} - ${finishDate.toLocaleDateString()}  ${getTimeFromDate(finishDate)}`;
+  }
+};
+
 const getISODateInUTC3 = (date: string | Date): string => {
   // Преобразуем строку в объект Date, если это строка
   const parsedDate = typeof date === 'string' ? new Date(date) : date;
@@ -52,4 +67,5 @@ export {
   getISODateInUTC3,
   getISODateTimeInUTC3,
   getTimeFromDate,
+  getEventDateDisplayString,
 };
