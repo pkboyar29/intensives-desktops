@@ -161,7 +161,7 @@ const IntensivesPage: FC = () => {
   };
 
   return (
-    <div className="max-w-[1280px] mt-[95px] mx-auto px-4">
+    <div className="max-w-[1280px] mt-10 mx-auto px-4">
       <Title text="Интенсивы" />
 
       <div className="mt-8">

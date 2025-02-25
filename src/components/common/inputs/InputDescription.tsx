@@ -10,6 +10,7 @@ interface InputDescriptionProps {
   isTextArea?: boolean;
   errorMessage?: string;
   type?: HTMLInputTypeAttribute;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 const InputDescription: FC<InputDescriptionProps> = ({
@@ -21,6 +22,7 @@ const InputDescription: FC<InputDescriptionProps> = ({
   isTextArea = false,
   errorMessage,
   type,
+  inputProps,
 }) => {
   return (
     <div className="flex flex-col w-full gap-2 text-lg">
@@ -28,6 +30,7 @@ const InputDescription: FC<InputDescriptionProps> = ({
 
       {!isTextArea ? (
         <input
+          {...inputProps}
           type={type ? type : 'text'}
           placeholder={placeholder}
           {...register(fieldName, registerOptions)}

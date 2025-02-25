@@ -1,6 +1,5 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { IFile } from '../ts/interfaces/IFile';
-import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
 import { formatFileSize } from '../helpers/fileHelpers';
 import DownloadFileItem from './DownloadFileItem';
 

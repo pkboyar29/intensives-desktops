@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { IFile } from '../ts/interfaces/IFile';
-import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
+import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import { formatFileSize } from '../helpers/fileHelpers';
 import DownloadFileItem from './DownloadFileItem';
 
@@ -47,7 +47,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
                     <span className="text-xs text-gray-500">
                       {formatFileSize(file.size)} •{' '}
                       {file.createdDt
-                        ? getISODateTimeInUTC3(file.createdDt)
+                        ? getDateTimeDisplay(file.createdDt)
                         : 'Неизвестная дата'}
                     </span>
                   </div>

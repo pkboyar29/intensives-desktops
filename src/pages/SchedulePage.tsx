@@ -80,6 +80,9 @@ const SchedulePage: FC = () => {
       audienceId: event.audience.id,
       stageId: event.stageId ? event.stageId : null,
       markStrategyId: event.markStrategy ? event.markStrategy.id : null,
+      deadlineDate: event.deadlineDate
+        ? event.deadlineDate.toISOString()
+        : null,
       criteriaIds: event.criterias.map((criteria) => criteria.id),
     });
 

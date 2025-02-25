@@ -1,8 +1,10 @@
 import { FC, useEffect, useState } from 'react';
-import { useForm, Controller, UseFormRegister } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
+  addOneDay,
   getISODateInUTC3,
+  getISODateTimeInUTC3,
   getTimeFromDate,
   transformSeparateDateAndTimeToISO,
 } from '../../helpers/dateHelpers';
@@ -18,7 +20,6 @@ import {
   useCreateEventMutation,
   useUpdateEventMutation,
 } from '../../redux/api/eventApi';
-
 import { useAppSelector } from '../../redux/store';
 
 import Select from '../common/inputs/Select';
@@ -44,6 +45,7 @@ interface ManageEventFormFields {
   stage: number;
   scoreType: 'withoutMarkStrategy' | 'withMarkStrategy' | 'withCriterias';
   markStrategy: string;
+  deadlineDate: string;
   criterias: Item[];
   teams: Item[];
   teachers: Item[];
@@ -53,22 +55,6 @@ interface Item {
   id: number;
   name: string;
 }
-
-const renderMarkStrategies = (
-  markStrategies: IMarkStrategy[] | undefined,
-  register: UseFormRegister<ManageEventFormFields>,
-  currentValue: string
-) =>
-  markStrategies?.map((markStrategy) => (
-    <InputRadio
-      register={register}
-      fieldName="markStrategy"
-      key={markStrategy.id}
-      value={markStrategy.id.toString()}
-      currentValue={currentValue}
-      description={markStrategy.name}
-    />
-  ));
 
 const ManageEventForm: FC = () => {
   const navigate = useNavigate();
@@ -90,7 +76,7 @@ const ManageEventForm: FC = () => {
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
-  const { startDate, scoreType, markStrategy } = watch();
+  const { startDate, startTime, scoreType, markStrategy } = watch();
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -161,6 +147,9 @@ const ManageEventForm: FC = () => {
           markStrategy: event.markStrategy
             ? event.markStrategy.id.toString()
             : markStrategies[0].id.toString(),
+          deadlineDate: event.deadlineDate
+            ? getISODateTimeInUTC3(event.deadlineDate)
+            : undefined,
           criterias: event.criterias.map((criteria) => ({
             id: criteria.id,
             name: criteria.name,
@@ -188,6 +177,76 @@ const ManageEventForm: FC = () => {
       setValue('finishDate', startDate);
     }
   }, [startDate]);
+
+  const renderMarkStrategies = (
+    markStrategies: IMarkStrategy[] | undefined,
+    currentValue: string
+  ) =>
+    markStrategies?.map((markStrategy) => (
+      <InputRadio
+        register={register}
+        fieldName="markStrategy"
+        key={markStrategy.id}
+        value={markStrategy.id.toString()}
+        currentValue={currentValue}
+        description={markStrategy.name}
+      />
+    ));
+
+  const renderDeadlineDateInput = () => (
+    <InputDescription
+      inputProps={{
+        min: transformSeparateDateAndTimeToISO(startDate, startTime),
+        max: currentIntensive
+          ? getISODateTimeInUTC3(addOneDay(currentIntensive.closeDate))
+          : undefined,
+      }}
+      fieldName="deadlineDate"
+      register={register}
+      registerOptions={{
+        required: 'Поле обязательно для заполнения',
+        validate: {
+          lessThanEventStartDate: (value: string, formValues) => {
+            const deadlineDateTime: Date = new Date(value);
+            const eventStartDateTime: Date = new Date(
+              transformSeparateDateAndTimeToISO(
+                formValues.startDate,
+                formValues.startTime
+              )
+            );
+
+            return (
+              deadlineDateTime >= eventStartDateTime ||
+              'Дата дедлайна не может быть раньше даты начала мероприятия'
+            );
+          },
+          moreThanIntensiveCloseDate: (value: string) => {
+            if (currentIntensive) {
+              const deadlineISODate: string = value.split('T')[0];
+              const intensiveCloseISODate: string = getISODateInUTC3(
+                currentIntensive.closeDate
+              );
+
+              return (
+                deadlineISODate <= intensiveCloseISODate ||
+                'Дата дедлайна дедлайна не может быть позже даты окончания интенсива'
+              );
+            } else {
+              return false;
+            }
+          },
+        },
+      }}
+      description="Дата дедлайна (времени окончания отправки ответов)"
+      placeholder="Дата дедлайна"
+      type="datetime-local"
+      errorMessage={
+        typeof errors.deadlineDate?.message === 'string'
+          ? errors.deadlineDate.message
+          : ''
+      }
+    />
+  );
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
@@ -226,24 +285,28 @@ const ManageEventForm: FC = () => {
 
     let scoreRequestBody: {
       markStrategyId: number | null;
+      deadlineDate: string | null;
       criteriaIds: number[];
     };
     switch (scoreType) {
       case 'withoutMarkStrategy':
         scoreRequestBody = {
           markStrategyId: null,
+          deadlineDate: null,
           criteriaIds: [],
         };
         break;
       case 'withMarkStrategy':
         scoreRequestBody = {
           markStrategyId: Number(data.markStrategy),
+          deadlineDate: data.deadlineDate,
           criteriaIds: [],
         };
         break;
       case 'withCriterias':
         scoreRequestBody = {
           markStrategyId: Number(data.markStrategy),
+          deadlineDate: data.deadlineDate,
           criteriaIds: data.criterias.map((criteria) => criteria.id),
         };
         break;
@@ -549,7 +612,7 @@ const ManageEventForm: FC = () => {
                   register={register}
                   registerOptions={{
                     validate: {
-                      equalZero: (value: string, formValues) =>
+                      equalZero: (value: string) =>
                         value != '0' || 'Поле обязательно для заполнения',
                     },
                   }}
@@ -615,7 +678,8 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале"
               >
-                {renderMarkStrategies(markStrategies, register, markStrategy)}
+                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderDeadlineDateInput()}
               </InputRadio>
               <InputRadio
                 register={register}
@@ -624,7 +688,8 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале с критериями"
               >
-                {renderMarkStrategies(markStrategies, register, markStrategy)}
+                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderDeadlineDateInput()}
 
                 {criterias && (
                   <div className="mt-3">
