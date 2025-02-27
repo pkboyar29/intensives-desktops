@@ -44,13 +44,6 @@ export const eventApi = createApi({
       query: (id) => `/events/${id}/`,
       transformResponse: (response: any): IEvent => mapEvent(response),
     }),
-    getEventsOnIntensive: builder.query<IEvent[], number>({
-      query: (intensiveId) => `/events/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): IEvent[] =>
-        response.results.map((unmappedManagerEvent: any) =>
-          mapEvent(unmappedManagerEvent)
-        ),
-    }),
     createEvent: builder.mutation<void, IEventCreate>({
       query: (data) => ({
         url: '/events/',
@@ -101,7 +94,6 @@ export const eventApi = createApi({
 });
 
 export const {
-  useGetEventsOnIntensiveQuery,
   useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,
