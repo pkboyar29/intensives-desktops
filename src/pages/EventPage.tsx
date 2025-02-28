@@ -22,16 +22,20 @@ import {
 } from '../helpers/dateHelpers';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
+import { IEventAnswer, IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
+import { motion } from 'framer-motion';
 
 const EventPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
   const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(false);
+  const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>();
+  const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
+  const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
 
   const [
     getEventAnswers,
-    { data: eventAnswers, isLoading: isLoadingEventAnswers, error },
+    { data: eventAnswersData, isLoading: isLoadingEventAnswers, error },
   ] = useLazyGetEventAnswersQuery();
 
   const navigate = useNavigate();
@@ -73,23 +77,20 @@ const EventPage: FC = () => {
   }, [event, currentUser]);
 
   useEffect(() => {
+    // Сохраняем данные ответов в состояние
+    setEventAnswers(eventAnswersData);
+
     // Проверяем есть ли неоцененные ответы
-    if (
-      eventAnswers &&
-      currentUser?.currentRole &&
-      isUserStudent(currentUser.currentRole)
-    ) {
-      for (const answer in eventAnswers) {
+    if (eventAnswersData) {
+      for (const answer in eventAnswersData) {
         // Если есть неоцененный ответ скрываем кнопку отправить новый ответ
-        if (eventAnswers[answer].hasMarks == false) {
+        if (eventAnswersData[answer].hasMarks == false) {
           setIsCreatingAnswer(false);
           break;
         }
-        // Если не нашлось неоцененного значит можно отправить ответ
-        setIsCreatingAnswer(true);
       }
     }
-  }, [eventAnswers, currentUser]);
+  }, [eventAnswersData]);
 
   return (
     <>
@@ -286,17 +287,43 @@ const EventPage: FC = () => {
                         ? 'Ответы на мероприятие'
                         : 'Ответ на мероприятие не отправлен'}
                     </p>
-                    {eventAnswers.length > 1 ? (
-                      <EventAnswerList
-                        eventAnswersShort={eventAnswers}
-                        clickEventAnswer={(id: number) => console.log(id)}
-                      />
-                    ) : (
-                      <EventAnswer
-                        eventAnswerId={
-                          eventAnswers[0] ? eventAnswers[0].id : undefined
-                        }
-                      />
+                    {eventAnswers.length > 0 && (
+                      <>
+                        <EventAnswerList
+                          eventAnswers={eventAnswers}
+                          expandedAnswer={expandedAnswer}
+                          clickEventAnswer={(id: number) =>
+                            setExpandedAnswer((prev) =>
+                              prev === id ? null : id
+                            )
+                          }
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                          animate={
+                            expandedAnswer
+                              ? { opacity: 1, height: 'auto', scale: 1 }
+                              : {}
+                          }
+                          exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          {expandedAnswer && (
+                            <EventAnswer
+                              eventAnswerId={expandedAnswer}
+                              hasMarks={
+                                eventAnswers.find(
+                                  (answer) => answer.id === expandedAnswer
+                                )?.hasMarks
+                              }
+                            />
+                          )}
+                        </motion.div>
+                      </>
+                    )}
+                    {isCreatingAnswer && !expandedAnswer && (
+                      <EventAnswer eventId={Number(params.eventId)} />
                     )}
                   </>
                 ) : (

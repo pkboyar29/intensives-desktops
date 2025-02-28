@@ -1,25 +1,31 @@
 import { FC, useState } from 'react';
-import { IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
+import { IEventAnswer, IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
 import { getISODateInUTC3, getISODateTimeInUTC3 } from '../helpers/dateHelpers';
 
 type EventAnswerListProps = {
-  eventAnswersShort: IEventAnswerShort[];
+  eventAnswers: IEventAnswer[];
+  expandedAnswer?: number | null;
   clickEventAnswer: (id: number) => void;
 };
 
 const EventAnswerList: FC<EventAnswerListProps> = ({
-  eventAnswersShort,
+  eventAnswers,
+  expandedAnswer,
   clickEventAnswer,
 }) => {
   return (
     <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
       <p className="mb-4 text-xl font-semibold"></p>
-      {eventAnswersShort && eventAnswersShort.length > 0 ? (
-        eventAnswersShort.map((eventAnswer, index) => (
+      {eventAnswers && eventAnswers.length > 0 ? (
+        eventAnswers.map((eventAnswer, index) => (
           <div
             key={eventAnswer.id}
             className={`p-4 mb-2 rounded-lg shadow-sm cursor-pointer duration-75 border hover:text-blue
-              ${eventAnswer.hasMarks ? 'border-green-400' : ''}`}
+              ${eventAnswer.hasMarks ? 'border-green-400' : ''} ${
+              expandedAnswer && expandedAnswer == eventAnswer.id
+                ? 'text-dark_blue'
+                : ''
+            }`}
             onClick={() => clickEventAnswer(eventAnswer.id)}
           >
             <div className="flex items-center justify-between">

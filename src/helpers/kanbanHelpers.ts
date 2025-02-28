@@ -17,10 +17,9 @@ export const KANBAN_COLORS = [
 ];
 
 export const validateKanban = (name: string): boolean => {
-  const regex = /^[a-zA-Zа-яА-Я0-9 _-]+$/; // Регулярка для разрешенных символов
-  if (name.trim() === '') {
-    return false;
-  }
+  // Можно сделать общей не только для канбана
+  const regex = /^[a-zA-Zа-яА-Я0-9.,!?@#%&*()_+=\-/\\:;"'<>[\]{}|`~\s]+$|^$/; // Регулярка для разрешенных символов
+
   if (!regex.test(name)) {
     return false;
   }
