@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { useAppSelector } from '../../redux/store';
+import { isUserManager } from '../../helpers/userHelpers';
 
 import EventInSchedule from './EventInSchedule';
 import TrashIcon from '../icons/TrashIcon';
@@ -25,6 +27,8 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
   onEventClick,
   onEventEyeIconClick,
 }) => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
   return (
     <section>
       <div className="flex justify-between">
@@ -35,25 +39,27 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
             {stage.finishDate.toLocaleDateString()}
           </div>
         </div>
-        <div className="flex gap-4">
-          <button
-            className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-            onClick={() => {
-              onEditClick(stage);
-            }}
-          >
-            <EditIcon />
-          </button>
+        {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
+          <div className="flex gap-4">
+            <button
+              className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
+              onClick={() => {
+                onEditClick(stage);
+              }}
+            >
+              <EditIcon />
+            </button>
 
-          <button
-            className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-            onClick={() => {
-              onDeleteClick(stage.id);
-            }}
-          >
-            <TrashIcon />
-          </button>
-        </div>
+            <button
+              className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
+              onClick={() => {
+                onDeleteClick(stage.id);
+              }}
+            >
+              <TrashIcon />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-2.5 ml-2.5">

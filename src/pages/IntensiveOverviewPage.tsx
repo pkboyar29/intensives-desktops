@@ -14,7 +14,7 @@ import Modal from '../components/common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import AttachedFileList from '../components/AttachedFileList';
 
-const ManagerIntensiveOverviewPage: FC = () => {
+const IntensiveOverviewPage: FC = () => {
   const navigate = useNavigate();
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -190,4 +190,4 @@ const ManagerIntensiveOverviewPage: FC = () => {
   );
 };
 
-export default ManagerIntensiveOverviewPage;
+export default IntensiveOverviewPage;

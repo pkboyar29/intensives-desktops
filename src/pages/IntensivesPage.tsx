@@ -161,112 +161,109 @@ const IntensivesPage: FC = () => {
   };
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4">
-      <div className="mt-10">
-        <Title text="Интенсивы" />
+    <div className="max-w-[1280px] mt-10 mx-auto px-4">
+      <Title text="Интенсивы" />
 
-        <div className="mt-10">
+      <div className="mt-8">
+        {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
+          <div className="flex justify-end">
+            <div className="ml-auto">
+              <PrimaryButton
+                children="Создать интенсив"
+                clickHandler={() => navigate(`/createIntensive`)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
+        <SearchIcon className="text-gray-500" />
+        <input
+          value={searchText}
+          onChange={searchInputChangeHandler}
+          className="w-full pl-4 bg-another_white focus:outline-none"
+          placeholder="Поиск"
+        />
+      </div>
+
+      <div className="flex items-center justify-between gap-8 mt-5">
+        <div className="flex gap-8">
           {currentUser?.currentRole &&
             isUserManager(currentUser.currentRole) && (
-              <div className="flex justify-end">
-                <div className="ml-auto">
-                  <PrimaryButton
-                    children="Создать интенсив"
-                    clickHandler={() => navigate(`/createIntensive`)}
-                  />
-                </div>
-              </div>
+              <Filter
+                onFilterOptionClick={(filterOption) =>
+                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                }
+                activeFilterOption={openness}
+                filterList={[
+                  { label: 'Открытые', value: 'opened' },
+                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Все', value: 'all' },
+                ]}
+              />
             )}
-        </div>
 
-        <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
-          <SearchIcon className="text-gray-500" />
-          <input
-            value={searchText}
-            onChange={searchInputChangeHandler}
-            className="w-full pl-4 bg-another_white focus:outline-none"
-            placeholder="Поиск"
+          <Filter
+            onFilterOptionClick={(filterOption) =>
+              setRelevance(filterOption as 'all' | 'past' | 'relevant')
+            }
+            activeFilterOption={relevance}
+            filterList={[
+              { label: 'Актуальные', value: 'relevant' },
+              { label: 'Прошедшие', value: 'past' },
+              { label: 'Все', value: 'all' },
+            ]}
           />
         </div>
 
-        <div className="flex items-center justify-between gap-8 mt-5">
-          <div className="flex gap-8">
-            {currentUser?.currentRole &&
-              isUserManager(currentUser.currentRole) && (
-                <Filter
-                  onFilterOptionClick={(filterOption) =>
-                    setOpenness(filterOption as 'all' | 'opened' | 'closed')
-                  }
-                  activeFilterOption={openness}
-                  filterList={[
-                    { label: 'Открытые', value: 'opened' },
-                    { label: 'Закрытые', value: 'closed' },
-                    { label: 'Все', value: 'all' },
-                  ]}
-                />
-              )}
+        <select
+          onChange={selectChangeHandler}
+          value={sortOption}
+          className="bg-another_white rounded-xl p-1.5"
+        >
+          <option value="fromOldToNew">
+            Сортировка по дате (сначала старые)
+          </option>
+          <option value="fromNewToOld">
+            Сортировка по дате (сначала новые)
+          </option>
+        </select>
+      </div>
 
-            <Filter
-              onFilterOptionClick={(filterOption) =>
-                setRelevance(filterOption as 'all' | 'past' | 'relevant')
-              }
-              activeFilterOption={relevance}
-              filterList={[
-                { label: 'Актуальные', value: 'relevant' },
-                { label: 'Прошедшие', value: 'past' },
-                { label: 'Все', value: 'all' },
-              ]}
-            />
+      <div className="mt-10">
+        {isLoading ? (
+          <Skeleton />
+        ) : intensives?.length === 0 ? (
+          <div className="text-xl font-bold">
+            Для вас нету открытых интенсивов
           </div>
-
-          <select
-            onChange={selectChangeHandler}
-            value={sortOption}
-            className="bg-another_white rounded-xl p-1.5"
-          >
-            <option value="fromOldToNew">
-              Сортировка по дате (сначала старые)
-            </option>
-            <option value="fromNewToOld">
-              Сортировка по дате (сначала новые)
-            </option>
-          </select>
-        </div>
-
-        <div className="mt-10">
-          {isLoading ? (
-            <Skeleton />
-          ) : intensives?.length === 0 ? (
-            <div className="text-xl font-bold">
-              Для вас нету открытых интенсивов
-            </div>
-          ) : (
-            <>
-              {sortedIntensives.length !== 0 ? (
-                currentUser?.currentRole &&
-                isUserManager(currentUser.currentRole) ? (
-                  <Table
-                    onClick={intensiveClickHandler}
-                    columns={columns}
-                    data={sortedIntensives}
-                  />
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {sortedIntensives.map((intensive) => (
-                      <IntensiveCard
-                        key={intensive.id}
-                        intensive={intensive}
-                        onClick={intensiveClickHandler}
-                      />
-                    ))}
-                  </div>
-                )
+        ) : (
+          <>
+            {sortedIntensives.length !== 0 ? (
+              currentUser?.currentRole &&
+              isUserManager(currentUser.currentRole) ? (
+                <Table
+                  onClick={intensiveClickHandler}
+                  columns={columns}
+                  data={sortedIntensives}
+                />
               ) : (
-                <div className="text-xl font-bold">Ничего не найдено</div>
-              )}
-            </>
-          )}
-        </div>
+                <div className="flex flex-col gap-4">
+                  {sortedIntensives.map((intensive) => (
+                    <IntensiveCard
+                      key={intensive.id}
+                      intensive={intensive}
+                      onClick={intensiveClickHandler}
+                    />
+                  ))}
+                </div>
+              )
+            ) : (
+              <div className="text-xl font-bold">Ничего не найдено</div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

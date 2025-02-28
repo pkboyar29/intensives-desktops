@@ -136,7 +136,7 @@ const Header: FC = () => {
       )}
 
       <header
-        className={`sticky top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
+        className={`fixed w-full top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
       >
         <div className="container md:relative">
           <div className="flex items-center justify-between">

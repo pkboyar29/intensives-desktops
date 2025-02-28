@@ -18,7 +18,7 @@ export const stageApi = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getStagesForIntensive: builder.query<IStage[], number>({
-      query: (intensiveId) => `/stages/?intensive=${intensiveId}`,
+      query: (intensiveId) => `/stages/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): IStage[] =>
         response.results.map((unmappedStage: any) => mapStage(unmappedStage)),
     }),

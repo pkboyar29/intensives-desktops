@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { useAppSelector } from '../redux/store';
 import { useDeleteStageMutation } from '../redux/api/stageApi';
 import { useUpdateEventMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
@@ -18,10 +18,13 @@ import StageModal from '../components/common/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
 import { IEvent } from '../ts/interfaces/IEvent';
+import { isUserManager } from '../helpers/userHelpers';
 
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
   const navigate = useNavigate();
+
+  const currentUser = useAppSelector((state) => state.user.data);
 
   const [deleteStageAPI] = useDeleteStageMutation();
   const [updateEventAPI] = useUpdateEventMutation();
@@ -80,6 +83,9 @@ const SchedulePage: FC = () => {
       audienceId: event.audience.id,
       stageId: event.stageId ? event.stageId : null,
       markStrategyId: event.markStrategy ? event.markStrategy.id : null,
+      deadlineDate: event.deadlineDate
+        ? event.deadlineDate.toISOString()
+        : null,
       criteriaIds: event.criterias.map((criteria) => criteria.id),
     });
 
@@ -210,32 +216,35 @@ const SchedulePage: FC = () => {
       <div className="max-w-[1280px]">
         <div className="flex items-start justify-between">
           <Title text="Расписание интенсива" />
-          <DisplaySelect
-            isOpen={isDropdownOpen}
-            onDropdownClick={() => setIsDropdownOpen((isOpen) => !isOpen)}
-            dropdownText="Редактировать"
-          >
-            <div className="flex flex-col gap-2.5 text-base">
-              <div
-                className="transition cursor-pointer hover:text-blue"
-                onClick={() => {
-                  setIsDropdownOpen(false);
-                  setStageModal({
-                    status: true,
-                    stage: null,
-                  });
-                }}
+          {currentUser?.currentRole &&
+            isUserManager(currentUser.currentRole) && (
+              <DisplaySelect
+                isOpen={isDropdownOpen}
+                onDropdownClick={() => setIsDropdownOpen((isOpen) => !isOpen)}
+                dropdownText="Редактировать"
               >
-                Добавить этап
-              </div>
-              <div
-                className="transition cursor-pointer hover:text-blue"
-                onClick={() => navigate('editEvent')}
-              >
-                Добавить мероприятие
-              </div>
-            </div>
-          </DisplaySelect>
+                <div className="flex flex-col gap-2.5 text-base">
+                  <div
+                    className="transition cursor-pointer hover:text-blue"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      setStageModal({
+                        status: true,
+                        stage: null,
+                      });
+                    }}
+                  >
+                    Добавить этап
+                  </div>
+                  <div
+                    className="transition cursor-pointer hover:text-blue"
+                    onClick={() => navigate('editEvent')}
+                  >
+                    Добавить мероприятие
+                  </div>
+                </div>
+              </DisplaySelect>
+            )}
         </div>
 
         {isScheduleLoading ? (

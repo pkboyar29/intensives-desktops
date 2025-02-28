@@ -58,48 +58,46 @@ const ManagerMainPage: FC = () => {
       {isError ? (
         <IntensiveNotFoundComponent />
       ) : (
-        <div className="flex h-full">
+        <div className="grid grid-cols-[auto,1fr]">
           <Sidebar>
-            <div className="w-80">
-              {isLoading ? (
-                <Skeleton />
-              ) : (
-                <>
-                  <div className="text-xl font-bold text-black_2">
-                    {currentIntensive?.name}
-                  </div>
-                  <div className="mt-2 text-bright_gray">
-                    {currentIntensive?.openDate.toLocaleDateString()}
-                    {` - `}
-                    {currentIntensive?.closeDate.toLocaleDateString()}
-                  </div>
-                </>
-              )}
+            {isLoading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <div className="text-xl font-bold text-black_2">
+                  {currentIntensive?.name}
+                </div>
+                <div className="mt-2 text-bright_gray">
+                  {currentIntensive?.openDate.toLocaleDateString()}
+                  {` - `}
+                  {currentIntensive?.closeDate.toLocaleDateString()}
+                </div>
+              </>
+            )}
 
-              <div className="mt-3">
-                <SwitchButton
-                  leftSideText="Открыт"
-                  rightSideText="Закрыт"
-                  currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
-                  onSideClick={(side) =>
-                    updateIntensiveOpenness(side === 'left' ? true : false)
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-4 mt-5 mb-3">
-                <SidebarLink to="overview" text="Настройки интенсива" />
-                <SidebarLink to="teams" text="Управление командами" />
-                <SidebarLink to="schedule" text="Управление расписанием" />
-                <SidebarLink to="statistics" text="Статистика" />
-              </div>
-              <PrimaryButton
-                children="Вернуться к списку интенсивов"
-                clickHandler={returnToIntensivesClickHandler}
+            <div className="mt-3">
+              <SwitchButton
+                leftSideText="Открыт"
+                rightSideText="Закрыт"
+                currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
+                onSideClick={(side) =>
+                  updateIntensiveOpenness(side === 'left' ? true : false)
+                }
               />
             </div>
+
+            <div className="flex flex-col gap-4 mt-5 mb-3">
+              <SidebarLink to="overview" text="Настройки интенсива" />
+              <SidebarLink to="teams" text="Управление командами" />
+              <SidebarLink to="schedule" text="Управление расписанием" />
+              <SidebarLink to="statistics" text="Статистика" />
+            </div>
+            <PrimaryButton
+              children="Вернуться к списку интенсивов"
+              clickHandler={returnToIntensivesClickHandler}
+            />
           </Sidebar>
-          <div className="w-full p-10">
+          <div className="w-full px-10 pt-5">
             <Outlet />
           </div>
         </div>

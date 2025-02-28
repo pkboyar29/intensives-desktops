@@ -15,6 +15,7 @@ export interface IEvent {
   teams: ITeam[];
   teachers: ITeacher[];
   markStrategy: IMarkStrategy | null;
+  deadlineDate: Date | null;
   criterias: ICriteria[];
   visibility: boolean;
 }
@@ -31,6 +32,7 @@ export interface IEventCreate {
   teamIds: number[];
   teacherIds: number[];
   markStrategyId: number | null;
+  deadlineDate: string | null;
   criteriaIds: number[];
 }
 

@@ -8,7 +8,7 @@ import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
 import { mapCriteria } from './criteriaApi';
 
-export const mapManagerEvent = (unmappedEvent: any): IEvent => {
+export const mapEvent = (unmappedEvent: any): IEvent => {
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
@@ -27,6 +27,9 @@ export const mapManagerEvent = (unmappedEvent: any): IEvent => {
     markStrategy:
       unmappedEvent.mark_strategy &&
       mapMarkStrategy(unmappedEvent.mark_strategy),
+    deadlineDate: unmappedEvent.deadline_dt
+      ? new Date(unmappedEvent.deadline_dt)
+      : null,
     criterias: unmappedEvent.criterias.map((unmappedCriteria: any) =>
       mapCriteria(unmappedCriteria)
     ),
@@ -39,14 +42,7 @@ export const eventApi = createApi({
   endpoints: (builder) => ({
     getEvent: builder.query<IEvent, number>({
       query: (id) => `/events/${id}/`,
-      transformResponse: (response: any): IEvent => mapManagerEvent(response),
-    }),
-    getEventsOnIntensive: builder.query<IEvent[], number>({
-      query: (intensiveId) => `/events/?intensiv=${intensiveId}`,
-      transformResponse: (response: any): IEvent[] =>
-        response.results.map((unmappedManagerEvent: any) =>
-          mapManagerEvent(unmappedManagerEvent)
-        ),
+      transformResponse: (response: any): IEvent => mapEvent(response),
     }),
     createEvent: builder.mutation<void, IEventCreate>({
       query: (data) => ({
@@ -63,6 +59,7 @@ export const eventApi = createApi({
           finish_dt: data.finishDate,
           mark_strategy: data.markStrategyId,
           criterias: data.criteriaIds,
+          deadline_dt: data.deadlineDate,
           files: [],
         },
       }),
@@ -82,6 +79,7 @@ export const eventApi = createApi({
           finish_dt: data.finishDate,
           mark_strategy: data.markStrategyId,
           criterias: data.criteriaIds,
+          deadline_dt: data.deadlineDate,
           files: [],
         },
       }),
@@ -96,7 +94,6 @@ export const eventApi = createApi({
 });
 
 export const {
-  useGetEventsOnIntensiveQuery,
   useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,

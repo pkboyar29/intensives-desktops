@@ -7,13 +7,12 @@ import ManagerMainPage from '../pages/MainPages/ManagerMainPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
-import EventsPage from '../pages/EventsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
-import ManagerIntensiveOverviewPage from '../pages/ManagerIntensiveOverviewPage';
+import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
 import CreateTeamsPage from '../pages/CreateTeamsPage';
 import CreateSupportTeamsPage from '../pages/CreateSupportTeamsPage';
@@ -40,19 +39,18 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'teams',
         element: <TeamsPage />,
       },
       {
-        // TODO: переименовать на schedule
-        path: 'events',
-        element: <EventsPage />,
+        path: 'schedule',
+        element: <SchedulePage />,
       },
       {
-        path: 'events/:eventId',
+        path: 'schedule/:eventId',
         element: <EventPage />,
       },
       {
@@ -76,7 +74,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'teams',
@@ -87,12 +85,11 @@ const routeConfig: RouteType[] = [
         element: <TeamOverviewPage />,
       },
       {
-        // TODO: переименовать на schedule
-        path: 'events',
-        element: <EventsPage />,
+        path: 'schedule',
+        element: <SchedulePage />,
       },
       {
-        path: 'events/:eventId',
+        path: 'schedule/:eventId',
         element: <EventPage />,
       },
       {
@@ -108,7 +105,7 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'overview',
-        element: <ManagerIntensiveOverviewPage />,
+        element: <IntensiveOverviewPage />,
       },
       {
         path: 'editIntensive',

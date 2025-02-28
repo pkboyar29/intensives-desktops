@@ -46,54 +46,52 @@ const StudentMainPage: FC = () => {
       {isError ? (
         <IntensiveNotFoundComponent />
       ) : (
-        <div className="flex h-full">
+        <div className="grid grid-cols-[auto,1fr]">
           <Sidebar>
-            <div className="w-80">
-              {isIntensiveLoading ? (
+            {isIntensiveLoading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <div className="text-xl font-bold text-black_2">
+                  {currentIntensive?.name}
+                </div>
+                <div className="mt-2 text-bright_gray">
+                  {currentIntensive?.openDate.toLocaleDateString()}
+                  {` - `}
+                  {currentIntensive?.closeDate.toLocaleDateString()}
+                </div>
+              </>
+            )}
+
+            <div className="flex flex-col gap-4 my-3">
+              <SidebarLink to="overview" text="Просмотр интенсива" />
+              <SidebarLink to="teams" text="Команды" />
+            </div>
+
+            <div className="my-3">
+              {isTeamLoading ? (
                 <Skeleton />
               ) : (
                 <>
                   <div className="text-xl font-bold text-black_2">
-                    {currentIntensive?.name}
+                    {currentTeam?.name}
                   </div>
-                  <div className="mt-2 text-bright_gray">
-                    {currentIntensive?.openDate.toLocaleDateString()}
-                    {` - `}
-                    {currentIntensive?.closeDate.toLocaleDateString()}
+
+                  <div className="flex flex-col gap-4 my-3">
+                    <SidebarLink to="team-overview" text="Просмотр команды" />
+                    <SidebarLink to="schedule" text="Мероприятия команды" />
+                    <SidebarLink to="kanban" text="Ведение задач" />
                   </div>
                 </>
               )}
-
-              <div className="flex flex-col gap-4 my-3">
-                <SidebarLink to="overview" text="Просмотр интенсива" />
-                <SidebarLink to="teams" text="Команды" />
-                <SidebarLink to="events" text="Мероприятия" />
-              </div>
-
-              <div className="my-3">
-                {isTeamLoading ? (
-                  <Skeleton />
-                ) : (
-                  <>
-                    <div className="text-xl font-bold text-black_2">
-                      {currentTeam?.name}
-                    </div>
-
-                    <div className="flex flex-col gap-4 my-3">
-                      <SidebarLink to="team-overview" text="Просмотр команды" />
-                      <SidebarLink to="kanban" text="Ведение задач" />
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <PrimaryButton
-                children="Вернуться к списку интенсивов"
-                clickHandler={returnToIntensivesClickHandler}
-              />
             </div>
+
+            <PrimaryButton
+              children="Вернуться к списку интенсивов"
+              clickHandler={returnToIntensivesClickHandler}
+            />
           </Sidebar>
-          <div className="w-full p-10">
+          <div className="w-full px-10 pt-5">
             <Outlet />
           </div>
         </div>

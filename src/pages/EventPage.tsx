@@ -16,7 +16,10 @@ import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/common/Chip';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { getTimeFromDate } from '../helpers/dateHelpers';
+import {
+  getEventDateDisplayString,
+  getTimeFromDate,
+} from '../helpers/dateHelpers';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
 
@@ -159,11 +162,11 @@ const EventPage: FC = () => {
                 <Title text={event.name} />
 
                 <div className="flex flex-col gap-4 mt-3">
-                  <div className="flex gap-2 text-base font-bold">
-                    <div>{`${getTimeFromDate(
-                      event.startDate
-                    )} - ${getTimeFromDate(event.finishDate)}`}</div>
-                    <div>{`${event.startDate.toLocaleDateString()}`}</div>
+                  <div className="text-base font-bold">
+                    {getEventDateDisplayString(
+                      event.startDate,
+                      event.finishDate
+                    )}
                   </div>
 
                   <p className="text-lg text-black_2">{event.description}</p>
