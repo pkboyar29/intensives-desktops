@@ -5,6 +5,7 @@ import { isUserStudent, isUserManager } from '../helpers/userHelpers';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
+import { useLazyGetEventAnswersQuery } from '../redux/api/eventAnswerApi';
 
 import Modal from '../components/common/modals/Modal';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -20,10 +21,18 @@ import {
   getTimeFromDate,
 } from '../helpers/dateHelpers';
 import EventAnswer from '../components/EventAnswer';
+import EventAnswerList from '../components/EventAnswerList';
 
 const EventPage: FC = () => {
+  const currentUser = useAppSelector((state) => state.user.data);
   const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(false);
+
+  const [
+    getEventAnswers,
+    { data: eventAnswers, isLoading: isLoadingEventAnswers, error },
+  ] = useLazyGetEventAnswersQuery();
 
   const navigate = useNavigate();
   const params = useParams();
@@ -52,9 +61,35 @@ const EventPage: FC = () => {
     } else {
       setScoreTypeString('Без оценивания');
     }
-  }, [event]);
 
-  const currentUser = useAppSelector((state) => state.user.data);
+    // Загружаем ответы (студентов команды) на мероприятие
+    if (
+      event &&
+      currentUser?.currentRole &&
+      isUserStudent(currentUser.currentRole)
+    ) {
+      getEventAnswers(event.id);
+    }
+  }, [event, currentUser]);
+
+  useEffect(() => {
+    // Проверяем есть ли неоцененные ответы
+    if (
+      eventAnswers &&
+      currentUser?.currentRole &&
+      isUserStudent(currentUser.currentRole)
+    ) {
+      for (const answer in eventAnswers) {
+        // Если есть неоцененный ответ скрываем кнопку отправить новый ответ
+        if (eventAnswers[answer].hasMarks == false) {
+          setIsCreatingAnswer(false);
+          break;
+        }
+        // Если не нашлось неоцененного значит можно отправить ответ
+        setIsCreatingAnswer(true);
+      }
+    }
+  }, [eventAnswers, currentUser]);
 
   return (
     <>
@@ -243,9 +278,30 @@ const EventPage: FC = () => {
                     </div>
                   )}
                 {currentUser?.currentRole &&
-                  isUserStudent(currentUser.currentRole) && (
-                    <EventAnswer eventAnswerId={19} />
-                  )}
+                isUserStudent(currentUser.currentRole) &&
+                eventAnswers ? (
+                  <>
+                    <p className="mb-3 text-xl font-bold text-black_2">
+                      {eventAnswers.length > 0
+                        ? 'Ответы на мероприятие'
+                        : 'Ответ на мероприятие не отправлен'}
+                    </p>
+                    {eventAnswers.length > 1 ? (
+                      <EventAnswerList
+                        eventAnswersShort={eventAnswers}
+                        clickEventAnswer={(id: number) => console.log(id)}
+                      />
+                    ) : (
+                      <EventAnswer
+                        eventAnswerId={
+                          eventAnswers[0] ? eventAnswers[0].id : undefined
+                        }
+                      />
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
               </>
             )
           )}

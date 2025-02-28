@@ -3,6 +3,7 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IEventAnswer,
+  IEventAnswerShort,
   IEventAnswerCreate,
   IEventAnswerUpdate,
 } from '../../ts/interfaces/IEventAnswer';
@@ -19,15 +20,25 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
   };
 };
 
+export const mapEventAnswerShort = (
+  unmappedEventAnswer: any
+): IEventAnswerShort => {
+  return {
+    id: unmappedEventAnswer.id,
+    createdDt: unmappedEventAnswer.created_at,
+    hasMarks: unmappedEventAnswer.has_marks,
+  };
+};
+
 export const eventAnswerApi = createApi({
   reducerPath: 'eventAnswerApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getEventAnswers: builder.query<IEventAnswer[], number>({
+    getEventAnswers: builder.query<IEventAnswerShort[], number>({
       query: (eventId) => `/event_answers/?event=${eventId}`,
-      transformResponse: (response: any): IEventAnswer[] =>
-        response.results.map((unmappedEventAnswer: any) =>
-          mapEventAnswer(unmappedEventAnswer)
+      transformResponse: (response: any): IEventAnswerShort[] =>
+        response.map((unmappedEventAnswer: any) =>
+          mapEventAnswerShort(unmappedEventAnswer)
         ),
     }),
     getEventAnswer: builder.query<IEventAnswer, number>({
