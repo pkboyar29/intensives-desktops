@@ -1,9 +1,11 @@
 import { FC } from 'react';
+import { useAppSelector } from '../../redux/store';
+import { isUserManager } from '../../helpers/userHelpers';
+import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 import EyeIcon from '../icons/EyeIcon';
 
 import { IEvent } from '../../ts/interfaces/IEvent';
-import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 interface EventInScheduleProps {
   event: IEvent;
@@ -16,14 +18,18 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
   onEventClick,
   onEyeIconClick,
 }) => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
   return (
     <section className="flex items-center gap-7">
-      <button>
-        <EyeIcon
-          eyeVisibility={event.visibility}
-          onClick={() => onEyeIconClick(event)}
-        />
-      </button>
+      {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
+        <button>
+          <EyeIcon
+            eyeVisibility={event.visibility}
+            onClick={() => onEyeIconClick(event)}
+          />
+        </button>
+      )}
       <div className="flex flex-col">
         <p
           onClick={() => onEventClick(event.id)}

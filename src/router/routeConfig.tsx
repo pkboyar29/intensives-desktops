@@ -7,7 +7,6 @@ import ManagerMainPage from '../pages/MainPages/ManagerMainPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
-import EventsPage from '../pages/EventsPage';
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
@@ -47,12 +46,11 @@ const routeConfig: RouteType[] = [
         element: <TeamsPage />,
       },
       {
-        // TODO: переименовать на schedule
-        path: 'events',
-        element: <EventsPage />,
+        path: 'schedule',
+        element: <SchedulePage />,
       },
       {
-        path: 'events/:eventId',
+        path: 'schedule/:eventId',
         element: <EventPage />,
       },
       {
@@ -87,12 +85,11 @@ const routeConfig: RouteType[] = [
         element: <TeamOverviewPage />,
       },
       {
-        // TODO: переименовать на schedule
-        path: 'events',
-        element: <EventsPage />,
+        path: 'schedule',
+        element: <SchedulePage />,
       },
       {
-        path: 'events/:eventId',
+        path: 'schedule/:eventId',
         element: <EventPage />,
       },
       {

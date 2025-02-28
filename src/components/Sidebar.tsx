@@ -6,7 +6,7 @@ interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({ children }) => {
   return (
-    <div className="sticky top-[74px] w-auto h-screen px-5 pt-5 border-r border-solid border-r-gray">
+    <div className="sticky top-[74px] w-[325px] h-screen px-5 pt-5 border-r border-solid border-r-gray">
       {children}
     </div>
   );
