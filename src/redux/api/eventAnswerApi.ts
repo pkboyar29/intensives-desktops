@@ -15,8 +15,11 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     id: unmappedEventAnswer.id,
     text: unmappedEventAnswer.text,
     student: unmappedEventAnswer.student,
+    team: unmappedEventAnswer.team,
     createdDt: unmappedEventAnswer.created_at,
     files: unmappedEventAnswer.files,
+    marks: unmappedEventAnswer.marks,
+    hasMarks: unmappedEventAnswer.has_marks,
   };
 };
 
@@ -34,11 +37,11 @@ export const eventAnswerApi = createApi({
   reducerPath: 'eventAnswerApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getEventAnswers: builder.query<IEventAnswerShort[], number>({
+    getEventAnswers: builder.query<IEventAnswer[], number>({
       query: (eventId) => `/event_answers/?event=${eventId}`,
-      transformResponse: (response: any): IEventAnswerShort[] =>
+      transformResponse: (response: any): IEventAnswer[] =>
         response.map((unmappedEventAnswer: any) =>
-          mapEventAnswerShort(unmappedEventAnswer)
+          mapEventAnswer(unmappedEventAnswer)
         ),
     }),
     getEventAnswer: builder.query<IEventAnswer, number>({
