@@ -131,11 +131,6 @@ const EventAnswer: FC<EventAnswerProps> = ({ eventAnswerId }) => {
 
   return (
     <div className="w-[100%] pt-5">
-      <p className="mb-3 text-xl font-bold text-black_2">
-        {eventAnswerId
-          ? 'Ответ на мероприятие'
-          : 'Ответ на мероприятие не отправлен'}
-      </p>
       {eventAnswerId || (!eventAnswerId && isEditing) ? (
         <>
           <textarea
