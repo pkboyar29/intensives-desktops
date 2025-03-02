@@ -217,7 +217,9 @@ const EventPage: FC = () => {
                             </div>
                           }
                           onClick={() => {
-                            navigate(`/manager/${params.intensiveId}/schedule`);
+                            navigate(
+                              `/intensives/${params.intensiveId}/schedule`
+                            );
                           }}
                         />
                       </div>
@@ -226,7 +228,7 @@ const EventPage: FC = () => {
                         children="Редактировать"
                         clickHandler={() => {
                           navigate(
-                            `/manager/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
+                            `/intensives/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
                           );
                         }}
                       />

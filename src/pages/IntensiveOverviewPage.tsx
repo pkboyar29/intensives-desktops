@@ -166,7 +166,7 @@ const IntensiveOverviewPage: FC = () => {
                       children="Редактировать"
                       clickHandler={() => {
                         navigate(
-                          `/manager/${currentIntensive?.id}/editIntensive`
+                          `/intensives/${currentIntensive?.id}/editIntensive`
                         );
                       }}
                     />

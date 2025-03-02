@@ -148,16 +148,11 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (currentUser && currentUser.currentRole) {
-      if (isUserStudent(currentUser.currentRole)) {
-        navigate(`/student/${id}/overview`);
-      } else if (isUserManager(currentUser.currentRole)) {
-        navigate(`/manager/${id}/overview`);
-      } else if (isUserTeacher(currentUser.currentRole)) {
-        localStorage.removeItem('tutorTeamId');
-        navigate(`/teacher/${id}/overview`);
-      }
+    if (currentUser?.currentRole && isUserTeacher(currentUser.currentRole)) {
+      localStorage.removeItem('tutorTeamId');
     }
+
+    navigate(`/intensives/${id}/overview`);
   };
 
   return (

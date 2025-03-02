@@ -183,7 +183,7 @@ const CreateSupportTeamsPage: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${intensiveId}/teams`);
+                    navigate(`/intensives/${intensiveId}/teams`);
                   }
                 }}
                 children="Отменить"
@@ -212,7 +212,7 @@ const CreateSupportTeamsPage: FC = () => {
                 clickHandler={() => {
                   setSaveModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${intensiveId}/teams`);
+                    navigate(`/intensives/${intensiveId}/teams`);
                   }
                 }}
                 children="Закрыть"
