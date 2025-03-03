@@ -307,7 +307,7 @@ const ManageIntensiveForm: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(`/manager/${intensiveId}/overview`);
+                    navigate(`/intensives/${intensiveId}/overview`);
                   } else {
                     navigate(`/intensives`);
                   }
@@ -323,7 +323,7 @@ const ManageIntensiveForm: FC = () => {
         <Modal
           title={`Интенсив был успешно ${intensiveId ? 'изменен' : 'создан'}`}
           onCloseModal={() => {
-            navigate(`/manager/${successfulSaveModal.intensiveId}/overview`);
+            navigate(`/intensives/${successfulSaveModal.intensiveId}/overview`);
             setSuccessfulSaveModal({
               status: false,
               intensiveId: null,
@@ -338,7 +338,7 @@ const ManageIntensiveForm: FC = () => {
               <PrimaryButton
                 clickHandler={() => {
                   navigate(
-                    `/manager/${successfulSaveModal.intensiveId}/overview`
+                    `/intensives/${successfulSaveModal.intensiveId}/overview`
                   );
                   setSuccessfulSaveModal({
                     status: false,

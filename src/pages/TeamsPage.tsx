@@ -50,7 +50,7 @@ const TeamsPage: FC = () => {
             <PrimaryButton
               children="Изменить состав команд"
               clickHandler={() =>
-                navigate(`/manager/${intensiveId}/createTeams`)
+                navigate(`/intensives/${intensiveId}/createTeams`)
               }
             />
           </div>
@@ -58,7 +58,7 @@ const TeamsPage: FC = () => {
             <PrimaryButton
               children="Изменить команды сопровождения"
               clickHandler={() =>
-                navigate(`/manager/${intensiveId}/createSupportTeams`)
+                navigate(`/intensives/${intensiveId}/createSupportTeams`)
               }
             />
           </div>

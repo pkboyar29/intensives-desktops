@@ -415,7 +415,7 @@ const ManageEventForm: FC = () => {
                   setCancelModal(false);
                   if (intensiveId) {
                     navigate(
-                      `/manager/${intensiveId}/schedule/${searchParams.get(
+                      `/intensives/${intensiveId}/schedule/${searchParams.get(
                         'eventId'
                       )}`
                     );
@@ -433,7 +433,7 @@ const ManageEventForm: FC = () => {
           title={`Мероприятие было успешно ${event ? 'изменено' : 'создано'}`}
           onCloseModal={() => {
             navigate(
-              `/manager/${intensiveId}/schedule/${successfulSaveModal.eventId}`
+              `/intensives/${intensiveId}/schedule/${successfulSaveModal.eventId}`
             );
             setSuccessfulSaveModal({
               status: false,
@@ -449,7 +449,7 @@ const ManageEventForm: FC = () => {
               <PrimaryButton
                 clickHandler={() => {
                   navigate(
-                    `/manager/${intensiveId}/schedule/${successfulSaveModal.eventId}`
+                    `/intensives/${intensiveId}/schedule/${successfulSaveModal.eventId}`
                   );
                   setSuccessfulSaveModal({
                     status: false,

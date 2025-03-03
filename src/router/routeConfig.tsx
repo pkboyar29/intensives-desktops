@@ -1,12 +1,10 @@
 import { RouteObject, Navigate } from 'react-router-dom';
 
-import TeacherMainPage from '../pages/MainPages/TeacherMainPage';
-import StudentMainPage from '../pages/MainPages/StudentMainPage';
-import ManagerMainPage from '../pages/MainPages/ManagerMainPage';
-
-import NotFoundPage from '../pages/NotFoundPage';
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
+import IntensiveMainPage from '../pages/IntensiveMainPage';
+import NotFoundPage from '../pages/NotFoundPage';
+
 import EventPage from '../pages/EventPage';
 import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
@@ -34,8 +32,13 @@ const routeConfig: RouteType[] = [
     requiredAuth: false,
   },
   {
-    path: '/teacher/:intensiveId',
-    element: <TeacherMainPage />,
+    path: '/intensives',
+    element: <IntensivesPage />,
+    requiredAuth: false,
+  },
+  {
+    path: '/intensives/:intensiveId',
+    element: <IntensiveMainPage />,
     children: [
       {
         path: 'overview',
@@ -53,67 +56,22 @@ const routeConfig: RouteType[] = [
         path: 'schedule/:eventId',
         element: <EventPage />,
       },
+      {
+        path: 'team-overview',
+        element: <TeamOverviewPage />,
+      },
+      {
+        path: 'kanban',
+        element: <KanbanBoardPage />,
+      },
+      // TODO: delete
       {
         path: 'team-evaluation/:eventId/:teamId',
         element: <TeamEvaluationPage />,
       },
       {
-        path: 'team-overview',
-        element: <TeamOverviewPage />,
-      },
-      {
-        path: 'kanban',
-        element: <KanbanBoardPage />,
-      },
-    ],
-    requiredAuth: false,
-  },
-  {
-    path: '/student/:intensiveId',
-    element: <StudentMainPage />,
-    children: [
-      {
-        path: 'overview',
-        element: <IntensiveOverviewPage />,
-      },
-      {
-        path: 'teams',
-        element: <TeamsPage />,
-      },
-      {
-        path: 'team-overview',
-        element: <TeamOverviewPage />,
-      },
-      {
-        path: 'schedule',
-        element: <SchedulePage />,
-      },
-      {
-        path: 'schedule/:eventId',
-        element: <EventPage />,
-      },
-      {
-        path: 'kanban',
-        element: <KanbanBoardPage />,
-      },
-    ],
-    requiredAuth: false,
-  },
-  {
-    path: '/manager/:intensiveId',
-    element: <ManagerMainPage />,
-    children: [
-      {
-        path: 'overview',
-        element: <IntensiveOverviewPage />,
-      },
-      {
         path: 'editIntensive',
         element: <ManageIntensiveForm />,
-      },
-      {
-        path: 'teams',
-        element: <TeamsPage />,
       },
       {
         path: 'createTeams',
@@ -122,14 +80,6 @@ const routeConfig: RouteType[] = [
       {
         path: 'createSupportTeams',
         element: <CreateSupportTeamsPage />,
-      },
-      {
-        path: 'schedule',
-        element: <SchedulePage />,
-      },
-      {
-        path: 'schedule/:eventId',
-        element: <EventPage />,
       },
       {
         path: 'schedule/editEvent',
@@ -150,11 +100,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/evaluation',
     element: <EvaluationIntensivePage />,
-    requiredAuth: false,
-  },
-  {
-    path: '/intensives',
-    element: <IntensivesPage />,
     requiredAuth: false,
   },
   {
