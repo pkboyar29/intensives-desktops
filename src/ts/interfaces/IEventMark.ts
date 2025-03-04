@@ -5,6 +5,6 @@ export interface IEventMark {
   mark: number;
   criteria: string;
   comment: string;
-  createdDt: Date;
+  createdDate: Date;
   teacher: ITeacher;
 }

@@ -8,7 +8,7 @@ export interface IEventAnswer {
   text: string;
   student: IStudent;
   team: ITeam;
-  createdDt: Date;
+  createdDate: Date;
   files: IFile[];
   marks: IEventMark[];
   hasMarks?: boolean;

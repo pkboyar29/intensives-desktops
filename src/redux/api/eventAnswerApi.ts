@@ -16,7 +16,7 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     text: unmappedEventAnswer.text,
     student: unmappedEventAnswer.student,
     team: unmappedEventAnswer.team,
-    createdDt: unmappedEventAnswer.created_at,
+    createdDate: unmappedEventAnswer.created_at,
     files: unmappedEventAnswer.files,
     marks: unmappedEventAnswer.marks,
     hasMarks: unmappedEventAnswer.has_marks,

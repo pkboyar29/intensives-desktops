@@ -29,7 +29,7 @@ const EventPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
   const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>();
+  const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>([]);
   const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
   const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
 
@@ -77,20 +77,27 @@ const EventPage: FC = () => {
   }, [event, currentUser]);
 
   useEffect(() => {
-    // Сохраняем данные ответов в состояние
-    setEventAnswers(eventAnswersData);
-
-    // Проверяем есть ли неоцененные ответы
     if (eventAnswersData) {
+      // Сохраняем данные ответов в состояние
+      setEventAnswers(eventAnswersData);
+
+      // Проверяем есть ли неоцененные ответы
       for (const answer in eventAnswersData) {
-        // Если есть неоцененный ответ скрываем кнопку отправить новый ответ
-        if (eventAnswersData[answer].hasMarks == false) {
+        // Если есть неоцененный ответ (undefined или 0 ответов) скрываем кнопку отправить новый ответ
+        if (
+          !eventAnswersData[answer].marks ||
+          eventAnswersData[answer].marks.length == 0
+        ) {
           setIsCreatingAnswer(false);
           break;
         }
       }
     }
   }, [eventAnswersData]);
+
+  useEffect(() => {
+    console.log(eventAnswers); //можно убрать
+  }, [eventAnswers]);
 
   return (
     <>
@@ -123,7 +130,7 @@ const EventPage: FC = () => {
                   if (responseError) {
                     toast('Произошла серверная ошибка', { type: 'error' });
                   } else {
-                    navigate(`/manager/${params.intensiveId}/schedule`);
+                    navigate(`/intensives/${params.intensiveId}/schedule`);
                   }
                 }}
                 children="Удалить"
@@ -152,7 +159,7 @@ const EventPage: FC = () => {
                     </div>
                   }
                   onClick={() => {
-                    navigate(`/manager/${params.intensiveId}/schedule`);
+                    navigate(`/intensives/${params.intensiveId}/schedule`);
                   }}
                 />
               </div>
@@ -313,19 +320,35 @@ const EventPage: FC = () => {
                         >
                           {expandedAnswer && (
                             <EventAnswer
-                              eventAnswerId={expandedAnswer}
-                              hasMarks={
-                                eventAnswers.find(
-                                  (answer) => answer.id === expandedAnswer
-                                )?.hasMarks
-                              }
+                              eventAnswerData={eventAnswers.find(
+                                (answer) => answer.id === expandedAnswer
+                              )}
+                              deleteAnswer={(id: number) => {
+                                setEventAnswers((prev) =>
+                                  prev?.filter((answer) => answer.id !== id)
+                                );
+
+                                setExpandedAnswer(null);
+                                setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
+                              }}
                             />
                           )}
                         </motion.div>
                       </>
                     )}
                     {isCreatingAnswer && !expandedAnswer && (
-                      <EventAnswer eventId={Number(params.eventId)} />
+                      <EventAnswer
+                        eventId={Number(params.eventId)}
+                        createAnswer={(newAnswer: IEventAnswer) => {
+                          setEventAnswers((prevAnswers) => [
+                            ...prevAnswers,
+                            newAnswer,
+                          ]);
+
+                          setIsCreatingAnswer(false); // тоже самое
+                          setExpandedAnswer(newAnswer.id);
+                        }}
+                      />
                     )}
                   </>
                 ) : (
