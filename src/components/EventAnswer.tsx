@@ -223,7 +223,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
         {eventAnswerId || (!eventAnswerId && isEditing) ? (
           <>
             <textarea
-              className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:ring-1 focus:ring-blue"
+              className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
               onChange={handleTextChange}
               rows={4}
