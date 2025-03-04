@@ -2,12 +2,17 @@ import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { isUserStudent, isUserManager } from '../helpers/userHelpers';
+import { getEventDateDisplayString } from '../helpers/dateHelpers';
+import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
 import { useLazyGetEventAnswersQuery } from '../redux/api/eventAnswerApi';
 
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
+
 import Modal from '../components/common/modals/Modal';
+import BackToScheduleButton from '../components/BackToScheduleButton';
 import PrimaryButton from '../components/common/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
 import BackArrowIcon from '../components/icons/BackArrowIcon';
@@ -15,15 +20,8 @@ import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/common/Chip';
 import { ToastContainer, toast } from 'react-toastify';
-
-import {
-  getEventDateDisplayString,
-  getTimeFromDate,
-} from '../helpers/dateHelpers';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
-import { IEventAnswer, IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
-import { motion } from 'framer-motion';
 
 const EventPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
@@ -133,7 +131,7 @@ const EventPage: FC = () => {
         </Modal>
       )}
 
-      <div className="flex justify-center max-w-[1280px]">
+      <div className="mb-5 flex justify-center max-w-[1280px]">
         <div className="max-w-[765px] w-full">
           {isLoading ? (
             <Skeleton />
@@ -152,7 +150,7 @@ const EventPage: FC = () => {
                     </div>
                   }
                   onClick={() => {
-                    navigate(`/manager/${params.intensiveId}/schedule`);
+                    navigate(`/intensives/${params.intensiveId}/schedule`);
                   }}
                 />
               </div>
@@ -239,26 +237,10 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* TODO: кнопку "назад" отображать для всех */}
                 {currentUser?.currentRole &&
                   isUserManager(currentUser.currentRole) && (
                     <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                      <div>
-                        <PrimaryButton
-                          buttonColor="gray"
-                          children={
-                            <div className="flex items-center gap-2">
-                              <BackArrowIcon />
-                              <p>Назад</p>
-                            </div>
-                          }
-                          onClick={() => {
-                            navigate(
-                              `/intensives/${params.intensiveId}/schedule`
-                            );
-                          }}
-                        />
-                      </div>
+                      <BackToScheduleButton />
 
                       <PrimaryButton
                         children="Редактировать"
@@ -280,15 +262,20 @@ const EventPage: FC = () => {
                       </div>
                     </div>
                   )}
+
+                {/* TODO: для преподавателя жюри отображать список команд */}
+
+                {/* TODO: для тьютора и наставника в этой команде должно отображать то же самое, что и для студента */}
                 {currentUser?.currentRole &&
                 isUserStudent(currentUser.currentRole) &&
                 eventAnswers ? (
-                  <>
-                    <p className="mb-3 text-xl font-bold text-black_2">
+                  <div className="flex flex-col gap-3 mt-10">
+                    <p className="text-xl font-bold text-black_2">
                       {eventAnswers.length > 0
                         ? 'Ответы на мероприятие'
                         : 'Ответ на мероприятие не отправлен'}
                     </p>
+
                     {eventAnswers.length > 0 && (
                       <>
                         <EventAnswerList
@@ -324,11 +311,13 @@ const EventPage: FC = () => {
                         </motion.div>
                       </>
                     )}
+
                     {isCreatingAnswer && !expandedAnswer && (
                       <EventAnswer eventId={Number(params.eventId)} />
                     )}
-                  </>
+                  </div>
                 ) : (
+                  // TODO: странный тернарный оператор
                   <></>
                 )}
               </>

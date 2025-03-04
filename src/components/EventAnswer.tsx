@@ -5,18 +5,22 @@ import {
   useCreateEventAnswerMutation,
   useDeleteEventAnswerMutation,
 } from '../redux/api/eventAnswerApi';
-import AttachedFileList from './AttachedFileList';
+import { useUploadFileMutation } from '../redux/api/fileApi';
+// TODO: что за validateKandan использующийся в компоненте EventAnswer?
+import { validateKanban } from '../helpers/kanbanHelpers';
+import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
+
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
+
+import BackToScheduleButton from './BackToScheduleButton';
+import TrashIcon from './icons/TrashIcon';
+import Modal from './common/modals/Modal';
 import EditableFileList from './EditableFileList';
 import FileInput from './common/inputs/FileInput';
 import PrimaryButton from './common/PrimaryButton';
+import AttachedFileList from './AttachedFileList';
 import { ToastContainer, toast } from 'react-toastify';
-import { useUploadFileMutation } from '../redux/api/fileApi';
-import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
-import TrashIcon from './icons/TrashIcon';
-import Modal from './common/modals/Modal';
-import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
-import { validateKanban } from '../helpers/kanbanHelpers';
 
 interface EventAnswerProps {
   eventAnswerId?: number;
@@ -215,7 +219,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
           </div>
         </Modal>
       )}
-      <div className="p-4 mt-5 max-w">
+      <div className="mt-5 max-w">
         {eventAnswerId || (!eventAnswerId && isEditing) ? (
           <>
             <textarea
@@ -235,7 +239,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 files={attachedFilesList}
               />
             ) : (
-              <div className="p-4 mx-auto my-3 bg-white rounded-lg shadow-md max-w">
+              <div className="mx-auto my-3 bg-white rounded-lg shadow-md max-w">
                 <EditableFileList
                   files={attachedFilesList}
                   nameFileList="ответа"
@@ -246,6 +250,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
             {!hasMarks ? (
               <div className="flex items-center gap-5 mt-2">
+                <BackToScheduleButton />
+
                 <PrimaryButton
                   type="button"
                   children={
@@ -274,7 +280,9 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
           </>
         ) : (
-          <>
+          <div className="flex gap-7">
+            <BackToScheduleButton />
+
             <PrimaryButton
               type="button"
               children={
@@ -282,7 +290,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
               }
               clickHandler={() => setIsEditing((prev) => !prev)}
             />
-          </>
+          </div>
         )}
       </div>
     </>

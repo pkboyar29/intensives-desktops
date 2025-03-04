@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { IEventAnswer, IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
-import { getISODateInUTC3, getISODateTimeInUTC3 } from '../helpers/dateHelpers';
+import { getDateTimeDisplay } from '../helpers/dateHelpers';
 
 type EventAnswerListProps = {
   eventAnswers: IEventAnswer[];
@@ -32,7 +32,7 @@ const EventAnswerList: FC<EventAnswerListProps> = ({
               <div className="flex space-x-3 justify-left">
                 <p className="text-lg font-semibold">{index + 1}.</p>
                 <p className="text-lg font-medium">
-                  Ответ от {getISODateTimeInUTC3(eventAnswer.createdDt)}
+                  Ответ от {getDateTimeDisplay(eventAnswer.createdDt)}
                 </p>
               </div>
               {eventAnswer.hasMarks && (
