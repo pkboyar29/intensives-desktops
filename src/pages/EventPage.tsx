@@ -88,14 +88,21 @@ const EventPage: FC = () => {
 
       // Проверяем есть ли неоцененные ответы
       for (const answer in eventAnswersData) {
-        // Если есть неоцененный ответ скрываем кнопку отправить новый ответ
-        if (eventAnswersData[answer].hasMarks == false) {
+        // Если есть неоцененный ответ (undefined или 0 ответов) скрываем кнопку отправить новый ответ
+        if (
+          !eventAnswersData[answer].marks ||
+          eventAnswersData[answer].marks.length == 0
+        ) {
           setIsCreatingAnswer(false);
           break;
         }
       }
     }
   }, [eventAnswersData]);
+
+  useEffect(() => {
+    console.log(eventAnswers); //можно убрать
+  }, [eventAnswers]);
 
   return (
     <>
@@ -333,12 +340,17 @@ const EventPage: FC = () => {
                         >
                           {expandedAnswer && (
                             <EventAnswer
-                              eventAnswerId={expandedAnswer}
-                              hasMarks={
-                                eventAnswers.find(
-                                  (answer) => answer.id === expandedAnswer
-                                )?.hasMarks
-                              }
+                              eventAnswerData={eventAnswers.find(
+                                (answer) => answer.id === expandedAnswer
+                              )}
+                              deleteAnswer={(id: number) => {
+                                setEventAnswers((prev) =>
+                                  prev?.filter((answer) => answer.id !== id)
+                                );
+
+                                setExpandedAnswer(null);
+                                setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
+                              }}
                             />
                           )}
                         </motion.div>
@@ -346,7 +358,18 @@ const EventPage: FC = () => {
                     )}
 
                     {isCreatingAnswer && !expandedAnswer && (
-                      <EventAnswer eventId={Number(params.eventId)} />
+                      <EventAnswer
+                        eventId={Number(params.eventId)}
+                        createAnswer={(newAnswer: IEventAnswer) => {
+                          setEventAnswers((prevAnswers) => [
+                            ...prevAnswers,
+                            newAnswer,
+                          ]);
+
+                          setIsCreatingAnswer(false); // тоже самое
+                          setExpandedAnswer(newAnswer.id);
+                        }}
+                      />
                     )}
                   </div>
                 ) : (

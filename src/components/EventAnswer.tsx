@@ -8,7 +8,7 @@ import {
 import { useUploadFileMutation } from '../redux/api/fileApi';
 // TODO: что за validateKandan использующийся в компоненте EventAnswer?
 import { validateKanban } from '../helpers/kanbanHelpers';
-import { getISODateTimeInUTC3 } from '../helpers/dateHelpers';
+import { getDateTimeDisplay } from '../helpers/dateHelpers';
 
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
@@ -20,18 +20,23 @@ import EditableFileList from './EditableFileList';
 import FileInput from './common/inputs/FileInput';
 import PrimaryButton from './common/PrimaryButton';
 import AttachedFileList from './AttachedFileList';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import TeacherMarkCard from './TeacherMarkCard';
 
 interface EventAnswerProps {
   eventAnswerId?: number;
+  eventAnswerData?: IEventAnswer;
   eventId?: number;
-  hasMarks?: boolean; //Временно
+  createAnswer?: (newEventAnswer: IEventAnswer) => void;
+  deleteAnswer?: (id: number) => void;
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
   eventAnswerId,
+  eventAnswerData,
   eventId,
-  hasMarks,
+  createAnswer,
+  deleteAnswer,
 }) => {
   const [getEventAnswer, { data, isLoading, error }] =
     useLazyGetEventAnswerQuery();
@@ -55,22 +60,31 @@ const EventAnswer: FC<EventAnswerProps> = ({
   }, [eventAnswerId]);
 
   useEffect(() => {
+    setEventAnswer(data);
+
     if (data?.text) {
       setEditedText(data.text);
     }
-    if (data?.files) {
-      setAttachedFilesList(data.files);
-    }
-    setEventAnswer(data);
   }, [data]);
 
   useEffect(() => {
-    console.log(eventAnswer);
+    if (eventAnswerData) {
+      setEventAnswer(eventAnswerData);
+
+      if (eventAnswerData.text) {
+        setEditedText(eventAnswerData.text);
+      }
+    }
+  }, [eventAnswerData]);
+
+  useEffect(() => {
+    console.log(eventAnswer); // можно убрать
   }, [eventAnswer]);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
     if (validateKanban(value)) {
+      //setEventAnswer((prev) => (prev ? { ...prev, text: value } : prev));
       setEditedText(value);
     }
   };
@@ -89,16 +103,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
     let responseData;
     let responseError;
 
-    if (fileIds.length == 0 && editedText.trim().length == 0) {
+    if (eventAnswer?.files.length == 0 && editedText.trim().length == 0) {
       toast('Должен быть текстовый ответ или файлы', {
         type: 'warning',
       });
       return;
     }
 
-    if (eventAnswerId) {
+    if (eventAnswer?.id) {
       ({ data: responseData, error: responseError } = await updateEventAnswer({
-        id: Number(eventAnswerId),
+        id: eventAnswer.id,
         text: editedText,
         fileIds: fileIds,
       }));
@@ -122,6 +136,9 @@ const EventAnswer: FC<EventAnswerProps> = ({
         return;
       }
 
+      if (createAnswer && responseData) {
+        createAnswer(responseData);
+      }
       toast('Ответ успешно отправлен', {
         type: 'success',
       });
@@ -130,7 +147,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления ответа
       const filesError = await uploadAllFiles(
-        Number(responseData.id || eventAnswerId)
+        Number(responseData.id || eventAnswer?.id)
       );
 
       if (filesError === 0) {
@@ -182,7 +199,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
   return (
     <>
-      {deleteModal && eventAnswerId && (
+      {deleteModal && eventAnswer?.id && (
         <Modal
           title="Удаление интенсива"
           onCloseModal={() => setDeleteModal(false)}
@@ -202,16 +219,23 @@ const EventAnswer: FC<EventAnswerProps> = ({
               <PrimaryButton
                 clickHandler={async () => {
                   const { error: responseError } = await deleteEventAnswer(
-                    eventAnswerId
+                    eventAnswer?.id
                   );
-                  toast('Ответ успешно удален', {
-                    type: 'success',
-                  });
+
                   setDeleteModal(false);
 
                   if (responseError) {
                     toast('Произошла серверная ошибка', { type: 'error' });
+                    return;
                   }
+
+                  if (deleteAnswer) {
+                    deleteAnswer(eventAnswer.id);
+                  }
+
+                  toast('Ответ успешно удален', {
+                    type: 'success',
+                  });
                 }}
                 children="Удалить"
               />
@@ -222,6 +246,11 @@ const EventAnswer: FC<EventAnswerProps> = ({
       <div className="mt-5 max-w">
         {eventAnswerId || (!eventAnswerId && isEditing) ? (
           <>
+            {eventAnswer && (
+              <p className="text-lg font-medium text-center">
+                Ответ от {getDateTimeDisplay(eventAnswer?.createdDate)}
+              </p>
+            )}
             <textarea
               className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
@@ -234,7 +263,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {!isEditing ? (
               <AttachedFileList
                 context={'event_answer'}
-                contextId={eventAnswerId}
+                contextId={eventAnswer?.id}
                 nameFileList="ответа"
                 files={attachedFilesList}
               />
@@ -248,7 +277,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 <FileInput onFilesChange={handleFilesChange} />
               </div>
             )}
-            {!hasMarks ? (
+            {!eventAnswer?.marks || eventAnswer.marks.length == 0 ? (
               <div className="flex items-center gap-5 mt-2">
                 <BackToScheduleButton />
 
@@ -256,10 +285,10 @@ const EventAnswer: FC<EventAnswerProps> = ({
                   type="button"
                   children={
                     isEditing
-                      ? eventAnswerId
+                      ? eventAnswer?.id
                         ? 'Сохранить ответ'
                         : 'Сохранить и отправить'
-                      : eventAnswerId
+                      : eventAnswer?.id
                       ? 'Редактировать ответ'
                       : 'Отправить ответ'
                   }
@@ -276,7 +305,10 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="mt-3">Область с оценками преподавателей</div>
+              <div className="mt-3">
+                Область с оценками преподавателей{' '}
+                <TeacherMarkCard teacherMarks={eventAnswer?.marks} />
+              </div>
             )}
           </>
         ) : (
