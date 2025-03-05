@@ -16,7 +16,7 @@ export interface IEventAnswer {
 
 export interface IEventAnswerShort {
   id: number;
-  createdDt: Date;
+  createdDate: Date;
   hasMarks: boolean;
 }
 

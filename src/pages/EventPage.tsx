@@ -1,13 +1,25 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
-import { isUserStudent, isUserManager } from '../helpers/userHelpers';
+import {
+  isUserStudent,
+  isUserTeacher,
+  isUserManager,
+} from '../helpers/userHelpers';
+import {
+  getEventDateDisplayString,
+  getDateTimeDisplay,
+} from '../helpers/dateHelpers';
+import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
 import { useDeleteEventMutation } from '../redux/api/eventApi';
 import { useLazyGetEventAnswersQuery } from '../redux/api/eventAnswerApi';
 
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
+
 import Modal from '../components/common/modals/Modal';
+import BackToScheduleButton from '../components/BackToScheduleButton';
 import PrimaryButton from '../components/common/PrimaryButton';
 import TrashIcon from '../components/icons/TrashIcon';
 import BackArrowIcon from '../components/icons/BackArrowIcon';
@@ -15,31 +27,22 @@ import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import Chip from '../components/common/Chip';
 import { ToastContainer, toast } from 'react-toastify';
-
-import {
-  getEventDateDisplayString,
-  getTimeFromDate,
-} from '../helpers/dateHelpers';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
-import { IEventAnswer, IEventAnswerShort } from '../ts/interfaces/IEventAnswer';
-import { motion } from 'framer-motion';
+import Accordion from '../components/common/Accordion';
 
 const EventPage: FC = () => {
+  const navigate = useNavigate();
+  const params = useParams();
+
   const currentUser = useAppSelector((state) => state.user.data);
-  const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
+
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
   const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>([]);
   const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
   const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
-
-  const [
-    getEventAnswers,
-    { data: eventAnswersData, isLoading: isLoadingEventAnswers, error },
-  ] = useLazyGetEventAnswersQuery();
-
-  const navigate = useNavigate();
-  const params = useParams();
+  const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
 
   const {
     data: event,
@@ -48,6 +51,12 @@ const EventPage: FC = () => {
   } = useGetEventQuery(Number(params.eventId), {
     refetchOnMountOrArgChange: true,
   });
+  const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
+
+  const [
+    getEventAnswers,
+    { data: eventAnswersData, isLoading: isLoadingEventAnswers, error },
+  ] = useLazyGetEventAnswersQuery();
 
   const [scoreTypeString, setScoreTypeString] = useState<
     | 'Без оценивания'
@@ -65,20 +74,18 @@ const EventPage: FC = () => {
     } else {
       setScoreTypeString('Без оценивания');
     }
-
-    // Загружаем ответы (студентов команды) на мероприятие
-    if (
-      event &&
-      currentUser?.currentRole &&
-      isUserStudent(currentUser.currentRole)
-    ) {
-      getEventAnswers(event.id);
-    }
   }, [event, currentUser]);
 
   useEffect(() => {
+    // Загружаем ответы на мероприятие (для студентов/тимлида/наставника/тьютора - ответы их команды, для препода жюри и организатора - все ответы команд)
+    if (event) {
+      getEventAnswers(event.id);
+    }
+  }, [event]);
+
+  useEffect(() => {
     if (eventAnswersData) {
-      // Сохраняем данные ответов в состояние
+      // Сохраняем ответы в состояние
       setEventAnswers(eventAnswersData);
 
       // Проверяем есть ли неоцененные ответы
@@ -95,9 +102,74 @@ const EventPage: FC = () => {
     }
   }, [eventAnswersData]);
 
-  useEffect(() => {
-    console.log(eventAnswers); //можно убрать
-  }, [eventAnswers]);
+  const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
+    return (
+      <>
+        {eventAnswers.length > 0 && (
+          <>
+            <EventAnswerList
+              eventAnswers={eventAnswers}
+              expandedAnswer={expandedAnswer}
+              clickEventAnswer={(id: number) =>
+                setExpandedAnswer((prev) => (prev === id ? null : id))
+              }
+            />
+
+            <motion.div
+              initial={{ opacity: 0, height: 0, scale: 0.95 }}
+              animate={
+                expandedAnswer ? { opacity: 1, height: 'auto', scale: 1 } : {}
+              }
+              exit={{ opacity: 0, height: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              {expandedAnswer && event && (
+                <EventAnswer
+                  event={event}
+                  eventAnswerData={eventAnswers.find(
+                    (answer) => answer.id === expandedAnswer
+                  )}
+                  deleteAnswer={(id: number) => {
+                    setEventAnswers((prev) =>
+                      prev?.filter((answer) => answer.id !== id)
+                    );
+
+                    setExpandedAnswer(null);
+                    setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
+                  }}
+                />
+              )}
+            </motion.div>
+          </>
+        )}
+
+        {isCreatingAnswer && !expandedAnswer && event && (
+          <EventAnswer
+            event={event}
+            createAnswer={(newAnswer: IEventAnswer) => {
+              setEventAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
+
+              setIsCreatingAnswer(false); // тоже самое
+              setExpandedAnswer(newAnswer.id);
+            }}
+          />
+        )}
+      </>
+    );
+  };
+
+  const renderTeamAnswers = (expandedTeam: number) => {
+    const teamAnswers = eventAnswers.filter(
+      (eventAnswer) => expandedTeam === eventAnswer.team.id
+    );
+
+    if (teamAnswers.length === 0) {
+      return <div className="p-4 text-lg">Команда не прислала ответа</div>;
+    } else {
+      return renderEventAnswers(teamAnswers);
+    }
+  };
 
   return (
     <>
@@ -140,7 +212,7 @@ const EventPage: FC = () => {
         </Modal>
       )}
 
-      <div className="flex justify-center max-w-[1280px]">
+      <div className="mb-5 flex justify-center max-w-[1280px]">
         <div className="max-w-[765px] w-full">
           {isLoading ? (
             <Skeleton />
@@ -246,26 +318,32 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* TODO: кнопку "назад" отображать для всех */}
+                {/* TODO: отображать такой же аккордион для организаторов */}
+                {/* отображение для преподавателей жюри */}
+                {currentUser?.teacherId &&
+                  event.teachers
+                    .map((teacher) => teacher.id)
+                    .includes(currentUser?.teacherId) && (
+                    <div className="flex flex-col gap-3 mt-10">
+                      <p className="text-xl font-bold text-black_2">
+                        Оцениваемые команды
+                      </p>
+
+                      <Accordion
+                        items={event.teams}
+                        expandedItemId={expandedTeam}
+                        onItemClick={(item) => setExpandedTeam(item)}
+                        expandedContent={
+                          expandedTeam ? renderTeamAnswers(expandedTeam) : null
+                        }
+                      />
+                    </div>
+                  )}
+
                 {currentUser?.currentRole &&
                   isUserManager(currentUser.currentRole) && (
                     <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                      <div>
-                        <PrimaryButton
-                          buttonColor="gray"
-                          children={
-                            <div className="flex items-center gap-2">
-                              <BackArrowIcon />
-                              <p>Назад</p>
-                            </div>
-                          }
-                          onClick={() => {
-                            navigate(
-                              `/intensives/${params.intensiveId}/schedule`
-                            );
-                          }}
-                        />
-                      </div>
+                      <BackToScheduleButton />
 
                       <PrimaryButton
                         children="Редактировать"
@@ -287,73 +365,20 @@ const EventPage: FC = () => {
                       </div>
                     </div>
                   )}
+
+                {/* TODO: для тьютора и наставника в этой команде должно отображать то же самое, что и для студента */}
                 {currentUser?.currentRole &&
-                isUserStudent(currentUser.currentRole) &&
-                eventAnswers ? (
-                  <>
-                    <p className="mb-3 text-xl font-bold text-black_2">
-                      {eventAnswers.length > 0
-                        ? 'Ответы на мероприятие'
-                        : 'Ответ на мероприятие не отправлен'}
-                    </p>
-                    {eventAnswers.length > 0 && (
-                      <>
-                        <EventAnswerList
-                          eventAnswers={eventAnswers}
-                          expandedAnswer={expandedAnswer}
-                          clickEventAnswer={(id: number) =>
-                            setExpandedAnswer((prev) =>
-                              prev === id ? null : id
-                            )
-                          }
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, height: 0, scale: 0.95 }}
-                          animate={
-                            expandedAnswer
-                              ? { opacity: 1, height: 'auto', scale: 1 }
-                              : {}
-                          }
-                          exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                          transition={{ duration: 0.2, ease: 'easeInOut' }}
-                          className="overflow-hidden"
-                        >
-                          {expandedAnswer && (
-                            <EventAnswer
-                              eventAnswerData={eventAnswers.find(
-                                (answer) => answer.id === expandedAnswer
-                              )}
-                              deleteAnswer={(id: number) => {
-                                setEventAnswers((prev) =>
-                                  prev?.filter((answer) => answer.id !== id)
-                                );
+                  isUserStudent(currentUser.currentRole) && (
+                    <div className="flex flex-col gap-3 mt-10">
+                      <p className="text-xl font-bold text-black_2">
+                        {eventAnswers.length > 0
+                          ? 'Ответы на мероприятие'
+                          : 'Ответ на мероприятие не отправлен'}
+                      </p>
 
-                                setExpandedAnswer(null);
-                                setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
-                              }}
-                            />
-                          )}
-                        </motion.div>
-                      </>
-                    )}
-                    {isCreatingAnswer && !expandedAnswer && (
-                      <EventAnswer
-                        eventId={Number(params.eventId)}
-                        createAnswer={(newAnswer: IEventAnswer) => {
-                          setEventAnswers((prevAnswers) => [
-                            ...prevAnswers,
-                            newAnswer,
-                          ]);
-
-                          setIsCreatingAnswer(false); // тоже самое
-                          setExpandedAnswer(newAnswer.id);
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <></>
-                )}
+                      {renderEventAnswers(eventAnswers)}
+                    </div>
+                  )}
               </>
             )
           )}

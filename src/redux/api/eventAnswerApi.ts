@@ -28,7 +28,7 @@ export const mapEventAnswerShort = (
 ): IEventAnswerShort => {
   return {
     id: unmappedEventAnswer.id,
-    createdDt: unmappedEventAnswer.created_at,
+    createdDate: unmappedEventAnswer.created_at,
     hasMarks: unmappedEventAnswer.has_marks,
   };
 };

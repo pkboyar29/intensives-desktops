@@ -1,81 +1,90 @@
 import { FC, useState, useEffect } from 'react';
+import { useAppSelector } from '../redux/store';
 import {
-  useLazyGetEventAnswerQuery,
+  // useLazyGetEventAnswerQuery,
   useUpdateEventAnswerMutation,
   useCreateEventAnswerMutation,
   useDeleteEventAnswerMutation,
 } from '../redux/api/eventAnswerApi';
-import AttachedFileList from './AttachedFileList';
+import { useUploadFileMutation } from '../redux/api/fileApi';
+import { validateKanban } from '../helpers/kanbanHelpers';
+import { getDateTimeDisplay } from '../helpers/dateHelpers';
+import {
+  isUserManager,
+  isUserTeacher,
+  isUserStudent,
+} from '../helpers/userHelpers';
+
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
+import { IEvent } from '../ts/interfaces/IEvent';
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
+
+import TrashIcon from './icons/TrashIcon';
+import Modal from './common/modals/Modal';
 import EditableFileList from './EditableFileList';
 import FileInput from './common/inputs/FileInput';
 import PrimaryButton from './common/PrimaryButton';
-import { ToastContainer, toast } from 'react-toastify';
-import { useUploadFileMutation } from '../redux/api/fileApi';
-import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
-import TrashIcon from './icons/TrashIcon';
-import Modal from './common/modals/Modal';
-import { getDateTimeDisplay } from '../helpers/dateHelpers';
-import { validateKanban } from '../helpers/kanbanHelpers';
+import AttachedFileList from './AttachedFileList';
+import { toast } from 'react-toastify';
 import TeacherMarkCard from './TeacherMarkCard';
 
 interface EventAnswerProps {
-  eventAnswerId?: number;
+  // eventAnswerId?: number;
   eventAnswerData?: IEventAnswer;
-  eventId?: number;
+  event: IEvent;
   createAnswer?: (newEventAnswer: IEventAnswer) => void;
   deleteAnswer?: (id: number) => void;
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
-  eventAnswerId,
+  // eventAnswerId,
   eventAnswerData,
-  eventId,
+  event,
   createAnswer,
   deleteAnswer,
 }) => {
-  const [getEventAnswer, { data, isLoading, error }] =
-    useLazyGetEventAnswerQuery();
-  const [updateEventAnswer] = useUpdateEventAnswerMutation();
+  // const [getEventAnswer, { data, isLoading, error }] =
+  //   useLazyGetEventAnswerQuery();
+  // const [eventAnswer, setEventAnswer] = useState<IEventAnswer>();
+
+  const currentUser = useAppSelector((state) => state.user.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
+
   const [createEventAnswer] = useCreateEventAnswerMutation();
+  const [updateEventAnswer] = useUpdateEventAnswerMutation();
   const [deleteEventAnswer] = useDeleteEventAnswerMutation();
   const [uploadFile] = useUploadFileMutation();
 
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
-  const [eventAnswer, setEventAnswer] = useState<IEventAnswer>();
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const [editedText, setEditedText] = useState('');
   const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
   const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
 
-  useEffect(() => {
-    if (eventAnswerId) {
-      getEventAnswer(eventAnswerId);
-    }
-  }, [eventAnswerId]);
+  // useEffect(() => {
+  //   if (eventAnswerId) {
+  //     getEventAnswer(eventAnswerId);
+  //   }
+  // }, [eventAnswerId]);
 
-  useEffect(() => {
-    setEventAnswer(data);
+  // useEffect(() => {
+  //   setEventAnswer(data);
 
-    if (data?.text) {
-      setEditedText(data.text);
-    }
-  }, [data]);
+  //   if (data?.text) {
+  //     setEditedText(data.text);
+  //   }
+  // }, [data]);
 
   useEffect(() => {
     if (eventAnswerData) {
-      setEventAnswer(eventAnswerData);
+      // setEventAnswer(eventAnswerData);
 
       if (eventAnswerData.text) {
         setEditedText(eventAnswerData.text);
       }
     }
   }, [eventAnswerData]);
-
-  useEffect(() => {
-    console.log(eventAnswer); // можно убрать
-  }, [eventAnswer]);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
@@ -90,8 +99,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
       setIsEditing((prev) => !prev);
       return;
     }
-    const fileIds: number[] = eventAnswer?.files
-      ? eventAnswer?.files
+    const fileIds: number[] = eventAnswerData?.files
+      ? eventAnswerData?.files
           .filter((file) => file.id > 0)
           .map((file: IFile) => file.id)
       : [];
@@ -99,16 +108,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
     let responseData;
     let responseError;
 
-    if (eventAnswer?.files.length == 0 && editedText.trim().length == 0) {
+    if (eventAnswerData?.files.length == 0 && editedText.trim().length == 0) {
       toast('Должен быть текстовый ответ или файлы', {
         type: 'warning',
       });
       return;
     }
 
-    if (eventAnswer?.id) {
+    if (eventAnswerData) {
       ({ data: responseData, error: responseError } = await updateEventAnswer({
-        id: eventAnswer.id,
+        id: eventAnswerData.id,
         text: editedText,
         fileIds: fileIds,
       }));
@@ -119,11 +128,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
         });
         return;
       }
-    } else if (eventId) {
-      ({ data: responseData, error: responseError } = await createEventAnswer({
-        event: eventId,
-        text: editedText,
-      }));
+
+      toast('Ответ успешно изменен', {
+        type: 'success',
+      });
+    } else {
+      const { data: responseData, error: responseError } =
+        await createEventAnswer({
+          event: event.id,
+          text: editedText,
+        });
 
       if (responseError) {
         toast('Произошла серверная ошибка при отправке ответа', {
@@ -143,7 +157,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления ответа
       const filesError = await uploadAllFiles(
-        Number(responseData.id || eventAnswer?.id)
+        Number(responseData.id || eventAnswerData?.id)
       );
 
       if (filesError === 0) {
@@ -195,9 +209,9 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
   return (
     <>
-      {deleteModal && eventAnswer?.id && (
+      {deleteModal && eventAnswerData && (
         <Modal
-          title="Удаление интенсива"
+          title="Удаление ответа на мероприятие"
           onCloseModal={() => setDeleteModal(false)}
         >
           <p className="text-lg text-bright_gray">
@@ -215,7 +229,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
               <PrimaryButton
                 clickHandler={async () => {
                   const { error: responseError } = await deleteEventAnswer(
-                    eventAnswer?.id
+                    eventAnswerData?.id
                   );
 
                   setDeleteModal(false);
@@ -226,7 +240,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                   }
 
                   if (deleteAnswer) {
-                    deleteAnswer(eventAnswer.id);
+                    deleteAnswer(eventAnswerData.id);
                   }
 
                   toast('Ответ успешно удален', {
@@ -239,16 +253,18 @@ const EventAnswer: FC<EventAnswerProps> = ({
           </div>
         </Modal>
       )}
-      <div className="p-4 mt-5 max-w">
-        {eventAnswer?.id || (!eventAnswer?.id && isEditing) ? (
+
+      <div className="mt-5 max-w">
+        {eventAnswerData || (!eventAnswerData && isEditing) ? (
           <>
-            {eventAnswer && (
+            {eventAnswerData && (
               <p className="text-lg font-medium text-center">
-                Ответ от {getDateTimeDisplay(eventAnswer?.createdDate)}
+                Ответ от {getDateTimeDisplay(eventAnswerData.createdDate)}
               </p>
             )}
+
             <textarea
-              className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:ring-1 focus:ring-blue"
+              className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
               onChange={handleTextChange}
               rows={4}
@@ -259,62 +275,106 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {!isEditing ? (
               <AttachedFileList
                 context={'event_answer'}
-                contextId={eventAnswer?.id}
+                contextId={eventAnswerData?.id}
                 nameFileList="ответа"
                 files={attachedFilesList}
               />
             ) : (
-              <div className="p-4 mx-auto my-3 bg-white rounded-lg shadow-md max-w">
+              <div className="mx-auto my-3 bg-white rounded-lg shadow-md max-w">
                 <EditableFileList
                   files={attachedFilesList}
                   nameFileList="ответа"
                   onFileDelete={handleFileDelete}
                 />
+
                 <FileInput onFilesChange={handleFilesChange} />
               </div>
             )}
-            {!eventAnswer?.marks || eventAnswer.marks.length == 0 ? (
-              <div className="flex items-center gap-5 mt-2">
-                <PrimaryButton
-                  type="button"
-                  children={
-                    isEditing
-                      ? eventAnswer?.id
-                        ? 'Сохранить ответ'
-                        : 'Сохранить и отправить'
-                      : eventAnswer?.id
-                      ? 'Редактировать ответ'
-                      : 'Отправить ответ'
-                  }
-                  clickHandler={() => handleEditClick()}
-                />
-                <div>
-                  <PrimaryButton
-                    buttonColor="gray"
-                    children={<TrashIcon />}
-                    onClick={() => {
-                      setDeleteModal(true);
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="mt-3">
-                Область с оценками преподавателей{' '}
-                <TeacherMarkCard teacherMarks={eventAnswer?.marks} />
-              </div>
+
+            {/* TODO: поломалась анимация? */}
+
+            {currentUser && currentUser.currentRole && (
+              <>
+                {/* опциональное отображение студентам */}
+                {isUserStudent(currentUser.currentRole) && (
+                  <>
+                    {/* если студент - тимлид, то если ответ оценен, то TeacherMarkCard, иначе кнопку */}
+                    {currentTeam?.teamlead?.id === currentUser.studentId ? (
+                      <>
+                        {eventAnswerData?.marks.length === 0 ? (
+                          <div className="flex items-center gap-5 mt-2">
+                            <PrimaryButton
+                              type="button"
+                              children={
+                                isEditing
+                                  ? eventAnswerData
+                                    ? 'Сохранить ответ'
+                                    : 'Сохранить и отправить'
+                                  : eventAnswerData
+                                  ? 'Редактировать ответ'
+                                  : 'Отправить ответ'
+                              }
+                              clickHandler={handleEditClick}
+                            />
+
+                            <div>
+                              <PrimaryButton
+                                buttonColor="gray"
+                                children={<TrashIcon />}
+                                onClick={() => {
+                                  setDeleteModal(true);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="mt-3">
+                              Оценки преподавателей{' '}
+                              {eventAnswerData && (
+                                <TeacherMarkCard
+                                  teacherMarks={eventAnswerData.marks}
+                                />
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      // если студент не тимлид, то отображаем только TeacherMarkCard
+                      <div className="mt-3">
+                        Оценки преподавателей{' '}
+                        {eventAnswerData && (
+                          <TeacherMarkCard
+                            teacherMarks={eventAnswerData.marks}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* опциональное отображение преподавателям */}
+                {/* TODO: нужно показывать возможность изменения оценки только преподавателю жюри */}
+                {isUserTeacher(currentUser.currentRole) && (
+                  <>контент для преподавателей</>
+                )}
+
+                {/* опциональное отображение организаторам */}
+                {isUserManager(currentUser.currentRole) && (
+                  <>контент для организаторов</>
+                )}
+              </>
             )}
           </>
         ) : (
-          <>
-            <PrimaryButton
-              type="button"
-              children={
-                isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
-              }
-              clickHandler={() => setIsEditing((prev) => !prev)}
-            />
-          </>
+          <PrimaryButton
+            type="button"
+            children={
+              isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
+            }
+            clickHandler={() => setIsEditing((prev) => !prev)}
+          />
         )}
       </div>
     </>

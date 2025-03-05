@@ -6,7 +6,6 @@ import IntensiveMainPage from '../pages/IntensiveMainPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 import EventPage from '../pages/EventPage';
-import TeamEvaluationPage from '../pages/TeamEvaluationPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
 import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
@@ -63,11 +62,6 @@ const routeConfig: RouteType[] = [
       {
         path: 'kanban',
         element: <KanbanBoardPage />,
-      },
-      // TODO: delete
-      {
-        path: 'team-evaluation/:eventId/:teamId',
-        element: <TeamEvaluationPage />,
       },
       {
         path: 'editIntensive',
