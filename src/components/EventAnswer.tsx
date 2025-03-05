@@ -79,10 +79,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
   useEffect(() => {
     if (eventAnswerData) {
       // setEventAnswer(eventAnswerData);
-
-      if (eventAnswerData.text) {
-        setEditedText(eventAnswerData.text);
-      }
+      setEditedText(eventAnswerData.text);
     }
   }, [eventAnswerData]);
 
@@ -154,6 +151,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
       });
     }
 
+    // TODO: responseData никогда не заполняется тут
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления ответа
       const filesError = await uploadAllFiles(
@@ -291,17 +289,19 @@ const EventAnswer: FC<EventAnswerProps> = ({
               </div>
             )}
 
-            {/* TODO: поломалась анимация? */}
-
             {currentUser && currentUser.currentRole && (
               <>
                 {/* опциональное отображение студентам */}
                 {isUserStudent(currentUser.currentRole) && (
                   <>
-                    {/* если студент - тимлид, то если ответ оценен, то TeacherMarkCard, иначе кнопку */}
+                    {/* если студент - тимлид */}
                     {currentTeam?.teamlead?.id === currentUser.studentId ? (
                       <>
-                        {eventAnswerData?.marks.length === 0 ? (
+                        {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
+                        {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
+                        {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
+                        {!eventAnswerData ||
+                        eventAnswerData.marks.length === 0 ? (
                           <div className="flex items-center gap-5 mt-2">
                             <PrimaryButton
                               type="button"

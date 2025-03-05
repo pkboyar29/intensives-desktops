@@ -366,7 +366,7 @@ const EventPage: FC = () => {
                     </div>
                   )}
 
-                {/* TODO: для тьютора и наставника в этой команде должно отображать то же самое, что и для студента */}
+                {/* TODO: для тьютора и наставника в этой команде нужно отображать то же самое, что и для обычного студента */}
                 {currentUser?.currentRole &&
                   isUserStudent(currentUser.currentRole) && (
                     <div className="flex flex-col gap-3 mt-10">
