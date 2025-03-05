@@ -18,8 +18,11 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     team: unmappedEventAnswer.team,
     createdDate: unmappedEventAnswer.created_at,
     files: unmappedEventAnswer.files,
-    marks: unmappedEventAnswer.marks,
-    hasMarks: unmappedEventAnswer.has_marks,
+    // TODO: надо понять, почему мы тут получаем undefined после именно создания ответа (дело в бэке наверн)
+    marks: unmappedEventAnswer.marks ? unmappedEventAnswer.marks : [],
+    hasMarks: unmappedEventAnswer.has_marks
+      ? unmappedEventAnswer.has_marks
+      : false,
   };
 };
 
