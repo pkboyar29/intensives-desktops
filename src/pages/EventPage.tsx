@@ -29,6 +29,7 @@ import Chip from '../components/common/Chip';
 import { ToastContainer, toast } from 'react-toastify';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
+import Accordion from '../components/common/Accordion';
 
 const EventPage: FC = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ const EventPage: FC = () => {
   const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>([]);
   const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
   const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
+  const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
 
   const {
     data: event,
@@ -99,10 +101,6 @@ const EventPage: FC = () => {
       }
     }
   }, [eventAnswersData]);
-
-  useEffect(() => {
-    console.log(eventAnswers); //можно убрать
-  }, [eventAnswers]);
 
   return (
     <>
@@ -251,6 +249,39 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
+                {/* отображение для преподавателей жюри и организаторов */}
+                {currentUser?.teacherId &&
+                  event.teachers
+                    .map((teacher) => teacher.id)
+                    .includes(currentUser?.teacherId) && (
+                    <div className="flex flex-col gap-3 mt-10">
+                      <p className="text-xl font-bold text-black_2">
+                        Оцениваемые команды
+                      </p>
+
+                      {/* TODO: отображать в expandedContent ответы этой команды, иначе сообщение, что команда не прислала ответа */}
+                      <Accordion
+                        items={event.teams}
+                        expandedItemId={expandedTeam}
+                        onItemClick={(item) => setExpandedTeam(item)}
+                        expandedContent={
+                          expandedTeam ? <div>{expandedTeam}</div> : null
+                        }
+                      />
+
+                      <p className="text-xl font-bold text-black_2">
+                        Все ответы
+                      </p>
+
+                      {eventAnswers.map((eventAnswer) => (
+                        <div>
+                          Ответ {getDateTimeDisplay(eventAnswer.createdDate)} от
+                          команды {eventAnswer.team.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                 {currentUser?.currentRole &&
                   isUserManager(currentUser.currentRole) && (
                     <div className="flex items-center mt-10 text-lg font-bold gap-7">
@@ -274,33 +305,6 @@ const EventPage: FC = () => {
                           }}
                         />
                       </div>
-                    </div>
-                  )}
-
-                {/* отображение для преподавателей жюри и организаторов */}
-                {currentUser?.teacherId &&
-                  event.teachers
-                    .map((teacher) => teacher.id)
-                    .includes(currentUser?.teacherId) && (
-                    <div className="flex flex-col gap-3 mt-10">
-                      <p className="text-xl font-bold text-black_2">
-                        Оцениваемые команды
-                      </p>
-
-                      {event.teams.map((team) => (
-                        <div>{team.name}</div>
-                      ))}
-
-                      <p className="text-xl font-bold text-black_2">
-                        Все ответы
-                      </p>
-
-                      {eventAnswers.map((eventAnswer) => (
-                        <div>
-                          Ответ {getDateTimeDisplay(eventAnswer.createdDate)} от
-                          команды {eventAnswer.team.name}
-                        </div>
-                      ))}
                     </div>
                   )}
 

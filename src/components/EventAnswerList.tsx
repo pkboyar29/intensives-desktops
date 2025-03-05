@@ -18,8 +18,7 @@ const EventAnswerList: FC<EventAnswerListProps> = ({
   clickEventAnswer,
 }) => {
   return (
-    <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
-      <p className="mb-4 text-xl font-semibold"></p>
+    <div className="p-4 bg-white rounded-lg shadow-md max-w">
       {eventAnswers && eventAnswers.length > 0 ? (
         eventAnswers.map((eventAnswer, index) => (
           <div
@@ -43,6 +42,7 @@ const EventAnswerList: FC<EventAnswerListProps> = ({
                   Ответ от {getDateTimeDisplay(eventAnswer.createdDate)}
                 </p>
               </div>
+
               {eventAnswer?.marks && eventAnswer.marks.length > 0 && (
                 <span className="text-sm font-semibold text-green-700">
                   ✅ Оценен
@@ -52,6 +52,7 @@ const EventAnswerList: FC<EventAnswerListProps> = ({
           </div>
         ))
       ) : (
+        // TODO: снова странный тернарный оператор
         <></>
       )}
     </div>
