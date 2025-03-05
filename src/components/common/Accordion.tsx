@@ -31,7 +31,7 @@ const Accordion = <T extends { id: number; name: string }>({
           key={item.id}
         >
           <div
-            className={`text-lg font-medium transition duration-300 ease-in-out group-hover:text-blue ${
+            className={`select-none text-lg font-medium transition duration-300 ease-in-out group-hover:text-blue ${
               expandedItemId && item.id === expandedItemId && 'text-blue'
             }`}
           >

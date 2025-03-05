@@ -102,6 +102,75 @@ const EventPage: FC = () => {
     }
   }, [eventAnswersData]);
 
+  const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
+    return (
+      <>
+        {eventAnswers.length > 0 && (
+          <>
+            <EventAnswerList
+              eventAnswers={eventAnswers}
+              expandedAnswer={expandedAnswer}
+              clickEventAnswer={(id: number) =>
+                setExpandedAnswer((prev) => (prev === id ? null : id))
+              }
+            />
+
+            <motion.div
+              initial={{ opacity: 0, height: 0, scale: 0.95 }}
+              animate={
+                expandedAnswer ? { opacity: 1, height: 'auto', scale: 1 } : {}
+              }
+              exit={{ opacity: 0, height: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              {expandedAnswer && event && (
+                <EventAnswer
+                  event={event}
+                  eventAnswerData={eventAnswers.find(
+                    (answer) => answer.id === expandedAnswer
+                  )}
+                  deleteAnswer={(id: number) => {
+                    setEventAnswers((prev) =>
+                      prev?.filter((answer) => answer.id !== id)
+                    );
+
+                    setExpandedAnswer(null);
+                    setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
+                  }}
+                />
+              )}
+            </motion.div>
+          </>
+        )}
+
+        {isCreatingAnswer && !expandedAnswer && event && (
+          <EventAnswer
+            event={event}
+            createAnswer={(newAnswer: IEventAnswer) => {
+              setEventAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
+
+              setIsCreatingAnswer(false); // тоже самое
+              setExpandedAnswer(newAnswer.id);
+            }}
+          />
+        )}
+      </>
+    );
+  };
+
+  const renderTeamAnswers = (expandedTeam: number) => {
+    const teamAnswers = eventAnswers.filter(
+      (eventAnswer) => expandedTeam === eventAnswer.team.id
+    );
+
+    if (teamAnswers.length === 0) {
+      return <div className="p-4 text-lg">Команда не прислала ответа</div>;
+    } else {
+      return renderEventAnswers(teamAnswers);
+    }
+  };
+
   return (
     <>
       <ToastContainer position="top-center" />
@@ -249,7 +318,8 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* отображение для преподавателей жюри и организаторов */}
+                {/* TODO: отображать такой же аккордион для организаторов */}
+                {/* отображение для преподавателей жюри */}
                 {currentUser?.teacherId &&
                   event.teachers
                     .map((teacher) => teacher.id)
@@ -259,26 +329,14 @@ const EventPage: FC = () => {
                         Оцениваемые команды
                       </p>
 
-                      {/* TODO: отображать в expandedContent ответы этой команды, иначе сообщение, что команда не прислала ответа */}
                       <Accordion
                         items={event.teams}
                         expandedItemId={expandedTeam}
                         onItemClick={(item) => setExpandedTeam(item)}
                         expandedContent={
-                          expandedTeam ? <div>{expandedTeam}</div> : null
+                          expandedTeam ? renderTeamAnswers(expandedTeam) : null
                         }
                       />
-
-                      <p className="text-xl font-bold text-black_2">
-                        Все ответы
-                      </p>
-
-                      {eventAnswers.map((eventAnswer) => (
-                        <div>
-                          Ответ {getDateTimeDisplay(eventAnswer.createdDate)} от
-                          команды {eventAnswer.team.name}
-                        </div>
-                      ))}
                     </div>
                   )}
 
@@ -310,76 +368,17 @@ const EventPage: FC = () => {
 
                 {/* TODO: для тьютора и наставника в этой команде должно отображать то же самое, что и для студента */}
                 {currentUser?.currentRole &&
-                isUserStudent(currentUser.currentRole) &&
-                eventAnswers ? (
-                  <div className="flex flex-col gap-3 mt-10">
-                    <p className="text-xl font-bold text-black_2">
-                      {eventAnswers.length > 0
-                        ? 'Ответы на мероприятие'
-                        : 'Ответ на мероприятие не отправлен'}
-                    </p>
+                  isUserStudent(currentUser.currentRole) && (
+                    <div className="flex flex-col gap-3 mt-10">
+                      <p className="text-xl font-bold text-black_2">
+                        {eventAnswers.length > 0
+                          ? 'Ответы на мероприятие'
+                          : 'Ответ на мероприятие не отправлен'}
+                      </p>
 
-                    {eventAnswers.length > 0 && (
-                      <>
-                        <EventAnswerList
-                          eventAnswers={eventAnswers}
-                          expandedAnswer={expandedAnswer}
-                          clickEventAnswer={(id: number) =>
-                            setExpandedAnswer((prev) =>
-                              prev === id ? null : id
-                            )
-                          }
-                        />
-
-                        <motion.div
-                          initial={{ opacity: 0, height: 0, scale: 0.95 }}
-                          animate={
-                            expandedAnswer
-                              ? { opacity: 1, height: 'auto', scale: 1 }
-                              : {}
-                          }
-                          exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                          transition={{ duration: 0.2, ease: 'easeInOut' }}
-                          className="overflow-hidden"
-                        >
-                          {expandedAnswer && (
-                            <EventAnswer
-                              eventAnswerData={eventAnswers.find(
-                                (answer) => answer.id === expandedAnswer
-                              )}
-                              deleteAnswer={(id: number) => {
-                                setEventAnswers((prev) =>
-                                  prev?.filter((answer) => answer.id !== id)
-                                );
-
-                                setExpandedAnswer(null);
-                                setIsCreatingAnswer(true); // еще лучше проверить что ответов без оценки действительно больше нет
-                              }}
-                            />
-                          )}
-                        </motion.div>
-                      </>
-                    )}
-
-                    {isCreatingAnswer && !expandedAnswer && (
-                      <EventAnswer
-                        eventId={Number(params.eventId)}
-                        createAnswer={(newAnswer: IEventAnswer) => {
-                          setEventAnswers((prevAnswers) => [
-                            ...prevAnswers,
-                            newAnswer,
-                          ]);
-
-                          setIsCreatingAnswer(false); // тоже самое
-                          setExpandedAnswer(newAnswer.id);
-                        }}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  // TODO: странный тернарный оператор
-                  <></>
-                )}
+                      {renderEventAnswers(eventAnswers)}
+                    </div>
+                  )}
               </>
             )
           )}
