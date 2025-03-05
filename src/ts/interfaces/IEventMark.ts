@@ -8,3 +8,5 @@ export interface IEventMark {
   createdDate: Date;
   teacher: ITeacher;
 }
+
+// TODO: добавить IEventMarkCreate

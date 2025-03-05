@@ -1,8 +1,15 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
-import { isUserStudent, isUserManager } from '../helpers/userHelpers';
-import { getEventDateDisplayString } from '../helpers/dateHelpers';
+import {
+  isUserStudent,
+  isUserTeacher,
+  isUserManager,
+} from '../helpers/userHelpers';
+import {
+  getEventDateDisplayString,
+  getDateTimeDisplay,
+} from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
@@ -24,20 +31,16 @@ import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
 
 const EventPage: FC = () => {
-  const currentUser = useAppSelector((state) => state.user.data);
-  const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
-  const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>();
-  const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
-  const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
-
-  const [
-    getEventAnswers,
-    { data: eventAnswersData, isLoading: isLoadingEventAnswers, error },
-  ] = useLazyGetEventAnswersQuery();
-
   const navigate = useNavigate();
   const params = useParams();
+
+  const currentUser = useAppSelector((state) => state.user.data);
+
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
+  const [eventAnswers, setEventAnswers] = useState<IEventAnswer[]>([]);
+  const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
+  const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
 
   const {
     data: event,
@@ -46,6 +49,12 @@ const EventPage: FC = () => {
   } = useGetEventQuery(Number(params.eventId), {
     refetchOnMountOrArgChange: true,
   });
+  const [deleteEvent, { isSuccess }] = useDeleteEventMutation();
+
+  const [
+    getEventAnswers,
+    { data: eventAnswersData, isLoading: isLoadingEventAnswers, error },
+  ] = useLazyGetEventAnswersQuery();
 
   const [scoreTypeString, setScoreTypeString] = useState<
     | 'Без оценивания'
@@ -63,23 +72,21 @@ const EventPage: FC = () => {
     } else {
       setScoreTypeString('Без оценивания');
     }
-
-    // Загружаем ответы (студентов команды) на мероприятие
-    if (
-      event &&
-      currentUser?.currentRole &&
-      isUserStudent(currentUser.currentRole)
-    ) {
-      getEventAnswers(event.id);
-    }
   }, [event, currentUser]);
 
   useEffect(() => {
-    // Сохраняем данные ответов в состояние
-    setEventAnswers(eventAnswersData);
+    // Загружаем ответы на мероприятие (для студентов/тимлида/наставника/тьютора - ответы их команды, для препода жюри и организатора - все ответы команд)
+    if (event) {
+      getEventAnswers(event.id);
+    }
+  }, [event]);
 
-    // Проверяем есть ли неоцененные ответы
+  useEffect(() => {
     if (eventAnswersData) {
+      // Сохраняем ответы в состояние
+      setEventAnswers(eventAnswersData);
+
+      // Проверяем есть ли неоцененные ответы
       for (const answer in eventAnswersData) {
         // Если есть неоцененный ответ скрываем кнопку отправить новый ответ
         if (eventAnswersData[answer].hasMarks == false) {
@@ -121,7 +128,7 @@ const EventPage: FC = () => {
                   if (responseError) {
                     toast('Произошла серверная ошибка', { type: 'error' });
                   } else {
-                    navigate(`/manager/${params.intensiveId}/schedule`);
+                    navigate(`/intensives/${params.intensiveId}/schedule`);
                   }
                 }}
                 children="Удалить"
@@ -263,7 +270,32 @@ const EventPage: FC = () => {
                     </div>
                   )}
 
-                {/* TODO: для преподавателя жюри отображать список команд */}
+                {/* отображение для преподавателей жюри и организаторов */}
+                {currentUser?.teacherId &&
+                  event.teachers
+                    .map((teacher) => teacher.id)
+                    .includes(currentUser?.teacherId) && (
+                    <div className="flex flex-col gap-3 mt-10">
+                      <p className="text-xl font-bold text-black_2">
+                        Оцениваемые команды
+                      </p>
+
+                      {event.teams.map((team) => (
+                        <div>{team.name}</div>
+                      ))}
+
+                      <p className="text-xl font-bold text-black_2">
+                        Все ответы
+                      </p>
+
+                      {eventAnswers.map((eventAnswer) => (
+                        <div>
+                          Ответ {getDateTimeDisplay(eventAnswer.createdDate)} от
+                          команды {eventAnswer.team.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 {/* TODO: для тьютора и наставника в этой команде должно отображать то же самое, что и для студента */}
                 {currentUser?.currentRole &&
@@ -287,6 +319,7 @@ const EventPage: FC = () => {
                             )
                           }
                         />
+
                         <motion.div
                           initial={{ opacity: 0, height: 0, scale: 0.95 }}
                           animate={

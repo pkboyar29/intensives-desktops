@@ -32,7 +32,7 @@ const EventAnswerList: FC<EventAnswerListProps> = ({
               <div className="flex space-x-3 justify-left">
                 <p className="text-lg font-semibold">{index + 1}.</p>
                 <p className="text-lg font-medium">
-                  Ответ от {getDateTimeDisplay(eventAnswer.createdDt)}
+                  Ответ от {getDateTimeDisplay(eventAnswer.createdDate)}
                 </p>
               </div>
               {eventAnswer.hasMarks && (
