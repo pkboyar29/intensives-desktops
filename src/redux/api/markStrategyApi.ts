@@ -7,6 +7,8 @@ export const mapMarkStrategy = (unmappedMarkStrategy: any): IMarkStrategy => {
   return {
     id: unmappedMarkStrategy.id,
     name: unmappedMarkStrategy.name,
+    lowBound: unmappedMarkStrategy.low_bound,
+    highBound: unmappedMarkStrategy.high_bound,
   };
 };
 

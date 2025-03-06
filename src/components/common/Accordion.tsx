@@ -18,7 +18,7 @@ const Accordion = <T extends { id: number; name: string }>({
     <div className="flex flex-col gap-2 p-4 bg-white rounded-lg shadow-md max-w">
       {items.map((item) => (
         <div
-          className={`p-4 rounded-lg shadow-sm cursor-pointer group`}
+          className={`p-4 rounded-lg shadow-sm`}
           onClick={() => {
             if (expandedItemId) {
               if (item.id !== expandedItemId) {
@@ -31,7 +31,7 @@ const Accordion = <T extends { id: number; name: string }>({
           key={item.id}
         >
           <div
-            className={`select-none text-lg font-medium transition duration-300 ease-in-out group-hover:text-blue ${
+            className={`cursor-pointer select-none text-lg font-medium transition duration-300 ease-in-out hover:text-blue py-1.5 ${
               expandedItemId && item.id === expandedItemId && 'text-blue'
             }`}
           >

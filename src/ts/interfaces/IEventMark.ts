@@ -1,3 +1,4 @@
+import { IEventAnswer } from './IEventAnswer';
 import { ITeacher } from './ITeacher';
 
 export interface IEventMark {
@@ -7,6 +8,16 @@ export interface IEventMark {
   comment: string;
   createdDate: Date;
   teacher: ITeacher;
+  eventAnswer: IEventAnswer;
 }
 
-// TODO: добавить IEventMarkCreate
+export interface IEventMarkCreate {
+  mark: number;
+  criteria?: number;
+  comment: string;
+  eventAnswerId: number;
+}
+
+export interface IEventMarkUpdate extends IEventMarkCreate {
+  eventMarkId: number;
+}
