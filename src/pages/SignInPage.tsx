@@ -104,7 +104,7 @@ const SignInPage: FC = () => {
   };
 
   return (
-    <div className="w-full px-3 mt-20 md:flex md:justify-center">
+    <div className="pt-[88px] w-full px-3 md:flex md:justify-center">
       <div className="md:w-[480px]">
         {tempUser ? (
           <motion.div
