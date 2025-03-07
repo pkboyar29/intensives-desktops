@@ -130,7 +130,18 @@ const EventPage: FC = () => {
                   eventAnswerData={eventAnswers.find(
                     (answer) => answer.id === expandedAnswer
                   )}
-                  deleteAnswer={(id: number) => {
+                  onUpdateAnswer={(newAnswer: IEventAnswer) => {
+                    setEventAnswers((prev) =>
+                      prev.map((answer) => {
+                        if (answer.id === newAnswer.id) {
+                          return newAnswer;
+                        } else {
+                          return answer;
+                        }
+                      })
+                    );
+                  }}
+                  onDeleteAnswer={(id: number) => {
                     setEventAnswers((prev) =>
                       prev?.filter((answer) => answer.id !== id)
                     );
@@ -147,7 +158,7 @@ const EventPage: FC = () => {
         {isCreatingAnswer && !expandedAnswer && event && (
           <EventAnswer
             event={event}
-            createAnswer={(newAnswer: IEventAnswer) => {
+            onCreateAnswer={(newAnswer: IEventAnswer) => {
               setEventAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
 
               setIsCreatingAnswer(false); // тоже самое

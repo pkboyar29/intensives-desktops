@@ -1,8 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import {
-  useCreateEventMarkMutation,
-  useCreateCriteriaMarksMutation,
-} from '../../redux/api/eventMarkApi';
+import { useCreateEventMarkMutation } from '../../redux/api/eventMarkApi';
 import { validateKanban } from '../../helpers/kanbanHelpers';
 
 import { IEvent } from '../../ts/interfaces/IEvent';
@@ -10,38 +7,61 @@ import { IEvent } from '../../ts/interfaces/IEvent';
 import RangeSlider from '../common/RangeSlider';
 import PrimaryButton from '../common/PrimaryButton';
 import { toast } from 'react-toastify';
+import { IEventMark } from '../../ts/interfaces/IEventMark';
 
-// TODO: начать получать eventMark, который может быть null - в таком случае мы отправляем новую оценку, а не изменяем ее
 interface EventMarkFormProps {
   event: IEvent;
   eventAnswerId: number;
+  existingEventMarks: IEventMark[];
+  onChangeMarks: (updatedMarks: IEventMark[]) => void;
 }
 
-const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
-  const [createEventMark] = useCreateEventMarkMutation();
-  const [createCriteriaMarks] = useCreateCriteriaMarksMutation();
+const EventMarkForm: FC<EventMarkFormProps> = ({
+  event,
+  eventAnswerId,
+  existingEventMarks,
+  onChangeMarks,
+}) => {
+  const [createEventMarks] = useCreateEventMarkMutation();
 
   const [eventMarks, setEventMarks] = useState<
-    { criteriaId: number; mark: number; comment: string }[]
+    { id: number; criteriaId: number; mark: number; comment: string }[]
   >([]);
 
   useEffect(() => {
-    // TODO: при существовании eventMark заполнять сразу currentMark и comment, иначе просто в currentMark записать event.lowBound
-
-    if (event.criterias.length === 0) {
-      setEventMarks([
-        { criteriaId: 0, mark: event.markStrategy?.lowBound ?? 0, comment: '' },
-      ]);
-    } else {
+    if (existingEventMarks.length > 0) {
+      // если оценки уже отправлены преподавателем
       setEventMarks(
-        event.criterias.map((criteria) => ({
-          criteriaId: criteria.id,
-          mark: event.markStrategy?.lowBound ?? 0,
-          comment: '',
+        existingEventMarks.map((existingMark) => ({
+          id: existingMark.id,
+          mark: existingMark.mark,
+          comment: existingMark.comment,
+          criteriaId: existingMark.criteria ?? 0,
         }))
       );
+    } else {
+      // иначе добавляем дефолтные оценки
+      if (event.criterias.length === 0) {
+        setEventMarks([
+          {
+            id: 0,
+            criteriaId: 0,
+            mark: event.markStrategy?.lowBound ?? 0,
+            comment: '',
+          },
+        ]);
+      } else {
+        setEventMarks(
+          event.criterias.map((criteria) => ({
+            id: 0,
+            criteriaId: criteria.id,
+            mark: event.markStrategy?.lowBound ?? 0,
+            comment: '',
+          }))
+        );
+      }
     }
-  }, [event]);
+  }, [event, existingEventMarks]);
 
   const updateMark = (criteriaId: number, newMark: number) => {
     setEventMarks((prevMarks) =>
@@ -63,52 +83,42 @@ const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
     }
   };
 
-  const onSubmit = async () => {
-    if (event.criterias.length === 0) {
-      const { data: responseData, error: responseError } =
-        await createEventMark({
-          mark: eventMarks[0].mark,
-          comment: eventMarks[0].comment,
-          eventAnswerId: eventAnswerId,
-        });
-
-      if (responseError) {
-        toast('Произошла серверная ошибка при отправке оценки', {
-          type: 'error',
-        });
-        return;
-      }
-
-      if (responseData) {
-        toast('Оценка успешно отправлена', {
-          type: 'success',
-        });
-      }
+  const displayMark = (mark: number) => {
+    if (
+      event.markStrategy &&
+      event.markStrategy.lowBound === 0 &&
+      event.markStrategy.highBound === 1
+    ) {
+      return mark === 0 ? 'Незачет' : 'Зачет';
     } else {
-      const { data: responseData, error: responseError } =
-        await createCriteriaMarks(
-          eventMarks.map((eventMark) => ({
-            mark: eventMark.mark,
-            comment: eventMark.comment,
-            criteria: eventMark.criteriaId,
-            eventAnswerId: eventAnswerId,
-          }))
-        );
-
-      if (responseError) {
-        toast('Произошла серверная ошибка при отправке оценок по критериям', {
-          type: 'error',
-        });
-        return;
-      }
-
-      if (responseData) {
-        toast('Оценки успешно отправлены', {
-          type: 'success',
-        });
-      }
+      return mark;
     }
-    // TODO: передавать в компонент пропсом метод, чтобы изменять состояние извне в обоих случаях
+  };
+
+  const onSubmit = async () => {
+    const { data: responseData, error: responseError } = await createEventMarks(
+      eventMarks.map((eventMark) => ({
+        mark: eventMark.mark,
+        comment: eventMark.comment,
+        criteria: eventMark.criteriaId ? eventMark.criteriaId : null,
+        eventAnswerId: eventAnswerId,
+      }))
+    );
+
+    if (responseError) {
+      toast('Произошла серверная ошибка при отправке оценки', {
+        type: 'error',
+      });
+      return;
+    }
+
+    if (responseData) {
+      toast('Оценка успешно отправлена', {
+        type: 'success',
+      });
+
+      onChangeMarks(responseData);
+    }
   };
 
   return (
@@ -138,7 +148,9 @@ const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
               </div>
             )}
 
-            <div className="text-lg font-semibold">{eventMarks[0]?.mark}</div>
+            <div className="text-lg font-semibold">
+              {displayMark(eventMarks[0]?.mark)}
+            </div>
           </div>
 
           <textarea
@@ -158,7 +170,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
               <div className="flex items-center justify-between gap-2">
                 <div className="text-lg">{criteria.name}</div>
 
-                <div className="flex items-center gap-2">
+                <div className="text-center">
                   {event.markStrategy && (
                     <div className="w-60">
                       <RangeSlider
@@ -176,7 +188,10 @@ const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
                   )}
 
                   <div className="text-lg font-semibold">
-                    {eventMarks.find((m) => m.criteriaId === criteria.id)?.mark}
+                    {displayMark(
+                      eventMarks.find((m) => m.criteriaId === criteria.id)
+                        ?.mark ?? 0
+                    )}
                   </div>
                 </div>
               </div>
@@ -198,7 +213,9 @@ const EventMarkForm: FC<EventMarkFormProps> = ({ event, eventAnswerId }) => {
 
       <PrimaryButton
         type="button"
-        children={'Отправить оценку'}
+        children={
+          existingEventMarks.length > 0 ? 'Изменить оценку' : 'Отправить оценки'
+        }
         clickHandler={onSubmit}
       />
     </div>

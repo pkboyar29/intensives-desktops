@@ -1,8 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { mapEventAnswer } from './eventAnswerApi';
-
 import {
   IEventMark,
   IEventMarkCreate,
@@ -10,14 +8,14 @@ import {
 } from '../../ts/interfaces/IEventMark';
 
 export const mapEventMark = (unmappedEventMark: any): IEventMark => {
-  console.log(unmappedEventMark);
   return {
     id: unmappedEventMark.id,
     mark: unmappedEventMark.mark,
     comment: unmappedEventMark.comment,
+    criteria: unmappedEventMark.criteria,
     createdDate: unmappedEventMark.created_at,
     teacher: unmappedEventMark.teacher,
-    eventAnswer: mapEventAnswer(unmappedEventMark.event_answer),
+    eventAnswerId: unmappedEventMark.event_answer,
   };
 };
 
@@ -25,18 +23,7 @@ export const eventMarkApi = createApi({
   reducerPath: 'eventMarkApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    createEventMark: builder.mutation<IEventMark, IEventMarkCreate>({
-      query: (data) => ({
-        url: '/event_marks/',
-        method: 'POST',
-        body: {
-          ...data,
-          event_answer: data.eventAnswerId,
-        },
-      }),
-      transformResponse: (response: any) => mapEventMark(response),
-    }),
-    createCriteriaMarks: builder.mutation<IEventMark, IEventMarkCreate[]>({
+    createEventMark: builder.mutation<IEventMark[], IEventMarkCreate[]>({
       query: (data) => ({
         url: '/event_marks/',
         method: 'POST',
@@ -46,12 +33,9 @@ export const eventMarkApi = createApi({
         })),
       }),
       transformResponse: (response: any) =>
-        response.map((unmappedEventMark: any) =>
-          mapEventMark(unmappedEventMark)
-        ),
+        response.map((unmappedMark: any) => mapEventMark(unmappedMark)),
     }),
   }),
 });
 
-export const { useCreateEventMarkMutation, useCreateCriteriaMarksMutation } =
-  eventMarkApi;
+export const { useCreateEventMarkMutation } = eventMarkApi;

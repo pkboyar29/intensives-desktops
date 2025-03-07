@@ -33,16 +33,18 @@ interface EventAnswerProps {
   // eventAnswerId?: number;
   eventAnswerData?: IEventAnswer;
   event: IEvent;
-  createAnswer?: (newEventAnswer: IEventAnswer) => void;
-  deleteAnswer?: (id: number) => void;
+  onCreateAnswer?: (newEventAnswer: IEventAnswer) => void;
+  onUpdateAnswer?: (newEventAnswer: IEventAnswer) => void;
+  onDeleteAnswer?: (id: number) => void;
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
   // eventAnswerId,
   eventAnswerData,
   event,
-  createAnswer,
-  deleteAnswer,
+  onCreateAnswer,
+  onUpdateAnswer,
+  onDeleteAnswer,
 }) => {
   // const [getEventAnswer, { data, isLoading, error }] =
   //   useLazyGetEventAnswerQuery();
@@ -144,8 +146,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
         return;
       }
 
-      if (createAnswer && responseData) {
-        createAnswer(responseData);
+      if (onCreateAnswer && responseData) {
+        onCreateAnswer(responseData);
       }
       toast('Ответ успешно отправлен', {
         type: 'success',
@@ -238,8 +240,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
                     return;
                   }
 
-                  if (deleteAnswer) {
-                    deleteAnswer(eventAnswerData.id);
+                  if (onDeleteAnswer) {
+                    onDeleteAnswer(eventAnswerData.id);
                   }
 
                   toast('Ответ успешно удален', {
@@ -361,6 +363,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
                   <EventMarkForm
                     event={event}
                     eventAnswerId={eventAnswerData.id}
+                    existingEventMarks={eventAnswerData.marks}
+                    onChangeMarks={(updatedMarks) => {
+                      if (eventAnswerData && onUpdateAnswer) {
+                        onUpdateAnswer({
+                          ...eventAnswerData,
+                          hasMarks: true,
+                          marks: updatedMarks,
+                        });
+                      }
+                    }}
                   />
                 )}
 
