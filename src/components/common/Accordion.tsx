@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 interface AccordionProps<T> {
   items: T[];
   expandedItemId: number | null;
-  onItemClick: (item: number) => void;
+  onItemClick: (item: number | null) => void;
   expandedContent: ReactNode | null;
 }
 
@@ -17,26 +17,21 @@ const Accordion = <T extends { id: number; name: string }>({
   return (
     <div className="flex flex-col gap-2 p-4 bg-white rounded-lg shadow-md max-w">
       {items.map((item) => (
-        <div
-          className={`p-4 rounded-lg shadow-sm`}
-          onClick={() => {
-            if (expandedItemId) {
-              if (item.id !== expandedItemId) {
-                onItemClick(item.id);
-              }
-            } else {
-              onItemClick(item.id);
-            }
-          }}
-          key={item.id}
-        >
-          <div
-            className={`cursor-pointer select-none text-lg font-medium transition duration-300 ease-in-out hover:text-blue py-1.5 ${
+        <div className={`p-4 rounded-lg shadow-sm`} key={item.id}>
+          <button
+            className={`w-full cursor-pointer select-none text-left text-lg font-medium transition duration-300 ease-in-out hover:text-blue py-1.5 ${
               expandedItemId && item.id === expandedItemId && 'text-blue'
             }`}
+            onClick={() => {
+              if (expandedItemId && item.id === expandedItemId) {
+                onItemClick(null);
+              } else {
+                onItemClick(item.id);
+              }
+            }}
           >
             {item.name}
-          </div>
+          </button>
 
           <motion.div
             initial={{ opacity: 0, height: 0, scale: 0.95 }}
@@ -47,6 +42,7 @@ const Accordion = <T extends { id: number; name: string }>({
             }
             exit={{ opacity: 0, height: 0, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
           >
             {expandedContent}
           </motion.div>

@@ -122,6 +122,7 @@ const EventPage: FC = () => {
               }
               exit={{ opacity: 0, height: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden' }}
             >
               {expandedAnswer && event && (
                 <EventAnswer
