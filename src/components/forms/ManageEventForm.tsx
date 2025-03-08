@@ -414,11 +414,13 @@ const ManageEventForm: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(
-                      `/intensives/${intensiveId}/schedule/${searchParams.get(
-                        'eventId'
-                      )}`
-                    );
+                    if (event) {
+                      navigate(
+                        `/intensives/${intensiveId}/schedule/${event.id}`
+                      );
+                    } else {
+                      navigate(`/intensives/${intensiveId}/schedule`);
+                    }
                   }
                 }}
                 children="Отменить"
