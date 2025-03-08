@@ -13,7 +13,8 @@ export const mapEventMark = (unmappedEventMark: any): IEventMark => {
     mark: unmappedEventMark.mark,
     comment: unmappedEventMark.comment,
     criteria: unmappedEventMark.criteria,
-    createdDate: unmappedEventMark.created_at,
+    createdDate: unmappedEventMark.created_dt,
+    updatedDate: unmappedEventMark.updated_dt,
     teacher: unmappedEventMark.teacher,
     eventAnswerId: unmappedEventMark.event_answer,
   };
@@ -35,7 +36,18 @@ export const eventMarkApi = createApi({
       transformResponse: (response: any) =>
         response.map((unmappedMark: any) => mapEventMark(unmappedMark)),
     }),
+    updateEventMark: builder.mutation<IEventMark, IEventMarkUpdate>({
+      query: (data) => ({
+        url: `/event_marks/${data.eventMarkId}/`,
+        method: 'PUT',
+        body: {
+          mark: data.mark,
+          comment: data.comment,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateEventMarkMutation } = eventMarkApi;
+export const { useCreateEventMarkMutation, useUpdateEventMarkMutation } =
+  eventMarkApi;

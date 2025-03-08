@@ -1,5 +1,8 @@
 import { FC, useState, useEffect } from 'react';
-import { useCreateEventMarkMutation } from '../../redux/api/eventMarkApi';
+import {
+  useCreateEventMarkMutation,
+  useUpdateEventMarkMutation,
+} from '../../redux/api/eventMarkApi';
 import { validateKanban } from '../../helpers/kanbanHelpers';
 
 import { IEvent } from '../../ts/interfaces/IEvent';
@@ -23,6 +26,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   onChangeMarks,
 }) => {
   const [createEventMarks] = useCreateEventMarkMutation();
+  const [updateEventMark] = useUpdateEventMarkMutation();
 
   const [eventMarks, setEventMarks] = useState<
     { id: number; criteriaId: number; mark: number; comment: string }[]
@@ -96,28 +100,62 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   };
 
   const onSubmit = async () => {
-    const { data: responseData, error: responseError } = await createEventMarks(
-      eventMarks.map((eventMark) => ({
-        mark: eventMark.mark,
-        comment: eventMark.comment,
-        criteria: eventMark.criteriaId ? eventMark.criteriaId : null,
-        eventAnswerId: eventAnswerId,
-      }))
-    );
+    if (existingEventMarks.length === 0) {
+      const { data: responseData, error: responseError } =
+        await createEventMarks(
+          eventMarks.map((eventMark) => ({
+            mark: eventMark.mark,
+            comment: eventMark.comment,
+            criteria: eventMark.criteriaId ? eventMark.criteriaId : null,
+            eventAnswerId: eventAnswerId,
+          }))
+        );
 
-    if (responseError) {
-      toast('Произошла серверная ошибка при отправке оценки', {
-        type: 'error',
-      });
-      return;
-    }
+      if (responseError) {
+        toast('Произошла серверная ошибка при отправке оценки', {
+          type: 'error',
+        });
+        return;
+      }
 
-    if (responseData) {
-      toast('Оценка успешно отправлена', {
+      if (responseData) {
+        toast('Оценка успешно отправлена', {
+          type: 'success',
+        });
+
+        onChangeMarks(responseData);
+      }
+    } else {
+      const updatedMarks = await Promise.all(
+        eventMarks.map(async (mark) => {
+          const { data: responseData, error: responseError } =
+            await updateEventMark({
+              eventMarkId: mark.id,
+              mark: mark.mark,
+              comment: mark.comment,
+            });
+
+          if (responseData) {
+            return responseData;
+          }
+
+          if (responseError) {
+            toast('Произошла серверная ошибка при отправке оценки', {
+              type: 'error',
+            });
+            return null;
+          }
+        })
+      );
+
+      toast('Оценка успешно обновлена', {
         type: 'success',
       });
 
-      onChangeMarks(responseData);
+      const validUpdatedMarks = updatedMarks.filter(
+        (mark): mark is IEventMark => mark !== null && mark !== undefined
+      );
+      onChangeMarks(validUpdatedMarks);
     }
   };
 
@@ -214,7 +252,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
       <PrimaryButton
         type="button"
         children={
-          existingEventMarks.length > 0 ? 'Изменить оценку' : 'Отправить оценки'
+          existingEventMarks.length > 0 ? 'Изменить оценку' : 'Отправить оценку'
         }
         clickHandler={onSubmit}
       />

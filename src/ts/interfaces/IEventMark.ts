@@ -6,6 +6,7 @@ export interface IEventMark {
   criteria?: number;
   comment: string;
   createdDate: Date;
+  updatedDate: Date;
   teacher: ITeacher;
   eventAnswerId: number;
 }
@@ -17,6 +18,8 @@ export interface IEventMarkCreate {
   eventAnswerId: number;
 }
 
-export interface IEventMarkUpdate extends IEventMarkCreate {
+export interface IEventMarkUpdate {
   eventMarkId: number;
+  mark: number;
+  comment: string;
 }
