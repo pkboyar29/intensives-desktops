@@ -36,6 +36,7 @@ const EventPage: FC = () => {
   const params = useParams();
 
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
@@ -122,7 +123,7 @@ const EventPage: FC = () => {
               }
               exit={{ opacity: 0, height: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="overflow-hidden"
+              style={{ overflow: 'hidden' }}
             >
               {expandedAnswer && event && (
                 <EventAnswer
@@ -130,7 +131,18 @@ const EventPage: FC = () => {
                   eventAnswerData={eventAnswers.find(
                     (answer) => answer.id === expandedAnswer
                   )}
-                  deleteAnswer={(id: number) => {
+                  onUpdateAnswer={(newAnswer: IEventAnswer) => {
+                    setEventAnswers((prev) =>
+                      prev.map((answer) => {
+                        if (answer.id === newAnswer.id) {
+                          return newAnswer;
+                        } else {
+                          return answer;
+                        }
+                      })
+                    );
+                  }}
+                  onDeleteAnswer={(id: number) => {
                     setEventAnswers((prev) =>
                       prev?.filter((answer) => answer.id !== id)
                     );
@@ -142,18 +154,6 @@ const EventPage: FC = () => {
               )}
             </motion.div>
           </>
-        )}
-
-        {isCreatingAnswer && !expandedAnswer && event && (
-          <EventAnswer
-            event={event}
-            createAnswer={(newAnswer: IEventAnswer) => {
-              setEventAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
-
-              setIsCreatingAnswer(false); // тоже самое
-              setExpandedAnswer(newAnswer.id);
-            }}
-          />
         )}
       </>
     );
@@ -377,6 +377,24 @@ const EventPage: FC = () => {
                       </p>
 
                       {renderEventAnswers(eventAnswers)}
+
+                      {currentUser.studentId === currentTeam?.teamlead?.id &&
+                        isCreatingAnswer &&
+                        !expandedAnswer &&
+                        event && (
+                          <EventAnswer
+                            event={event}
+                            onCreateAnswer={(newAnswer: IEventAnswer) => {
+                              setEventAnswers((prevAnswers) => [
+                                ...prevAnswers,
+                                newAnswer,
+                              ]);
+
+                              setIsCreatingAnswer(false); // тоже самое
+                              setExpandedAnswer(newAnswer.id);
+                            }}
+                          />
+                        )}
                     </div>
                   )}
               </>

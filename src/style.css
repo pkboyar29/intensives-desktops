@@ -118,15 +118,6 @@ body,
   height: 100vh;
 }
 
-.App {
-  padding-top: 74px;
-}
-
-/* .container {
-  max-width: 1366px;
-  margin: 0 auto;
-} */
-
 /* TABLE */
 
 .table {
@@ -235,4 +226,25 @@ input[type='radio']:checked {
 .box-shadow {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* range slider */
+
+.range {
+  -webkit-appearance: none;
+  background: #f0f2f5;
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.2);
+  height: 10px;
+  border-radius: 25px;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #1a5ce5;
+  background-color: white;
+  border-radius: 50%;
+  cursor: pointer;
 }

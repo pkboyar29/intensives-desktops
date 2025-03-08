@@ -28,7 +28,7 @@ const IntensiveMainPage: FC = () => {
       {isError ? (
         <IntensiveNotFoundComponent />
       ) : (
-        <div className="grid grid-cols-[auto,1fr]">
+        <div className="pt-[74px] h-screen grid grid-cols-[auto,1fr]">
           <Sidebar>
             {currentUser?.currentRole &&
               (isUserStudent(currentUser.currentRole) ? (
@@ -39,7 +39,7 @@ const IntensiveMainPage: FC = () => {
                 <ManagerSidebarContent isIntensiveLoading={isLoading} />
               ))}
           </Sidebar>
-          <div className="w-full px-10 pt-5">
+          <div className="w-full px-10 pt-5 overflow-y-auto">
             <Outlet />
           </div>
         </div>

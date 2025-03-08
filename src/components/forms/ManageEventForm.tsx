@@ -414,11 +414,13 @@ const ManageEventForm: FC = () => {
                 clickHandler={() => {
                   setCancelModal(false);
                   if (intensiveId) {
-                    navigate(
-                      `/intensives/${intensiveId}/schedule/${searchParams.get(
-                        'eventId'
-                      )}`
-                    );
+                    if (event) {
+                      navigate(
+                        `/intensives/${intensiveId}/schedule/${event.id}`
+                      );
+                    } else {
+                      navigate(`/intensives/${intensiveId}/schedule`);
+                    }
                   }
                 }}
                 children="Отменить"
@@ -485,8 +487,8 @@ const ManageEventForm: FC = () => {
                   message: 'Минимальное количество символов - 4',
                 },
                 maxLength: {
-                  value: 50,
-                  message: 'Максимальное количество символов - 50',
+                  value: 100,
+                  message: 'Максимальное количество символов - 100',
                 },
               }}
               description="Название мероприятия"

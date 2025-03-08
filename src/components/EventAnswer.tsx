@@ -27,21 +27,24 @@ import PrimaryButton from './common/PrimaryButton';
 import AttachedFileList from './AttachedFileList';
 import { toast } from 'react-toastify';
 import TeacherMarkCard from './TeacherMarkCard';
+import EventMarkForm from './forms/EventMarkForm';
 
 interface EventAnswerProps {
   // eventAnswerId?: number;
   eventAnswerData?: IEventAnswer;
   event: IEvent;
-  createAnswer?: (newEventAnswer: IEventAnswer) => void;
-  deleteAnswer?: (id: number) => void;
+  onCreateAnswer?: (newEventAnswer: IEventAnswer) => void;
+  onUpdateAnswer?: (newEventAnswer: IEventAnswer) => void;
+  onDeleteAnswer?: (id: number) => void;
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
   // eventAnswerId,
   eventAnswerData,
   event,
-  createAnswer,
-  deleteAnswer,
+  onCreateAnswer,
+  onUpdateAnswer,
+  onDeleteAnswer,
 }) => {
   // const [getEventAnswer, { data, isLoading, error }] =
   //   useLazyGetEventAnswerQuery();
@@ -143,8 +146,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
         return;
       }
 
-      if (createAnswer && responseData) {
-        createAnswer(responseData);
+      if (onCreateAnswer && responseData) {
+        onCreateAnswer(responseData);
       }
       toast('Ответ успешно отправлен', {
         type: 'success',
@@ -237,8 +240,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
                     return;
                   }
 
-                  if (deleteAnswer) {
-                    deleteAnswer(eventAnswerData.id);
+                  if (onDeleteAnswer) {
+                    onDeleteAnswer(eventAnswerData.id);
                   }
 
                   toast('Ответ успешно удален', {
@@ -262,7 +265,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
 
             <textarea
-              className="w-full p-3 border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+              className="w-full p-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
               onChange={handleTextChange}
               rows={4}
@@ -356,8 +359,21 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
                 {/* опциональное отображение преподавателям */}
                 {/* TODO: нужно показывать возможность изменения оценки только преподавателю жюри */}
-                {isUserTeacher(currentUser.currentRole) && (
-                  <>контент для преподавателей</>
+                {isUserTeacher(currentUser.currentRole) && eventAnswerData && (
+                  <EventMarkForm
+                    event={event}
+                    eventAnswerId={eventAnswerData.id}
+                    existingEventMarks={eventAnswerData.marks}
+                    onChangeMarks={(updatedMarks) => {
+                      if (eventAnswerData && onUpdateAnswer) {
+                        onUpdateAnswer({
+                          ...eventAnswerData,
+                          hasMarks: true,
+                          marks: updatedMarks,
+                        });
+                      }
+                    }}
+                  />
                 )}
 
                 {/* опциональное отображение организаторам */}

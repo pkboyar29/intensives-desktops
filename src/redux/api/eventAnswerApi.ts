@@ -1,5 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
+import { mapFile } from './fileApi';
+import { mapEventMark } from './eventMarkApi';
 
 import {
   IEventAnswer,
@@ -8,7 +10,6 @@ import {
   IEventAnswerUpdate,
 } from '../../ts/interfaces/IEventAnswer';
 import { IFile, IUploadFile } from '../../ts/interfaces/IFile';
-import { mapFile } from './fileApi';
 
 export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
   return {
@@ -18,8 +19,12 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     team: unmappedEventAnswer.team,
     createdDate: unmappedEventAnswer.created_at,
     files: unmappedEventAnswer.files,
-    // TODO: надо понять, почему мы тут получаем undefined после именно создания ответа (дело в бэке наверн)
-    marks: unmappedEventAnswer.marks ? unmappedEventAnswer.marks : [],
+    // TODO: надо понять, почему мы тут получаем undefined после именно создания ответа (дело в бэке наверн) и убрать этот тернарный оператор потом
+    marks: unmappedEventAnswer.marks
+      ? unmappedEventAnswer.marks.map((unmappedMark: any) =>
+          mapEventMark(unmappedMark)
+        )
+      : [],
     hasMarks: unmappedEventAnswer.has_marks
       ? unmappedEventAnswer.has_marks
       : false,

@@ -17,7 +17,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
     <button
       className={`${
         buttonColor === 'blue'
-          ? 'text-white font-semibold bg-blue hover:bg-dark_blue'
+          ? 'text-white font-semibold bg-blue hover:bg-dark_blue disabled:bg-dark_blue'
           : buttonColor === 'gray'
           ? 'text-black font-bold bg-another_white hover:bg-black_gray'
           : 'text-white font-bold bg-red hover:bg-dark_red'
