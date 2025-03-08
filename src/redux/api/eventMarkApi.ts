@@ -4,6 +4,7 @@ import { baseQueryWithReauth } from './baseQuery';
 import {
   IEventMark,
   IEventMarkCreate,
+  IEventMarksCreate,
   IEventMarkUpdate,
 } from '../../ts/interfaces/IEventMark';
 
@@ -24,13 +25,12 @@ export const eventMarkApi = createApi({
   reducerPath: 'eventMarkApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    createEventMark: builder.mutation<IEventMark[], IEventMarkCreate[]>({
+    createEventMark: builder.mutation<IEventMark[], IEventMarksCreate>({
       query: (data) => ({
-        url: '/event_marks/',
+        url: `/event_marks/?event_answer_id=${data.eventAnswerId}`,
         method: 'POST',
-        body: data.map((eventMark) => ({
+        body: data.marksToCreate.map((eventMark) => ({
           ...eventMark,
-          event_answer: eventMark.eventAnswerId,
         })),
       }),
       transformResponse: (response: any) =>

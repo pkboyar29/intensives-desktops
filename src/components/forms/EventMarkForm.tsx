@@ -102,14 +102,14 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   const onSubmit = async () => {
     if (existingEventMarks.length === 0) {
       const { data: responseData, error: responseError } =
-        await createEventMarks(
-          eventMarks.map((eventMark) => ({
+        await createEventMarks({
+          eventAnswerId: eventAnswerId,
+          marksToCreate: eventMarks.map((eventMark) => ({
             mark: eventMark.mark,
             comment: eventMark.comment,
             criteria: eventMark.criteriaId ? eventMark.criteriaId : null,
-            eventAnswerId: eventAnswerId,
-          }))
-        );
+          })),
+        });
 
       if (responseError) {
         toast('Произошла серверная ошибка при отправке оценки', {

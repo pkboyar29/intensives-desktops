@@ -15,7 +15,11 @@ export interface IEventMarkCreate {
   mark: number;
   criteria: number | null;
   comment: string;
+}
+
+export interface IEventMarksCreate {
   eventAnswerId: number;
+  marksToCreate: IEventMarkCreate[];
 }
 
 export interface IEventMarkUpdate {
