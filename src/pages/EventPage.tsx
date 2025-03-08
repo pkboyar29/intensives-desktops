@@ -36,6 +36,7 @@ const EventPage: FC = () => {
   const params = useParams();
 
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
@@ -153,18 +154,6 @@ const EventPage: FC = () => {
               )}
             </motion.div>
           </>
-        )}
-
-        {isCreatingAnswer && !expandedAnswer && event && (
-          <EventAnswer
-            event={event}
-            onCreateAnswer={(newAnswer: IEventAnswer) => {
-              setEventAnswers((prevAnswers) => [...prevAnswers, newAnswer]);
-
-              setIsCreatingAnswer(false); // тоже самое
-              setExpandedAnswer(newAnswer.id);
-            }}
-          />
         )}
       </>
     );
@@ -388,6 +377,24 @@ const EventPage: FC = () => {
                       </p>
 
                       {renderEventAnswers(eventAnswers)}
+
+                      {currentUser.studentId === currentTeam?.teamlead?.id &&
+                        isCreatingAnswer &&
+                        !expandedAnswer &&
+                        event && (
+                          <EventAnswer
+                            event={event}
+                            onCreateAnswer={(newAnswer: IEventAnswer) => {
+                              setEventAnswers((prevAnswers) => [
+                                ...prevAnswers,
+                                newAnswer,
+                              ]);
+
+                              setIsCreatingAnswer(false); // тоже самое
+                              setExpandedAnswer(newAnswer.id);
+                            }}
+                          />
+                        )}
                     </div>
                   )}
               </>

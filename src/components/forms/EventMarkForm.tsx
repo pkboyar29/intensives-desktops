@@ -31,6 +31,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   const [eventMarks, setEventMarks] = useState<
     { id: number; criteriaId: number; mark: number; comment: string }[]
   >([]);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     if (existingEventMarks.length > 0) {
@@ -68,6 +69,10 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   }, [event, existingEventMarks]);
 
   const updateMark = (criteriaId: number, newMark: number) => {
+    if (!isEditing) {
+      setIsEditing(true);
+    }
+
     setEventMarks((prevMarks) =>
       prevMarks.map((mark) =>
         mark.criteriaId === criteriaId ? { ...mark, mark: newMark } : mark
@@ -76,6 +81,10 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
   };
 
   const updateComment = (criteriaId: number, newComment: string) => {
+    if (!isEditing) {
+      setIsEditing(true);
+    }
+
     if (validateKanban(newComment)) {
       setEventMarks((prevMarks) =>
         prevMarks.map((mark) =>
@@ -122,6 +131,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
         toast('Оценка успешно отправлена', {
           type: 'success',
         });
+        setIsEditing(false);
 
         onChangeMarks(responseData);
       }
@@ -151,6 +161,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
       toast('Оценка успешно обновлена', {
         type: 'success',
       });
+      setIsEditing(false);
 
       const validUpdatedMarks = updatedMarks.filter(
         (mark): mark is IEventMark => mark !== null && mark !== undefined
@@ -250,6 +261,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
       )}
 
       <PrimaryButton
+        disabled={!isEditing}
         type="button"
         children={
           existingEventMarks.length > 0 ? 'Изменить оценку' : 'Отправить оценку'
