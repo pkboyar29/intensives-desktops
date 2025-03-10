@@ -28,6 +28,8 @@ import AttachedFileList from './AttachedFileList';
 import { toast } from 'react-toastify';
 import TeacherMarkCard from './TeacherMarkCard';
 import EventMarkForm from './forms/EventMarkForm';
+import { IEventMark } from '../ts/interfaces/IEventMark';
+import { ICriteria } from '../ts/interfaces/ICriteria';
 
 interface EventAnswerProps {
   // eventAnswerId?: number;
@@ -331,29 +333,45 @@ const EventAnswer: FC<EventAnswerProps> = ({
                             </div>
                           </div>
                         ) : (
-                          <>
-                            <div className="mt-3">
-                              Оценки преподавателей{' '}
-                              {eventAnswerData && (
-                                <TeacherMarkCard
-                                  teacherMarks={eventAnswerData.marks}
-                                />
-                              )}
-                            </div>
-                          </>
+                          <></>
                         )}
                       </>
                     ) : (
-                      // если студент не тимлид, то отображаем только TeacherMarkCard
-                      <div className="mt-3">
-                        Оценки преподавателей{' '}
-                        {eventAnswerData && (
-                          <TeacherMarkCard
-                            teacherMarks={eventAnswerData.marks}
-                          />
-                        )}
-                      </div>
+                      <></>
                     )}
+                    <div className="mt-3">
+                      {eventAnswerData?.marks &&
+                        eventAnswerData.marks.length !== 0 && (
+                          <>
+                            <p className="text-lg text-center">
+                              Оценка на ответ
+                            </p>
+
+                            {eventAnswerData.marks.map((mark, index) => {
+                              if ('avgMark' in mark) {
+                                return (
+                                  <div key={index}>
+                                    {mark.criteria?.name ? (
+                                      <div>
+                                        <p>Критерии и средняя оценка</p>
+                                        <p>
+                                          {mark.criteria.name} — {mark.avgMark}
+                                        </p>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {' '}
+                                        <p>Средняя оценка: {mark.avgMark}</p>
+                                      </>
+                                    )}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })}
+                          </>
+                        )}
+                    </div>
                   </>
                 )}
 
@@ -363,7 +381,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                   <EventMarkForm
                     event={event}
                     eventAnswerId={eventAnswerData.id}
-                    existingEventMarks={eventAnswerData.marks}
+                    existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
                     onChangeMarks={(updatedMarks) => {
                       if (eventAnswerData && onUpdateAnswer) {
                         onUpdateAnswer({

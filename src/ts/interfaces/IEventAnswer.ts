@@ -1,4 +1,4 @@
-import { IEventMark } from './IEventMark';
+import { IEventMark, IEventMarkAvg } from './IEventMark';
 import { IFile } from './IFile';
 import { IStudent } from './IStudent';
 import { ITeam } from './ITeam';
@@ -10,7 +10,7 @@ export interface IEventAnswer {
   team: ITeam;
   createdDate: Date;
   files: IFile[];
-  marks: IEventMark[];
+  marks: IEventMark[] | IEventMarkAvg[];
   hasMarks?: boolean;
 }
 

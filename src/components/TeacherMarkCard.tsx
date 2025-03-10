@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { IEventMark } from '../ts/interfaces/IEventMark';
+import { IEventMark, IEventMarkAvg } from '../ts/interfaces/IEventMark';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 
 type TeacherMarkCardProps = {

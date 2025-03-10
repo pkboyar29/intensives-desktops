@@ -1,3 +1,4 @@
+import { ICriteria } from './ICriteria';
 import { ITeacher } from './ITeacher';
 
 export interface IEventMark {
@@ -9,6 +10,11 @@ export interface IEventMark {
   updatedDate: Date;
   teacher: ITeacher;
   eventAnswerId: number;
+}
+
+export interface IEventMarkAvg {
+  criteria?: ICriteria;
+  avgMark: number;
 }
 
 export interface IEventMarkCreate {
