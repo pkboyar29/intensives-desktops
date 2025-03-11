@@ -39,3 +39,8 @@ export interface IEventCreate {
 export interface IEventUpdate extends IEventCreate {
   eventId: number;
 }
+
+export interface IEventUpdateVisibility {
+  eventId: number;
+  visibility: boolean;
+}

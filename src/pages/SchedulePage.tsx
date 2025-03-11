@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { useDeleteStageMutation } from '../redux/api/stageApi';
-import { useUpdateEventMutation } from '../redux/api/eventApi';
+import { useUpdateVisibilityMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
 
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -27,7 +27,7 @@ const SchedulePage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
 
   const [deleteStageAPI] = useDeleteStageMutation();
-  const [updateEventAPI] = useUpdateEventMutation();
+  const [updateVisibilityAPI] = useUpdateVisibilityMutation();
 
   const {
     data,
@@ -70,24 +70,11 @@ const SchedulePage: FC = () => {
   };
 
   const toggleEventVisibility = async (event: IEvent) => {
-    const { data: responseData, error: responseError } = await updateEventAPI({
-      visibility: !event.visibility,
-      eventId: event.id,
-      intensiveId: Number(intensiveId),
-      name: event.name,
-      description: event.description,
-      startDate: event.startDate.toISOString(),
-      finishDate: event.finishDate.toISOString(),
-      teamIds: event.teams.map((team) => team.id),
-      teacherIds: event.teachers.map((teacher) => teacher.id),
-      audienceId: event.audience.id,
-      stageId: event.stageId ? event.stageId : null,
-      markStrategyId: event.markStrategy ? event.markStrategy.id : null,
-      deadlineDate: event.deadlineDate
-        ? event.deadlineDate.toISOString()
-        : null,
-      criteriaIds: event.criterias.map((criteria) => criteria.id),
-    });
+    const { data: responseData, error: responseError } =
+      await updateVisibilityAPI({
+        visibility: !event.visibility,
+        eventId: event.id,
+      });
 
     if (responseError) {
       toast('Произошла серверная ошибка', {

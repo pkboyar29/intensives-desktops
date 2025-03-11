@@ -1,7 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { IEventCreate, IEventUpdate, IEvent } from '../../ts/interfaces/IEvent';
+import {
+  IEventCreate,
+  IEventUpdate,
+  IEvent,
+  IEventUpdateVisibility,
+} from '../../ts/interfaces/IEvent';
 import { mapTeam } from './teamApi';
 import { mapAudience } from './audienceApi';
 import { mapTeacher } from './teacherApi';
@@ -84,6 +89,15 @@ export const eventApi = createApi({
         },
       }),
     }),
+    updateVisibility: builder.mutation<void, IEventUpdateVisibility>({
+      query: (data) => ({
+        url: `/events/${data.eventId}/`,
+        method: 'PATCH',
+        body: {
+          visibility: data.visibility,
+        },
+      }),
+    }),
     deleteEvent: builder.mutation<void, number>({
       query: (eventId) => ({
         url: `/events/${eventId}`,
@@ -97,5 +111,6 @@ export const {
   useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,
+  useUpdateVisibilityMutation,
   useDeleteEventMutation,
 } = eventApi;
