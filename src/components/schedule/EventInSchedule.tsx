@@ -5,12 +5,12 @@ import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 import EyeIcon from '../icons/EyeIcon';
 
-import { IEvent } from '../../ts/interfaces/IEvent';
+import { IEventShort } from '../../ts/interfaces/IEvent';
 
 interface EventInScheduleProps {
-  event: IEvent;
+  event: IEventShort;
   onEventClick: (eventId: number) => void;
-  onEyeIconClick: (event: IEvent) => void;
+  onEyeIconClick: (event: IEventShort) => void;
 }
 
 const EventInSchedule: FC<EventInScheduleProps> = ({

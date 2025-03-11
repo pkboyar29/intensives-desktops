@@ -6,6 +6,7 @@ import {
   IEventUpdate,
   IEvent,
   IEventUpdateVisibility,
+  IEventShort,
 } from '../../ts/interfaces/IEvent';
 import { mapTeam } from './teamApi';
 import { mapAudience } from './audienceApi';
@@ -38,6 +39,20 @@ export const mapEvent = (unmappedEvent: any): IEvent => {
     criterias: unmappedEvent.criterias.map((unmappedCriteria: any) =>
       mapCriteria(unmappedCriteria)
     ),
+  };
+};
+
+export const mapEventShort = (unmappedEvent: any): IEventShort => {
+  return {
+    id: unmappedEvent.id,
+    name: unmappedEvent.name,
+    description: unmappedEvent.description,
+    startDate: new Date(unmappedEvent.start_dt),
+    finishDate: new Date(unmappedEvent.finish_dt),
+    stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage,
+    visibility: unmappedEvent.visibility,
+    teamIds: unmappedEvent.teams,
+    teacherIds: unmappedEvent.teachers,
   };
 };
 

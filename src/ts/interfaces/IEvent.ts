@@ -20,6 +20,18 @@ export interface IEvent {
   visibility: boolean;
 }
 
+export interface IEventShort {
+  id: number;
+  name: string;
+  description: string;
+  startDate: Date;
+  finishDate: Date;
+  stageId: number | null;
+  visibility: boolean;
+  teamIds: number[];
+  teacherIds: number[];
+}
+
 export interface IEventCreate {
   name: string;
   description: string;

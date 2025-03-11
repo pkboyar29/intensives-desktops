@@ -7,16 +7,15 @@ import TrashIcon from '../icons/TrashIcon';
 import EditIcon from '../icons/EditIcon';
 
 import { IStage } from '../../ts/interfaces/IStage';
-import { IEvent } from '../../ts/interfaces/IEvent';
+import { IEventShort } from '../../ts/interfaces/IEvent';
 
-// TODO: начать передавать список событий! stageEvents, это массив из IManagerEvent[]
 interface StageInScheduleProps {
   stage: IStage;
-  stageEvents: IEvent[];
+  stageEvents: IEventShort[];
   onEditClick: (stage: IStage) => void;
   onDeleteClick: (stageId: number) => void;
   onEventClick: (eventId: number) => void;
-  onEventEyeIconClick: (event: IEvent) => void;
+  onEventEyeIconClick: (event: IEventShort) => void;
 }
 
 const StageInSchedule: FC<StageInScheduleProps> = ({

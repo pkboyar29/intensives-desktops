@@ -17,7 +17,7 @@ import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/common/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
-import { IEvent } from '../ts/interfaces/IEvent';
+import { IEventShort } from '../ts/interfaces/IEvent';
 import { isUserManager } from '../helpers/userHelpers';
 
 const SchedulePage: FC = () => {
@@ -65,11 +65,11 @@ const SchedulePage: FC = () => {
     navigate(`${eventId}`);
   };
 
-  const onEventEyeIconClick = async (event: IEvent) => {
+  const onEventEyeIconClick = async (event: IEventShort) => {
     toggleEventVisibility(event);
   };
 
-  const toggleEventVisibility = async (event: IEvent) => {
+  const toggleEventVisibility = async (event: IEventShort) => {
     const { data: responseData, error: responseError } =
       await updateVisibilityAPI({
         visibility: !event.visibility,
