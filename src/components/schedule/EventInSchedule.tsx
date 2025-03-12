@@ -1,9 +1,11 @@
 import { FC } from 'react';
 import { useAppSelector } from '../../redux/store';
-import { isUserManager } from '../../helpers/userHelpers';
+import { isUserManager, isUserTeacher } from '../../helpers/userHelpers';
 import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 import EyeIcon from '../icons/EyeIcon';
+import EditIcon from '../icons/EditIcon';
+import Tooltip from '../common/Tooltip';
 
 import { IEventShort } from '../../ts/interfaces/IEvent';
 
@@ -41,6 +43,20 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
           {getEventDateDisplayString(event.startDate, event.finishDate)}
         </time>
       </div>
+      {currentUser?.currentRole &&
+        isUserTeacher(currentUser.currentRole) &&
+        currentUser.teacherId &&
+        event.teacherIds.includes(currentUser.teacherId) && (
+          <span className="self-start w-4 h-4">
+            {' '}
+            <Tooltip
+              tooltipText="Вы учавствуете в этом мероприятии"
+              tooltipClasses="p-1 bg-gray_5 rounded"
+            >
+              <EditIcon />
+            </Tooltip>
+          </span>
+        )}
     </section>
   );
 };
