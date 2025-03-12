@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
 import Chip from '../Chip';
@@ -24,6 +25,11 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectAllState, setSelectAllState] = useState<boolean>(false);
+
+  const dropdownVariants = {
+    open: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
+    closed: { opacity: 0, height: 0, transition: { duration: 0.3 } },
+  };
 
   const toggleDropdownHandler = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -78,10 +84,12 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         </svg>
       </button>
 
-      <div
-        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none ${
-          !isOpen && `hidden`
-        }`}
+      <motion.div
+        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none`}
+        initial="closed"
+        animate={isOpen ? 'open' : 'closed'}
+        variants={dropdownVariants}
+        style={{ overflow: 'hidden' }}
       >
         <div className="pb-8">
           <Checkbox
@@ -113,7 +121,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
             />
           ))}
         </ul>
-      </div>
+      </motion.div>
 
       <div className="flex flex-wrap gap-2 mx-3 mt-3">
         {selectedItems.map((selectedItem) => (
