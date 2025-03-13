@@ -12,3 +12,7 @@ export const isCurrentRoleManager = (currentRole: UserRole): boolean => {
 export const isCurrentRoleAdmin = (currentRole: UserRole): boolean => {
   return currentRole.name === 'Admin';
 };
+
+export const isCurrentRoleMentor = (currentRole: UserRole): boolean => {
+  return currentRole.name === 'Mentor';
+};

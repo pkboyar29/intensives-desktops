@@ -122,6 +122,8 @@ const EventPage: FC = () => {
   const isUserTutor =
     isUserTeacher && currentTeam?.tutor?.id === currentUser.teacherId;
 
+  const isUserMentor = currentTeam?.mentor?.id === currentUser?.studentId;
+
   const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
     return (
       <>
@@ -337,22 +339,70 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* отображение аккордеона для преподавателей жюри/организаторов */}
-                {event.markStrategy && (isUserManager || isUserJury) && (
-                  <div className="flex flex-col gap-3 mt-10">
-                    <p className="text-xl font-bold text-black_2">
-                      {isUserManager ? 'Ответы команд' : 'Оцениваемые команды'}
-                    </p>
+                {/* отображение секции с ответами только если у нас тип мероприятия - с оцениванием */}
+                {event.markStrategy && (
+                  <>
+                    {/* отображение аккордеона для преподавателей жюри/организаторов */}
+                    {(isUserManager || isUserJury) && (
+                      <div className="flex flex-col gap-3 mt-10">
+                        <p className="text-xl font-bold text-black_2">
+                          {isUserManager
+                            ? 'Ответы команд'
+                            : 'Оцениваемые команды'}
+                        </p>
 
-                    <Accordion
-                      items={event.teams}
-                      expandedItemId={expandedTeam}
-                      onItemClick={(item) => setExpandedTeam(item)}
-                      expandedContent={
-                        expandedTeam ? renderTeamAnswers(expandedTeam) : null
-                      }
-                    />
-                  </div>
+                        <Accordion
+                          items={event.teams}
+                          expandedItemId={expandedTeam}
+                          onItemClick={(item) => setExpandedTeam(item)}
+                          expandedContent={
+                            expandedTeam
+                              ? renderTeamAnswers(expandedTeam)
+                              : null
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {/* отображение ответов текущей команды для студентов/наставника/тьютора команды */}
+                    {(isUserStudent || isUserTutor || isUserMentor) && (
+                      <div className="flex flex-col gap-3 mt-10">
+                        <p className="text-xl font-bold text-black_2">
+                          {eventAnswers.length > 0
+                            ? 'Ответы на мероприятие моей команды'
+                            : 'Ответ на мероприятие не отправлен'}
+                        </p>
+
+                        {/* если есть currentTeam, то eventAnswers отображается фильтрованный для этой команды */}
+                        {currentTeam
+                          ? renderEventAnswers(
+                              eventAnswers.filter(
+                                (answer) => answer.team.id === currentTeam.id
+                              )
+                            )
+                          : renderEventAnswers(eventAnswers)}
+
+                        {/* отображение только для тимлида */}
+                        {isUserTeamlead &&
+                          isCreatingAnswer &&
+                          !expandedAnswer &&
+                          event && (
+                            <EventAnswer
+                              event={event}
+                              onCreateAnswer={(newAnswer: IEventAnswer) => {
+                                setEventAnswers((prevAnswers) => [
+                                  ...prevAnswers,
+                                  newAnswer,
+                                ]);
+
+                                setIsCreatingAnswer(false);
+                                setExpandedAnswer(newAnswer.id);
+                              }}
+                            />
+                          )}
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {isUserManager && (
@@ -377,46 +427,6 @@ const EventPage: FC = () => {
                         }}
                       />
                     </div>
-                  </div>
-                )}
-
-                {/* TODO: для наставника в этой команде нужно отображать то же самое, что и для обычного студента/тимлида/тьютора */}
-                {/* отображение ответов текущей команды */}
-                {(isUserStudent || isUserTutor) && (
-                  <div className="flex flex-col gap-3 mt-10">
-                    <p className="text-xl font-bold text-black_2">
-                      {eventAnswers.length > 0
-                        ? 'Ответы на мероприятие моей команды'
-                        : 'Ответ на мероприятие не отправлен'}
-                    </p>
-
-                    {/* если есть currentTeam, то eventAnswers отображается фильтрованный для этой команды */}
-                    {currentTeam
-                      ? renderEventAnswers(
-                          eventAnswers.filter(
-                            (answer) => answer.team.id === currentTeam.id
-                          )
-                        )
-                      : renderEventAnswers(eventAnswers)}
-
-                    {/* отображение только для тимлида */}
-                    {isUserTeamlead &&
-                      isCreatingAnswer &&
-                      !expandedAnswer &&
-                      event && (
-                        <EventAnswer
-                          event={event}
-                          onCreateAnswer={(newAnswer: IEventAnswer) => {
-                            setEventAnswers((prevAnswers) => [
-                              ...prevAnswers,
-                              newAnswer,
-                            ]);
-
-                            setIsCreatingAnswer(false);
-                            setExpandedAnswer(newAnswer.id);
-                          }}
-                        />
-                      )}
                   </div>
                 )}
               </>
