@@ -7,9 +7,9 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 import {
-  isUserManager,
-  isUserStudent,
-  isUserTeacher,
+  isCurrentRoleManager,
+  isCurrentRoleStudent,
+  isCurrentRoleTeacher,
 } from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
@@ -62,7 +62,10 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (currentUser?.currentRole && isUserManager(currentUser.currentRole)) {
+      if (
+        currentUser?.currentRole &&
+        isCurrentRoleManager(currentUser.currentRole)
+      ) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -148,7 +151,10 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (currentUser?.currentRole && isUserTeacher(currentUser.currentRole)) {
+    if (
+      currentUser?.currentRole &&
+      isCurrentRoleTeacher(currentUser.currentRole)
+    ) {
       localStorage.removeItem('tutorTeamId');
     }
 
@@ -160,16 +166,17 @@ const IntensivesPage: FC = () => {
       <Title text="Интенсивы" />
 
       <div className="mt-8">
-        {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
-          <div className="flex justify-end">
-            <div className="ml-auto">
-              <PrimaryButton
-                children="Создать интенсив"
-                clickHandler={() => navigate(`/createIntensive`)}
-              />
+        {currentUser?.currentRole &&
+          isCurrentRoleManager(currentUser.currentRole) && (
+            <div className="flex justify-end">
+              <div className="ml-auto">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
@@ -185,7 +192,7 @@ const IntensivesPage: FC = () => {
       <div className="flex items-center justify-between gap-8 mt-5">
         <div className="flex gap-8">
           {currentUser?.currentRole &&
-            isUserManager(currentUser.currentRole) && (
+            isCurrentRoleManager(currentUser.currentRole) && (
               <Filter
                 onFilterOptionClick={(filterOption) =>
                   setOpenness(filterOption as 'all' | 'opened' | 'closed')
@@ -237,7 +244,7 @@ const IntensivesPage: FC = () => {
           <>
             {sortedIntensives.length !== 0 ? (
               currentUser?.currentRole &&
-              isUserManager(currentUser.currentRole) ? (
+              isCurrentRoleManager(currentUser.currentRole) ? (
                 <Table
                   onClick={intensiveClickHandler}
                   columns={columns}

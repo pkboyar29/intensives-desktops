@@ -10,9 +10,9 @@ import { useUploadFileMutation } from '../redux/api/fileApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
-  isUserManager,
-  isUserTeacher,
-  isUserStudent,
+  isCurrentRoleManager,
+  isCurrentRoleTeacher,
+  isCurrentRoleStudent,
 } from '../helpers/userHelpers';
 
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
@@ -30,6 +30,8 @@ import TeacherMarkCard from './TeacherMarkCard';
 import EventMarkForm from './forms/EventMarkForm';
 import { IEventMark } from '../ts/interfaces/IEventMark';
 import { ICriteria } from '../ts/interfaces/ICriteria';
+import { useFileHandler } from '../helpers/useFileHandler';
+import { uploadAllFiles } from '../helpers/fileHelpers';
 
 interface EventAnswerProps {
   // eventAnswerId?: number;
@@ -58,14 +60,20 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const [createEventAnswer] = useCreateEventAnswerMutation();
   const [updateEventAnswer] = useUpdateEventAnswerMutation();
   const [deleteEventAnswer] = useDeleteEventAnswerMutation();
-  const [uploadFile] = useUploadFileMutation();
+  const [uploadFiles] = useUploadFileMutation();
 
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const [editedText, setEditedText] = useState('');
-  const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
-  const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
+  const {
+    attachedFilesList,
+    newFiles,
+    handleFilesChange,
+    setAttachedFilesList,
+    setNewFiles,
+    handleFileDelete,
+  } = useFileHandler();
 
   // useEffect(() => {
   //   if (eventAnswerId) {
@@ -85,6 +93,13 @@ const EventAnswer: FC<EventAnswerProps> = ({
     if (eventAnswerData) {
       // setEventAnswer(eventAnswerData);
       setEditedText(eventAnswerData.text);
+
+      if (attachedFilesList.length === 0) {
+        setAttachedFilesList((prevFiles) => [
+          ...prevFiles,
+          ...eventAnswerData.files,
+        ]);
+      }
     }
   }, [eventAnswerData]);
 
@@ -135,11 +150,10 @@ const EventAnswer: FC<EventAnswerProps> = ({
         type: 'success',
       });
     } else {
-      const { data: responseData, error: responseError } =
-        await createEventAnswer({
-          event: event.id,
-          text: editedText,
-        });
+      ({ data: responseData, error: responseError } = await createEventAnswer({
+        event: event.id,
+        text: editedText,
+      }));
 
       if (responseError) {
         toast('Произошла серверная ошибка при отправке ответа', {
@@ -160,54 +174,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления ответа
       const filesError = await uploadAllFiles(
-        Number(responseData.id || eventAnswerData?.id)
+        uploadFiles,
+        'event_answers',
+        Number(responseData.id || eventAnswerData?.id),
+        newFiles
       );
-
+      console.log(filesError);
       if (filesError === 0) {
       }
     }
     setIsEditing((prev) => !prev);
-  };
-
-  const handleFileDelete = (id: number) => {
-    // Удаляем файл из массива для UI и массива с файлами (если файл новый)
-    setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
-    setNewFiles((prev) => prev.filter((file) => file.id !== id));
-  };
-
-  const handleFilesChange = async (fileList: FileList | null) => {};
-
-  const uploadAllFiles = async (intensiveId: number) => {
-    let filesError = 0;
-
-    if (newFiles.length === 0) return filesError;
-
-    for (const newFile of newFiles) {
-      // Показываем уведомление загрузки
-      const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
-
-      const { error: responseError } = await uploadFile({
-        context: 'event_answer',
-        contextId: Number(intensiveId),
-        files: newFile.file,
-      });
-
-      if (responseError) {
-        filesError++;
-        toast.update(toastId, {
-          render: `Ошибка загрузки: ${newFile.file.name}`,
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000,
-        });
-        continue; // Переход к следующему файлу
-      }
-
-      // Просто скрываем toast загрузки при успехе
-      toast.dismiss(toastId);
-    }
-
-    return filesError;
   };
 
   return (
@@ -277,7 +253,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
             {!isEditing ? (
               <AttachedFileList
-                context={'event_answer'}
+                context={'event_answers'}
                 contextId={eventAnswerData?.id}
                 nameFileList="ответа"
                 files={attachedFilesList}
@@ -297,7 +273,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {currentUser && currentUser.currentRole && (
               <>
                 {/* опциональное отображение студентам */}
-                {isUserStudent(currentUser.currentRole) && (
+                {isCurrentRoleStudent(currentUser.currentRole) && (
                   <>
                     {/* если студент - тимлид */}
                     {currentTeam?.teamlead?.id === currentUser.studentId ? (
@@ -343,32 +319,49 @@ const EventAnswer: FC<EventAnswerProps> = ({
                       {eventAnswerData?.marks &&
                         eventAnswerData.marks.length !== 0 && (
                           <>
-                            <p className="text-lg text-center">
+                            <p className="text-lg font-medium text-center">
                               Оценка на ответ
                             </p>
 
-                            {eventAnswerData.marks.map((mark, index) => {
-                              if ('avgMark' in mark) {
-                                return (
-                                  <div key={index}>
-                                    {mark.criteria?.name ? (
-                                      <div>
-                                        <p>Критерии и средняя оценка</p>
-                                        <p>
-                                          {mark.criteria.name} — {mark.avgMark}
+                            {eventAnswerData.marks.some(
+                              (mark) => mark.criteria
+                            ) && (
+                              <p className="text-lg font-medium">
+                                Критерии и средняя оценка:
+                              </p>
+                            )}
+
+                            <div className="mt-2 space-y-2 transition-transform transform bg-white">
+                              {eventAnswerData.marks.map((mark, index) => {
+                                if ('avgMark' in mark) {
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="p-4 transition-transform transform bg-white border border-gray-200 rounded-xl"
+                                    >
+                                      {mark.criteria?.name ? (
+                                        <div>
+                                          <p className="p-1">
+                                            {mark.criteria.name} —{' '}
+                                            <span className="font-bold text-green-600">
+                                              {mark.avgMark}
+                                            </span>
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        <p className="p-1 text-lg font-medium">
+                                          Средняя оценка —{' '}
+                                          <span className="text-green-600">
+                                            {mark.avgMark}
+                                          </span>
                                         </p>
-                                      </div>
-                                    ) : (
-                                      <>
-                                        {' '}
-                                        <p>Средняя оценка: {mark.avgMark}</p>
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })}
+                                      )}
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </div>
                           </>
                         )}
                     </div>
@@ -377,25 +370,26 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
                 {/* опциональное отображение преподавателям */}
                 {/* TODO: нужно показывать возможность изменения оценки только преподавателю жюри */}
-                {isUserTeacher(currentUser.currentRole) && eventAnswerData && (
-                  <EventMarkForm
-                    event={event}
-                    eventAnswerId={eventAnswerData.id}
-                    existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
-                    onChangeMarks={(updatedMarks) => {
-                      if (eventAnswerData && onUpdateAnswer) {
-                        onUpdateAnswer({
-                          ...eventAnswerData,
-                          hasMarks: true,
-                          marks: updatedMarks,
-                        });
-                      }
-                    }}
-                  />
-                )}
+                {isCurrentRoleTeacher(currentUser.currentRole) &&
+                  eventAnswerData && (
+                    <EventMarkForm
+                      event={event}
+                      eventAnswerId={eventAnswerData.id}
+                      existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
+                      onChangeMarks={(updatedMarks) => {
+                        if (eventAnswerData && onUpdateAnswer) {
+                          onUpdateAnswer({
+                            ...eventAnswerData,
+                            hasMarks: true,
+                            marks: updatedMarks,
+                          });
+                        }
+                      }}
+                    />
+                  )}
 
                 {/* опциональное отображение организаторам */}
-                {isUserManager(currentUser.currentRole) && (
+                {isCurrentRoleManager(currentUser.currentRole) && (
                   <>контент для организаторов</>
                 )}
               </>

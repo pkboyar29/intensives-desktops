@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { intensiveApi } from '../api/intensiveApi';
 
 import { IIntensive } from '../../ts/interfaces/IIntensive';
+import { fileApi } from '../api/fileApi';
 
 interface IntensiveState {
   data: IIntensive | null;
@@ -39,12 +40,29 @@ const intensiveSlice = createSlice({
           state.data = payload;
         }
       )
+      /*
       .addMatcher(
         intensiveApi.endpoints.uploadFiles.matchFulfilled,
         (state, { payload }) => {
-          if(state.data) {
+          if (state.data) {
             // Добавляем загруженные файлы к текущим в состоянии
-            state.data.files = [...state.data.files, ...payload]
+            state.data.files = [...state.data.files, ...payload];
+          }
+        }
+      )
+        */
+      .addMatcher(
+        fileApi.endpoints.uploadFile.matchFulfilled,
+        (state, { meta, payload }) => {
+          const { arg } = meta;
+          // Добавляем загруженные файлы к текущим в состоянии если вызвался запрос на загрузку файлов интенсиву
+          if (
+            arg.originalArgs.context === 'intensives' &&
+            state.data?.id === arg.originalArgs.contextId
+          ) {
+            if (state.data) {
+              state.data.files = [...state.data?.files, ...payload];
+            }
           }
         }
       )

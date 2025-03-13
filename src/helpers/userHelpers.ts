@@ -1,14 +1,14 @@
 import { IUser, UserRole } from '../ts/interfaces/IUser';
 
-export const isUserStudent = (currentRole: UserRole): boolean => {
+export const isCurrentRoleStudent = (currentRole: UserRole): boolean => {
   return currentRole.name === 'Student';
 };
-export const isUserTeacher = (currentRole: UserRole): boolean => {
+export const isCurrentRoleTeacher = (currentRole: UserRole): boolean => {
   return currentRole.name === 'Teacher';
 };
-export const isUserManager = (currentRole: UserRole): boolean => {
+export const isCurrentRoleManager = (currentRole: UserRole): boolean => {
   return currentRole.name === 'Manager';
 };
-export const isUserAdmin = (currentRole: UserRole): boolean => {
+export const isCurrentRoleAdmin = (currentRole: UserRole): boolean => {
   return currentRole.name === 'Admin';
 };

@@ -7,14 +7,14 @@ import { useAppSelector } from '../../redux/store';
 import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
-  useUploadFilesMutation,
 } from '../../redux/api/intensiveApi';
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
+import { useUploadFileMutation } from '../../redux/api/fileApi';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
-import { getUniqueFiles } from '../../helpers/fileHelpers';
+import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
 
 import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
@@ -25,6 +25,7 @@ import Modal from '../common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
+import { useFileHandler } from '../../helpers/useFileHandler';
 
 interface Item {
   id: number;
@@ -59,7 +60,7 @@ const ManageIntensiveForm: FC = () => {
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
-  const [uploadFiles] = useUploadFilesMutation();
+  const [uploadFiles] = useUploadFileMutation();
 
   // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery();
@@ -67,8 +68,14 @@ const ManageIntensiveForm: FC = () => {
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
 
-  const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
-  const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
+  const {
+    attachedFilesList,
+    newFiles,
+    handleFilesChange,
+    setAttachedFilesList,
+    setNewFiles,
+    handleFileDelete,
+  } = useFileHandler();
 
   const {
     register,
@@ -176,7 +183,10 @@ const ManageIntensiveForm: FC = () => {
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления интенсива
       const filesError = await uploadAllFiles(
-        Number(responseData.id || intensiveId)
+        uploadFiles,
+        'intensives',
+        Number(responseData.id || intensiveId),
+        newFiles
       );
 
       if (filesError === 0) {
@@ -186,99 +196,6 @@ const ManageIntensiveForm: FC = () => {
         });
       }
     }
-  };
-
-  const uploadAllFiles = async (intensiveId: number) => {
-    let filesError = 0;
-
-    if (newFiles.length === 0) return filesError;
-
-    for (const newFile of newFiles) {
-      // Показываем уведомление загрузки
-      const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
-
-      const { error: responseError } = await uploadFiles({
-        contextId: Number(intensiveId),
-        files: newFile.file,
-      });
-
-      if (responseError) {
-        filesError++;
-        toast.update(toastId, {
-          render: `Ошибка загрузки: ${newFile.file.name}`,
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000,
-        });
-        continue; // Переход к следующему файлу
-      }
-
-      // Просто скрываем toast загрузки при успехе
-      toast.dismiss(toastId);
-    }
-
-    return filesError;
-  };
-
-  const handleFilesChange = async (fileList: FileList | null) => {
-    if (fileList) {
-      const selectedFiles: File[] = Array.from(fileList);
-      console.log(
-        'Выбранные файлы:',
-        selectedFiles.map((file) => file.name)
-      );
-
-      const uniqueFiles = getUniqueFiles(selectedFiles, newFiles);
-
-      // Если какие-то файлы оказались дубликатами уведомляем
-      if (uniqueFiles.length < selectedFiles.length) {
-        toast.warning('Ошибка загрузки файла!', {
-          draggable: true, // Позволяет смахивать
-          closeOnClick: true, // Закрытие по нажатию
-          autoClose: 3000,
-        });
-      }
-
-      // Если нет новых файлов после фильтрации, выходим
-      if (uniqueFiles.length === 0) return;
-
-      // Генерируем ID один раз и создаём сразу оба массива
-      const newFilesData = uniqueFiles.map((file, index) => {
-        // Генерируем временный ID файла для списка в UI и массива newFiles
-        // Отрицательное значение означает временный ID
-        const tempId = (Date.now() + index) * -1;
-
-        return {
-          attachedFile: {
-            id: tempId,
-            name: file.name,
-            size: file.size,
-          },
-          newFileObject: {
-            file,
-            id: tempId,
-          },
-        };
-      });
-
-      // Добавляем к существующим файлам в списке файлов (просто UI)
-      setAttachedFilesList((prev) => [
-        ...prev,
-        ...newFilesData.map((item) => item.attachedFile),
-      ]);
-
-      // Добавляем сами объекты файлов в newFiles (для отправки)
-      setNewFiles((prev) => [
-        ...prev,
-        ...newFilesData.map((item) => item.newFileObject),
-      ]);
-    }
-  };
-
-  const handleFileDelete = (id: number) => {
-    // Удаляем файл из массива для UI и массива с файлами (если файл новый)
-    setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
-    setNewFiles((prev) => prev.filter((file) => file.id !== id));
   };
 
   return (

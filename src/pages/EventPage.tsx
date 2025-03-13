@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import {
-  isUserStudent,
-  isUserTeacher,
-  isUserManager,
+  isCurrentRoleStudent,
+  isCurrentRoleTeacher,
+  isCurrentRoleManager,
 } from '../helpers/userHelpers';
 import {
   getEventDateDisplayString,
@@ -341,7 +341,7 @@ const EventPage: FC = () => {
                   )}
 
                 {currentUser?.currentRole &&
-                  isUserManager(currentUser.currentRole) && (
+                  isCurrentRoleManager(currentUser.currentRole) && (
                     <div className="flex items-center mt-10 text-lg font-bold gap-7">
                       <BackToScheduleButton />
 
@@ -368,7 +368,7 @@ const EventPage: FC = () => {
 
                 {/* TODO: для тьютора и наставника в этой команде нужно отображать то же самое, что и для обычного студента */}
                 {currentUser?.currentRole &&
-                  isUserStudent(currentUser.currentRole) && (
+                  isCurrentRoleStudent(currentUser.currentRole) && (
                     <div className="flex flex-col gap-3 mt-10">
                       <p className="text-xl font-bold text-black_2">
                         {eventAnswers.length > 0

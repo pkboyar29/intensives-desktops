@@ -18,7 +18,7 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     student: unmappedEventAnswer.student,
     team: unmappedEventAnswer.team,
     createdDate: unmappedEventAnswer.created_at,
-    files: unmappedEventAnswer.files,
+    files: unmappedEventAnswer.files.map((file: any) => mapFile(file)),
     // TODO: надо понять, почему мы тут получаем undefined после именно создания ответа (дело в бэке наверн) и убрать этот тернарный оператор потом
     // Потому что при создании там возвращается из EventAnswerSerializerRequest
     marks: unmappedEventAnswer.marks

@@ -18,7 +18,7 @@ import StageModal from '../components/common/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
 import { IEvent } from '../ts/interfaces/IEvent';
-import { isUserManager } from '../helpers/userHelpers';
+import { isCurrentRoleManager } from '../helpers/userHelpers';
 
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
@@ -217,7 +217,7 @@ const SchedulePage: FC = () => {
         <div className="flex items-start justify-between">
           <Title text="Расписание интенсива" />
           {currentUser?.currentRole &&
-            isUserManager(currentUser.currentRole) && (
+            isCurrentRoleManager(currentUser.currentRole) && (
               <DisplaySelect
                 isOpen={isDropdownOpen}
                 onDropdownClick={() => setIsDropdownOpen((isOpen) => !isOpen)}
