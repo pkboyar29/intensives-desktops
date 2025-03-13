@@ -106,12 +106,21 @@ const EventPage: FC = () => {
   const isUserManager =
     currentUser?.currentRole && isCurrentRoleManager(currentUser.currentRole);
 
+  const isUserStudent =
+    currentUser?.currentRole && isCurrentRoleStudent(currentUser.currentRole);
+
+  const isUserTeacher =
+    currentUser?.currentRole && isCurrentRoleTeacher(currentUser.currentRole);
+
   const isUserJury =
-    currentUser?.currentRole &&
-    isCurrentRoleTeacher(currentUser.currentRole) &&
+    isUserTeacher &&
     event?.teachers.some((teacher) => teacher.id === currentUser.teacherId);
 
-  const canUserSeeAccordion = isUserManager || isUserJury;
+  const isUserTeamlead =
+    isUserStudent && currentTeam?.teamlead?.id === currentUser.studentId;
+
+  const isUserTutor =
+    isUserTeacher && currentTeam?.tutor?.id === currentUser.teacherId;
 
   const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
     return (
@@ -328,8 +337,8 @@ const EventPage: FC = () => {
                     )}
                 </div>
 
-                {/* отображение для преподавателей жюри */}
-                {event.markStrategy && canUserSeeAccordion && (
+                {/* отображение аккордеона для преподавателей жюри/организаторов */}
+                {event.markStrategy && (isUserManager || isUserJury) && (
                   <div className="flex flex-col gap-3 mt-10">
                     <p className="text-xl font-bold text-black_2">
                       {isUserManager ? 'Ответы команд' : 'Оцениваемые команды'}
@@ -346,63 +355,70 @@ const EventPage: FC = () => {
                   </div>
                 )}
 
-                {currentUser?.currentRole &&
-                  isCurrentRoleManager(currentUser.currentRole) && (
-                    <div className="flex items-center mt-10 text-lg font-bold gap-7">
-                      <BackToScheduleButton />
+                {isUserManager && (
+                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                    <BackToScheduleButton />
 
+                    <PrimaryButton
+                      children="Редактировать"
+                      clickHandler={() => {
+                        navigate(
+                          `/intensives/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
+                        );
+                      }}
+                    />
+
+                    <div>
                       <PrimaryButton
-                        children="Редактировать"
-                        clickHandler={() => {
-                          navigate(
-                            `/intensives/${params.intensiveId}/schedule/editEvent?eventId=${event.id}`
-                          );
+                        buttonColor="gray"
+                        children={<TrashIcon />}
+                        onClick={() => {
+                          setDeleteModal(true);
                         }}
                       />
+                    </div>
+                  </div>
+                )}
 
-                      <div>
-                        <PrimaryButton
-                          buttonColor="gray"
-                          children={<TrashIcon />}
-                          onClick={() => {
-                            setDeleteModal(true);
+                {/* TODO: для наставника в этой команде нужно отображать то же самое, что и для обычного студента/тимлида/тьютора */}
+                {/* отображение ответов текущей команды */}
+                {(isUserStudent || isUserTutor) && (
+                  <div className="flex flex-col gap-3 mt-10">
+                    <p className="text-xl font-bold text-black_2">
+                      {eventAnswers.length > 0
+                        ? 'Ответы на мероприятие моей команды'
+                        : 'Ответ на мероприятие не отправлен'}
+                    </p>
+
+                    {/* если есть currentTeam, то eventAnswers отображается фильтрованный для этой команды */}
+                    {currentTeam
+                      ? renderEventAnswers(
+                          eventAnswers.filter(
+                            (answer) => answer.team.id === currentTeam.id
+                          )
+                        )
+                      : renderEventAnswers(eventAnswers)}
+
+                    {/* отображение только для тимлида */}
+                    {isUserTeamlead &&
+                      isCreatingAnswer &&
+                      !expandedAnswer &&
+                      event && (
+                        <EventAnswer
+                          event={event}
+                          onCreateAnswer={(newAnswer: IEventAnswer) => {
+                            setEventAnswers((prevAnswers) => [
+                              ...prevAnswers,
+                              newAnswer,
+                            ]);
+
+                            setIsCreatingAnswer(false);
+                            setExpandedAnswer(newAnswer.id);
                           }}
                         />
-                      </div>
-                    </div>
-                  )}
-
-                {/* TODO: для тьютора и наставника в этой команде нужно отображать то же самое, что и для обычного студента */}
-                {currentUser?.currentRole &&
-                  isCurrentRoleStudent(currentUser.currentRole) && (
-                    <div className="flex flex-col gap-3 mt-10">
-                      <p className="text-xl font-bold text-black_2">
-                        {eventAnswers.length > 0
-                          ? 'Ответы на мероприятие'
-                          : 'Ответ на мероприятие не отправлен'}
-                      </p>
-
-                      {renderEventAnswers(eventAnswers)}
-
-                      {currentUser.studentId === currentTeam?.teamlead?.id &&
-                        isCreatingAnswer &&
-                        !expandedAnswer &&
-                        event && (
-                          <EventAnswer
-                            event={event}
-                            onCreateAnswer={(newAnswer: IEventAnswer) => {
-                              setEventAnswers((prevAnswers) => [
-                                ...prevAnswers,
-                                newAnswer,
-                              ]);
-
-                              setIsCreatingAnswer(false); // тоже самое
-                              setExpandedAnswer(newAnswer.id);
-                            }}
-                          />
-                        )}
-                    </div>
-                  )}
+                      )}
+                  </div>
+                )}
               </>
             )
           )}
