@@ -10,9 +10,9 @@ import { useUploadFileMutation } from '../redux/api/fileApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
-  isUserManager,
-  isUserTeacher,
-  isUserStudent,
+  isCurrentRoleManager,
+  isCurrentRoleTeacher,
+  isCurrentRoleStudent,
 } from '../helpers/userHelpers';
 
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
@@ -64,6 +64,11 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const [editedText, setEditedText] = useState('');
   const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
   const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
+
+  const isUserJury =
+    currentUser?.currentRole &&
+    isCurrentRoleTeacher(currentUser.currentRole) &&
+    event?.teachers.some((teacher) => teacher.id === currentUser.teacherId);
 
   // useEffect(() => {
   //   if (eventAnswerId) {
@@ -295,7 +300,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {currentUser && currentUser.currentRole && (
               <>
                 {/* опциональное отображение студентам */}
-                {isUserStudent(currentUser.currentRole) && (
+                {isCurrentRoleStudent(currentUser.currentRole) && (
                   <>
                     {/* если студент - тимлид */}
                     {currentTeam?.teamlead?.id === currentUser.studentId ? (
@@ -358,8 +363,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 )}
 
                 {/* опциональное отображение преподавателям */}
-                {/* TODO: нужно показывать возможность изменения оценки только преподавателю жюри */}
-                {isUserTeacher(currentUser.currentRole) && eventAnswerData && (
+                {isUserJury && eventAnswerData && (
                   <EventMarkForm
                     event={event}
                     eventAnswerId={eventAnswerData.id}
@@ -377,7 +381,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 )}
 
                 {/* опциональное отображение организаторам */}
-                {isUserManager(currentUser.currentRole) && (
+                {isCurrentRoleManager(currentUser.currentRole) && (
                   <>контент для организаторов</>
                 )}
               </>

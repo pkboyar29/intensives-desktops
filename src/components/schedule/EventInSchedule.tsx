@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import { useAppSelector } from '../../redux/store';
-import { isUserManager, isUserTeacher } from '../../helpers/userHelpers';
+import {
+  isCurrentRoleManager,
+  isCurrentRoleTeacher,
+} from '../../helpers/userHelpers';
 import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 import EyeIcon from '../icons/EyeIcon';
@@ -24,14 +27,15 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
 
   return (
     <section className="flex items-center gap-7">
-      {currentUser?.currentRole && isUserManager(currentUser.currentRole) && (
-        <button>
-          <EyeIcon
-            eyeVisibility={event.visibility}
-            onClick={() => onEyeIconClick(event)}
-          />
-        </button>
-      )}
+      {currentUser?.currentRole &&
+        isCurrentRoleManager(currentUser.currentRole) && (
+          <button>
+            <EyeIcon
+              eyeVisibility={event.visibility}
+              onClick={() => onEyeIconClick(event)}
+            />
+          </button>
+        )}
       <div className="flex flex-col">
         <p
           onClick={() => onEventClick(event.id)}
@@ -44,7 +48,7 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
         </time>
       </div>
       {currentUser?.currentRole &&
-        isUserTeacher(currentUser.currentRole) &&
+        isCurrentRoleTeacher(currentUser.currentRole) &&
         currentUser.teacherId &&
         event.teacherIds.includes(currentUser.teacherId) && (
           <span className="self-start w-4 h-4">

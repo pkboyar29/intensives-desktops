@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
-import { isUserManager } from '../helpers/userHelpers';
+import { isCurrentRoleManager } from '../helpers/userHelpers';
 
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
@@ -160,7 +160,7 @@ const IntensiveOverviewPage: FC = () => {
               )}
 
               {currentUser?.currentRole &&
-                isUserManager(currentUser.currentRole) && (
+                isCurrentRoleManager(currentUser.currentRole) && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <PrimaryButton
                       children="Редактировать"
