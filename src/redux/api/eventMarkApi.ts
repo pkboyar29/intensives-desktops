@@ -3,22 +3,36 @@ import { baseQueryWithReauth } from './baseQuery';
 
 import {
   IEventMark,
+  IEventMarkAvg,
   IEventMarkCreate,
   IEventMarksCreate,
   IEventMarkUpdate,
 } from '../../ts/interfaces/IEventMark';
+import { mapCriteria } from './criteriaApi';
 
-export const mapEventMark = (unmappedEventMark: any): IEventMark => {
-  return {
-    id: unmappedEventMark.id,
-    mark: unmappedEventMark.mark,
-    comment: unmappedEventMark.comment,
-    criteria: unmappedEventMark.criteria,
-    createdDate: unmappedEventMark.created_dt,
-    updatedDate: unmappedEventMark.updated_dt,
-    teacher: unmappedEventMark.teacher,
-    eventAnswerId: unmappedEventMark.event_answer,
-  };
+export const mapEventMark = (
+  unmappedEventMark: any
+): IEventMark | IEventMarkAvg => {
+  if (unmappedEventMark.average_mark !== undefined) {
+    // Если пришёл ответ со средним баллом мапим в IEventMarkAvg
+    return {
+      criteria: unmappedEventMark
+        ? mapCriteria(unmappedEventMark.criteria)
+        : undefined,
+      avgMark: unmappedEventMark.average_mark,
+    };
+  } else {
+    return {
+      id: unmappedEventMark.id,
+      mark: unmappedEventMark.mark,
+      comment: unmappedEventMark.comment,
+      criteria: unmappedEventMark.criteria,
+      createdDate: unmappedEventMark.created_dt,
+      updatedDate: unmappedEventMark.updated_dt,
+      teacher: unmappedEventMark.teacher,
+      eventAnswerId: unmappedEventMark.event_answer,
+    };
+  }
 };
 
 export const eventMarkApi = createApi({
