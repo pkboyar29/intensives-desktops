@@ -85,6 +85,17 @@ const EventAnswer: FC<EventAnswerProps> = ({
   //   }
   // }, [data]);
 
+  const marksByTeacher = eventAnswerData?.marks.reduce<
+    Record<number, IEventMark[]>
+  >((acc, mark) => {
+    const teacherId = (mark as IEventMark).teacher.id;
+    if (!acc[teacherId]) {
+      acc[teacherId] = [];
+    }
+    acc[teacherId].push(mark as IEventMark);
+    return acc;
+  }, {});
+
   useEffect(() => {
     if (eventAnswerData) {
       // setEventAnswer(eventAnswerData);
@@ -393,7 +404,19 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
 
             {/* опциональное отображение организаторам */}
-            {isUserManager(currentUser) && <>контент для организаторов</>}
+            {isUserManager(currentUser) && marksByTeacher && (
+              <div className="flex flex-col gap-2">
+                {Object.entries(marksByTeacher).map(
+                  ([teacherId, teacherMarks]) => (
+                    <TeacherMarkCard
+                      key={teacherId}
+                      teacherMarks={teacherMarks}
+                      markStrategy={event.markStrategy!}
+                    />
+                  )
+                )}
+              </div>
+            )}
           </>
         ) : (
           <PrimaryButton

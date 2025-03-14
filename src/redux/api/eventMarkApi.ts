@@ -4,11 +4,11 @@ import { baseQueryWithReauth } from './baseQuery';
 import {
   IEventMark,
   IEventMarkAvg,
-  IEventMarkCreate,
   IEventMarksCreate,
   IEventMarkUpdate,
 } from '../../ts/interfaces/IEventMark';
 import { mapCriteria } from './criteriaApi';
+import { mapTeacher } from './teacherApi';
 
 export const mapEventMark = (
   unmappedEventMark: any
@@ -26,10 +26,12 @@ export const mapEventMark = (
       id: unmappedEventMark.id,
       mark: unmappedEventMark.mark,
       comment: unmappedEventMark.comment,
-      criteria: unmappedEventMark.criteria,
+      criteria: unmappedEventMark.criteria
+        ? mapCriteria(unmappedEventMark.criteria)
+        : undefined,
       createdDate: unmappedEventMark.created_dt,
       updatedDate: unmappedEventMark.updated_dt,
-      teacher: unmappedEventMark.teacher,
+      teacher: mapTeacher(unmappedEventMark.teacher),
       eventAnswerId: unmappedEventMark.event_answer,
     };
   }
