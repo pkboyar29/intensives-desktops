@@ -42,6 +42,10 @@ const EventPage: FC = () => {
   const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
   const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
 
+  useEffect(() => {
+    console.log(eventAnswers);
+  }, [eventAnswers]);
+
   const {
     data: event,
     isLoading,

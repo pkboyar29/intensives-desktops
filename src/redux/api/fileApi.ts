@@ -47,7 +47,7 @@ export const fileApi = createApi({
 
         return {
           url: `${context}/${contextId}/files/upload/`,
-          method: 'POST',
+          method: 'PATCH',
           body: formData,
         };
       },

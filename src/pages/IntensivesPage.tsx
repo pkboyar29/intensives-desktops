@@ -6,11 +6,7 @@ import { useAppSelector } from '../redux/store';
 import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
-import {
-  isUserManager,
-  isUserStudent,
-  isUserTeacher,
-} from '../helpers/userHelpers';
+import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
 import IntensiveCard from '../components/IntensiveCard';

@@ -32,6 +32,7 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
           />
         </button>
       )}
+
       <div className="flex flex-col">
         <p
           onClick={() => onEventClick(event.id)}

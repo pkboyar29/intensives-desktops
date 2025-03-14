@@ -87,6 +87,7 @@ export const intensiveApi = createApi({
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
+    /*
     uploadFiles: builder.mutation<IFile[], IUploadFile>({
       query: ({ contextId, files }) => {
         const formData = new FormData();
@@ -105,6 +106,7 @@ export const intensiveApi = createApi({
       transformResponse: (response: any): IFile[] =>
         response.map((unmappedColumn: any) => mapFile(unmappedColumn)),
     }),
+    */
     deleteIntensive: builder.mutation<void, number>({
       query: (id) => ({
         url: `/intensives/${id}/`,
@@ -120,6 +122,6 @@ export const {
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
-  useUploadFilesMutation,
+  //useUploadFilesMutation,
   useDeleteIntensiveMutation,
 } = intensiveApi;

@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import {
-  // useLazyGetEventAnswerQuery,
   useUpdateEventAnswerMutation,
   useCreateEventAnswerMutation,
   useDeleteEventAnswerMutation,
@@ -14,6 +13,8 @@ import {
   isUserTeacher,
   isUserStudent,
 } from '../helpers/userHelpers';
+import { useFileHandler } from '../helpers/useFileHandler';
+import { uploadAllFiles } from '../helpers/fileHelpers';
 
 import TrashIcon from './icons/TrashIcon';
 import Modal from './common/modals/Modal';
@@ -29,9 +30,9 @@ import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 import { IEvent } from '../ts/interfaces/IEvent';
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 import { IEventMark } from '../ts/interfaces/IEventMark';
+import { ICriteria } from '../ts/interfaces/ICriteria';
 
 interface EventAnswerProps {
-  // eventAnswerId?: number;
   eventAnswerData?: IEventAnswer;
   event: IEvent;
   onCreateAnswer?: (newEventAnswer: IEventAnswer) => void;
@@ -40,31 +41,32 @@ interface EventAnswerProps {
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
-  // eventAnswerId,
   eventAnswerData,
   event,
   onCreateAnswer,
   onUpdateAnswer,
   onDeleteAnswer,
 }) => {
-  // const [getEventAnswer, { data, isLoading, error }] =
-  //   useLazyGetEventAnswerQuery();
-  // const [eventAnswer, setEventAnswer] = useState<IEventAnswer>();
-
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
 
   const [createEventAnswer] = useCreateEventAnswerMutation();
   const [updateEventAnswer] = useUpdateEventAnswerMutation();
   const [deleteEventAnswer] = useDeleteEventAnswerMutation();
-  const [uploadFile] = useUploadFileMutation();
+  const [uploadFiles] = useUploadFileMutation();
 
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const [editedText, setEditedText] = useState('');
-  const [attachedFilesList, setAttachedFilesList] = useState<IFile[]>([]);
-  const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
+  const {
+    attachedFilesList,
+    newFiles,
+    handleFilesChange,
+    setAttachedFilesList,
+    setNewFiles,
+    handleFileDelete,
+  } = useFileHandler();
 
   const isUserJury =
     isUserTeacher(currentUser) &&
@@ -74,19 +76,18 @@ const EventAnswer: FC<EventAnswerProps> = ({
     isUserStudent(currentUser) &&
     currentTeam?.teamlead?.id === currentUser?.studentId;
 
-  // useEffect(() => {
-  //   if (eventAnswerId) {
-  //     getEventAnswer(eventAnswerId);
-  //   }
-  // }, [eventAnswerId]);
+  useEffect(() => {
+    if (eventAnswerData) {
+      setEditedText(eventAnswerData.text);
 
-  // useEffect(() => {
-  //   setEventAnswer(data);
-
-  //   if (data?.text) {
-  //     setEditedText(data.text);
-  //   }
-  // }, [data]);
+      if (attachedFilesList.length === 0) {
+        setAttachedFilesList((prevFiles) => [
+          ...prevFiles,
+          ...eventAnswerData.files,
+        ]);
+      }
+    }
+  }, [eventAnswerData]);
 
   const marksByTeacher = eventAnswerData?.marks.reduce<
     Record<number, IEventMark[]>
@@ -99,17 +100,9 @@ const EventAnswer: FC<EventAnswerProps> = ({
     return acc;
   }, {});
 
-  useEffect(() => {
-    if (eventAnswerData) {
-      // setEventAnswer(eventAnswerData);
-      setEditedText(eventAnswerData.text);
-    }
-  }, [eventAnswerData]);
-
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
     if (validateKanban(value)) {
-      //setEventAnswer((prev) => (prev ? { ...prev, text: value } : prev));
       setEditedText(value);
     }
   };
@@ -153,11 +146,10 @@ const EventAnswer: FC<EventAnswerProps> = ({
         type: 'success',
       });
     } else {
-      const { data: responseData, error: responseError } =
-        await createEventAnswer({
-          event: event.id,
-          text: editedText,
-        });
+      ({ data: responseData, error: responseError } = await createEventAnswer({
+        event: event.id,
+        text: editedText,
+      }));
 
       if (responseError) {
         toast('Произошла серверная ошибка при отправке ответа', {
@@ -178,54 +170,16 @@ const EventAnswer: FC<EventAnswerProps> = ({
     if (responseData) {
       // Загрузка файлов после успешного создания/обновления ответа
       const filesError = await uploadAllFiles(
-        Number(responseData.id || eventAnswerData?.id)
+        uploadFiles,
+        'event_answers',
+        Number(responseData.id || eventAnswerData?.id),
+        newFiles
       );
-
+      console.log(filesError);
       if (filesError === 0) {
       }
     }
     setIsEditing((prev) => !prev);
-  };
-
-  const handleFileDelete = (id: number) => {
-    // Удаляем файл из массива для UI и массива с файлами (если файл новый)
-    setAttachedFilesList((prev) => prev.filter((file) => file.id !== id));
-    setNewFiles((prev) => prev.filter((file) => file.id !== id));
-  };
-
-  const handleFilesChange = async (fileList: FileList | null) => {};
-
-  const uploadAllFiles = async (intensiveId: number) => {
-    let filesError = 0;
-
-    if (newFiles.length === 0) return filesError;
-
-    for (const newFile of newFiles) {
-      // Показываем уведомление загрузки
-      const toastId = toast.loading(`Загрузка файла: ${newFile.file.name}...`);
-
-      const { error: responseError } = await uploadFile({
-        context: 'event_answer',
-        contextId: Number(intensiveId),
-        files: newFile.file,
-      });
-
-      if (responseError) {
-        filesError++;
-        toast.update(toastId, {
-          render: `Ошибка загрузки: ${newFile.file.name}`,
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000,
-        });
-        continue; // Переход к следующему файлу
-      }
-
-      // Просто скрываем toast загрузки при успехе
-      toast.dismiss(toastId);
-    }
-
-    return filesError;
   };
 
   return (
@@ -295,7 +249,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
 
             {!isEditing ? (
               <AttachedFileList
-                context={'event_answer'}
+                context={'event_answers'}
                 contextId={eventAnswerData?.id}
                 nameFileList="ответа"
                 files={attachedFilesList}
@@ -359,29 +313,36 @@ const EventAnswer: FC<EventAnswerProps> = ({
                     eventAnswerData.marks.length !== 0 && (
                       <>
                         <p className="text-lg text-center">Оценка на ответ</p>
-
+                        <div className="mt-2 space-y-2 transition-transform transform bg-white"></div>
                         {eventAnswerData.marks.map((mark, index) => {
                           if ('avgMark' in mark) {
                             return (
-                              <div key={index}>
+                              <div
+                                key={index}
+                                className="p-4 transition-transform transform bg-white border border-gray-200 rounded-xl"
+                              >
                                 {mark.criteria?.name ? (
                                   <div>
-                                    <p>Критерии и средняя оценка</p>
-                                    <p>
-                                      {mark.criteria.name} — {mark.avgMark}
+                                    <p className="p-1">
+                                      {mark.criteria.name} —{' '}
+                                      <span className="font-bold text-green-600">
+                                        {mark.avgMark}
+                                      </span>
                                     </p>
                                   </div>
                                 ) : (
-                                  <>
-                                    {' '}
-                                    <p>Средняя оценка: {mark.avgMark}</p>
-                                  </>
+                                  <p className="p-1 text-lg font-medium">
+                                    Средняя оценка —{' '}
+                                    <span className="text-green-600">
+                                      {mark.avgMark}
+                                    </span>
+                                  </p>
                                 )}
                               </div>
                             );
                           }
                           return null;
-                        })}
+                        })}{' '}
                       </>
                     )}
                 </div>
