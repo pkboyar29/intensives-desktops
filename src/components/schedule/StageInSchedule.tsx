@@ -1,22 +1,21 @@
 import { FC } from 'react';
 import { useAppSelector } from '../../redux/store';
-import { isCurrentRoleManager } from '../../helpers/userHelpers';
+import { isUserManager } from '../../helpers/userHelpers';
 
 import EventInSchedule from './EventInSchedule';
 import TrashIcon from '../icons/TrashIcon';
 import EditIcon from '../icons/EditIcon';
 
 import { IStage } from '../../ts/interfaces/IStage';
-import { IEvent } from '../../ts/interfaces/IEvent';
+import { IEventShort } from '../../ts/interfaces/IEvent';
 
-// TODO: начать передавать список событий! stageEvents, это массив из IManagerEvent[]
 interface StageInScheduleProps {
   stage: IStage;
-  stageEvents: IEvent[];
+  stageEvents: IEventShort[];
   onEditClick: (stage: IStage) => void;
   onDeleteClick: (stageId: number) => void;
   onEventClick: (eventId: number) => void;
-  onEventEyeIconClick: (event: IEvent) => void;
+  onEventEyeIconClick: (event: IEventShort) => void;
 }
 
 const StageInSchedule: FC<StageInScheduleProps> = ({
@@ -39,28 +38,27 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
             {stage.finishDate.toLocaleDateString()}
           </div>
         </div>
-        {currentUser?.currentRole &&
-          isCurrentRoleManager(currentUser.currentRole) && (
-            <div className="flex gap-4">
-              <button
-                className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-                onClick={() => {
-                  onEditClick(stage);
-                }}
-              >
-                <EditIcon />
-              </button>
+        {isUserManager(currentUser) && (
+          <div className="flex gap-4">
+            <button
+              className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
+              onClick={() => {
+                onEditClick(stage);
+              }}
+            >
+              <EditIcon />
+            </button>
 
-              <button
-                className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
-                onClick={() => {
-                  onDeleteClick(stage.id);
-                }}
-              >
-                <TrashIcon />
-              </button>
-            </div>
-          )}
+            <button
+              className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
+              onClick={() => {
+                onDeleteClick(stage.id);
+              }}
+            >
+              <TrashIcon />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mt-2.5 ml-2.5">

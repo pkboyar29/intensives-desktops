@@ -2,8 +2,9 @@ import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { useDeleteStageMutation } from '../redux/api/stageApi';
-import { useUpdateEventMutation } from '../redux/api/eventApi';
+import { useUpdateVisibilityMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
+import { isUserManager } from '../helpers/userHelpers';
 
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
@@ -11,14 +12,12 @@ import Title from '../components/common/Title';
 import DisplaySelect from '../components/common/DisplaySelect';
 import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
-
 import StageInSchedule from '../components/schedule/StageInSchedule';
 import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/common/modals/StageModal';
 
 import { IStage } from '../ts/interfaces/IStage';
-import { IEvent } from '../ts/interfaces/IEvent';
-import { isCurrentRoleManager } from '../helpers/userHelpers';
+import { IEventShort } from '../ts/interfaces/IEvent';
 
 const SchedulePage: FC = () => {
   const { intensiveId } = useParams();
@@ -27,7 +26,7 @@ const SchedulePage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
 
   const [deleteStageAPI] = useDeleteStageMutation();
-  const [updateEventAPI] = useUpdateEventMutation();
+  const [updateVisibilityAPI] = useUpdateVisibilityMutation();
 
   const {
     data,
@@ -65,29 +64,16 @@ const SchedulePage: FC = () => {
     navigate(`${eventId}`);
   };
 
-  const onEventEyeIconClick = async (event: IEvent) => {
+  const onEventEyeIconClick = async (event: IEventShort) => {
     toggleEventVisibility(event);
   };
 
-  const toggleEventVisibility = async (event: IEvent) => {
-    const { data: responseData, error: responseError } = await updateEventAPI({
-      visibility: !event.visibility,
-      eventId: event.id,
-      intensiveId: Number(intensiveId),
-      name: event.name,
-      description: event.description,
-      startDate: event.startDate.toISOString(),
-      finishDate: event.finishDate.toISOString(),
-      teamIds: event.teams.map((team) => team.id),
-      teacherIds: event.teachers.map((teacher) => teacher.id),
-      audienceId: event.audience.id,
-      stageId: event.stageId ? event.stageId : null,
-      markStrategyId: event.markStrategy ? event.markStrategy.id : null,
-      deadlineDate: event.deadlineDate
-        ? event.deadlineDate.toISOString()
-        : null,
-      criteriaIds: event.criterias.map((criteria) => criteria.id),
-    });
+  const toggleEventVisibility = async (event: IEventShort) => {
+    const { data: responseData, error: responseError } =
+      await updateVisibilityAPI({
+        visibility: !event.visibility,
+        eventId: event.id,
+      });
 
     if (responseError) {
       toast('Произошла серверная ошибка', {
@@ -216,35 +202,34 @@ const SchedulePage: FC = () => {
       <div className="max-w-[1280px]">
         <div className="flex items-start justify-between">
           <Title text="Расписание интенсива" />
-          {currentUser?.currentRole &&
-            isCurrentRoleManager(currentUser.currentRole) && (
-              <DisplaySelect
-                isOpen={isDropdownOpen}
-                onDropdownClick={() => setIsDropdownOpen((isOpen) => !isOpen)}
-                dropdownText="Редактировать"
-              >
-                <div className="flex flex-col gap-2.5 text-base">
-                  <div
-                    className="transition cursor-pointer hover:text-blue"
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      setStageModal({
-                        status: true,
-                        stage: null,
-                      });
-                    }}
-                  >
-                    Добавить этап
-                  </div>
-                  <div
-                    className="transition cursor-pointer hover:text-blue"
-                    onClick={() => navigate('editEvent')}
-                  >
-                    Добавить мероприятие
-                  </div>
+          {isUserManager(currentUser) && (
+            <DisplaySelect
+              isOpen={isDropdownOpen}
+              onDropdownClick={() => setIsDropdownOpen((isOpen) => !isOpen)}
+              dropdownText="Редактировать"
+            >
+              <div className="flex flex-col gap-2.5 text-base">
+                <div
+                  className="transition cursor-pointer hover:text-blue"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    setStageModal({
+                      status: true,
+                      stage: null,
+                    });
+                  }}
+                >
+                  Добавить этап
                 </div>
-              </DisplaySelect>
-            )}
+                <div
+                  className="transition cursor-pointer hover:text-blue"
+                  onClick={() => navigate('editEvent')}
+                >
+                  Добавить мероприятие
+                </div>
+              </div>
+            </DisplaySelect>
+          )}
         </div>
 
         {isScheduleLoading ? (

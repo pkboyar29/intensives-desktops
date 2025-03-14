@@ -5,11 +5,11 @@ import {
 } from '../../redux/api/eventMarkApi';
 import { validateKanban } from '../../helpers/kanbanHelpers';
 
-import { IEvent } from '../../ts/interfaces/IEvent';
-
 import RangeSlider from '../common/RangeSlider';
 import PrimaryButton from '../common/PrimaryButton';
 import { toast } from 'react-toastify';
+
+import { IEvent } from '../../ts/interfaces/IEvent';
 import { IEventMark } from '../../ts/interfaces/IEventMark';
 
 interface EventMarkFormProps {
@@ -41,7 +41,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
           id: existingMark.id,
           mark: existingMark.mark,
           comment: existingMark.comment,
-          criteriaId: existingMark.criteria ?? 0,
+          criteriaId: existingMark.criteria?.id ?? 0,
         }))
       );
     } else {

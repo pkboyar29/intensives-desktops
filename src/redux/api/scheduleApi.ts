@@ -1,21 +1,21 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
-import { mapEvent } from './eventApi';
+import { mapEventShort } from './eventApi';
 import { mapStage } from './stageApi';
 
 import { IStage } from '../../ts/interfaces/IStage';
-import { IEvent } from '../../ts/interfaces/IEvent';
+import { IEventShort } from '../../ts/interfaces/IEvent';
 
 export interface ISchedule {
   stages: IStage[];
-  events: IEvent[];
+  events: IEventShort[];
 }
 
 const mapSchedule = (unmappedSchedule: any): ISchedule => {
   return {
     stages: unmappedSchedule.stages.map((stage: any) => mapStage(stage)),
-    events: unmappedSchedule.events.map((event: any) => mapEvent(event)),
+    events: unmappedSchedule.events.map((event: any) => mapEventShort(event)),
   };
 };
 

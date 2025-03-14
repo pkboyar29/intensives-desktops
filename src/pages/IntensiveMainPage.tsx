@@ -1,9 +1,6 @@
 import { FC } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
-import {
-  isCurrentRoleStudent,
-  isCurrentRoleTeacher,
-} from '../helpers/userHelpers';
+import { isUserStudent, isUserTeacher } from '../helpers/userHelpers';
 
 import { useGetIntensiveQuery } from '../redux/api/intensiveApi';
 import { useAppSelector } from '../redux/store';
@@ -33,14 +30,13 @@ const IntensiveMainPage: FC = () => {
       ) : (
         <div className="pt-[74px] h-screen grid grid-cols-[auto,1fr]">
           <Sidebar>
-            {currentUser?.currentRole &&
-              (isCurrentRoleStudent(currentUser.currentRole) ? (
-                <StudentSidebarContent isIntensiveLoading={isLoading} />
-              ) : isCurrentRoleTeacher(currentUser.currentRole) ? (
-                <TeacherSidebarContent isIntensiveLoading={isLoading} />
-              ) : (
-                <ManagerSidebarContent isIntensiveLoading={isLoading} />
-              ))}
+            {isUserStudent(currentUser) ? (
+              <StudentSidebarContent isIntensiveLoading={isLoading} />
+            ) : isUserTeacher(currentUser) ? (
+              <TeacherSidebarContent isIntensiveLoading={isLoading} />
+            ) : (
+              <ManagerSidebarContent isIntensiveLoading={isLoading} />
+            )}
           </Sidebar>
           <div className="w-full px-10 pt-5 overflow-y-auto">
             <Outlet />

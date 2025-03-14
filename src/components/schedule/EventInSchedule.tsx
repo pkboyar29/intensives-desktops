@@ -1,16 +1,18 @@
 import { FC } from 'react';
 import { useAppSelector } from '../../redux/store';
-import { isCurrentRoleManager } from '../../helpers/userHelpers';
+import { isUserManager, isUserTeacher } from '../../helpers/userHelpers';
 import { getEventDateDisplayString } from '../../helpers/dateHelpers';
 
 import EyeIcon from '../icons/EyeIcon';
+import EditIcon from '../icons/EditIcon';
+import Tooltip from '../common/Tooltip';
 
-import { IEvent } from '../../ts/interfaces/IEvent';
+import { IEventShort } from '../../ts/interfaces/IEvent';
 
 interface EventInScheduleProps {
-  event: IEvent;
+  event: IEventShort;
   onEventClick: (eventId: number) => void;
-  onEyeIconClick: (event: IEvent) => void;
+  onEyeIconClick: (event: IEventShort) => void;
 }
 
 const EventInSchedule: FC<EventInScheduleProps> = ({
@@ -22,15 +24,15 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
 
   return (
     <section className="flex items-center gap-7">
-      {currentUser?.currentRole &&
-        isCurrentRoleManager(currentUser.currentRole) && (
-          <button>
-            <EyeIcon
-              eyeVisibility={event.visibility}
-              onClick={() => onEyeIconClick(event)}
-            />
-          </button>
-        )}
+      {isUserManager(currentUser) && (
+        <button>
+          <EyeIcon
+            eyeVisibility={event.visibility}
+            onClick={() => onEyeIconClick(event)}
+          />
+        </button>
+      )}
+
       <div className="flex flex-col">
         <p
           onClick={() => onEventClick(event.id)}
@@ -42,6 +44,19 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
           {getEventDateDisplayString(event.startDate, event.finishDate)}
         </time>
       </div>
+      {isUserTeacher(currentUser) &&
+        currentUser?.teacherId &&
+        event.teacherIds.includes(currentUser.teacherId) && (
+          <span className="self-start w-4 h-4">
+            {' '}
+            <Tooltip
+              tooltipText="Вы учавствуете в этом мероприятии"
+              tooltipClasses="p-1 bg-gray_5 rounded"
+            >
+              <EditIcon />
+            </Tooltip>
+          </span>
+        )}
     </section>
   );
 };

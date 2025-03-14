@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
-import { isCurrentRoleManager } from '../helpers/userHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 import { useGetTeamsQuery } from '../redux/api/teamApi';
 
@@ -25,8 +25,7 @@ const TeamsPage: FC = () => {
       <Title text="Команды" />
 
       <h2 className="text-lg font-bold mt-7">
-        {currentUser?.currentRole &&
-        isCurrentRoleManager(currentUser.currentRole)
+        {isUserManager(currentUser)
           ? 'Созданные команды'
           : 'Существующие команды'}
       </h2>
@@ -45,27 +44,26 @@ const TeamsPage: FC = () => {
         </div>
       )}
 
-      {currentUser?.currentRole &&
-        isCurrentRoleManager(currentUser.currentRole) && (
-          <div className="flex gap-5 mt-10">
-            <div>
-              <PrimaryButton
-                children="Изменить состав команд"
-                clickHandler={() =>
-                  navigate(`/intensives/${intensiveId}/createTeams`)
-                }
-              />
-            </div>
-            <div>
-              <PrimaryButton
-                children="Изменить команды сопровождения"
-                clickHandler={() =>
-                  navigate(`/intensives/${intensiveId}/createSupportTeams`)
-                }
-              />
-            </div>
+      {isUserManager(currentUser) && (
+        <div className="flex gap-5 mt-10">
+          <div>
+            <PrimaryButton
+              children="Изменить состав команд"
+              clickHandler={() =>
+                navigate(`/intensives/${intensiveId}/createTeams`)
+              }
+            />
           </div>
-        )}
+          <div>
+            <PrimaryButton
+              children="Изменить команды сопровождения"
+              clickHandler={() =>
+                navigate(`/intensives/${intensiveId}/createSupportTeams`)
+              }
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

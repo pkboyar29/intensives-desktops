@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
-import { isCurrentRoleManager } from '../helpers/userHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
@@ -159,29 +159,28 @@ const IntensiveOverviewPage: FC = () => {
                 </div>
               )}
 
-              {currentUser?.currentRole &&
-                isCurrentRoleManager(currentUser.currentRole) && (
-                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
+              {isUserManager(currentUser) && (
+                <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                  <PrimaryButton
+                    children="Редактировать"
+                    clickHandler={() => {
+                      navigate(
+                        `/intensives/${currentIntensive?.id}/editIntensive`
+                      );
+                    }}
+                  />
+
+                  <div>
                     <PrimaryButton
-                      children="Редактировать"
-                      clickHandler={() => {
-                        navigate(
-                          `/intensives/${currentIntensive?.id}/editIntensive`
-                        );
+                      buttonColor="gray"
+                      children={<TrashIcon />}
+                      onClick={() => {
+                        setDeleteModal(true);
                       }}
                     />
-
-                    <div>
-                      <PrimaryButton
-                        buttonColor="gray"
-                        children={<TrashIcon />}
-                        onClick={() => {
-                          setDeleteModal(true);
-                        }}
-                      />
-                    </div>
                   </div>
-                )}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,14 +1,38 @@
-import { IUser, UserRole } from '../ts/interfaces/IUser';
+import { IEvent, IEventShort } from '../ts/interfaces/IEvent';
+import { ITeam } from '../ts/interfaces/ITeam';
+import { IUser } from '../ts/interfaces/IUser';
 
-export const isCurrentRoleStudent = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Student';
-};
-export const isCurrentRoleTeacher = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Teacher';
-};
-export const isCurrentRoleManager = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Manager';
-};
-export const isCurrentRoleAdmin = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Admin';
-};
+export const isUserStudent = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Student';
+
+export const isUserTeacher = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Teacher';
+
+export const isUserManager = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Manager';
+
+export const isUserAdmin = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Admin';
+
+export const isUserMentor = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Mentor';
+
+export const isUserTeamlead = (
+  currentUser: IUser | null,
+  team: ITeam | null
+): boolean =>
+  isUserStudent(currentUser) && team?.teamlead?.id === currentUser?.studentId;
+
+export const isUserTutor = (
+  currentUser: IUser | null,
+  team: ITeam | null
+): boolean =>
+  isUserTeacher(currentUser) && team?.tutor?.id === currentUser?.teacherId;
+
+export const isUserMentorInCurrentTeam = (
+  currentUser: IUser | null,
+  team: ITeam | null
+): boolean =>
+  isUserMentor(currentUser) && team?.mentor?.id === currentUser?.studentId;
+
+// export const isUserJury = (currentUser: IUser | null, event: IEvent | IEventShort): boolean => isUserTeacher(currentUser) && event.teachers.includes(currentUser?.teacherId);

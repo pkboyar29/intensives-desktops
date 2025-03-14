@@ -271,6 +271,22 @@ const ManageEventForm: FC = () => {
   };
 
   const onSubmit = async (data: ManageEventFormFields) => {
+    if (!data.teams || data.teams.length === 0) {
+      setError('teams', {
+        type: 'custom',
+        message: 'Необходимо выбрать как минимум одну команду',
+      });
+      return;
+    }
+
+    if (!data.teachers || data.teachers.length === 0) {
+      setError('teachers', {
+        type: 'custom',
+        message: 'Необходимо выбрать как минимум одного преподавателя',
+      });
+      return;
+    }
+
     const scoreType = data.scoreType;
     if (
       scoreType === 'withCriterias' &&
@@ -641,6 +657,11 @@ const ManageEventForm: FC = () => {
                       id: team.id,
                       name: team.name,
                     }))}
+                    errorMessage={
+                      typeof errors.teams?.message === 'string'
+                        ? errors.teams.message
+                        : ''
+                    }
                     selectedItems={field.value || []}
                     setSelectedItems={field.onChange}
                   />
@@ -656,6 +677,11 @@ const ManageEventForm: FC = () => {
                   <MultipleSelectInput
                     description="Преподаватели"
                     items={teachersToChoose}
+                    errorMessage={
+                      typeof errors.teachers?.message === 'string'
+                        ? errors.teachers.message
+                        : ''
+                    }
                     selectedItems={field.value || []}
                     setSelectedItems={field.onChange}
                   />

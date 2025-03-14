@@ -270,8 +270,8 @@ const ManageIntensiveForm: FC = () => {
       )}
 
       <div
-        className={`flex justify-center ${
-          !intensiveId ? `mt-5` : `max-w-[1280px]`
+        className={`pt-[88px] flex justify-center ${
+          !intensiveId ? `` : `max-w-[1280px]`
         }`}
       >
         <form

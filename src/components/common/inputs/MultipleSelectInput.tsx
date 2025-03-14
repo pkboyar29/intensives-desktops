@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
 import Chip from '../Chip';
@@ -23,6 +24,12 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectAllState, setSelectAllState] = useState<boolean>(false);
+
+  const dropdownVariants = {
+    open: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
+    closed: { opacity: 0, height: 0, transition: { duration: 0.3 } },
+  };
 
   const toggleDropdownHandler = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -77,23 +84,44 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         </svg>
       </button>
 
-      <ul
-        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none transition-all duration-300 ease-in-out flex flex-col gap-2.5 ${
-          !isOpen && `hidden`
-        }`}
+      <motion.div
+        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none`}
+        initial="closed"
+        animate={isOpen ? 'open' : 'closed'}
+        variants={dropdownVariants}
+        style={{ overflow: 'hidden' }}
       >
-        {items.map((item) => (
+        <div className="pb-8">
           <Checkbox
-            key={item.id}
-            item={item}
-            addSelectedItem={addSelectedItem}
-            deleteSelectedItem={deleteSelectedItem}
-            isChecked={selectedItems.some(
-              (selectedItem) => selectedItem.id === item.id
-            )}
+            item={{ id: 0, name: 'Выбрать все' }}
+            addSelectedItem={() => {
+              if (selectedItems.length !== items.length) {
+                setSelectedItems(items);
+              }
+              setSelectAllState(true);
+            }}
+            deleteSelectedItem={() => {
+              setSelectAllState(false);
+            }}
+            isChecked={selectAllState}
           />
-        ))}
-      </ul>
+        </div>
+        <ul
+          className={`transition-all duration-300 ease-in-out flex flex-col gap-2.5`}
+        >
+          {items.map((item) => (
+            <Checkbox
+              key={item.id}
+              item={item}
+              addSelectedItem={addSelectedItem}
+              deleteSelectedItem={deleteSelectedItem}
+              isChecked={selectedItems.some(
+                (selectedItem) => selectedItem.id === item.id
+              )}
+            />
+          ))}
+        </ul>
+      </motion.div>
 
       <div className="flex flex-wrap gap-2 mx-3 mt-3">
         {selectedItems.map((selectedItem) => (

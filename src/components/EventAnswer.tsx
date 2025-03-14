@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import {
-  // useLazyGetEventAnswerQuery,
   useUpdateEventAnswerMutation,
   useCreateEventAnswerMutation,
   useDeleteEventAnswerMutation,
@@ -10,14 +9,13 @@ import { useUploadFileMutation } from '../redux/api/fileApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
-  isCurrentRoleManager,
-  isCurrentRoleTeacher,
-  isCurrentRoleStudent,
+  isUserManager,
+  isUserTeacher,
+  isUserStudent,
+  isUserTeamlead,
 } from '../helpers/userHelpers';
-
-import { IFile, INewFileObject } from '../ts/interfaces/IFile';
-import { IEvent } from '../ts/interfaces/IEvent';
-import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
+import { useFileHandler } from '../helpers/useFileHandler';
+import { uploadAllFiles } from '../helpers/fileHelpers';
 
 import TrashIcon from './icons/TrashIcon';
 import Modal from './common/modals/Modal';
@@ -28,13 +26,14 @@ import AttachedFileList from './AttachedFileList';
 import { toast } from 'react-toastify';
 import TeacherMarkCard from './TeacherMarkCard';
 import EventMarkForm from './forms/EventMarkForm';
+
+import { IFile, INewFileObject } from '../ts/interfaces/IFile';
+import { IEvent } from '../ts/interfaces/IEvent';
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 import { IEventMark } from '../ts/interfaces/IEventMark';
 import { ICriteria } from '../ts/interfaces/ICriteria';
-import { useFileHandler } from '../helpers/useFileHandler';
-import { uploadAllFiles } from '../helpers/fileHelpers';
 
 interface EventAnswerProps {
-  // eventAnswerId?: number;
   eventAnswerData?: IEventAnswer;
   event: IEvent;
   onCreateAnswer?: (newEventAnswer: IEventAnswer) => void;
@@ -43,17 +42,12 @@ interface EventAnswerProps {
 }
 
 const EventAnswer: FC<EventAnswerProps> = ({
-  // eventAnswerId,
   eventAnswerData,
   event,
   onCreateAnswer,
   onUpdateAnswer,
   onDeleteAnswer,
 }) => {
-  // const [getEventAnswer, { data, isLoading, error }] =
-  //   useLazyGetEventAnswerQuery();
-  // const [eventAnswer, setEventAnswer] = useState<IEventAnswer>();
-
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
 
@@ -75,23 +69,12 @@ const EventAnswer: FC<EventAnswerProps> = ({
     handleFileDelete,
   } = useFileHandler();
 
-  // useEffect(() => {
-  //   if (eventAnswerId) {
-  //     getEventAnswer(eventAnswerId);
-  //   }
-  // }, [eventAnswerId]);
-
-  // useEffect(() => {
-  //   setEventAnswer(data);
-
-  //   if (data?.text) {
-  //     setEditedText(data.text);
-  //   }
-  // }, [data]);
+  const isUserJury =
+    isUserTeacher(currentUser) &&
+    event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
 
   useEffect(() => {
     if (eventAnswerData) {
-      // setEventAnswer(eventAnswerData);
       setEditedText(eventAnswerData.text);
 
       if (attachedFilesList.length === 0) {
@@ -103,10 +86,20 @@ const EventAnswer: FC<EventAnswerProps> = ({
     }
   }, [eventAnswerData]);
 
+  const marksByTeacher = eventAnswerData?.marks.reduce<
+    Record<number, IEventMark[]>
+  >((acc, mark) => {
+    const teacherId = (mark as IEventMark).teacher.id;
+    if (!acc[teacherId]) {
+      acc[teacherId] = [];
+    }
+    acc[teacherId].push(mark as IEventMark);
+    return acc;
+  }, {});
+
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
     if (validateKanban(value)) {
-      //setEventAnswer((prev) => (prev ? { ...prev, text: value } : prev));
       setEditedText(value);
     }
   };
@@ -270,139 +263,132 @@ const EventAnswer: FC<EventAnswerProps> = ({
               </div>
             )}
 
-            {currentUser && currentUser.currentRole && (
+            {/* опциональное отображение студентам */}
+            {isUserStudent(currentUser) && (
               <>
-                {/* опциональное отображение студентам */}
-                {isCurrentRoleStudent(currentUser.currentRole) && (
+                {/* если студент - тимлид */}
+                {isUserTeamlead(currentUser, currentTeam) ? (
                   <>
-                    {/* если студент - тимлид */}
-                    {currentTeam?.teamlead?.id === currentUser.studentId ? (
-                      <>
-                        {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
-                        {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
-                        {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
-                        {!eventAnswerData ||
-                        eventAnswerData.marks.length === 0 ? (
-                          <div className="flex items-center gap-5 mt-2">
-                            <PrimaryButton
-                              type="button"
-                              children={
-                                isEditing
-                                  ? eventAnswerData
-                                    ? 'Сохранить ответ'
-                                    : 'Сохранить и отправить'
-                                  : eventAnswerData
-                                  ? 'Редактировать ответ'
-                                  : 'Отправить ответ'
-                              }
-                              clickHandler={handleEditClick}
-                            />
+                    {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
+                    {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
+                    {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
+                    {!eventAnswerData || eventAnswerData.marks.length === 0 ? (
+                      <div className="flex items-center gap-5 mt-2">
+                        <PrimaryButton
+                          type="button"
+                          children={
+                            isEditing
+                              ? eventAnswerData
+                                ? 'Сохранить ответ'
+                                : 'Сохранить и отправить'
+                              : eventAnswerData
+                              ? 'Редактировать ответ'
+                              : 'Отправить ответ'
+                          }
+                          clickHandler={handleEditClick}
+                        />
 
-                            <div>
-                              <PrimaryButton
-                                buttonColor="gray"
-                                children={<TrashIcon />}
-                                onClick={() => {
-                                  setDeleteModal(true);
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </>
+                        <div>
+                          <PrimaryButton
+                            buttonColor="gray"
+                            children={<TrashIcon />}
+                            onClick={() => {
+                              setDeleteModal(true);
+                            }}
+                          />
+                        </div>
+                      </div>
                     ) : (
                       <></>
                     )}
-                    <div className="mt-3">
-                      {eventAnswerData?.marks &&
-                        eventAnswerData.marks.length !== 0 && (
-                          <>
-                            <p className="text-lg font-medium text-center">
-                              Оценка на ответ
-                            </p>
-
-                            {eventAnswerData.marks.some(
-                              (mark) => mark.criteria
-                            ) && (
-                              <p className="text-lg font-medium">
-                                Критерии и средняя оценка:
-                              </p>
-                            )}
-
-                            <div className="mt-2 space-y-2 transition-transform transform bg-white">
-                              {eventAnswerData.marks.map((mark, index) => {
-                                if ('avgMark' in mark) {
-                                  return (
-                                    <div
-                                      key={index}
-                                      className="p-4 transition-transform transform bg-white border border-gray-200 rounded-xl"
-                                    >
-                                      {mark.criteria?.name ? (
-                                        <div>
-                                          <p className="p-1">
-                                            {mark.criteria.name} —{' '}
-                                            <span className="font-bold text-green-600">
-                                              {mark.avgMark}
-                                            </span>
-                                          </p>
-                                        </div>
-                                      ) : (
-                                        <p className="p-1 text-lg font-medium">
-                                          Средняя оценка —{' '}
-                                          <span className="text-green-600">
-                                            {mark.avgMark}
-                                          </span>
-                                        </p>
-                                      )}
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })}
-                            </div>
-                          </>
-                        )}
-                    </div>
                   </>
+                ) : (
+                  <></>
                 )}
-
-                {/* опциональное отображение преподавателям */}
-                {/* TODO: нужно показывать возможность изменения оценки только преподавателю жюри */}
-                {isCurrentRoleTeacher(currentUser.currentRole) &&
-                  eventAnswerData && (
-                    <EventMarkForm
-                      event={event}
-                      eventAnswerId={eventAnswerData.id}
-                      existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
-                      onChangeMarks={(updatedMarks) => {
-                        if (eventAnswerData && onUpdateAnswer) {
-                          onUpdateAnswer({
-                            ...eventAnswerData,
-                            hasMarks: true,
-                            marks: updatedMarks,
-                          });
-                        }
-                      }}
-                    />
-                  )}
-
-                {/* опциональное отображение организаторам */}
-                {isCurrentRoleManager(currentUser.currentRole) && (
-                  <>контент для организаторов</>
-                )}
+                <div className="mt-3">
+                  {eventAnswerData?.marks &&
+                    eventAnswerData.marks.length !== 0 && (
+                      <>
+                        <p className="text-lg text-center">Оценка на ответ</p>
+                        <div className="mt-2 space-y-2 transition-transform transform bg-white"></div>
+                        {eventAnswerData.marks.map((mark, index) => {
+                          if ('avgMark' in mark) {
+                            return (
+                              <div
+                                key={index}
+                                className="p-4 transition-transform transform bg-white border border-gray-200 rounded-xl"
+                              >
+                                {mark.criteria?.name ? (
+                                  <div>
+                                    <p className="p-1">
+                                      {mark.criteria.name} —{' '}
+                                      <span className="font-bold text-green-600">
+                                        {mark.avgMark}
+                                      </span>
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <p className="p-1 text-lg font-medium">
+                                    Средняя оценка —{' '}
+                                    <span className="text-green-600">
+                                      {mark.avgMark}
+                                    </span>
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}{' '}
+                      </>
+                    )}
+                </div>
               </>
+            )}
+
+            {/* опциональное отображение преподавателям */}
+            {isUserJury && eventAnswerData && (
+              <EventMarkForm
+                event={event}
+                eventAnswerId={eventAnswerData.id}
+                existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
+                onChangeMarks={(updatedMarks) => {
+                  if (eventAnswerData && onUpdateAnswer) {
+                    onUpdateAnswer({
+                      ...eventAnswerData,
+                      hasMarks: true,
+                      marks: updatedMarks,
+                    });
+                  }
+                }}
+              />
+            )}
+
+            {/* опциональное отображение организаторам */}
+            {isUserManager(currentUser) && marksByTeacher && (
+              <div className="flex flex-col gap-2">
+                {Object.entries(marksByTeacher).map(
+                  ([teacherId, teacherMarks]) => (
+                    <TeacherMarkCard
+                      key={teacherId}
+                      teacherMarks={teacherMarks}
+                      markStrategy={event.markStrategy!}
+                    />
+                  )
+                )}
+              </div>
             )}
           </>
         ) : (
-          <PrimaryButton
-            type="button"
-            children={
-              isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
-            }
-            clickHandler={() => setIsEditing((prev) => !prev)}
-          />
+          isUserTeamlead(currentUser, currentTeam) && (
+            <PrimaryButton
+              type="button"
+              children={
+                isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
+              }
+              clickHandler={() => setIsEditing((prev) => !prev)}
+            />
+          )
         )}
       </div>
     </>

@@ -4,7 +4,7 @@ import { ITeacher } from './ITeacher';
 export interface IEventMark {
   id: number;
   mark: number;
-  criteria?: number;
+  criteria?: ICriteria;
   comment: string;
   createdDate: Date;
   updatedDate: Date;

@@ -20,7 +20,7 @@ export const audienceApi = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getAudiences: builder.query<IAudience[], void>({
-      query: () => '/auditories/',
+      query: () => '/audiences/',
       transformResponse: (response: any): IAudience[] =>
         response.results.map((unmappedAudience: any) =>
           mapAudience(unmappedAudience)
