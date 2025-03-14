@@ -1,18 +1,16 @@
-import { UserRole } from '../ts/interfaces/IUser';
+import { IUser } from '../ts/interfaces/IUser';
 
-export const isCurrentRoleStudent = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Student';
-};
-export const isCurrentRoleTeacher = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Teacher';
-};
-export const isCurrentRoleManager = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Manager';
-};
-export const isCurrentRoleAdmin = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Admin';
-};
+export const isUserStudent = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Student';
 
-export const isCurrentRoleMentor = (currentRole: UserRole): boolean => {
-  return currentRole.name === 'Mentor';
-};
+export const isUserTeacher = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Teacher';
+
+export const isUserManager = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Manager';
+
+export const isUserAdmin = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Admin';
+
+export const isUserMentor = (currentUser: IUser | null): boolean =>
+  !!currentUser?.currentRole && currentUser.currentRole.name === 'Mentor';

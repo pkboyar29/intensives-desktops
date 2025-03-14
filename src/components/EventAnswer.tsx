@@ -10,9 +10,9 @@ import { useUploadFileMutation } from '../redux/api/fileApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
-  isCurrentRoleManager,
-  isCurrentRoleTeacher,
-  isCurrentRoleStudent,
+  isUserManager,
+  isUserTeacher,
+  isUserStudent,
 } from '../helpers/userHelpers';
 
 import { IFile, INewFileObject } from '../ts/interfaces/IFile';
@@ -68,9 +68,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
 
   const isUserJury =
-    currentUser?.currentRole &&
-    isCurrentRoleTeacher(currentUser.currentRole) &&
-    event?.teachers.some((teacher) => teacher.id === currentUser.teacherId);
+    isUserTeacher(currentUser) &&
+    event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
 
   // useEffect(() => {
   //   if (eventAnswerId) {
@@ -299,111 +298,102 @@ const EventAnswer: FC<EventAnswerProps> = ({
               </div>
             )}
 
-            {currentUser && currentUser.currentRole && (
+            {/* опциональное отображение студентам */}
+            {isUserStudent(currentUser) && (
               <>
-                {/* опциональное отображение студентам */}
-                {isCurrentRoleStudent(currentUser.currentRole) && (
+                {/* если студент - тимлид */}
+                {currentTeam?.teamlead?.id === currentUser?.studentId ? (
                   <>
-                    {/* если студент - тимлид */}
-                    {currentTeam?.teamlead?.id === currentUser.studentId ? (
-                      <>
-                        {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
-                        {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
-                        {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
-                        {!eventAnswerData ||
-                        eventAnswerData.marks.length === 0 ? (
-                          <div className="flex items-center gap-5 mt-2">
-                            <PrimaryButton
-                              type="button"
-                              children={
-                                isEditing
-                                  ? eventAnswerData
-                                    ? 'Сохранить ответ'
-                                    : 'Сохранить и отправить'
-                                  : eventAnswerData
-                                  ? 'Редактировать ответ'
-                                  : 'Отправить ответ'
-                              }
-                              clickHandler={handleEditClick}
-                            />
+                    {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
+                    {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
+                    {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
+                    {!eventAnswerData || eventAnswerData.marks.length === 0 ? (
+                      <div className="flex items-center gap-5 mt-2">
+                        <PrimaryButton
+                          type="button"
+                          children={
+                            isEditing
+                              ? eventAnswerData
+                                ? 'Сохранить ответ'
+                                : 'Сохранить и отправить'
+                              : eventAnswerData
+                              ? 'Редактировать ответ'
+                              : 'Отправить ответ'
+                          }
+                          clickHandler={handleEditClick}
+                        />
 
-                            <div>
-                              <PrimaryButton
-                                buttonColor="gray"
-                                children={<TrashIcon />}
-                                onClick={() => {
-                                  setDeleteModal(true);
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </>
+                        <div>
+                          <PrimaryButton
+                            buttonColor="gray"
+                            children={<TrashIcon />}
+                            onClick={() => {
+                              setDeleteModal(true);
+                            }}
+                          />
+                        </div>
+                      </div>
                     ) : (
                       <></>
                     )}
-                    <div className="mt-3">
-                      {eventAnswerData?.marks &&
-                        eventAnswerData.marks.length !== 0 && (
-                          <>
-                            <p className="text-lg text-center">
-                              Оценка на ответ
-                            </p>
-
-                            {eventAnswerData.marks.map((mark, index) => {
-                              if ('avgMark' in mark) {
-                                return (
-                                  <div key={index}>
-                                    {mark.criteria?.name ? (
-                                      <div>
-                                        <p>Критерии и средняя оценка</p>
-                                        <p>
-                                          {mark.criteria.name} — {mark.avgMark}
-                                        </p>
-                                      </div>
-                                    ) : (
-                                      <>
-                                        {' '}
-                                        <p>Средняя оценка: {mark.avgMark}</p>
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })}
-                          </>
-                        )}
-                    </div>
                   </>
+                ) : (
+                  <></>
                 )}
+                <div className="mt-3">
+                  {eventAnswerData?.marks &&
+                    eventAnswerData.marks.length !== 0 && (
+                      <>
+                        <p className="text-lg text-center">Оценка на ответ</p>
 
-                {/* опциональное отображение преподавателям */}
-                {isUserJury && eventAnswerData && (
-                  <EventMarkForm
-                    event={event}
-                    eventAnswerId={eventAnswerData.id}
-                    existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
-                    onChangeMarks={(updatedMarks) => {
-                      if (eventAnswerData && onUpdateAnswer) {
-                        onUpdateAnswer({
-                          ...eventAnswerData,
-                          hasMarks: true,
-                          marks: updatedMarks,
-                        });
-                      }
-                    }}
-                  />
-                )}
-
-                {/* опциональное отображение организаторам */}
-                {isCurrentRoleManager(currentUser.currentRole) && (
-                  <>контент для организаторов</>
-                )}
+                        {eventAnswerData.marks.map((mark, index) => {
+                          if ('avgMark' in mark) {
+                            return (
+                              <div key={index}>
+                                {mark.criteria?.name ? (
+                                  <div>
+                                    <p>Критерии и средняя оценка</p>
+                                    <p>
+                                      {mark.criteria.name} — {mark.avgMark}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <>
+                                    {' '}
+                                    <p>Средняя оценка: {mark.avgMark}</p>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
+                      </>
+                    )}
+                </div>
               </>
             )}
+
+            {/* опциональное отображение преподавателям */}
+            {isUserJury && eventAnswerData && (
+              <EventMarkForm
+                event={event}
+                eventAnswerId={eventAnswerData.id}
+                existingEventMarks={eventAnswerData.marks as IEventMark[]} // можно создать функцию type guard
+                onChangeMarks={(updatedMarks) => {
+                  if (eventAnswerData && onUpdateAnswer) {
+                    onUpdateAnswer({
+                      ...eventAnswerData,
+                      hasMarks: true,
+                      marks: updatedMarks,
+                    });
+                  }
+                }}
+              />
+            )}
+
+            {/* опциональное отображение организаторам */}
+            {isUserManager(currentUser) && <>контент для организаторов</>}
           </>
         ) : (
           <PrimaryButton

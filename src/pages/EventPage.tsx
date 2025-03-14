@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import {
-  isCurrentRoleStudent,
-  isCurrentRoleTeacher,
-  isCurrentRoleManager,
+  isUserStudent,
+  isUserTeacher,
+  isUserManager,
 } from '../helpers/userHelpers';
 import {
   getEventDateDisplayString,
@@ -103,24 +103,17 @@ const EventPage: FC = () => {
     }
   }, [eventAnswersData]);
 
-  const isUserManager =
-    currentUser?.currentRole && isCurrentRoleManager(currentUser.currentRole);
-
-  const isUserStudent =
-    currentUser?.currentRole && isCurrentRoleStudent(currentUser.currentRole);
-
-  const isUserTeacher =
-    currentUser?.currentRole && isCurrentRoleTeacher(currentUser.currentRole);
-
   const isUserJury =
-    isUserTeacher &&
-    event?.teachers.some((teacher) => teacher.id === currentUser.teacherId);
+    isUserTeacher(currentUser) &&
+    event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
 
   const isUserTeamlead =
-    isUserStudent && currentTeam?.teamlead?.id === currentUser.studentId;
+    isUserStudent(currentUser) &&
+    currentTeam?.teamlead?.id === currentUser?.studentId;
 
   const isUserTutor =
-    isUserTeacher && currentTeam?.tutor?.id === currentUser.teacherId;
+    isUserTeacher(currentUser) &&
+    currentTeam?.tutor?.id === currentUser?.teacherId;
 
   const isUserMentor = currentTeam?.mentor?.id === currentUser?.studentId;
 
@@ -343,10 +336,10 @@ const EventPage: FC = () => {
                 {event.markStrategy && (
                   <>
                     {/* отображение аккордеона для преподавателей жюри/организаторов */}
-                    {(isUserManager || isUserJury) && (
+                    {(isUserManager(currentUser) || isUserJury) && (
                       <div className="flex flex-col gap-3 mt-10">
                         <p className="text-xl font-bold text-black_2">
-                          {isUserManager
+                          {isUserManager(currentUser)
                             ? 'Ответы команд'
                             : 'Оцениваемые команды'}
                         </p>
@@ -365,7 +358,9 @@ const EventPage: FC = () => {
                     )}
 
                     {/* отображение ответов текущей команды для студентов/наставника/тьютора команды */}
-                    {(isUserStudent || isUserTutor || isUserMentor) && (
+                    {(isUserStudent(currentUser) ||
+                      isUserTutor ||
+                      isUserMentor) && (
                       <div className="flex flex-col gap-3 mt-10">
                         <p className="text-xl font-bold text-black_2">
                           {eventAnswers.length > 0
@@ -405,7 +400,7 @@ const EventPage: FC = () => {
                   </>
                 )}
 
-                {isUserManager && (
+                {isUserManager(currentUser) && (
                   <div className="flex items-center mt-10 text-lg font-bold gap-7">
                     <BackToScheduleButton />
 

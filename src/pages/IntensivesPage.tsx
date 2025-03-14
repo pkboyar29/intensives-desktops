@@ -7,9 +7,9 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 import {
-  isCurrentRoleManager,
-  isCurrentRoleStudent,
-  isCurrentRoleTeacher,
+  isUserManager,
+  isUserStudent,
+  isUserTeacher,
 } from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
@@ -62,10 +62,7 @@ const IntensivesPage: FC = () => {
         intensive.name.toLowerCase().includes(searchText)
       );
 
-      if (
-        currentUser?.currentRole &&
-        isCurrentRoleManager(currentUser.currentRole)
-      ) {
+      if (isUserManager(currentUser)) {
         if (openness === 'opened') {
           filteredIntensives = filteredIntensives.filter(
             (intensive) => intensive.isOpen
@@ -151,10 +148,7 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (
-      currentUser?.currentRole &&
-      isCurrentRoleTeacher(currentUser.currentRole)
-    ) {
+    if (isUserTeacher(currentUser)) {
       localStorage.removeItem('tutorTeamId');
     }
 
@@ -166,17 +160,16 @@ const IntensivesPage: FC = () => {
       <Title text="Интенсивы" />
 
       <div className="mt-8">
-        {currentUser?.currentRole &&
-          isCurrentRoleManager(currentUser.currentRole) && (
-            <div className="flex justify-end">
-              <div className="ml-auto">
-                <PrimaryButton
-                  children="Создать интенсив"
-                  clickHandler={() => navigate(`/createIntensive`)}
-                />
-              </div>
+        {isUserManager(currentUser) && (
+          <div className="flex justify-end">
+            <div className="ml-auto">
+              <PrimaryButton
+                children="Создать интенсив"
+                clickHandler={() => navigate(`/createIntensive`)}
+              />
             </div>
-          )}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
@@ -191,20 +184,19 @@ const IntensivesPage: FC = () => {
 
       <div className="flex items-center justify-between gap-8 mt-5">
         <div className="flex gap-8">
-          {currentUser?.currentRole &&
-            isCurrentRoleManager(currentUser.currentRole) && (
-              <Filter
-                onFilterOptionClick={(filterOption) =>
-                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
-                }
-                activeFilterOption={openness}
-                filterList={[
-                  { label: 'Открытые', value: 'opened' },
-                  { label: 'Закрытые', value: 'closed' },
-                  { label: 'Все', value: 'all' },
-                ]}
-              />
-            )}
+          {isUserManager(currentUser) && (
+            <Filter
+              onFilterOptionClick={(filterOption) =>
+                setOpenness(filterOption as 'all' | 'opened' | 'closed')
+              }
+              activeFilterOption={openness}
+              filterList={[
+                { label: 'Открытые', value: 'opened' },
+                { label: 'Закрытые', value: 'closed' },
+                { label: 'Все', value: 'all' },
+              ]}
+            />
+          )}
 
           <Filter
             onFilterOptionClick={(filterOption) =>
@@ -243,8 +235,7 @@ const IntensivesPage: FC = () => {
         ) : (
           <>
             {sortedIntensives.length !== 0 ? (
-              currentUser?.currentRole &&
-              isCurrentRoleManager(currentUser.currentRole) ? (
+              isUserManager(currentUser) ? (
                 <Table
                   onClick={intensiveClickHandler}
                   columns={columns}

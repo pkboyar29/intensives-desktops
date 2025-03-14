@@ -1,10 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import { useAppDispatch } from '../redux/store';
-import {
-  isCurrentRoleTeacher,
-  isCurrentRoleStudent,
-} from '../helpers/userHelpers';
+import { isUserStudent, isUserTeacher } from '../helpers/userHelpers';
 
 import {
   useChangeTeamleadMutation,
@@ -60,14 +57,12 @@ const TeamOverviewPage: FC = () => {
   }, [currentTeam]);
 
   useEffect(() => {
-    if (currentUser?.currentRole && currentTeam) {
-      // TODO: когда появится текущая роль, то сравнивать ее
-      if (isCurrentRoleTeacher(currentUser.currentRole)) {
+    if (currentUser && currentTeam) {
+      if (isUserTeacher(currentUser)) {
         setIsAllowedToChangeStudentRoles(true);
         setIsAllowedToChangeTeamlead(true);
-      }
-      if (isCurrentRoleStudent(currentUser.currentRole)) {
-        if (currentUser.studentId === currentTeam.teamlead?.id) {
+      } else if (isUserStudent(currentUser)) {
+        if (currentUser?.studentId === currentTeam.teamlead?.id) {
           setIsAllowedToChangeStudentRoles(true);
         }
       }
