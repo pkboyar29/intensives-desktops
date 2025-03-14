@@ -12,6 +12,7 @@ import {
   isUserManager,
   isUserTeacher,
   isUserStudent,
+  isUserTeamlead,
 } from '../helpers/userHelpers';
 import { useFileHandler } from '../helpers/useFileHandler';
 import { uploadAllFiles } from '../helpers/fileHelpers';
@@ -71,10 +72,6 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const isUserJury =
     isUserTeacher(currentUser) &&
     event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
-
-  const isUserTeamlead =
-    isUserStudent(currentUser) &&
-    currentTeam?.teamlead?.id === currentUser?.studentId;
 
   useEffect(() => {
     if (eventAnswerData) {
@@ -270,7 +267,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {isUserStudent(currentUser) && (
               <>
                 {/* если студент - тимлид */}
-                {isUserTeamlead ? (
+                {isUserTeamlead(currentUser, currentTeam) ? (
                   <>
                     {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
                     {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
@@ -383,7 +380,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
           </>
         ) : (
-          isUserTeamlead && (
+          isUserTeamlead(currentUser, currentTeam) && (
             <PrimaryButton
               type="button"
               children={

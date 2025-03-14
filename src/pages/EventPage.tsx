@@ -5,6 +5,9 @@ import {
   isUserStudent,
   isUserTeacher,
   isUserManager,
+  isUserTeamlead,
+  isUserMentor,
+  isUserTutor,
 } from '../helpers/userHelpers';
 import { getEventDateDisplayString } from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
@@ -41,10 +44,6 @@ const EventPage: FC = () => {
   const [isCreatingAnswer, setIsCreatingAnswer] = useState<boolean>(true);
   const [expandedAnswer, setExpandedAnswer] = useState<number | null>(null);
   const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
-
-  useEffect(() => {
-    console.log(eventAnswers);
-  }, [eventAnswers]);
 
   const {
     data: event,
@@ -107,16 +106,6 @@ const EventPage: FC = () => {
   const isUserJury =
     isUserTeacher(currentUser) &&
     event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
-
-  const isUserTeamlead =
-    isUserStudent(currentUser) &&
-    currentTeam?.teamlead?.id === currentUser?.studentId;
-
-  const isUserTutor =
-    isUserTeacher(currentUser) &&
-    currentTeam?.tutor?.id === currentUser?.teacherId;
-
-  const isUserMentor = currentTeam?.mentor?.id === currentUser?.studentId;
 
   const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
     return (
@@ -360,8 +349,8 @@ const EventPage: FC = () => {
 
                     {/* отображение ответов текущей команды для студентов/наставника/тьютора команды */}
                     {(isUserStudent(currentUser) ||
-                      isUserTutor ||
-                      isUserMentor) && (
+                      isUserTutor(currentUser, currentTeam) ||
+                      isUserMentor(currentUser)) && (
                       <div className="flex flex-col gap-3 mt-10">
                         <p className="text-xl font-bold text-black_2">
                           {eventAnswers.length > 0
@@ -379,7 +368,7 @@ const EventPage: FC = () => {
                           : renderEventAnswers(eventAnswers)}
 
                         {/* отображение только для тимлида */}
-                        {isUserTeamlead &&
+                        {isUserTeamlead(currentUser, currentTeam) &&
                           isCreatingAnswer &&
                           !expandedAnswer &&
                           event && (
