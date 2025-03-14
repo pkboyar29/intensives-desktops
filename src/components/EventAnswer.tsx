@@ -15,10 +15,6 @@ import {
   isUserStudent,
 } from '../helpers/userHelpers';
 
-import { IFile, INewFileObject } from '../ts/interfaces/IFile';
-import { IEvent } from '../ts/interfaces/IEvent';
-import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
-
 import TrashIcon from './icons/TrashIcon';
 import Modal from './common/modals/Modal';
 import EditableFileList from './EditableFileList';
@@ -28,8 +24,11 @@ import AttachedFileList from './AttachedFileList';
 import { toast } from 'react-toastify';
 import TeacherMarkCard from './TeacherMarkCard';
 import EventMarkForm from './forms/EventMarkForm';
+
+import { IFile, INewFileObject } from '../ts/interfaces/IFile';
+import { IEvent } from '../ts/interfaces/IEvent';
+import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 import { IEventMark } from '../ts/interfaces/IEventMark';
-import { ICriteria } from '../ts/interfaces/ICriteria';
 
 interface EventAnswerProps {
   // eventAnswerId?: number;
@@ -70,6 +69,10 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const isUserJury =
     isUserTeacher(currentUser) &&
     event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
+
+  const isUserTeamlead =
+    isUserStudent(currentUser) &&
+    currentTeam?.teamlead?.id === currentUser?.studentId;
 
   // useEffect(() => {
   //   if (eventAnswerId) {
@@ -313,7 +316,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {isUserStudent(currentUser) && (
               <>
                 {/* если студент - тимлид */}
-                {currentTeam?.teamlead?.id === currentUser?.studentId ? (
+                {isUserTeamlead ? (
                   <>
                     {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
                     {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
@@ -419,13 +422,15 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
           </>
         ) : (
-          <PrimaryButton
-            type="button"
-            children={
-              isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
-            }
-            clickHandler={() => setIsEditing((prev) => !prev)}
-          />
+          isUserTeamlead && (
+            <PrimaryButton
+              type="button"
+              children={
+                isEditing ? 'Сохранить и отправить' : 'Отправить новый ответ'
+              }
+              clickHandler={() => setIsEditing((prev) => !prev)}
+            />
+          )
         )}
       </div>
     </>

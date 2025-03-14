@@ -6,10 +6,7 @@ import {
   isUserTeacher,
   isUserManager,
 } from '../helpers/userHelpers';
-import {
-  getEventDateDisplayString,
-  getDateTimeDisplay,
-} from '../helpers/dateHelpers';
+import { getEventDateDisplayString } from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
@@ -78,7 +75,7 @@ const EventPage: FC = () => {
   }, [event, currentUser]);
 
   useEffect(() => {
-    // Загружаем ответы на мероприятие (для студентов/тимлида/наставника/тьютора - ответы их команды, для препода жюри и организатора - все ответы команд)
+    // Загружаем ответы на мероприятие (для студентов/тимлида/наставника/тьютора - ответы их команды, для препода жюри и организатора - ответы всех команд)
     if (event) {
       getEventAnswers(event.id);
     }
