@@ -35,4 +35,19 @@ export const isUserMentorInCurrentTeam = (
 ): boolean =>
   isUserMentor(currentUser) && team?.mentor?.id === currentUser?.studentId;
 
-// export const isUserJury = (currentUser: IUser | null, event: IEvent | IEventShort): boolean => isUserTeacher(currentUser) && event.teachers.includes(currentUser?.teacherId);
+export const isUserJury = (
+  currentUser: IUser | null,
+  event: IEvent | IEventShort
+): boolean => {
+  if (!isUserTeacher(currentUser) || !currentUser?.teacherId) {
+    return false;
+  }
+
+  if ('teachers' in event) {
+    return event.teachers.some(
+      (teacher) => teacher.id === currentUser.teacherId
+    );
+  } else {
+    return event.teacherIds.includes(currentUser.teacherId);
+  }
+};
