@@ -85,16 +85,20 @@ const EventAnswer: FC<EventAnswerProps> = ({
     }
   }, [eventAnswerData]);
 
-  const marksByTeacher = eventAnswerData?.marks.reduce<
-    Record<number, IEventMark[]>
-  >((acc, mark) => {
-    const teacherId = (mark as IEventMark).teacher.id;
-    if (!acc[teacherId]) {
-      acc[teacherId] = [];
-    }
-    acc[teacherId].push(mark as IEventMark);
-    return acc;
-  }, {});
+  const marksByTeacher = () => {
+    const _marksByTeacher = eventAnswerData?.marks.reduce<
+      Record<number, IEventMark[]>
+    >((acc, mark) => {
+      const teacherId = (mark as IEventMark).teacher.id;
+      if (!acc[teacherId]) {
+        acc[teacherId] = [];
+      }
+      acc[teacherId].push(mark as IEventMark);
+      return acc;
+    }, {});
+
+    return _marksByTeacher;
+  };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
@@ -365,19 +369,26 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
 
             {/* опциональное отображение организаторам */}
-            {isUserManager(currentUser) && marksByTeacher && (
-              <div className="flex flex-col gap-2">
-                {Object.entries(marksByTeacher).map(
-                  ([teacherId, teacherMarks]) => (
-                    <TeacherMarkCard
-                      key={teacherId}
-                      teacherMarks={teacherMarks}
-                      markStrategy={event.markStrategy!}
-                    />
+
+            {isUserManager(currentUser) &&
+              (() => {
+                const teacherMarksData = marksByTeacher();
+                return (
+                  teacherMarksData && (
+                    <div className="flex flex-col gap-2">
+                      {Object.entries(marksByTeacher).map(
+                        ([teacherId, teacherMarks]) => (
+                          <TeacherMarkCard
+                            key={teacherId}
+                            teacherMarks={teacherMarks}
+                            markStrategy={event.markStrategy!}
+                          />
+                        )
+                      )}
+                    </div>
                   )
-                )}
-              </div>
-            )}
+                );
+              })()}
           </>
         ) : (
           isUserTeamlead(currentUser, currentTeam) && (

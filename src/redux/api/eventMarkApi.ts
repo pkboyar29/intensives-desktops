@@ -16,7 +16,7 @@ export const mapEventMark = (
   if (unmappedEventMark.average_mark !== undefined) {
     // Если пришёл ответ со средним баллом мапим в IEventMarkAvg
     return {
-      criteria: unmappedEventMark
+      criteria: unmappedEventMark.criteria
         ? mapCriteria(unmappedEventMark.criteria)
         : undefined,
       avgMark: unmappedEventMark.average_mark,
