@@ -13,6 +13,9 @@ import {
   isUserTeacher,
   isUserStudent,
   isUserTeamlead,
+  isUserTutor,
+  isUserMentor,
+  isUserJury,
 } from '../helpers/userHelpers';
 import { useFileHandler } from '../helpers/useFileHandler';
 import { uploadAllFiles } from '../helpers/fileHelpers';
@@ -68,10 +71,6 @@ const EventAnswer: FC<EventAnswerProps> = ({
     setNewFiles,
     handleFileDelete,
   } = useFileHandler();
-
-  const isUserJury =
-    isUserTeacher(currentUser) &&
-    event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
 
   useEffect(() => {
     if (eventAnswerData) {
@@ -263,48 +262,48 @@ const EventAnswer: FC<EventAnswerProps> = ({
               </div>
             )}
 
-            {/* опциональное отображение студентам */}
-            {isUserStudent(currentUser) && (
+            {/* опциональное отображение студентам/тьютору/наставнику команды */}
+            {(isUserStudent(currentUser) ||
+              isUserTutor(currentUser, currentTeam) ||
+              isUserMentor(currentUser)) && (
               <>
-                {/* если студент - тимлид */}
-                {isUserTeamlead(currentUser, currentTeam) ? (
+                {/* если студент - тимлид, то отображаем  */}
+                {isUserTeamlead(currentUser, currentTeam) && (
                   <>
                     {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
                     {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
                     {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
-                    {!eventAnswerData || eventAnswerData.marks.length === 0 ? (
-                      <div className="flex items-center gap-5 mt-2">
-                        <PrimaryButton
-                          type="button"
-                          children={
-                            isEditing
-                              ? eventAnswerData
-                                ? 'Сохранить ответ'
-                                : 'Сохранить и отправить'
-                              : eventAnswerData
-                              ? 'Редактировать ответ'
-                              : 'Отправить ответ'
-                          }
-                          clickHandler={handleEditClick}
-                        />
-
-                        <div>
+                    {!eventAnswerData ||
+                      (eventAnswerData.marks.length === 0 && (
+                        <div className="flex items-center gap-5 mt-2">
                           <PrimaryButton
-                            buttonColor="gray"
-                            children={<TrashIcon />}
-                            onClick={() => {
-                              setDeleteModal(true);
-                            }}
+                            type="button"
+                            children={
+                              isEditing
+                                ? eventAnswerData
+                                  ? 'Сохранить ответ'
+                                  : 'Сохранить и отправить'
+                                : eventAnswerData
+                                ? 'Редактировать ответ'
+                                : 'Отправить ответ'
+                            }
+                            clickHandler={handleEditClick}
                           />
+
+                          <div>
+                            <PrimaryButton
+                              buttonColor="gray"
+                              children={<TrashIcon />}
+                              onClick={() => {
+                                setDeleteModal(true);
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <></>
-                    )}
+                      ))}
                   </>
-                ) : (
-                  <></>
                 )}
+
                 <div className="mt-3">
                   {eventAnswerData?.marks &&
                     eventAnswerData.marks.length !== 0 && (
@@ -338,6 +337,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                               </div>
                             );
                           }
+                          // TODO: что за return null?
                           return null;
                         })}{' '}
                       </>
@@ -346,8 +346,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
               </>
             )}
 
-            {/* опциональное отображение преподавателям */}
-            {isUserJury && eventAnswerData && (
+            {/* опциональное отображение преподавателям жюри */}
+            {isUserJury(currentUser, event) && eventAnswerData && (
               <EventMarkForm
                 event={event}
                 eventAnswerId={eventAnswerData.id}

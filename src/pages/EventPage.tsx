@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import {
   isUserStudent,
-  isUserTeacher,
   isUserManager,
   isUserTeamlead,
   isUserMentor,
   isUserTutor,
+  isUserJury,
 } from '../helpers/userHelpers';
 import { getEventDateDisplayString } from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
@@ -102,10 +102,6 @@ const EventPage: FC = () => {
       }
     }
   }, [eventAnswersData]);
-
-  const isUserJury =
-    isUserTeacher(currentUser) &&
-    event?.teachers.some((teacher) => teacher.id === currentUser?.teacherId);
 
   const renderEventAnswers = (eventAnswers: IEventAnswer[]) => {
     return (
@@ -326,7 +322,8 @@ const EventPage: FC = () => {
                 {event.markStrategy && (
                   <>
                     {/* отображение аккордеона для преподавателей жюри/организаторов */}
-                    {(isUserManager(currentUser) || isUserJury) && (
+                    {(isUserManager(currentUser) ||
+                      isUserJury(currentUser, event)) && (
                       <div className="flex flex-col gap-3 mt-10">
                         <p className="text-xl font-bold text-black_2">
                           {isUserManager(currentUser)
