@@ -85,11 +85,10 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
       </button>
 
       <motion.div
-        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none`}
+        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
         variants={dropdownVariants}
-        style={{ overflow: 'hidden' }}
       >
         <div className="pb-8">
           <Checkbox
