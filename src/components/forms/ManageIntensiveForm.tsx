@@ -11,7 +11,7 @@ import {
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
-import { useUploadFileMutation } from '../../redux/api/fileApi';
+import { useUploadFilesMutation } from '../../redux/api/fileApi';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
@@ -60,7 +60,7 @@ const ManageIntensiveForm: FC = () => {
 
   const [createIntensive] = useCreateIntensiveMutation();
   const [updateIntensive] = useUpdateIntensiveMutation();
-  const [uploadFiles] = useUploadFileMutation();
+  const [uploadFiles] = useUploadFilesMutation();
 
   // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery();
@@ -180,16 +180,16 @@ const ManageIntensiveForm: FC = () => {
       });
     }
 
-    if (responseData) {
+    if (responseData && newFiles) {
       // Загрузка файлов после успешного создания/обновления интенсива
-      const filesError = await uploadAllFiles(
+      const { success, errors } = await uploadAllFiles(
         uploadFiles,
         'intensives',
         Number(responseData.id || intensiveId),
         newFiles
       );
 
-      if (filesError === 0) {
+      if (errors === 0) {
         setSuccessfulSaveModal({
           status: true,
           intensiveId: Number(responseData.id || intensiveId),

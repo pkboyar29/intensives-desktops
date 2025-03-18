@@ -5,7 +5,6 @@ import {
   IIntensive,
   IIntensiveCreate,
   IIntensiveUpdate,
-  IIntensiveUploadFiles,
 } from '../../ts/interfaces/IIntensive';
 
 import { mapTeacher } from './teacherApi';

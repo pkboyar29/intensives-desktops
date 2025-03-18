@@ -76,7 +76,7 @@ export const eventAnswerApi = createApi({
         method: 'PATCH',
         body: {
           text: data.text,
-          fileIds: data.fileIds,
+          file_ids: data.fileIds,
         },
       }),
       transformResponse: (response: any): IEventAnswer =>
@@ -115,5 +115,4 @@ export const {
   useCreateEventAnswerMutation,
   useUpdateEventAnswerMutation,
   useDeleteEventAnswerMutation,
-  useUploadFilesMutation,
 } = eventAnswerApi;

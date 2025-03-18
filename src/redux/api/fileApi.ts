@@ -35,7 +35,7 @@ export const fileApi = createApi({
       }),
       transformResponse: (response: Blob) => response,
     }),
-    uploadFile: builder.mutation<IFile[], IUploadFileContext>({
+    uploadFiles: builder.mutation<IFile[], IUploadFileContext>({
       query: ({ context, contextId, files }) => {
         const formData = new FormData();
 
@@ -57,4 +57,4 @@ export const fileApi = createApi({
   }),
 });
 
-export const { useLazyDownloadFileQuery, useUploadFileMutation } = fileApi;
+export const { useLazyDownloadFileQuery, useUploadFilesMutation } = fileApi;

@@ -30,6 +30,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
 import Accordion from '../components/common/Accordion';
+import AttachedFileList from '../components/AttachedFileList';
 
 const EventPage: FC = () => {
   const navigate = useNavigate();
@@ -316,6 +317,17 @@ const EventPage: FC = () => {
                         </div>
                       </div>
                     )}
+
+                  {event?.files && (
+                    <div>
+                      <AttachedFileList
+                        context={'events'}
+                        nameFileList={'мероприятия'}
+                        contextId={event.id}
+                        files={event?.files}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* отображение секции с ответами только если у нас тип мероприятия - с оцениванием */}
@@ -356,7 +368,7 @@ const EventPage: FC = () => {
                         </p>
 
                         {/* если есть currentTeam, то eventAnswers отображается фильтрованный для этой команды */}
-                        {currentTeam
+                        {currentTeam && !isUserStudent(currentUser)
                           ? renderEventAnswers(
                               eventAnswers.filter(
                                 (answer) => answer.team.id === currentTeam.id
@@ -372,10 +384,12 @@ const EventPage: FC = () => {
                             <EventAnswer
                               event={event}
                               onCreateAnswer={(newAnswer: IEventAnswer) => {
+                                console.log('dfkkskf');
                                 setEventAnswers((prevAnswers) => [
                                   ...prevAnswers,
                                   newAnswer,
                                 ]);
+                                console.log('dfkkskf2');
 
                                 setIsCreatingAnswer(false);
                                 setExpandedAnswer(newAnswer.id);
