@@ -105,6 +105,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
             isChecked={selectAllState}
           />
         </div>
+
         <ul
           className={`transition-all duration-300 ease-in-out flex flex-col gap-2.5`}
         >
