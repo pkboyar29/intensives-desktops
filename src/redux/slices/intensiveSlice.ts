@@ -52,7 +52,7 @@ const intensiveSlice = createSlice({
       )
         */
       .addMatcher(
-        fileApi.endpoints.uploadFile.matchFulfilled,
+        fileApi.endpoints.uploadFiles.matchFulfilled,
         (state, { meta, payload }) => {
           const { arg } = meta;
           // Добавляем загруженные файлы к текущим в состоянии если вызвался запрос на загрузку файлов интенсиву

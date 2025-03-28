@@ -13,6 +13,7 @@ import { mapAudience } from './audienceApi';
 import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
 import { mapCriteria } from './criteriaApi';
+import { mapFile } from './fileApi';
 
 export const mapEvent = (unmappedEvent: any): IEvent => {
   return {
@@ -39,6 +40,7 @@ export const mapEvent = (unmappedEvent: any): IEvent => {
     criterias: unmappedEvent.criterias.map((unmappedCriteria: any) =>
       mapCriteria(unmappedCriteria)
     ),
+    files: unmappedEvent.files.map((file: any) => mapFile(file)),
   };
 };
 
@@ -64,7 +66,7 @@ export const eventApi = createApi({
       query: (id) => `/events/${id}/`,
       transformResponse: (response: any): IEvent => mapEvent(response),
     }),
-    createEvent: builder.mutation<void, IEventCreate>({
+    createEvent: builder.mutation<IEvent, IEventCreate>({
       query: (data) => ({
         url: '/events/',
         method: 'POST',
@@ -84,7 +86,7 @@ export const eventApi = createApi({
         },
       }),
     }),
-    updateEvent: builder.mutation<void, IEventUpdate>({
+    updateEvent: builder.mutation<IEvent, IEventUpdate>({
       query: (data) => ({
         url: `/events/${data.eventId}/`,
         method: 'PUT',
@@ -100,7 +102,7 @@ export const eventApi = createApi({
           mark_strategy: data.markStrategyId,
           criterias: data.criteriaIds,
           deadline_dt: data.deadlineDate,
-          files: [],
+          file_ids: data.fileIds,
         },
       }),
     }),

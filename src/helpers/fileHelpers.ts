@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { INewFileObject } from '../ts/interfaces/IFile';
+import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 
 // Функция для форматирования размера файла
 export const formatFileSize = (size: number): string => {
@@ -25,12 +25,14 @@ export const uploadAllFiles = async (
   context: string,
   contextId: number,
   newFiles: INewFileObject[]
-) => {
+): Promise<{ success: IFile[]; errors: number }> => {
+  const successFileData: IFile[] = [];
+
   let filesError = 0;
 
   if (newFiles.length === 0) {
     console.error('newFiles пуст');
-    return filesError;
+    return { success: successFileData, errors: filesError };
   }
 
   let responseData;
@@ -45,6 +47,10 @@ export const uploadAllFiles = async (
       contextId: Number(contextId),
       files: newFile.file,
     }));
+
+    if (responseData) {
+      successFileData.push(responseData[0]); // 0 так как в ответе будет массив с одним элементом
+    }
 
     if (responseError) {
       filesError++;
@@ -61,5 +67,5 @@ export const uploadAllFiles = async (
     toast.dismiss(toastId);
   }
 
-  return filesError;
+  return { success: successFileData, errors: filesError };
 };

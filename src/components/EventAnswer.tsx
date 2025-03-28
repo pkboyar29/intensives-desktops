@@ -5,7 +5,7 @@ import {
   useCreateEventAnswerMutation,
   useDeleteEventAnswerMutation,
 } from '../redux/api/eventAnswerApi';
-import { useUploadFileMutation } from '../redux/api/fileApi';
+import { useUploadFilesMutation } from '../redux/api/fileApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
@@ -57,7 +57,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
   const [createEventAnswer] = useCreateEventAnswerMutation();
   const [updateEventAnswer] = useUpdateEventAnswerMutation();
   const [deleteEventAnswer] = useDeleteEventAnswerMutation();
-  const [uploadFiles] = useUploadFileMutation();
+  const [uploadFiles] = useUploadFilesMutation();
 
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -112,8 +112,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
       setIsEditing((prev) => !prev);
       return;
     }
-    const fileIds: number[] = eventAnswerData?.files
-      ? eventAnswerData?.files
+    const fileIds: number[] = attachedFilesList
+      ? attachedFilesList
           .filter((file) => file.id > 0)
           .map((file: IFile) => file.id)
       : [];
@@ -121,7 +121,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
     let responseData;
     let responseError;
 
-    if (eventAnswerData?.files.length == 0 && editedText.trim().length == 0) {
+    if (attachedFilesList.length == 0 && editedText.trim().length == 0) {
       toast('Должен быть текстовый ответ или файлы', {
         type: 'warning',
       });
@@ -166,17 +166,24 @@ const EventAnswer: FC<EventAnswerProps> = ({
       });
     }
 
-    // TODO: responseData никогда не заполняется тут
-    if (responseData) {
+    if (responseData && newFiles.length > 0) {
+      console.log('upload files');
       // Загрузка файлов после успешного создания/обновления ответа
-      const filesError = await uploadAllFiles(
+      const { success, errors } = await uploadAllFiles(
         uploadFiles,
         'event_answers',
         Number(responseData.id || eventAnswerData?.id),
         newFiles
       );
-      console.log(filesError);
-      if (filesError === 0) {
+      console.log(success);
+
+      if (success) {
+        setAttachedFilesList(attachedFilesList.filter((file) => file.id > 0)); // удаляем временные значения с отрицательным id (может перенести в хук)
+
+        setAttachedFilesList((prev) => [...prev, ...success]); // записываем пришедшие данные о файлах
+      }
+      if (errors !== 0) {
+        // че то делать или ничего если ошибки
       }
     }
     setIsEditing((prev) => !prev);
@@ -277,34 +284,34 @@ const EventAnswer: FC<EventAnswerProps> = ({
                     {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
                     {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
                     {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
-                    {!eventAnswerData ||
-                      (eventAnswerData.marks.length === 0 && (
-                        <div className="flex items-center gap-5 mt-2">
-                          <PrimaryButton
-                            type="button"
-                            children={
-                              isEditing
-                                ? eventAnswerData
-                                  ? 'Сохранить ответ'
-                                  : 'Сохранить и отправить'
-                                : eventAnswerData
-                                ? 'Редактировать ответ'
-                                : 'Отправить ответ'
-                            }
-                            clickHandler={handleEditClick}
-                          />
+                    {(!eventAnswerData ||
+                      eventAnswerData.marks.length === 0) && (
+                      <div className="flex items-center gap-5 mt-2">
+                        <PrimaryButton
+                          type="button"
+                          children={
+                            isEditing
+                              ? eventAnswerData
+                                ? 'Сохранить ответ'
+                                : 'Сохранить и отправить'
+                              : eventAnswerData
+                              ? 'Редактировать ответ'
+                              : 'Отправить ответ'
+                          }
+                          clickHandler={handleEditClick}
+                        />
 
-                          <div>
-                            <PrimaryButton
-                              buttonColor="gray"
-                              children={<TrashIcon />}
-                              onClick={() => {
-                                setDeleteModal(true);
-                              }}
-                            />
-                          </div>
+                        <div>
+                          <PrimaryButton
+                            buttonColor="gray"
+                            children={<TrashIcon />}
+                            onClick={() => {
+                              setDeleteModal(true);
+                            }}
+                          />
                         </div>
-                      ))}
+                      </div>
+                    )}
                   </>
                 )}
 

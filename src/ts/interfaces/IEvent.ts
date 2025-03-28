@@ -1,5 +1,6 @@
 import { IAudience } from './IAudience';
 import { ICriteria } from './ICriteria';
+import { IFile } from './IFile';
 import { IMarkStrategy } from './IMarkStrategy';
 import { ITeacher } from './ITeacher';
 import { ITeam } from './ITeam';
@@ -18,6 +19,7 @@ export interface IEvent {
   deadlineDate: Date | null;
   criterias: ICriteria[];
   visibility: boolean;
+  files: IFile[];
 }
 
 export interface IEventShort {
@@ -50,6 +52,7 @@ export interface IEventCreate {
 
 export interface IEventUpdate extends IEventCreate {
   eventId: number;
+  fileIds?: number[];
 }
 
 export interface IEventUpdateVisibility {

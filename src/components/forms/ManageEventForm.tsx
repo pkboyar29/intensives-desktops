@@ -33,6 +33,10 @@ import InputRadio from '../common/inputs/InputRadio';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
+import { useFileHandler } from '../../helpers/useFileHandler';
+import EditableFileList from '../EditableFileList';
+import { uploadAllFiles } from '../../helpers/fileHelpers';
+import { useUploadFilesMutation } from '../../redux/api/fileApi';
 
 interface ManageEventFormFields {
   name: string;
@@ -65,6 +69,15 @@ const ManageEventForm: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
 
   const {
+    attachedFilesList,
+    newFiles,
+    handleFilesChange,
+    setAttachedFilesList,
+    setNewFiles,
+    handleFileDelete,
+  } = useFileHandler();
+
+  const {
     register,
     handleSubmit,
     setValue,
@@ -80,6 +93,7 @@ const ManageEventForm: FC = () => {
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
+  const [uploadFiles] = useUploadFilesMutation();
 
   const { data: event } = useGetEventQuery(
     Number(searchParams.get('eventId')) || skipToken,
@@ -168,6 +182,13 @@ const ManageEventForm: FC = () => {
           scoreType: 'withoutMarkStrategy',
           markStrategy: markStrategies[0].id.toString(),
         });
+      }
+    }
+
+    if (event) {
+      // Записываем в отображаемый список файлов реальный текущий список
+      if (attachedFilesList.length === 0) {
+        setAttachedFilesList((prevFiles) => [...prevFiles, ...event.files]);
       }
     }
   }, [event, markStrategies]);
@@ -329,8 +350,11 @@ const ManageEventForm: FC = () => {
     }
 
     if (intensiveId) {
+      let responseData;
+      let responseError;
+
       if (event) {
-        const { data: responseData, error: responseError } = await updateEvent({
+        ({ data: responseData, error: responseError } = await updateEvent({
           intensiveId: parseInt(intensiveId),
           eventId: event.id,
           name: data.name,
@@ -351,7 +375,7 @@ const ManageEventForm: FC = () => {
             : [],
           teamIds: data.teams ? data.teams.map((team) => team.id) : [],
           ...scoreRequestBody,
-        });
+        }));
 
         if (responseData) {
           setSuccessfulSaveModal({
@@ -364,7 +388,7 @@ const ManageEventForm: FC = () => {
           handleResponseError(responseError as FetchBaseQueryError);
         }
       } else {
-        const { data: responseData, error: responseError } = await createEvent({
+        ({ data: responseData, error: responseError } = await createEvent({
           intensiveId: parseInt(intensiveId),
           name: data.name,
           description: data.description,
@@ -384,7 +408,7 @@ const ManageEventForm: FC = () => {
             : [],
           teamIds: data.teams ? data.teams.map((team) => team.id) : [],
           ...scoreRequestBody,
-        });
+        }));
 
         if (responseData) {
           setSuccessfulSaveModal({
@@ -399,6 +423,20 @@ const ManageEventForm: FC = () => {
 
         if (responseError) {
           handleResponseError(responseError as FetchBaseQueryError);
+        }
+      }
+
+      if (responseData && newFiles) {
+        // Загрузка файлов после успешного создания/обновления интенсива
+        const { success, errors } = await uploadAllFiles(
+          uploadFiles,
+          'events',
+          Number(responseData.id ?? (event ? event.id : intensiveId)),
+          newFiles
+        );
+
+        if (errors !== 0) {
+          // че то делаем
         }
       }
     }
@@ -743,7 +781,16 @@ const ManageEventForm: FC = () => {
               </InputRadio>
             </div>
 
-            <FileUpload />
+            <div className="p-4 my-3 bg-white rounded-lg shadow-md max-w">
+              <div className="text-lg font-bold">Файлы для студентов</div>
+              {attachedFilesList && (
+                <EditableFileList
+                  files={attachedFilesList}
+                  onFileDelete={handleFileDelete}
+                />
+              )}
+              <FileUpload onFilesChange={handleFilesChange} />
+            </div>
           </div>
 
           <div className="flex my-5 gap-7">

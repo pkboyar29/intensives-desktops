@@ -21,7 +21,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
 }) => {
   return (
     <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
-      <h2 className="mb-3 text-lg font-semibold">{`📂 Список файлов ${
+      <h2 className="mb-3 text-lg font-semibold">{`📄 Список файлов ${
         nameFileList ? nameFileList : ''
       }`}</h2>
       <div className="overflow-y-auto max-h-60">
