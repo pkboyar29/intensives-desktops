@@ -38,7 +38,7 @@ const IntensiveMainPage: FC = () => {
               <ManagerSidebarContent isIntensiveLoading={isLoading} />
             )}
           </Sidebar>
-          <div className="w-full px-10 pt-5 overflow-y-auto">
+          <div className="w-full md:pl-10 pl-[90px] pr-10 pt-5 overflow-y-auto">
             <Outlet />
           </div>
         </div>
