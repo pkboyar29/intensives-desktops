@@ -1,15 +1,15 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
+import { mapTeacher } from './teacherApi';
+import { mapStudent } from './studentApi';
+import { mapStudentRole } from './studentRoleApi';
+import { mapFile } from './fileApi';
 
 import {
   IIntensive,
   IIntensiveCreate,
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
-
-import { mapTeacher } from './teacherApi';
-import { mapStudentRole } from './studentRoleApi';
-import { mapFile } from './fileApi';
 import { IFile, IUploadFile } from '../../ts/interfaces/IFile';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
@@ -21,6 +21,9 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     openDate: new Date(unmappedIntensive.open_dt),
     closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
+    specificStudents: unmappedIntensive.specific_students.map((student: any) =>
+      mapStudent(student)
+    ),
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
@@ -59,6 +62,7 @@ export const intensiveApi = createApi({
           close_dt: data.closeDate,
           teachers: data.teacherIds,
           flows: data.flowIds,
+          specific_students: data.specificStudentsIds,
           roles: data.roleIds,
         },
       }),
@@ -79,6 +83,7 @@ export const intensiveApi = createApi({
             close_dt: data.closeDate,
             teachers: data.teacherIds,
             flows: data.flowIds,
+            specific_students: data.specificStudentsIds,
             roles: data.roleIds,
             file_ids: data.fileIds,
           },

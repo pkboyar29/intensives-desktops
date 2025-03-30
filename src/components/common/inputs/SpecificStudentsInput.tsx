@@ -17,12 +17,16 @@ interface SpecificStudentsInputProps {
   selectedItems: Item[];
   setSelectedItems: (items: Item[]) => void;
   flowsToExclude: number[];
+  errorMessage?: string;
+  setErrorMessage?: (errorMessage: string) => void;
 }
 
 const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
   flowsToExclude,
   selectedItems,
   setSelectedItems,
+  errorMessage,
+  setErrorMessage,
 }) => {
   const [getStudents] = useLazyGetStudentsQuery();
 
@@ -82,9 +86,9 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
       setSelectedItems([...selectedItems, selectedItem]);
     }
 
-    // if (setErrorMessage) {
-    //   setErrorMessage('');
-    // }
+    if (setErrorMessage) {
+      setErrorMessage('');
+    }
   };
 
   const deleteSelectedItem = (id: number) => {
@@ -165,9 +169,13 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
             key={selectedItem.id}
             label={selectedItem.name}
             size={'small'}
+            shouldHaveCrossIcon={true}
+            deleteHandler={() => deleteSelectedItem(selectedItem.id)}
           />
         ))}
       </div>
+
+      <div className="mt-3 text-base text-red">{errorMessage}</div>
     </div>
   );
 };

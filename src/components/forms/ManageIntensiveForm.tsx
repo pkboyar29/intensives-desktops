@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import { useAppSelector } from '../../redux/store';
 
@@ -100,6 +101,10 @@ const ManageIntensiveForm: FC = () => {
         openDate: getISODateInUTC3(currentIntensive.openDate),
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
         flows: currentIntensive.flows,
+        specificStudents: currentIntensive.specificStudents.map((student) => ({
+          id: student.id,
+          name: student.nameWithGroup,
+        })),
         teachers: currentIntensive.teachers,
         roles: currentIntensive.roles,
       });
@@ -114,9 +119,31 @@ const ManageIntensiveForm: FC = () => {
     }
   }, [intensiveId, currentIntensive]);
 
-  const onSubmit = async (data: ManageIntensiveFields) => {
-    console.log(data.specificStudents);
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      specific_students?: string[];
+    };
+    console.log(errorData);
+    if (errorData && errorData.specific_students) {
+      console.log(errorData.specific_students[0]);
+      setError('specificStudents', {
+        type: 'custom',
+        message: errorData.specific_students[0],
+      });
+    } else {
+      if (currentIntensive) {
+        toast('Произошла серверная ошибка при сохранении изменений', {
+          type: 'error',
+        });
+      } else {
+        toast('Произошла серверная ошибка при создании', {
+          type: 'error',
+        });
+      }
+    }
+  };
 
+  const onSubmit = async (data: ManageIntensiveFields) => {
     if (!data.flows || data.flows.length === 0) {
       setError('flows', {
         type: 'custom',
@@ -133,6 +160,9 @@ const ManageIntensiveForm: FC = () => {
     }
 
     const flowIds: number[] = data.flows.map((flow) => flow.id);
+    const specificStudentsIds: number[] = data.specificStudents
+      ? data.specificStudents.map((student) => student.id)
+      : [];
     const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
     const roleIds: number[] = data.roles
       ? data.roles.map((role) => role.id)
@@ -151,6 +181,7 @@ const ManageIntensiveForm: FC = () => {
         id: Number(intensiveId),
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
@@ -158,24 +189,21 @@ const ManageIntensiveForm: FC = () => {
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при сохранении изменений', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
     } else {
       ({ data: responseData, error: responseError } = await createIntensive({
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при создании', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
 
@@ -412,7 +440,14 @@ const ManageIntensiveForm: FC = () => {
                     selectedItems={field.value || []}
                     setSelectedItems={field.onChange}
                     flowsToExclude={
-                      watch('flows') && watch('flows').map((flow) => flow.id)
+                      watch('flows')
+                        ? watch('flows').map((flow) => flow.id)
+                        : []
+                    }
+                    errorMessage={
+                      typeof errors.specificStudents?.message === 'string'
+                        ? errors.specificStudents.message
+                        : ''
                     }
                   />
                 </div>
