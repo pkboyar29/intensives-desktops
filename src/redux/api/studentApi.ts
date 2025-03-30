@@ -25,6 +25,11 @@ const getNameWithGroup = (
   return `${groupName} ${lastName} ${firstName[0]}. ${[patronymic[0]]}.`;
 };
 
+interface IStudentListQuery {
+  search: string;
+  flowsToExclude: number[];
+}
+
 export const studentApi = createApi({
   reducerPath: 'studentApi',
   baseQuery: baseQueryWithReauth,
@@ -40,8 +45,19 @@ export const studentApi = createApi({
       transformResponse: (response: any): IStudent[] =>
         response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
     }),
+    getStudents: builder.query<IStudent[], IStudentListQuery>({
+      query: ({ search, flowsToExclude }) =>
+        `students/?search=${search}&flows_exclude=${flowsToExclude.join(',')}`,
+      transformResponse: (response: any): IStudent[] =>
+        response.results.map((unmappedStudent: any) =>
+          mapStudent(unmappedStudent)
+        ),
+    }),
   }),
 });
 
-export const { useLazyGetFreeStudentsQuery, useGetNotAssignedStudentsQuery } =
-  studentApi;
+export const {
+  useLazyGetFreeStudentsQuery,
+  useGetNotAssignedStudentsQuery,
+  useLazyGetStudentsQuery,
+} = studentApi;

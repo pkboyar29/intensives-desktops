@@ -8,6 +8,7 @@ const ChevronLeftIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
       height="27"
       viewBox="0 0 24 24"
       fill="none"
+      {...props}
     >
       <path
         d="M15 6L9 12L15 18"

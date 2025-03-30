@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
 import Chip from '../Chip';
+import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
 interface MultipleSelectInputProps<T> {
   description: string;
@@ -64,28 +65,15 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         }`}
       >
         <div>Выбрать</div>
-        <svg
+        <ChevronDownIcon
           className={`transition-transform duration-300 ${
             isOpen && `rotate-180`
           }`}
-          width="15"
-          height="9"
-          viewBox="0 0 15 9"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1.5 1.5L7.5 7.5L13.5 1.5"
-            stroke="#667080"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        />
       </button>
 
       <motion.div
-        className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
+        className={`bg-another_white rounded-b-xl text-bright_gray px-7 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
         variants={dropdownVariants}

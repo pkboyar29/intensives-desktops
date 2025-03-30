@@ -12,6 +12,7 @@ import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
+import { useFileHandler } from '../../helpers/useFileHandler';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
@@ -20,12 +21,13 @@ import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
+import SpecificStudentsInput from '../common/inputs/SpecificStudentsInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
-import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
-import { useFileHandler } from '../../helpers/useFileHandler';
+
+import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 
 interface Item {
   id: number;
@@ -38,6 +40,7 @@ interface ManageIntensiveFields {
   openDate: string;
   closeDate: string;
   flows: Item[];
+  specificStudents: Item[];
   teachers: Item[];
   roles: Item[];
   files?: IFile[];
@@ -83,6 +86,7 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
+    watch,
     formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
@@ -111,6 +115,8 @@ const ManageIntensiveForm: FC = () => {
   }, [intensiveId, currentIntensive]);
 
   const onSubmit = async (data: ManageIntensiveFields) => {
+    console.log(data.specificStudents);
+
     if (!data.flows || data.flows.length === 0) {
       setError('flows', {
         type: 'custom',
@@ -396,6 +402,22 @@ const ManageIntensiveForm: FC = () => {
                 )}
               />
             )}
+
+            <Controller
+              name="specificStudents"
+              control={control}
+              render={({ field }) => (
+                <div className="mt-3">
+                  <SpecificStudentsInput
+                    selectedItems={field.value || []}
+                    setSelectedItems={field.onChange}
+                    flowsToExclude={
+                      watch('flows') && watch('flows').map((flow) => flow.id)
+                    }
+                  />
+                </div>
+              )}
+            />
 
             {teachers && (
               <Controller
