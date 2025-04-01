@@ -34,17 +34,6 @@ export const studentApi = createApi({
   reducerPath: 'studentApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getFreeStudents: builder.query<IStudent[], number>({
-      query: (intensiveId) => `students/free/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): IStudent[] =>
-        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
-    }),
-    getSpecificFreeStudents: builder.query<IStudent[], number>({
-      query: (intensiveId) =>
-        `students/specific-free/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): IStudent[] =>
-        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
-    }),
     getStudents: builder.query<IStudent[], IStudentListQuery>({
       query: ({ search, flowsToExclude }) =>
         `students/?search=${search}&flows_exclude=${flowsToExclude.join(',')}`,
@@ -56,8 +45,4 @@ export const studentApi = createApi({
   }),
 });
 
-export const {
-  useLazyGetFreeStudentsQuery,
-  useGetSpecificFreeStudentsQuery,
-  useLazyGetStudentsQuery,
-} = studentApi;
+export const { useLazyGetStudentsQuery } = studentApi;

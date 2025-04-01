@@ -5,8 +5,7 @@ import {
   useLazyGetTeamsQuery,
   useUpdateSupportMembersMutation,
 } from '../redux/api/teamApi';
-import { useGetSpecificFreeStudentsQuery } from '../redux/api/studentApi';
-
+import { useGetSpecificFreeStudentsQuery } from '../redux/api/intensiveApi';
 import { useAppSelector } from '../redux/store';
 
 import Modal from '../components/common/modals/Modal';
