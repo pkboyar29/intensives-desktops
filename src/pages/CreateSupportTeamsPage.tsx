@@ -5,7 +5,7 @@ import {
   useLazyGetTeamsQuery,
   useUpdateSupportMembersMutation,
 } from '../redux/api/teamApi';
-import { useGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
+import { useGetSpecificFreeStudentsQuery } from '../redux/api/studentApi';
 
 import { useAppSelector } from '../redux/store';
 
@@ -39,8 +39,11 @@ const CreateSupportTeamsPage: FC = () => {
   );
 
   const allTeachers = currentIntensive?.teachers;
-  const { data: allStudents } = useGetNotAssignedStudentsQuery(
-    Number(intensiveId)
+  const { data: allStudents } = useGetSpecificFreeStudentsQuery(
+    Number(intensiveId),
+    {
+      refetchOnMountOrArgChange: true,
+    }
   );
 
   const [searchString, setSearchString] = useState<string>('');

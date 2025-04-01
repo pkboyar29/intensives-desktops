@@ -29,6 +29,9 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           closeDate: currentIntensive.closeDate.toISOString(),
           id: currentIntensive.id,
           flowIds: currentIntensive.flows.map((flow) => flow.id),
+          specificStudentsIds: currentIntensive.specificStudents.map(
+            (student) => student.id
+          ),
           teacherIds: currentIntensive.teachers.map((teacher) => teacher.id),
           roleIds: currentIntensive.roles.map((role) => role.id),
           isOpen,

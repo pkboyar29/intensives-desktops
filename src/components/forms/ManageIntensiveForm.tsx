@@ -121,14 +121,12 @@ const ManageIntensiveForm: FC = () => {
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
-      specific_students?: string[];
+      specific_student_ids?: string[];
     };
-    console.log(errorData);
-    if (errorData && errorData.specific_students) {
-      console.log(errorData.specific_students[0]);
+    if (errorData && errorData.specific_student_ids) {
       setError('specificStudents', {
         type: 'custom',
-        message: errorData.specific_students[0],
+        message: errorData.specific_student_ids[0],
       });
     } else {
       if (currentIntensive) {
