@@ -10,6 +10,7 @@ interface QuestionItem {
   description: string;
 }
 
+// оку
 interface AddTestField {
   name: string;
   description: string;
