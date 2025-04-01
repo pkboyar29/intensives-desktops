@@ -11,7 +11,6 @@ import {
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
 import { IStudent } from '../../ts/interfaces/IStudent';
-import { IFile, IUploadFile } from '../../ts/interfaces/IFile';
 
 const mapIntensive = (unmappedIntensive: any): IIntensive => {
   return {
@@ -102,26 +101,6 @@ export const intensiveApi = createApi({
       transformResponse: (response: any): IStudent[] =>
         response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
     }),
-    /*
-    uploadFiles: builder.mutation<IFile[], IUploadFile>({
-      query: ({ contextId, files }) => {
-        const formData = new FormData();
-        if (Array.isArray(files)) {
-          files.forEach((file) => formData.append('files', file));
-        } else {
-          formData.append('files', files);
-        }
-
-        return {
-          url: `/intensives/${contextId}/files/upload/`,
-          method: 'POST',
-          body: formData,
-        };
-      },
-      transformResponse: (response: any): IFile[] =>
-        response.map((unmappedColumn: any) => mapFile(unmappedColumn)),
-    }),
-    */
     deleteIntensive: builder.mutation<void, number>({
       query: (id) => ({
         url: `/intensives/${id}/`,
@@ -139,5 +118,5 @@ export const {
   useUpdateIntensiveMutation,
   useDeleteIntensiveMutation,
   useLazyGetFreeStudentsQuery,
-  useGetSpecificFreeStudentsQuery,
+  useLazyGetSpecificFreeStudentsQuery,
 } = intensiveApi;

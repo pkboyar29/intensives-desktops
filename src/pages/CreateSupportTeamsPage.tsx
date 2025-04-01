@@ -1,12 +1,12 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
 
 import {
   useLazyGetTeamsQuery,
   useUpdateSupportMembersMutation,
 } from '../redux/api/teamApi';
-import { useGetSpecificFreeStudentsQuery } from '../redux/api/intensiveApi';
-import { useAppSelector } from '../redux/store';
+import { useLazyGetSpecificFreeStudentsQuery } from '../redux/api/intensiveApi';
 
 import Modal from '../components/common/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
@@ -18,6 +18,7 @@ import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { ITeam } from '../ts/interfaces/ITeam';
+import { IStudent } from '../ts/interfaces/IStudent';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -25,7 +26,6 @@ const CreateSupportTeamsPage: FC = () => {
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  // TODO: все-таки вместо lazy хуков использовать нормальные?
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
 
@@ -38,12 +38,8 @@ const CreateSupportTeamsPage: FC = () => {
   );
 
   const allTeachers = currentIntensive?.teachers;
-  const { data: allStudents } = useGetSpecificFreeStudentsQuery(
-    Number(intensiveId),
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  const [getSpecificFreeStudents] = useLazyGetSpecificFreeStudentsQuery();
+  const [allStudents, setAllStudents] = useState<IStudent[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
 
@@ -58,22 +54,52 @@ const CreateSupportTeamsPage: FC = () => {
 
   useEffect(() => {
     const fetchTeams = async () => {
-      try {
-        if (intensiveId) {
-          const { data } = await getTeams(parseInt(intensiveId));
+      if (intensiveId) {
+        const { data, error } = await getTeams(parseInt(intensiveId));
 
-          if (data) {
-            setTeams(data);
-            setCurrentTeamId(data[0].id || undefined);
-          }
+        if (data) {
+          setTeams(data);
+          setCurrentTeamId(data[0].id || undefined);
         }
-      } catch (e) {
-        console.log(e);
+
+        if (error) {
+          console.log(error);
+        }
       }
     };
 
     fetchTeams();
   }, []);
+
+  useEffect(() => {
+    const fetchSpecificFreeStudents = async () => {
+      if (intensiveId) {
+        const { data, error } = await getSpecificFreeStudents(
+          parseInt(intensiveId)
+        );
+
+        if (data) {
+          setAllStudents(data);
+        }
+
+        if (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    fetchSpecificFreeStudents();
+  }, []);
+
+  const onTutorSlugClick = () => {
+    setSearchString('');
+    setSlug('tutors');
+  };
+
+  const onMentorSlugClick = () => {
+    setSearchString('');
+    setSlug('mentors');
+  };
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentTeamId(Number(event.target.value));
@@ -101,6 +127,12 @@ const CreateSupportTeamsPage: FC = () => {
             name: newDroppedElement.content,
           };
         } else {
+          let students: IStudent[] = allStudents;
+          if (team.mentor) {
+            students = [...allStudents, team.mentor];
+          }
+          setAllStudents(students.filter((s) => s.id !== newDroppedElement.id));
+
           updatedTeam.mentor = {
             id: newDroppedElement.id,
             nameWithGroup: newDroppedElement.content,
@@ -114,7 +146,11 @@ const CreateSupportTeamsPage: FC = () => {
 
   const deleteTeamSupportMember = (
     currentTeamId: number,
-    deleteTutorOrMentor: boolean
+    deletedElement: {
+      id: number;
+      content: string;
+      isTutor: boolean;
+    }
   ) => {
     setTeams((teams) =>
       teams.map((team) => {
@@ -124,9 +160,14 @@ const CreateSupportTeamsPage: FC = () => {
 
         const updatedTeam = { ...team };
 
-        if (deleteTutorOrMentor) {
+        if (deletedElement.isTutor) {
           updatedTeam.tutor = null;
         } else {
+          setAllStudents((students) => [
+            ...students,
+            { id: deletedElement.id, nameWithGroup: deletedElement.content },
+          ]);
+
           updatedTeam.mentor = null;
         }
 
@@ -136,26 +177,22 @@ const CreateSupportTeamsPage: FC = () => {
   };
 
   const onSubmit = async () => {
-    try {
-      const { data: responseData, error: responseError } =
-        await updateSupportMembers({
-          teams: teams.map((team) => ({
-            id: team.id,
-            tutorId: team.tutor?.id || null,
-            mentorId: team.mentor?.id || null,
-          })),
-          intensiveId: Number(intensiveId),
-        });
+    const { data: responseData, error: responseError } =
+      await updateSupportMembers({
+        teams: teams.map((team) => ({
+          id: team.id,
+          tutorId: team.tutor?.id || null,
+          mentorId: team.mentor?.id || null,
+        })),
+        intensiveId: Number(intensiveId),
+      });
 
-      if (responseData) {
-        setSaveModal(true);
-      }
+    if (responseData) {
+      setSaveModal(true);
+    }
 
-      if (responseError) {
-        toast('Произошла серверная ошибка', { type: 'error' });
-      }
-    } catch (e) {
-      console.log(e);
+    if (responseError) {
+      toast('Произошла серверная ошибка', { type: 'error' });
     }
   };
 
@@ -278,12 +315,9 @@ const CreateSupportTeamsPage: FC = () => {
                       );
                     }
                   }}
-                  onDelete={(deleteTutorOrMentor) => {
+                  onDelete={(deletedElement) => {
                     if (currentTeamId) {
-                      deleteTeamSupportMember(
-                        currentTeamId,
-                        deleteTutorOrMentor
-                      );
+                      deleteTeamSupportMember(currentTeamId, deletedElement);
                     }
                   }}
                 />
@@ -297,10 +331,7 @@ const CreateSupportTeamsPage: FC = () => {
 
               <div className="relative flex justify-between mt-6 min-w-[266px] border-solid border-b border-b-black pb-2 text-lg">
                 <button
-                  onClick={() => {
-                    setSearchString('');
-                    setSlug('tutors');
-                  }}
+                  onClick={onTutorSlugClick}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'tutors' ? 'text-blue' : 'hover:text-blue'
                   }`}
@@ -308,10 +339,7 @@ const CreateSupportTeamsPage: FC = () => {
                   Тьюторы
                 </button>
                 <button
-                  onClick={() => {
-                    setSearchString('');
-                    setSlug('mentors');
-                  }}
+                  onClick={onMentorSlugClick}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'mentors' ? 'text-blue' : 'hover:text-blue'
                   }`}
