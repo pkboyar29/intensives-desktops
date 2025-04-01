@@ -383,7 +383,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 return (
                   teacherMarksData && (
                     <div className="flex flex-col gap-2">
-                      {Object.entries(marksByTeacher).map(
+                      {Object.entries(teacherMarksData).map(
                         ([teacherId, teacherMarks]) => (
                           <TeacherMarkCard
                             key={teacherId}

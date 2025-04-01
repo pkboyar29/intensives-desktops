@@ -19,6 +19,7 @@ import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
 import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
+import AdminUniversitiesPage from '../pages/AdminUniversitiesPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -26,10 +27,21 @@ type RouteType = RouteObject & {
 
 const routeConfig: RouteType[] = [
   {
-    path: '/admin',
+    path: '/admin/',
     element: <AdminPage />,
+    children: [
+      {
+        path: 'universities',
+        element: <AdminUniversitiesPage />,
+      },
+      {
+        path: 'users',
+        element: <AdminUniversitiesPage />,
+      },
+    ],
     requiredAuth: false,
   },
+
   {
     path: '/intensives',
     element: <IntensivesPage />,

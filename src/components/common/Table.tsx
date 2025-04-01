@@ -8,7 +8,7 @@ import {
 interface TableProps {
   data: any[];
   columns: any[];
-  onClick: (id: number) => void;
+  onClick?: (id: number) => void;
 }
 
 const Table: FC<TableProps> = ({ data, columns, onClick }) => {
@@ -48,13 +48,13 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr
                 onClick={() =>
-                  onClick(row.getAllCells()[0].getValue() as number)
+                  onClick && onClick(row.getAllCells()[0].getValue() as number)
                 }
                 key={row.id}
-                className={`cursor-pointer hover:bg-gray_8 transition duration-300 ease-in-out ${
+                className={`hover:bg-gray_8 transition duration-300 ease-in-out ${
                   rowIndex !== lastRowIndex &&
                   `border-b border-solid border-gray_9`
-                }`}
+                } ${onClick && `cursor-pointer`}`}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
