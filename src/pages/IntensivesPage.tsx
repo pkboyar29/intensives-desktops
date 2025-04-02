@@ -3,7 +3,10 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
-import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
+import {
+  useLazyGetIntensivesQuery,
+  useGetIntensivesQuery,
+} from '../redux/api/intensiveApi';
 
 import { IIntensive } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
@@ -21,10 +24,13 @@ const IntensivesPage: FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser,
-  });
+  const { data: intensives, isLoading } = useGetIntensivesQuery(
+    currentUser?.currentRole?.name === 'Mentor',
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !currentUser?.currentRole,
+    }
+  );
   const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
     []
   );

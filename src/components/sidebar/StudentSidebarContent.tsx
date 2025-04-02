@@ -14,10 +14,10 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [getMyTeam, { isLoading: isTeamLoading }] = useLazyGetMyTeamQuery();
-
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const currentTeam = useAppSelector((state) => state.team.data);
+
+  const [getMyTeam, { isLoading: isTeamLoading }] = useLazyGetMyTeamQuery();
 
   useEffect(() => {
     if (currentIntensive) {

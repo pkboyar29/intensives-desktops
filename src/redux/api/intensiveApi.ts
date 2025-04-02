@@ -36,8 +36,8 @@ export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getIntensives: builder.query<IIntensive[], void>({
-      query: () => '/intensives/',
+    getIntensives: builder.query<IIntensive[], boolean>({
+      query: (isMentor) => `/intensives/?is_mentor=${isMentor}`,
       transformResponse: (response: any): IIntensive[] => {
         const mappedIntensives: IIntensive[] = response.map(
           (unmappedIntensive: any) => mapIntensive(unmappedIntensive)
@@ -112,6 +112,7 @@ export const intensiveApi = createApi({
 
 export const {
   useGetIntensivesQuery,
+  useLazyGetIntensivesQuery,
   useLazyGetIntensiveQuery,
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
