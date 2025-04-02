@@ -18,6 +18,17 @@ export interface IIntensive {
   files: IFile[];
 }
 
+export interface IIntensiveShort {
+  id: number;
+  name: string;
+  description?: string;
+  isOpen: boolean;
+  openDate: Date;
+  closeDate: Date;
+  flows: IFlow[];
+  teachers: number[];
+}
+
 export interface IIntensiveCreate {
   name: string;
   description?: string;

@@ -8,6 +8,7 @@ import { mapFile } from './fileApi';
 import {
   IIntensive,
   IIntensiveCreate,
+  IIntensiveShort,
   IIntensiveUpdate,
 } from '../../ts/interfaces/IIntensive';
 import { IStudent } from '../../ts/interfaces/IStudent';
@@ -32,15 +33,28 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
   };
 };
 
+const mapIntensiveShort = (unmappedIntensive: any): IIntensiveShort => {
+  return {
+    id: unmappedIntensive.id,
+    name: unmappedIntensive.name,
+    description: unmappedIntensive.description,
+    isOpen: unmappedIntensive.is_open,
+    openDate: new Date(unmappedIntensive.open_dt),
+    closeDate: new Date(unmappedIntensive.close_dt),
+    flows: unmappedIntensive.flows,
+    teachers: unmappedIntensive.teachers,
+  };
+};
+
 export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getIntensives: builder.query<IIntensive[], boolean>({
+    getIntensives: builder.query<IIntensiveShort[], boolean>({
       query: (isMentor) => `/intensives/?is_mentor=${isMentor}`,
-      transformResponse: (response: any): IIntensive[] => {
-        const mappedIntensives: IIntensive[] = response.map(
-          (unmappedIntensive: any) => mapIntensive(unmappedIntensive)
+      transformResponse: (response: any): IIntensiveShort[] => {
+        const mappedIntensives: IIntensiveShort[] = response.map(
+          (unmappedIntensive: any) => mapIntensiveShort(unmappedIntensive)
         );
 
         return mappedIntensives;

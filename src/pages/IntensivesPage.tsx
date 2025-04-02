@@ -8,7 +8,7 @@ import {
   useGetIntensivesQuery,
 } from '../redux/api/intensiveApi';
 
-import { IIntensive } from '../ts/interfaces/IIntensive';
+import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
 import SearchIcon from '../components/icons/SearchIcon';
@@ -31,10 +31,12 @@ const IntensivesPage: FC = () => {
       skip: !currentUser?.currentRole,
     }
   );
-  const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
+  const [filteredIntensives, setFilteredIntensives] = useState<
+    IIntensiveShort[]
+  >([]);
+  const [sortedIntensives, setSortedIntensives] = useState<IIntensiveShort[]>(
     []
   );
-  const [sortedIntensives, setSortedIntensives] = useState<IIntensive[]>([]);
 
   const [searchText, setSearchText] = useState<string>('');
   const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
@@ -58,7 +60,7 @@ const IntensivesPage: FC = () => {
   // TODO: обрабатывать relevance
   const updateFilteredIntensives = () => {
     if (intensives) {
-      let filteredIntensives: IIntensive[] = [];
+      let filteredIntensives: IIntensiveShort[] = [];
 
       filteredIntensives = intensives.filter((intensive) =>
         intensive.name.toLowerCase().includes(searchText)
