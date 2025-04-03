@@ -126,7 +126,6 @@ export const intensiveApi = createApi({
 
 export const {
   useGetIntensivesQuery,
-  useLazyGetIntensivesQuery,
   useLazyGetIntensiveQuery,
   useGetIntensiveQuery,
   useCreateIntensiveMutation,

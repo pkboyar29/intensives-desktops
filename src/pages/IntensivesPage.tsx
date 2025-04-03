@@ -3,10 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
-import {
-  useLazyGetIntensivesQuery,
-  useGetIntensivesQuery,
-} from '../redux/api/intensiveApi';
+import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 
 import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
