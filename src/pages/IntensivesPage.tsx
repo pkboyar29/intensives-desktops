@@ -149,8 +149,8 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (isUserTeacher(currentUser)) {
-      localStorage.removeItem('tutorTeamId');
+    if (isUserTeacher(currentUser) || isUserManager(currentUser)) {
+      sessionStorage.removeItem('currentTeam');
     }
 
     navigate(`/intensives/${id}/overview`);
