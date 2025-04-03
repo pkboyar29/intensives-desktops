@@ -111,6 +111,25 @@ const IntensiveOverviewPage: FC = () => {
                 )}
               </div>
 
+              {currentIntensive ? (
+                currentIntensive.specificStudents.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    <div>Список отдельных студентов</div>
+                    <div className="flex flex-wrap gap-3">
+                      {currentIntensive.specificStudents.map((student) => (
+                        <Chip
+                          key={student.id}
+                          label={student.nameWithGroup}
+                          size="small"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )
+              ) : (
+                <Skeleton />
+              )}
+
               <div className="flex flex-col gap-3">
                 <div>Список преподавателей</div>
                 {currentIntensive ? (

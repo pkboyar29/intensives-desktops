@@ -1,7 +1,7 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { useLazyGetFreeStudentsQuery } from '../redux/api/studentApi';
+import { useLazyGetFreeStudentsQuery } from '../redux/api/intensiveApi';
 import {
   useChangeAllTeamsMutation,
   useLazyGetTeamsQuery,
@@ -13,7 +13,6 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
-
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
 

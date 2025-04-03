@@ -22,11 +22,13 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   useEffect(() => {
     const fetchTeam = async () => {
-      const { data: team } = await getTeam(
-        Number(localStorage.getItem('tutorTeamId'))
-      );
-      if (team) {
-        dispatch(setTeam(team));
+      const tutorTeamId = Number(localStorage.getItem('tutorTeamId'));
+
+      if (tutorTeamId) {
+        const { data: team } = await getTeam(tutorTeamId);
+        if (team) {
+          dispatch(setTeam(team));
+        }
       }
     };
     fetchTeam();

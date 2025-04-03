@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { IIntensive } from '../ts/interfaces/IIntensive';
+import { IIntensiveShort } from '../ts/interfaces/IIntensive';
 
 interface IntensiveCardProps {
-  intensive: IIntensive;
+  intensive: IIntensiveShort;
   onClick: (intensiveId: number) => void;
 }
 

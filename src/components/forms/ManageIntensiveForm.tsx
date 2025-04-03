@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import { useAppSelector } from '../../redux/store';
 
@@ -12,6 +13,7 @@ import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
+import { useFileHandler } from '../../helpers/useFileHandler';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
@@ -20,12 +22,13 @@ import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
+import SpecificStudentsInput from '../common/inputs/SpecificStudentsInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
-import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
-import { useFileHandler } from '../../helpers/useFileHandler';
+
+import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 
 interface Item {
   id: number;
@@ -38,6 +41,7 @@ interface ManageIntensiveFields {
   openDate: string;
   closeDate: string;
   flows: Item[];
+  specificStudents: Item[];
   teachers: Item[];
   roles: Item[];
   files?: IFile[];
@@ -83,6 +87,7 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
+    watch,
     formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
@@ -96,6 +101,10 @@ const ManageIntensiveForm: FC = () => {
         openDate: getISODateInUTC3(currentIntensive.openDate),
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
         flows: currentIntensive.flows,
+        specificStudents: currentIntensive.specificStudents.map((student) => ({
+          id: student.id,
+          name: student.nameWithGroup,
+        })),
         teachers: currentIntensive.teachers,
         roles: currentIntensive.roles,
       });
@@ -109,6 +118,28 @@ const ManageIntensiveForm: FC = () => {
       }
     }
   }, [intensiveId, currentIntensive]);
+
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      specific_student_ids?: string[];
+    };
+    if (errorData && errorData.specific_student_ids) {
+      setError('specificStudents', {
+        type: 'custom',
+        message: errorData.specific_student_ids[0],
+      });
+    } else {
+      if (currentIntensive) {
+        toast('Произошла серверная ошибка при сохранении изменений', {
+          type: 'error',
+        });
+      } else {
+        toast('Произошла серверная ошибка при создании', {
+          type: 'error',
+        });
+      }
+    }
+  };
 
   const onSubmit = async (data: ManageIntensiveFields) => {
     if (!data.flows || data.flows.length === 0) {
@@ -127,6 +158,9 @@ const ManageIntensiveForm: FC = () => {
     }
 
     const flowIds: number[] = data.flows.map((flow) => flow.id);
+    const specificStudentsIds: number[] = data.specificStudents
+      ? data.specificStudents.map((student) => student.id)
+      : [];
     const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
     const roleIds: number[] = data.roles
       ? data.roles.map((role) => role.id)
@@ -145,6 +179,7 @@ const ManageIntensiveForm: FC = () => {
         id: Number(intensiveId),
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
@@ -152,24 +187,21 @@ const ManageIntensiveForm: FC = () => {
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при сохранении изменений', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
     } else {
       ({ data: responseData, error: responseError } = await createIntensive({
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при создании', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
 
@@ -396,6 +428,29 @@ const ManageIntensiveForm: FC = () => {
                 )}
               />
             )}
+
+            <Controller
+              name="specificStudents"
+              control={control}
+              render={({ field }) => (
+                <div className="mt-3">
+                  <SpecificStudentsInput
+                    selectedItems={field.value || []}
+                    setSelectedItems={field.onChange}
+                    flowsToExclude={
+                      watch('flows')
+                        ? watch('flows').map((flow) => flow.id)
+                        : []
+                    }
+                    errorMessage={
+                      typeof errors.specificStudents?.message === 'string'
+                        ? errors.specificStudents.message
+                        : ''
+                    }
+                  />
+                </div>
+              )}
+            />
 
             {teachers && (
               <Controller

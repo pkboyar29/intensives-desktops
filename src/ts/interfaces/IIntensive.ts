@@ -1,5 +1,6 @@
 import { IFile } from './IFile';
 import { IFlow } from './IFlow';
+import { IStudent } from './IStudent';
 import { IStudentRole } from './IStudentRole';
 import { ITeacher } from './ITeacher';
 
@@ -11,9 +12,21 @@ export interface IIntensive {
   openDate: Date;
   closeDate: Date;
   flows: IFlow[];
+  specificStudents: IStudent[];
   teachers: ITeacher[];
   roles: IStudentRole[];
   files: IFile[];
+}
+
+export interface IIntensiveShort {
+  id: number;
+  name: string;
+  description?: string;
+  isOpen: boolean;
+  openDate: Date;
+  closeDate: Date;
+  flows: IFlow[];
+  teachers: number[];
 }
 
 export interface IIntensiveCreate {
@@ -23,6 +36,7 @@ export interface IIntensiveCreate {
   closeDate: string;
   teacherIds: number[];
   flowIds: number[];
+  specificStudentsIds: number[];
   roleIds: number[];
   isOpen: boolean;
   fileIds?: number[]; // можно перенести в IIntensiveUpdate
