@@ -24,7 +24,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick }) => {
 
   return (
     <>
-      <div className="inline-block w-full mt-8 rounded-lg">
+      <div className="inline-block w-full mt-8 overflow-x-auto rounded-lg">
         <table className="w-full">
           <thead className="border-b border-solid bg-gray_8 border-gray_9">
             {table.getHeaderGroups().map((headerGroup) => (
