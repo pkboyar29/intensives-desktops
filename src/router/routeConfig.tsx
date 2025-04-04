@@ -1,4 +1,4 @@
-import { RouteObject, Navigate } from 'react-router-dom';
+import { RouteObject, Navigate, Outlet } from 'react-router-dom';
 
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
@@ -20,14 +20,18 @@ import KanbanBoardPage from '../pages/KanbanBoardPage';
 import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
 import AdminUniversitiesPage from '../pages/AdminUniversitiesPage';
+import AdminBuildingsPage from '../pages/AdminBuildingPage';
+import AdminFlowsPage from '../pages/AdminFlowsPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
 };
 
+const Layout = () => <Outlet />; //заглушка для url типа admin/university/1 так как это не таблицы
+
 const routeConfig: RouteType[] = [
   {
-    path: '/admin/',
+    path: '/admin',
     element: <AdminPage />,
     children: [
       {
@@ -35,8 +39,44 @@ const routeConfig: RouteType[] = [
         element: <AdminUniversitiesPage />,
       },
       {
+        path: 'universities/:universityId', // только обрабатывает этот адрес
+        element: <Outlet />,
+        children: [
+          {
+            // такая запись не работает хз почему
+            path: 'buildings',
+            element: <AdminBuildingsPage />,
+          },
+        ],
+      },
+      {
         path: 'users',
         element: <AdminUniversitiesPage />,
+      },
+    ],
+    requiredAuth: false,
+  },
+
+  {
+    path: '/admin',
+    element: <AdminPage />,
+    children: [
+      {
+        // так работает
+        path: 'universities/:universityId/buildings',
+        element: <AdminBuildingsPage />,
+      },
+    ],
+    requiredAuth: false,
+  },
+
+  {
+    path: '/admin',
+    element: <AdminPage />,
+    children: [
+      {
+        path: 'universities/:universityId/flows',
+        element: <AdminFlowsPage />,
       },
     ],
     requiredAuth: false,

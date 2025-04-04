@@ -63,7 +63,7 @@ const ManageIntensiveForm: FC = () => {
   const [uploadFiles] = useUploadFilesMutation();
 
   // TODO: получать от конкретного университета
-  const { data: flows } = useGetFlowsQuery();
+  const { data: flows } = useGetFlowsQuery({});
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
   const { data: studentRoles } = useGetStudentRolesQuery();
@@ -387,7 +387,7 @@ const ManageIntensiveForm: FC = () => {
                           ? errors.flows.message
                           : ''
                       }
-                      items={flows}
+                      items={flows.results}
                       selectedItems={field.value || []}
                       setSelectedItems={field.onChange}
                       chipSize="big"

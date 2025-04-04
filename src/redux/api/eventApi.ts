@@ -82,7 +82,6 @@ export const eventApi = createApi({
           mark_strategy: data.markStrategyId,
           criterias: data.criteriaIds,
           deadline_dt: data.deadlineDate,
-          files: [],
         },
       }),
     }),

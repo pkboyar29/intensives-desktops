@@ -12,11 +12,11 @@ import {
 } from '@tanstack/react-table';
 import { tableConfigs, TableType } from '../tableConfigs';
 import DisplaySelect from './common/DisplaySelect';
+import { IUniversity } from '../ts/interfaces/IUniversity';
 
 interface CrudTableProps<T> {
   data: T[];
   type: TableType;
-  //columns: ColumnConfig<T>[];
   childEntities?: childEntitiesMeta[];
   onCreate?: () => void;
   onUpdate?: (item: T) => void;
@@ -24,15 +24,16 @@ interface CrudTableProps<T> {
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
   onChildNavigatePath?: (childNavigatePath: string) => void;
   onNextPage?: () => void;
+  getId: (row: T) => string | number;
 }
 
 type WithId = { id: number };
 
-function CrudTable<T extends WithId>(props: CrudTableProps<T>) {
+function CrudTable<T>(props: CrudTableProps<T>) {
   const {
     data,
     type,
-    //columns,
+    getId,
     childEntities,
     onCreate,
     onUpdate,
@@ -42,15 +43,50 @@ function CrudTable<T extends WithId>(props: CrudTableProps<T>) {
     onNextPage,
   } = props;
   console.log(data);
-  const columns = tableConfigs[type];
+  const columns = tableConfigs[type] as ColumnConfig<T>[];
 
   const columnHelper = createColumnHelper<T>();
 
   const columnsTable: ColumnDef<T, any>[] = useMemo(() => {
     return columns.map((column) =>
-      columnHelper.accessor(column.key.toString() as any, {
-        header: () => column.label,
-      })
+      columnHelper.accessor(
+        (row) => {
+          const value = row[column.key];
+          //console.log(value);
+          //console.log(column);
+          //console.log(row);
+          if (
+            //разные почти бесполезные проверки
+            column.renderKey &&
+            typeof value === 'object' &&
+            value !== null &&
+            column.type === 'relation'
+          ) {
+            const nested = value as Record<string, any>;
+            return nested[column.renderKey];
+          }
+          return value;
+        },
+        {
+          id: String(column.key),
+          header: column.label,
+          cell: (info) => {
+            // Кастомный рендер ячейки
+            const value = info.getValue();
+            //if(typeof value === 'boolean') return 1
+
+            /*
+            switch (column.type) {
+              case 'relation':
+                return <ul>ku</ul>;
+              default:
+                return String(value ?? '');
+            }
+            */
+            return value;
+          },
+        }
+      )
     );
   }, []);
 
@@ -62,13 +98,13 @@ function CrudTable<T extends WithId>(props: CrudTableProps<T>) {
         <div className="space-x-1">
           <button
             onClick={() => handleEdit(row.original)}
-            className="px-2 py-1 rounded bg-blue hover:bg-dark_blue"
+            className="px-2 py-1 rounded hover:bg-gray_6"
           >
             ✏️
           </button>
           <button
             onClick={() => handleDelete(row.original)}
-            className="px-2 py-1 text-white rounded bg-red hover:bg-dark_red"
+            className="px-2 py-1 text-white rounded hover:bg-red"
           >
             🗑️
           </button>
@@ -118,42 +154,13 @@ function CrudTable<T extends WithId>(props: CrudTableProps<T>) {
   const handleChildNavigate = (row: T, child: childEntitiesMeta) => {
     console.log(child, row);
     if (onChildNavigatePath) {
-      const path = '/' + row.id + '/' + child.type;
+      const path = '/' + getId(row) + '/' + child.type;
       onChildNavigatePath(path);
     }
   };
 
   return (
     <>
-      <div>
-        <table>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
       <div>
         <Table data={data} columns={columnsTable} />
       </div>

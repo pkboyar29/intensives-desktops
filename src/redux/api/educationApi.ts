@@ -1,0 +1,76 @@
+import { createApi } from '@reduxjs/toolkit/query/react';
+import {
+  IProfile,
+  ISpecialization,
+  IStageEducation,
+} from '../../ts/interfaces/IEducation';
+import { baseQueryWithReauth } from './baseQuery';
+
+export const mapStageEducation = (
+  unmappedStageEducation: any
+): IStageEducation => {
+  return {
+    id: unmappedStageEducation.id,
+    name: unmappedStageEducation.name,
+  };
+};
+
+export const mapProfile = (unmappedProfile: any): IProfile => {
+  return {
+    id: unmappedProfile.id,
+    name: unmappedProfile.name,
+  };
+};
+
+export const mapSpecialization = (
+  unmappedSpecialization: any
+): ISpecialization => {
+  return {
+    id: unmappedSpecialization.id,
+    name: unmappedSpecialization.name,
+    code: unmappedSpecialization.code,
+  };
+};
+
+export const educationApi = createApi({
+  reducerPath: 'educationApi',
+  baseQuery: baseQueryWithReauth,
+  endpoints: (builder) => ({
+    getEducation: builder.query<
+      {
+        results: IStageEducation[] | IProfile[] | ISpecialization[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        type: 'stages' | 'profiles' | 'specializations';
+        page?: number;
+        pageSize?: number;
+      }
+    >({
+      query: ({ type, page, pageSize }) =>
+        `/${type}/${page ? `?page=` + page : ''}${
+          pageSize ? `&pageSize=` + pageSize : ''
+        }`,
+      transformResponse: (response: any, meta, arg) => ({
+        results: response.results.map((unmapped: any) => {
+          console.log(arg.type);
+          switch (arg.type) {
+            case 'stages':
+              return mapStageEducation(unmapped);
+            case 'profiles':
+              return mapProfile(unmapped);
+            case 'specializations':
+              return mapSpecialization(unmapped);
+          }
+        }),
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }),
+    }),
+  }),
+});
+
+export const { useLazyGetEducationQuery } = educationApi;

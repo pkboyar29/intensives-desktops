@@ -113,9 +113,7 @@ const ManageEventForm: FC = () => {
     }
   );
   // TODO: начать получать аудитории университета интенсива
-  const { data: audiencesToChoose } = useGetAudiencesQuery(undefined, {
-    skip: !currentUser,
-  });
+  const { data: audiencesToChoose } = useGetAudiencesQuery({});
   const { data: markStrategies } = useGetMarkStrategiesQuery(undefined, {
     skip: !currentUser,
   });
@@ -664,7 +662,7 @@ const ManageEventForm: FC = () => {
                 <div className="text-xl font-bold">Место проведения</div>
                 <Select
                   initialText="Выберите место проведения"
-                  options={audiencesToChoose}
+                  options={audiencesToChoose.results}
                   register={register}
                   registerOptions={{
                     validate: {
