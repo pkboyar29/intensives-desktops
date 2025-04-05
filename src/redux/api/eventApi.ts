@@ -117,7 +117,7 @@ export const eventApi = createApi({
     }),
     deleteEvent: builder.mutation<void, number>({
       query: (eventId) => ({
-        url: `/events/${eventId}`,
+        url: `/events/${eventId}/`,
         method: 'DELETE',
       }),
     }),
