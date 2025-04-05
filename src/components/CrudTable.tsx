@@ -42,7 +42,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onChildNavigatePath,
     onNextPage,
   } = props;
-  console.log(data);
+  //console.log(data);
   const columns = tableConfigs[type] as ColumnConfig<T>[];
 
   const columnHelper = createColumnHelper<T>();
@@ -152,7 +152,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   };
 
   const handleChildNavigate = (row: T, child: childEntitiesMeta) => {
-    console.log(child, row);
+    //console.log(child, row);
     if (onChildNavigatePath) {
       const path = '/' + getId(row) + '/' + child.type;
       onChildNavigatePath(path);

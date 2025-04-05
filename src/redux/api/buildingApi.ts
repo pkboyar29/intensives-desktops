@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 import {
   IUniversity,
   IUniversityCreate,
@@ -40,12 +40,7 @@ export const buildingApi = createApi({
         pageSize?: number;
       }
     >({
-      query: ({ universities, withChildrenMeta, page, pageSize }) =>
-        `/buildings/${page ? `?page=` + page : ''}${
-          pageSize ? `&pageSize=` + pageSize : ''
-        }${universities ? `&universities=` + universities : ''}${
-          withChildrenMeta ? `&withChildrenMeta=` + withChildrenMeta : ''
-        }`,
+      query: (args) => buildUrl('/buildings', args),
       transformResponse: (response: any) => ({
         results: response.results.map((unmappedBuilding: any) =>
           mapBuilding(unmappedBuilding)

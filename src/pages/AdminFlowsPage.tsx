@@ -1,11 +1,6 @@
 import { FC, useEffect, useState } from 'react';
-import { useLazyGetUniversitiesQuery } from '../redux/api/universityApi';
 import CrudTable from '../components/CrudTable';
-import { IUniversity } from '../ts/interfaces/IUniversity';
-import { buildingColumns } from '../tableConfigs/nameConfig';
 import { useNavigate } from 'react-router-dom';
-import { useLazyGetBuildingsQuery } from '../redux/api/buildingApi';
-import { IBuilding } from '../ts/interfaces/IBuilding';
 import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
 import { IFlow } from '../ts/interfaces/IFlow';
 

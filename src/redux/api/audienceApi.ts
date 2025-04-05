@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 import {
   IAudience,
@@ -27,15 +27,12 @@ export const audienceApi = createApi({
         previous: string | null;
       },
       {
-        building?: number | null;
+        buildings?: number | null;
         page?: number;
         pageSize?: number;
       }
     >({
-      query: ({ building, page, pageSize }) =>
-        `/audiences/${page ? `?page=` + page : ''}${
-          pageSize ? `&pageSize=` + pageSize : ''
-        }${building ? `&universities=` + building : ''}`,
+      query: (args) => buildUrl('/audiences', args),
       transformResponse: (response: any) => ({
         results: response.results.map((unmappedAudience: any) =>
           mapAudience(unmappedAudience)

@@ -64,3 +64,18 @@ export const baseQueryWithReauth: BaseQueryFn<
 
   return result;
 };
+
+export const buildUrl = (
+  basePath: string,
+  queryParams: Record<string, any>
+) => {
+  const params = new URLSearchParams();
+
+  Object.entries(queryParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      params.set(key, String(value));
+    }
+  });
+
+  return `${basePath}${params.toString() ? `?${params.toString()}` : ''}`;
+};

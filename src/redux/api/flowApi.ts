@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 import { IFlow, IFlowCreate, IFlowUpdate } from '../../ts/interfaces/IFlow';
 import { childEntitiesMeta } from '../../ts/types/types';
@@ -34,12 +34,7 @@ export const flowApi = createApi({
         pageSize?: number;
       }
     >({
-      query: ({ universities, withChildrenMeta, page, pageSize }) =>
-        `/flows/${page ? `?page=` + page : ''}${
-          pageSize ? `&pageSize=` + pageSize : ''
-        }${universities ? `&universities=` + universities : ''}${
-          withChildrenMeta ? `&withChildrenMeta=` + withChildrenMeta : ''
-        }`,
+      query: (args) => buildUrl('/flows', args),
       transformResponse: (response: any) => ({
         results: response.results.map((unmappedFlow: any) =>
           mapFlow(unmappedFlow)

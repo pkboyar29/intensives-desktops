@@ -4,7 +4,7 @@ import {
   ISpecialization,
   IStageEducation,
 } from '../../ts/interfaces/IEducation';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 export const mapStageEducation = (
   unmappedStageEducation: any
@@ -49,10 +49,7 @@ export const educationApi = createApi({
         pageSize?: number;
       }
     >({
-      query: ({ type, page, pageSize }) =>
-        `/${type}/${page ? `?page=` + page : ''}${
-          pageSize ? `&pageSize=` + pageSize : ''
-        }`,
+      query: ({ type, ...args }) => buildUrl(`/${type}`, args),
       transformResponse: (response: any, meta, arg) => ({
         results: response.results.map((unmapped: any) => {
           console.log(arg.type);

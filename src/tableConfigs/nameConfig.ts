@@ -1,3 +1,4 @@
+import { IAudience } from '../ts/interfaces/IAudience';
 import { IBuilding } from '../ts/interfaces/IBuilding';
 import { IFlow } from '../ts/interfaces/IFlow';
 import { IUniversity } from '../ts/interfaces/IUniversity';
@@ -27,6 +28,17 @@ export const buildingColumns: ColumnConfig<IBuilding>[] = [
     renderKey: 'name',
   },
   { key: 'address', label: 'Адрес', type: 'string' },
+];
+
+export const audienceColumns: ColumnConfig<IAudience>[] = [
+  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'name', label: 'Название', type: 'string' },
+  {
+    key: 'building',
+    label: 'Корпус',
+    type: 'relation',
+    renderKey: 'name',
+  },
 ];
 
 export const flowsColumns: ColumnConfig<IFlow>[] = [

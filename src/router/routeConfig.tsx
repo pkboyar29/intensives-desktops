@@ -22,12 +22,15 @@ import AdminPage from '../pages/AdminPage';
 import AdminUniversitiesPage from '../pages/AdminUniversitiesPage';
 import AdminBuildingsPage from '../pages/AdminBuildingPage';
 import AdminFlowsPage from '../pages/AdminFlowsPage';
+import AdminEntityPage from '../pages/AdminEntityPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
 };
 
-const Layout = () => <Outlet />; //заглушка для url типа admin/university/1 так как это не таблицы
+const AdminEntityPageWrapper = ({ entityType }: { entityType: string }) => {
+  return <AdminEntityPage key={entityType} entityType={entityType} />;
+};
 
 const routeConfig: RouteType[] = [
   {
@@ -36,47 +39,23 @@ const routeConfig: RouteType[] = [
     children: [
       {
         path: 'universities',
-        element: <AdminUniversitiesPage />,
-      },
-      {
-        path: 'universities/:universityId', // только обрабатывает этот адрес
-        element: <Outlet />,
-        children: [
-          {
-            // такая запись не работает хз почему
-            path: 'buildings',
-            element: <AdminBuildingsPage />,
-          },
-        ],
+        element: <AdminEntityPageWrapper entityType="universities" />,
       },
       {
         path: 'users',
-        element: <AdminUniversitiesPage />,
+        element: <AdminEntityPageWrapper entityType="buildings" />,
       },
-    ],
-    requiredAuth: false,
-  },
-
-  {
-    path: '/admin',
-    element: <AdminPage />,
-    children: [
       {
-        // так работает
         path: 'universities/:universityId/buildings',
-        element: <AdminBuildingsPage />,
+        element: <AdminEntityPageWrapper entityType="buildings" />,
       },
-    ],
-    requiredAuth: false,
-  },
-
-  {
-    path: '/admin',
-    element: <AdminPage />,
-    children: [
+      {
+        path: 'universities/:universityId/buildings/:buildingId/audiences',
+        element: <AdminEntityPageWrapper entityType="audiences" />,
+      },
       {
         path: 'universities/:universityId/flows',
-        element: <AdminFlowsPage />,
+        element: <AdminEntityPageWrapper entityType="flows" />,
       },
     ],
     requiredAuth: false,

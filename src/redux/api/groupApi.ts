@@ -7,7 +7,7 @@ import {
 } from '../../ts/interfaces/IGroup';
 import { mapFlow } from './flowApi';
 import { mapProfile, mapSpecialization } from './educationApi';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 import { childEntitiesMeta } from '../../ts/types/types';
 
 export const mapGroup = (unmappedGroup: any): IGroup => {
@@ -38,12 +38,7 @@ export const groupApi = createApi({
         pageSize?: number;
       }
     >({
-      query: ({ flow, withChildrenMeta, page, pageSize }) =>
-        `/groups/${page ? `?page=` + page : ''}${
-          pageSize ? `&pageSize=` + pageSize : ''
-        }${flow ? `&flow=` + flow : ''}${
-          withChildrenMeta ? `&withChildrenMeta=` + withChildrenMeta : ''
-        }`,
+      query: (args) => buildUrl('/groups', args),
       transformResponse: (response: any) => ({
         results: response.results.map((unmappedGroup: any) =>
           mapGroup(unmappedGroup)
