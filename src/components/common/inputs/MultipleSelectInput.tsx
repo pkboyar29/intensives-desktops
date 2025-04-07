@@ -25,7 +25,6 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectAllState, setSelectAllState] = useState<boolean>(false);
 
   const dropdownVariants = {
     open: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
@@ -82,15 +81,12 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
           <Checkbox
             item={{ id: 0, name: 'Выбрать все' }}
             addSelectedItem={() => {
-              if (selectedItems.length !== items.length) {
-                setSelectedItems(items);
-              }
-              setSelectAllState(true);
+              setSelectedItems(items);
             }}
             deleteSelectedItem={() => {
-              setSelectAllState(false);
+              setSelectedItems([]);
             }}
-            isChecked={selectAllState}
+            isChecked={selectedItems.length === items.length}
           />
         </div>
 

@@ -238,7 +238,7 @@ const CreateSupportTeamsPage: FC = () => {
           onCloseModal={() => {
             setSaveModal(false);
             if (intensiveId) {
-              navigate(`/manager/${intensiveId}/teams`);
+              navigate(`/intensives/${intensiveId}/teams`);
             }
           }}
         >

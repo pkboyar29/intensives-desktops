@@ -1,8 +1,10 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
+import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
 import { useUpdateIntensiveMutation } from '../../redux/api/intensiveApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
+import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
 
 import SwitchButton from '../common/SwitchButton';
 import Skeleton from 'react-loading-skeleton';
@@ -15,6 +17,23 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const [getTeam] = useLazyGetTeamQuery();
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      const currentTeam = Number(sessionStorage.getItem('currentTeam'));
+
+      if (currentTeam) {
+        const { data: team } = await getTeam(currentTeam);
+        if (team) {
+          dispatch(setTeam(team));
+        }
+      }
+    };
+    fetchTeam();
+  }, []);
+
+  const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [updateIntensive] = useUpdateIntensiveMutation();
@@ -42,6 +61,7 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
+    dispatch(resetTeamState());
     navigate(`/intensives`);
   };
 
@@ -78,6 +98,18 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         <SidebarLink to="schedule" text="Управление расписанием" />
         <SidebarLink to="statistics" text="Статистика" />
       </div>
+      {currentTeam && (
+        <div className="my-3">
+          <div className="text-xl font-bold text-black_2">
+            {currentTeam.name}
+          </div>
+
+          <div className="flex flex-col gap-4 my-3">
+            <SidebarLink to="team-overview" text="Просмотр команды" />
+            <SidebarLink to="kanban" text="Ведение задач" />
+          </div>
+        </div>
+      )}
       <PrimaryButton
         children="Вернуться к списку интенсивов"
         clickHandler={returnToIntensivesClickHandler}

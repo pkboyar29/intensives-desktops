@@ -149,8 +149,8 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (isUserTeacher(currentUser)) {
-      localStorage.removeItem('tutorTeamId');
+    if (isUserTeacher(currentUser) || isUserManager(currentUser)) {
+      sessionStorage.removeItem('currentTeam');
     }
 
     navigate(`/intensives/${id}/overview`);
@@ -160,7 +160,7 @@ const IntensivesPage: FC = () => {
     <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
       <Title text="Интенсивы" />
 
-      <div className="mt-8">
+      <div className="mt-4 sm:mt-8">
         {isUserManager(currentUser) && (
           <div className="flex justify-end">
             <div className="ml-auto">
@@ -183,8 +183,8 @@ const IntensivesPage: FC = () => {
         />
       </div>
 
-      <div className="flex items-center justify-between gap-8 mt-5">
-        <div className="flex gap-8">
+      <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
           {isUserManager(currentUser) && (
             <Filter
               onFilterOptionClick={(filterOption) =>
@@ -226,7 +226,7 @@ const IntensivesPage: FC = () => {
         </select>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-3 sm:mt-10">
         {isLoading ? (
           <Skeleton />
         ) : intensives?.length === 0 ? (
