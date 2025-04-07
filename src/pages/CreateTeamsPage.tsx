@@ -13,8 +13,10 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
+import Tooltip from '../components/common/Tooltip';
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
+import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
 import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
@@ -36,6 +38,8 @@ const CreateTeamsPage: FC = () => {
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
 
   const [teamsCountModal, setTeamsCountModal] = useState<boolean>(false);
+  const [randomDistributeModal, setRandomDistributeModal] =
+    useState<boolean>(false);
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [saveModal, setSaveModal] = useState<boolean>(false);
 
@@ -254,6 +258,52 @@ const CreateTeamsPage: FC = () => {
     setFreeStudents([...freeStudents, studentToDelete]);
   };
 
+  const getRandomStudent = (students: IStudent[]): IStudent => {
+    const randomStudentIndex: number = Math.floor(
+      Math.random() * students.length
+    );
+
+    const randomStudent: IStudent[] = students.splice(randomStudentIndex, 1); // тип написан как массив, но на деле это всегда один элемент
+
+    return randomStudent[0];
+  };
+
+  const distributeStudents = () => {
+    let allStudents: IStudent[] = freeStudents;
+    teams.forEach((team) => {
+      allStudents = [...allStudents, ...team.studentsInTeam];
+    });
+
+    // минимальное количество студентов в команде
+    const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
+
+    let newTeams: ITeamForManager[] = [];
+    teams.forEach((team) => {
+      let newStudentsInTeam: IStudent[] = [];
+      for (let i = 0; i < minStudentsCountPerTeam; i++) {
+        newStudentsInTeam = [
+          ...newStudentsInTeam,
+          getRandomStudent(allStudents),
+        ];
+      }
+
+      newTeams = [...newTeams, { ...team, studentsInTeam: newStudentsInTeam }];
+    });
+
+    newTeams = newTeams.map((team) => {
+      return {
+        ...team,
+        studentsInTeam:
+          allStudents.length > 0
+            ? [...team.studentsInTeam, getRandomStudent(allStudents)]
+            : team.studentsInTeam,
+      };
+    });
+
+    setTeams(newTeams);
+    setFreeStudents([]);
+  };
+
   const onSubmit = async () => {
     if (intensiveId) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
@@ -319,6 +369,28 @@ const CreateTeamsPage: FC = () => {
                   setTeamsCountModal(false);
                 }}
                 children="Сохранить участников"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {randomDistributeModal && (
+        <Modal
+          title={'Случайное распределение участников по командам'}
+          onCloseModal={() => setRandomDistributeModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Все студенты будут случайно равномерно распределены среди ${teamsCount} команд`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  distributeStudents();
+                  setRandomDistributeModal(false);
+                }}
+                children="Распределить"
               />
             </div>
           </div>
@@ -410,6 +482,18 @@ const CreateTeamsPage: FC = () => {
             clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
+
+        <Tooltip
+          tooltipText="Случайно распределить участников"
+          tooltipClasses="bg-gray_5 p-1 rounded"
+        >
+          <button
+            onClick={() => setRandomDistributeModal(true)}
+            className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
+          >
+            <ShuffleIcon />
+          </button>
+        </Tooltip>
       </div>
 
       <div className="flex gap-10 mt-5">
