@@ -258,16 +258,6 @@ const CreateTeamsPage: FC = () => {
     setFreeStudents([...freeStudents, studentToDelete]);
   };
 
-  const getRandomStudent = (students: IStudent[]): IStudent => {
-    const randomStudentIndex: number = Math.floor(
-      Math.random() * students.length
-    );
-
-    const randomStudent: IStudent[] = students.splice(randomStudentIndex, 1); // одновременно берем студента из массива и убираем его
-
-    return randomStudent[0];
-  };
-
   const distributeStudents = () => {
     let allStudents: IStudent[] = freeStudents;
     teams.forEach((team) => {
@@ -275,30 +265,47 @@ const CreateTeamsPage: FC = () => {
     });
 
     // минимальное количество студентов в команде
-    const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
+    // const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
+    // console.log(allStudents.length);
+    // console.log(minStudentsCountPerTeam);
 
-    // TODO: наверное только тут надо как-то учитывать равномерное распределение по группам
-    let newTeams: ITeamForManager[] = [];
-    teams.forEach((team) => {
-      let newStudentsInTeam: IStudent[] = [];
-      for (let i = 0; i < minStudentsCountPerTeam; i++) {
-        newStudentsInTeam = [
-          ...newStudentsInTeam,
-          getRandomStudent(allStudents),
-        ];
+    // структура данных, чтобы перемещаться по каждой группе
+    const studentsByGroup: Record<number, IStudent[]> = {};
+
+    allStudents.forEach((student) => {
+      if (!studentsByGroup[student.groupId]) {
+        studentsByGroup[student.groupId] = [];
       }
 
-      newTeams = [...newTeams, { ...team, studentsInTeam: newStudentsInTeam }];
+      studentsByGroup[student.groupId].push(student);
     });
 
-    newTeams = newTeams.map((team) => {
-      return {
-        ...team,
-        studentsInTeam:
-          allStudents.length > 0
-            ? [...team.studentsInTeam, getRandomStudent(allStudents)]
-            : team.studentsInTeam,
-      };
+    let newTeams: ITeamForManager[] = teams.map((team) => ({
+      ...team,
+      studentsInTeam: [],
+    }));
+
+    // итерируемся по массивам студентов, сгрупированных по groupId
+    Object.values(studentsByGroup).forEach((groupStudents) => {
+      const groupCopy = [...groupStudents]; // клонируем, чтобы не мутировать оригинал
+
+      let teamIndex = 0;
+
+      while (groupCopy.length > 0) {
+        // if (
+        //   newTeams[teamIndex % teamsCount].studentsInTeam.length >=
+        //   minStudentsCountPerTeam
+        // ) {
+        //   teamIndex++;
+        //   continue;
+        // }
+
+        const randomStudentIndex = Math.floor(Math.random() * groupCopy.length);
+        const [student] = groupCopy.splice(randomStudentIndex, 1); // берем студента из groupCopy и одновременно удаляем его
+
+        newTeams[teamIndex % teamsCount].studentsInTeam.push(student);
+        teamIndex++;
+      }
     });
 
     setTeams(newTeams);
