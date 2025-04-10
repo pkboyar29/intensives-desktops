@@ -13,3 +13,16 @@ export interface ISpecialization {
   name: string;
   code: string;
 }
+
+export interface IStageEducationCreate {
+  name: string;
+}
+
+export interface IProfileCreate {
+  name: string;
+}
+
+export interface ISpecializationCreate {
+  name: string;
+  code: string;
+}

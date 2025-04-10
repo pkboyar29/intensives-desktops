@@ -23,12 +23,13 @@ import AdminUniversitiesPage from '../pages/AdminUniversitiesPage';
 import AdminBuildingsPage from '../pages/AdminBuildingPage';
 import AdminFlowsPage from '../pages/AdminFlowsPage';
 import AdminEntityPage from '../pages/AdminEntityPage';
+import { TableType } from '../tableConfigs';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
 };
 
-const AdminEntityPageWrapper = ({ entityType }: { entityType: string }) => {
+const AdminEntityPageWrapper = ({ entityType }: { entityType: TableType }) => {
   return <AdminEntityPage key={entityType} entityType={entityType} />;
 };
 

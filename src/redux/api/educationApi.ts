@@ -1,8 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import {
   IProfile,
+  IProfileCreate,
   ISpecialization,
+  ISpecializationCreate,
   IStageEducation,
+  IStageEducationCreate,
 } from '../../ts/interfaces/IEducation';
 import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
@@ -67,7 +70,54 @@ export const educationApi = createApi({
         previous: response.previous,
       }),
     }),
+    createEducation: builder.mutation<
+      IStageEducation | IProfile | ISpecialization,
+      {
+        type?: 'stages_education' | 'profiles' | 'specializations';
+        object: IStageEducationCreate | IProfileCreate | ISpecializationCreate;
+      }
+    >({
+      query: (data) => ({
+        url: '/buildings/',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: any): ISpecialization =>
+        mapSpecialization(response),
+    }),
+    updateEducation: builder.mutation<
+      IStageEducation | IProfile | ISpecialization,
+      {
+        type?: 'stages_education' | 'profiles' | 'specializations';
+        object: IStageEducationCreate | IProfileCreate | ISpecializationCreate;
+      }
+    >({
+      query: (data) => ({
+        url: '/buildings/',
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: any): ISpecialization =>
+        mapSpecialization(response),
+    }),
+    deleteEducation: builder.mutation<
+      void,
+      {
+        type: 'stages_education' | 'profiles' | 'specializations';
+        id: number; // Тоже решить
+      }
+    >({
+      query: ({ type, id }) => ({
+        url: `/${type}/${id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
-export const { useLazyGetEducationQuery } = educationApi;
+export const {
+  useLazyGetEducationQuery,
+  useCreateEducationMutation,
+  useUpdateEducationMutation,
+  useDeleteEducationMutation,
+} = educationApi;

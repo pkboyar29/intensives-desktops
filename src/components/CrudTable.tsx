@@ -143,6 +143,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
   const handleDelete = (row: T) => {
     console.log('delet', row);
+    onDelete && onDelete(row);
   };
 
   const handleChildNavigate = (row: T, child: childEntitiesMeta) => {

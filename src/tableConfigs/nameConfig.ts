@@ -100,4 +100,5 @@ export const profilesColumns: ColumnConfig<IProfile>[] = [
 export const specializationsColumns: ColumnConfig<ISpecialization>[] = [
   { key: 'id', label: 'ID', type: 'number' },
   { key: 'name', label: 'Название', type: 'string' },
+  { key: 'code', label: 'Код', type: 'string' },
 ];
