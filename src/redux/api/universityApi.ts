@@ -26,7 +26,7 @@ export const universityApi = createApi({
         previous: string | null;
         childEntitiesMeta?: childEntitiesMeta[];
       },
-      { withChildrenMeta?: boolean; page?: number; pageSize?: number }
+      { withChildrenMeta?: boolean; limit?: number; offset?: number }
     >({
       query: (args) => buildUrl('/universities', args),
       transformResponse: (response: any) => ({
@@ -52,7 +52,7 @@ export const universityApi = createApi({
     }),
     updateUniversity: builder.mutation<IUniversity, IUniversityPatch>({
       query: (data) => ({
-        url: `/universities/${data.id}`,
+        url: `/universities/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,

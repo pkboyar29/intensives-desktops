@@ -8,14 +8,14 @@ const AdminFlowsPage: FC = () => {
   const [getFlows, { data, isLoading, isError }] = useLazyGetFlowsQuery();
 
   const navigate = useNavigate();
-  const [page, setPage] = useState(1); // Текущая страница
-  const pageSize = 100; // Размер страницы
+  const limit = 100; // Размер страницы данных
+  const [offset, setOffset] = useState(0); // Текущее смешещение
 
   useEffect(() => {
     getFlows({
       withChildrenMeta: true,
-      page: page,
-      pageSize: pageSize,
+      limit: limit,
+      offset: offset,
     });
   }, []);
 

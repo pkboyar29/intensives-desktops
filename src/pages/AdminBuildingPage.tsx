@@ -14,15 +14,15 @@ const AdminBuildingsPage: FC = () => {
   const { universityId } = useParams();
 
   const navigate = useNavigate();
-  const [page, setPage] = useState(1); // Текущая страница
-  const pageSize = 100; // Размер страницы
+  const limit = 100; // Размер страницы данных
+  const [offset, setOffset] = useState(0); // Текущее смешещение
 
   useEffect(() => {
     getBuildings({
       universities: universityId ? parseInt(universityId) : null,
       withChildrenMeta: true,
-      page: page,
-      pageSize: pageSize,
+      limit: limit,
+      offset: offset,
     });
   }, []);
 

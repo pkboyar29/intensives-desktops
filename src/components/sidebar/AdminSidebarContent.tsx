@@ -7,9 +7,9 @@ const AdminSidebarContent: FC = () => {
       <div className="text-xl font-bold text-black_2">{'Админ-панель'}</div>
       <div className="flex flex-col gap-4 my-3">
         <SidebarLink to="universities" text="Университеты" />
-        <SidebarLink to="kanban" text="Education" />
-        <SidebarLink to="kanban" text="Потоки и группы" />
-        <SidebarLink to="users" text="Пользователи" />
+        <SidebarLink to="stagesEducation" text="Ступени" />
+        <SidebarLink to="profiles" text="Профили" />
+        <SidebarLink to="specializations" text="Специализации" />
       </div>
     </>
   );

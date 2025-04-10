@@ -11,8 +11,6 @@ import {
   Row,
 } from '@tanstack/react-table';
 import { tableConfigs, TableType } from '../tableConfigs';
-import DisplaySelect from './common/DisplaySelect';
-import { IUniversity } from '../ts/interfaces/IUniversity';
 
 interface CrudTableProps<T> {
   data: T[];
@@ -42,13 +40,13 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onChildNavigatePath,
     onNextPage,
   } = props;
-  //console.log(data);
+
   const columns = tableConfigs[type] as ColumnConfig<T>[];
 
   const columnHelper = createColumnHelper<T>();
 
   const columnsTable: ColumnDef<T, any>[] = useMemo(() => {
-    return columns.map((column) =>
+    const cols: ColumnDef<T, any>[] = columns.map((column) =>
       columnHelper.accessor(
         (row) => {
           const value = row[column.key];
@@ -73,6 +71,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           cell: (info) => {
             // Кастомный рендер ячейки
             const value = info.getValue();
+            if (value === null || value === undefined) return '—';
             //if(typeof value === 'boolean') return 1
 
             /*
@@ -88,7 +87,32 @@ function CrudTable<T>(props: CrudTableProps<T>) {
         }
       )
     );
-  }, []);
+
+    if (childEntities && childEntities.length > 0) {
+      console.log(childEntities);
+      cols.push(
+        columnHelper.display({
+          id: 'childEntities',
+          header: 'Перейти к',
+          cell: ({ row }) => (
+            <ul>
+              {childEntities.map((child) => (
+                <li key={child.type}>
+                  <button
+                    onClick={() => handleChildNavigate(row.original, child)}
+                    className="hover:text-blue"
+                  >
+                    {child.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ),
+        })
+      );
+    }
+    return cols;
+  }, [childEntities]);
 
   columnsTable.push(
     columnHelper.display({
@@ -113,36 +137,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     })
   );
 
-  if (childEntities && childEntities.length > 0) {
-    console.log(childEntities);
-    columnsTable.push(
-      columnHelper.display({
-        id: 'childEntities',
-        header: 'Перейти к',
-        cell: ({ row }) => (
-          <ul>
-            {childEntities.map((child) => (
-              <li key={child.type}>
-                <button
-                  onClick={() => handleChildNavigate(row.original, child)}
-                  className="hover:text-blue"
-                >
-                  {child.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ),
-      })
-    );
-  }
-
-  const table = useReactTable<T>({
-    data,
-    columns: columnsTable,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   const handleEdit = (row: T) => {
     console.log('edit', row);
   };
@@ -162,7 +156,11 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   return (
     <>
       <div>
-        <Table data={data} columns={columnsTable} />
+        <Table
+          data={data}
+          columns={columnsTable}
+          pagination={onNextPage ? { onNextPage: () => onNextPage } : undefined}
+        />
       </div>
     </>
   );

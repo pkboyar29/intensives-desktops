@@ -15,8 +15,10 @@ export const mapGroup = (unmappedGroup: any): IGroup => {
     id: unmappedGroup.id,
     name: unmappedGroup.name,
     flow: mapFlow(unmappedGroup.flow),
-    profile: mapProfile(unmappedGroup.profile),
-    specialization: mapSpecialization(unmappedGroup.specialization),
+    profile: unmappedGroup.profile && mapProfile(unmappedGroup.profile),
+    specialization:
+      unmappedGroup.specialization &&
+      mapSpecialization(unmappedGroup.specialization),
   };
 };
 export const groupApi = createApi({
@@ -32,10 +34,10 @@ export const groupApi = createApi({
         childEntitiesMeta?: childEntitiesMeta[];
       },
       {
-        flow?: number | null;
+        flows?: number | null;
         withChildrenMeta?: boolean;
-        page?: number;
-        pageSize?: number;
+        limit?: number;
+        offset?: number;
       }
     >({
       query: (args) => buildUrl('/groups', args),
@@ -61,7 +63,7 @@ export const groupApi = createApi({
     }),
     updateGroup: builder.mutation<IGroup, IGroupPatch>({
       query: ({ id, ...patch }) => ({
-        url: `/groups/${id}`,
+        url: `/groups/${id}/`,
         method: 'PATCH',
         body: patch,
       }),

@@ -36,8 +36,8 @@ export const buildingApi = createApi({
       {
         universities?: number | null;
         withChildrenMeta?: boolean;
-        page?: number;
-        pageSize?: number;
+        limit?: number;
+        offset?: number;
       }
     >({
       query: (args) => buildUrl('/buildings', args),

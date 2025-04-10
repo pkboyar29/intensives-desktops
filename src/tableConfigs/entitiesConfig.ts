@@ -3,6 +3,8 @@ import { useLazyGetBuildingsQuery } from '../redux/api/buildingApi';
 import { useLazyGetUniversitiesQuery } from '../redux/api/universityApi';
 import { TableType, tableConfigs } from '.';
 import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
+import { useLazyGetGroupsQuery } from '../redux/api/groupApi';
+import { useLazyGetEducationQuery } from '../redux/api/educationApi';
 
 // Тип описания query параметров родительской сущности у дочерней сущности
 type QueryParamDependencies = {
@@ -40,6 +42,27 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
     queryParamsDependencies: [{ from: 'universityId', as: 'universities' }],
     defaultQueryParams: { withChildrenMeta: true },
   },
+  groups: {
+    type: 'groups',
+    title: 'Группы',
+    queryParamsDependencies: [{ from: 'flowId', as: 'flows' }],
+    defaultQueryParams: { withChildrenMeta: true },
+  },
+  stagesEducation: {
+    type: 'stagesEducation',
+    title: 'Ступени образования',
+    defaultQueryParams: { type: 'stages_education' },
+  },
+  profiles: {
+    type: 'profiles',
+    title: 'Профили',
+    defaultQueryParams: { type: 'profiles' },
+  },
+  specializations: {
+    type: 'specializations',
+    title: 'Специализации',
+    defaultQueryParams: { type: 'specializations' },
+  },
 };
 
 export const useEntityQueryHook = (type: string) => {
@@ -52,6 +75,12 @@ export const useEntityQueryHook = (type: string) => {
       return useLazyGetAudiencesQuery();
     case 'flows':
       return useLazyGetFlowsQuery();
+    case 'groups':
+      return useLazyGetGroupsQuery();
+    case 'stagesEducation':
+    case 'profiles':
+    case 'specializations':
+      return useLazyGetEducationQuery();
     default:
       throw new Error('Unknown entity type');
   }

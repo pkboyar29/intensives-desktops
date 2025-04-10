@@ -28,8 +28,8 @@ export const audienceApi = createApi({
       },
       {
         buildings?: number | null;
-        page?: number;
-        pageSize?: number;
+        limit?: number;
+        offset?: number;
       }
     >({
       query: (args) => buildUrl('/audiences', args),

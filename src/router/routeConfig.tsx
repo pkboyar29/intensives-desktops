@@ -57,6 +57,22 @@ const routeConfig: RouteType[] = [
         path: 'universities/:universityId/flows',
         element: <AdminEntityPageWrapper entityType="flows" />,
       },
+      {
+        path: 'universities/:universityId/flows/:flowId/groups',
+        element: <AdminEntityPageWrapper entityType="groups" />,
+      },
+      {
+        path: 'stagesEducation',
+        element: <AdminEntityPageWrapper entityType="stagesEducation" />,
+      },
+      {
+        path: 'profiles',
+        element: <AdminEntityPageWrapper entityType="profiles" />,
+      },
+      {
+        path: 'specializations',
+        element: <AdminEntityPageWrapper entityType="specializations" />,
+      },
     ],
     requiredAuth: false,
   },

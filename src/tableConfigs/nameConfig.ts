@@ -1,6 +1,12 @@
 import { IAudience } from '../ts/interfaces/IAudience';
 import { IBuilding } from '../ts/interfaces/IBuilding';
+import {
+  IProfile,
+  ISpecialization,
+  IStageEducation,
+} from '../ts/interfaces/IEducation';
 import { IFlow } from '../ts/interfaces/IFlow';
+import { IGroup } from '../ts/interfaces/IGroup';
 import { IUniversity } from '../ts/interfaces/IUniversity';
 
 // Тип для метаданных интерфейсов для таблицы
@@ -56,4 +62,42 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
     type: 'relation',
     renderKey: 'name',
   },
+];
+
+export const groupsColumns: ColumnConfig<IGroup>[] = [
+  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'name', label: 'Название', type: 'string' },
+  {
+    key: 'flow',
+    label: 'Поток',
+    type: 'relation',
+    renderKey: 'name',
+  },
+  {
+    key: 'profile',
+    label: 'Профиль',
+    type: 'relation',
+    renderKey: 'name',
+  },
+  {
+    key: 'specialization',
+    label: 'Специализация',
+    type: 'relation',
+    renderKey: 'name',
+  },
+];
+
+export const stagesEducationColumns: ColumnConfig<IStageEducation>[] = [
+  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'name', label: 'Название', type: 'string' },
+];
+
+export const profilesColumns: ColumnConfig<IProfile>[] = [
+  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'name', label: 'Название', type: 'string' },
+];
+
+export const specializationsColumns: ColumnConfig<ISpecialization>[] = [
+  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'name', label: 'Название', type: 'string' },
 ];

@@ -44,9 +44,9 @@ export const educationApi = createApi({
         previous: string | null;
       },
       {
-        type: 'stages' | 'profiles' | 'specializations';
-        page?: number;
-        pageSize?: number;
+        type?: 'stages_education' | 'profiles' | 'specializations'; //решить проблему при обязательности
+        limit?: number;
+        offset?: number;
       }
     >({
       query: ({ type, ...args }) => buildUrl(`/${type}`, args),
@@ -54,7 +54,7 @@ export const educationApi = createApi({
         results: response.results.map((unmapped: any) => {
           console.log(arg.type);
           switch (arg.type) {
-            case 'stages':
+            case 'stages_education':
               return mapStageEducation(unmapped);
             case 'profiles':
               return mapProfile(unmapped);
