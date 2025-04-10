@@ -1,5 +1,8 @@
 export interface IStudent {
   id: number;
-  groupId: number;
+  group: {
+    id: number;
+    flowId: number;
+  };
   nameWithGroup: string;
 }

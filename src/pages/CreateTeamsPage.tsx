@@ -1,5 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
 
 import { useLazyGetFreeStudentsQuery } from '../redux/api/intensiveApi';
 import {
@@ -23,8 +24,10 @@ import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
-
   const { intensiveId } = useParams();
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
   const [getFreeStudents] = useLazyGetFreeStudentsQuery();
   const [getTeams] = useLazyGetTeamsQuery();
   const [changeAllTeams] = useChangeAllTeamsMutation();
@@ -264,6 +267,15 @@ const CreateTeamsPage: FC = () => {
       allStudents = [...allStudents, ...team.studentsInTeam];
     });
 
+    const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
+    const freeSpecificStudents = allStudents.filter(
+      (student) => !flowIds.includes(student.group.flowId)
+    );
+    // убираем всех отдельных студентов (они не должны участвовать в распределении)
+    allStudents = allStudents.filter((student) =>
+      flowIds.includes(student.group.flowId)
+    );
+
     // минимальное количество студентов в команде
     // const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
     // console.log(allStudents.length);
@@ -273,11 +285,11 @@ const CreateTeamsPage: FC = () => {
     const studentsByGroup: Record<number, IStudent[]> = {};
 
     allStudents.forEach((student) => {
-      if (!studentsByGroup[student.groupId]) {
-        studentsByGroup[student.groupId] = [];
+      if (!studentsByGroup[student.group.id]) {
+        studentsByGroup[student.group.id] = [];
       }
 
-      studentsByGroup[student.groupId].push(student);
+      studentsByGroup[student.group.id].push(student);
     });
 
     let newTeams: ITeamForManager[] = teams.map((team) => ({
@@ -309,7 +321,7 @@ const CreateTeamsPage: FC = () => {
     });
 
     setTeams(newTeams);
-    setFreeStudents([]);
+    setFreeStudents([...freeSpecificStudents]);
   };
 
   const onSubmit = async () => {
