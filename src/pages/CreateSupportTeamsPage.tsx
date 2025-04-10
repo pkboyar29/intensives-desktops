@@ -17,8 +17,9 @@ import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { ITeam } from '../ts/interfaces/ITeam';
+import { ISupportTeamForManager } from '../ts/interfaces/ITeam';
 import { IStudent } from '../ts/interfaces/IStudent';
+import { E } from 'framer-motion/dist/types.d-6pKw1mTI';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -28,18 +29,24 @@ const CreateSupportTeamsPage: FC = () => {
 
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
+  const [getSpecificFreeStudents] = useLazyGetSpecificFreeStudentsQuery();
 
-  const [teams, setTeams] = useState<ITeam[]>([]);
-  // TODO: предположить, что тут может быть рандомная цифра?
+  const [supportTeams, setSupportTeams] = useState<ISupportTeamForManager[]>(
+    []
+  );
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
-    () => teams.find((team) => team.id === currentTeamId),
-    [teams, currentTeamId]
+    () => supportTeams.find((team) => team.id === currentTeamId),
+    [supportTeams, currentTeamId]
   );
 
-  const allTeachers = currentIntensive?.teachers;
-  const [getSpecificFreeStudents] = useLazyGetSpecificFreeStudentsQuery();
-  const [allStudents, setAllStudents] = useState<IStudent[]>([]);
+  interface ElementType {
+    id: number;
+    name: string;
+  }
+
+  const [allStudents, setAllStudents] = useState<ElementType[]>([]);
+  const [allTeachers, setAllTeachers] = useState<ElementType[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
 
@@ -58,7 +65,17 @@ const CreateSupportTeamsPage: FC = () => {
         const { data, error } = await getTeams(parseInt(intensiveId));
 
         if (data) {
-          setTeams(data);
+          setSupportTeams(
+            data.map((team) => ({
+              ...team,
+              mentor: team.mentor
+                ? { id: team.mentor.id, name: team.mentor.nameWithGroup }
+                : null,
+              tutor: team.tutor
+                ? { id: team.tutor.id, name: team.tutor.name }
+                : null,
+            }))
+          );
           setCurrentTeamId(data[0].id || undefined);
         }
 
@@ -79,7 +96,12 @@ const CreateSupportTeamsPage: FC = () => {
         );
 
         if (data) {
-          setAllStudents(data);
+          setAllStudents(
+            data.map((s) => ({
+              id: s.id,
+              name: s.nameWithGroup,
+            }))
+          );
         }
 
         if (error) {
@@ -90,6 +112,14 @@ const CreateSupportTeamsPage: FC = () => {
 
     fetchSpecificFreeStudents();
   }, []);
+
+  useEffect(() => {
+    if (currentIntensive) {
+      setAllTeachers(
+        currentIntensive.teachers.map((t) => ({ id: t.id, name: t.name }))
+      );
+    }
+  }, [currentIntensive]);
 
   const onTutorSlugClick = () => {
     setSearchString('');
@@ -113,7 +143,7 @@ const CreateSupportTeamsPage: FC = () => {
       isTutor: boolean;
     }
   ) => {
-    setTeams((teams) =>
+    setSupportTeams((teams) =>
       teams.map((team) => {
         if (currentTeamId !== team.id) {
           return team;
@@ -127,15 +157,15 @@ const CreateSupportTeamsPage: FC = () => {
             name: newDroppedElement.content,
           };
         } else {
-          let students: IStudent[] = allStudents;
+          let students: ElementType[] = allStudents;
           if (team.mentor) {
-            students = [...allStudents, team.mentor];
+            students = [...students, team.mentor];
           }
           setAllStudents(students.filter((s) => s.id !== newDroppedElement.id));
 
           updatedTeam.mentor = {
             id: newDroppedElement.id,
-            nameWithGroup: newDroppedElement.content,
+            name: newDroppedElement.content,
           };
         }
 
@@ -152,7 +182,7 @@ const CreateSupportTeamsPage: FC = () => {
       isTutor: boolean;
     }
   ) => {
-    setTeams((teams) =>
+    setSupportTeams((teams) =>
       teams.map((team) => {
         if (currentTeamId !== team.id) {
           return team;
@@ -165,7 +195,7 @@ const CreateSupportTeamsPage: FC = () => {
         } else {
           setAllStudents((students) => [
             ...students,
-            { id: deletedElement.id, nameWithGroup: deletedElement.content },
+            { id: deletedElement.id, name: deletedElement.content },
           ]);
 
           updatedTeam.mentor = null;
@@ -179,7 +209,7 @@ const CreateSupportTeamsPage: FC = () => {
   const onSubmit = async () => {
     const { data: responseData, error: responseError } =
       await updateSupportMembers({
-        teams: teams.map((team) => ({
+        teams: supportTeams.map((team) => ({
           id: team.id,
           tutorId: team.tutor?.id || null,
           mentorId: team.mentor?.id || null,
@@ -271,7 +301,7 @@ const CreateSupportTeamsPage: FC = () => {
         <div className="mt-7">
           <Skeleton />
         </div>
-      ) : teams.length <= 0 ? (
+      ) : supportTeams.length <= 0 ? (
         <div className="text-xl font-bold text-black mt-7">
           Команды еще не определены для этого интенсива
         </div>
@@ -285,7 +315,7 @@ const CreateSupportTeamsPage: FC = () => {
               value={currentTeamId}
               className="mt-3 bg-another_white rounded-xl p-2.5"
             >
-              {teams.map((team) => (
+              {supportTeams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
                   {team.name}
                 </option>
@@ -391,7 +421,7 @@ const CreateSupportTeamsPage: FC = () => {
                     {' '}
                     {allStudents
                       ?.filter((student) =>
-                        student.nameWithGroup
+                        student.name
                           .toLowerCase()
                           .includes(searchString.toLowerCase())
                       )
@@ -400,7 +430,7 @@ const CreateSupportTeamsPage: FC = () => {
                           key={student.id}
                           data={{
                             id: student.id,
-                            content: student.nameWithGroup,
+                            content: student.name,
                             isTutor: false,
                           }}
                         />

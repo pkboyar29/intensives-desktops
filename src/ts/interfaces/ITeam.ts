@@ -17,6 +17,18 @@ export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
   id: number | null;
 }
 
+export interface ISupportTeamForManager
+  extends Omit<ITeam, 'tutor' | 'mentor'> {
+  tutor: {
+    id: number;
+    name: string;
+  } | null;
+  mentor: {
+    id: number;
+    name: string;
+  } | null;
+}
+
 export interface ITeamsCreate {
   teams: ITeamCreate[];
   intensiveId: number;

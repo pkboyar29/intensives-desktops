@@ -263,7 +263,7 @@ const CreateTeamsPage: FC = () => {
       Math.random() * students.length
     );
 
-    const randomStudent: IStudent[] = students.splice(randomStudentIndex, 1); // тип написан как массив, но на деле это всегда один элемент
+    const randomStudent: IStudent[] = students.splice(randomStudentIndex, 1); // одновременно берем студента из массива и убираем его
 
     return randomStudent[0];
   };
@@ -277,6 +277,7 @@ const CreateTeamsPage: FC = () => {
     // минимальное количество студентов в команде
     const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
 
+    // TODO: наверное только тут надо как-то учитывать равномерное распределение по группам
     let newTeams: ITeamForManager[] = [];
     teams.forEach((team) => {
       let newStudentsInTeam: IStudent[] = [];
@@ -508,22 +509,13 @@ const CreateTeamsPage: FC = () => {
             <TeamDragContainer
               key={team.index}
               containerName={team.name}
-              onDrop={(droppedElement) => {
-                handleStudentMove(team, {
-                  id: droppedElement.id,
-                  nameWithGroup: droppedElement.content,
-                });
+              onDrop={(droppedStudent) => {
+                handleStudentMove(team, droppedStudent);
               }}
-              onDelete={(deletedElement) => {
-                handleStudentDelete(team, {
-                  id: deletedElement.id,
-                  nameWithGroup: deletedElement.content,
-                });
+              onDelete={(deletedStudent) => {
+                handleStudentDelete(team, deletedStudent);
               }}
-              droppedElements={team.studentsInTeam.map((studentInTeam) => ({
-                id: studentInTeam.id,
-                content: studentInTeam.nameWithGroup,
-              }))}
+              droppedStudents={team.studentsInTeam}
             />
           ))}
         </div>
@@ -550,6 +542,7 @@ const CreateTeamsPage: FC = () => {
                 <TeamDragElement
                   key={freeStudent.id}
                   data={{
+                    ...freeStudent,
                     id: freeStudent.id,
                     content: freeStudent.nameWithGroup,
                   }}

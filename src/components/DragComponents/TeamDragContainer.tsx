@@ -1,47 +1,48 @@
+import { FC } from 'react';
 import { useDrop } from 'react-dnd';
 
 import DroppedElement from './DroppedElement';
 import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
+import { IStudent } from '../../ts/interfaces/IStudent';
 
-interface TeamDragContainerProps<T extends { id: number; content: string }> {
+interface TeamDragContainerProps {
   containerName: string;
-  droppedElements: T[];
-  onDrop: (droppedElement: T) => void;
-  onDelete: (deletedElement: T) => void;
+  droppedStudents: IStudent[];
+  onDrop: (droppedStudent: IStudent) => void;
+  onDelete: (deletedStudent: IStudent) => void;
 }
 
 // TODO: тут начать использовать компонент Tag?
-// Раз компонент относится непосредственно к Team, то и необязательно делать дженерик тайпы непосредственно тут?
 // если передавать team типа ITeam, то возможно не имеет смысла разделять компонент на два?
 // начать отображать тьютора и наставника также тут?
-const TeamDragContainer = <T extends { id: number; content: string }>({
+const TeamDragContainer: FC<TeamDragContainerProps> = ({
   containerName,
-  droppedElements,
+  droppedStudents,
   onDrop,
   onDelete,
-}: TeamDragContainerProps<T>) => {
+}) => {
   const [{ isDragging }, dropRef] = useDrop({
     accept: ItemTypes.STUDENT,
-    drop(newDroppedElement: T) {
-      const isDroppedInTheSameContainer: boolean = droppedElements.some(
-        (existingDroppedElement: T) =>
-          existingDroppedElement.id === newDroppedElement.id
+    drop(newDroppedStudent: IStudent) {
+      const isDroppedInTheSameContainer: boolean = droppedStudents.some(
+        (existingDroppedStudent: IStudent) =>
+          existingDroppedStudent.id === newDroppedStudent.id
       );
       if (isDroppedInTheSameContainer) {
         return;
       }
 
-      onDrop(newDroppedElement);
+      onDrop(newDroppedStudent);
     },
     collect: (monitor) => ({
       isDragging: monitor.isOver(),
     }),
   });
 
-  const deleteElementFromContainer = (elementToDelete: T) => {
-    onDelete(elementToDelete);
+  const deleteStudentFromContainer = (studentToDelete: IStudent) => {
+    onDelete(studentToDelete);
   };
 
   return (
@@ -62,20 +63,21 @@ const TeamDragContainer = <T extends { id: number; content: string }>({
           <span className="text-lg text-black_3">{containerName}</span>
         </div>
 
-        {droppedElements.length === 0 && (
+        {droppedStudents.length === 0 && (
           <span className="text-base text-gray_3">Нет участников</span>
         )}
 
         <div className="flex flex-col gap-[6px]">
-          {droppedElements.map((droppedElement) => (
+          {droppedStudents.map((droppedStudent) => (
             <DroppedElement
-              key={droppedElement.id}
-              element={droppedElement}
-              onDelete={deleteElementFromContainer}
+              key={droppedStudent.id}
+              element={droppedStudent}
+              onDelete={deleteStudentFromContainer}
             />
           ))}
         </div>
 
+        {/* TODO: добавить при адаптивной верстке */}
         {/* <select className="mt-[4px] cursor-pointer px-4 py-1.5 text-base rounded-lg border-none outline-none bg-gray_5 w-min appearance-none">
           <option>
             <div>Добавить участника</div>

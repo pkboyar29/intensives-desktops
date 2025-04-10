@@ -7,6 +7,7 @@ import { IStudent } from '../../ts/interfaces/IStudent';
 export const mapStudent = (unmappedStudent: any): IStudent => {
   return {
     id: unmappedStudent.id,
+    groupId: unmappedStudent.group.id,
     nameWithGroup: getNameWithGroup(
       unmappedStudent.group.name,
       unmappedStudent.user.first_name,
