@@ -401,7 +401,7 @@ const CreateTeamsPage: FC = () => {
           onCloseModal={() => setRandomDistributeModal(false)}
         >
           <p className="text-lg text-bright_gray">
-            {`Все студенты будут случайно равномерно распределены среди ${teamsCount} команд`}
+            {`Все студенты из потоков интенсива будут случайно равномерно распределены среди ${teamsCount} команд`}
           </p>
           <div className="flex justify-end gap-3 mt-6">
             <div>
