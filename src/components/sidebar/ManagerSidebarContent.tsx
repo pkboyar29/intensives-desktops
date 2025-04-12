@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
 import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
 import { useUpdateIntensiveOpennessMutation } from '../../redux/api/intensiveApi';
@@ -15,9 +15,14 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   isIntensiveLoading,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
   const [getTeam] = useLazyGetTeamQuery();
+  const [updateOpenness] = useUpdateIntensiveOpennessMutation();
+
+  const currentTeam = useAppSelector((state) => state.team.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -32,11 +37,6 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
     };
     fetchTeam();
   }, []);
-
-  const currentTeam = useAppSelector((state) => state.team.data);
-  const currentIntensive = useAppSelector((state) => state.intensive.data);
-
-  const [updateOpenness] = useUpdateIntensiveOpennessMutation();
 
   const updateIntensiveOpenness = (isOpen: boolean) => {
     if (currentIntensive) {
@@ -83,8 +83,20 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         />
       </div>
       <div className="flex flex-col gap-4 mt-5 mb-3">
-        <SidebarLink to="overview" text="Настройки интенсива" />
-        <SidebarLink to="teams" text="Управление командами" />
+        <SidebarLink
+          to="overview"
+          text="Настройки интенсива"
+          className={`${pathname.includes('/editIntensive') && 'active'}`}
+        />
+        <SidebarLink
+          to="teams"
+          text="Управление командами"
+          className={`${
+            (pathname.includes('/createTeams') ||
+              pathname.includes('/createSupportTeams')) &&
+            'active'
+          }`}
+        />
         <SidebarLink to="schedule" text="Управление расписанием" />
         <SidebarLink to="statistics" text="Статистика" />
       </div>
