@@ -2,7 +2,7 @@ import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
 import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
-import { useUpdateIntensiveMutation } from '../../redux/api/intensiveApi';
+import { useUpdateIntensiveOpennessMutation } from '../../redux/api/intensiveApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
 
@@ -36,24 +36,14 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  const [updateIntensive] = useUpdateIntensiveMutation();
+  const [updateOpenness] = useUpdateIntensiveOpennessMutation();
 
   const updateIntensiveOpenness = (isOpen: boolean) => {
     if (currentIntensive) {
       if (isOpen !== currentIntensive.isOpen) {
-        updateIntensive({
-          name: currentIntensive.name,
-          description: currentIntensive.description,
-          openDate: currentIntensive.openDate.toISOString(),
-          closeDate: currentIntensive.closeDate.toISOString(),
-          id: currentIntensive.id,
-          flowIds: currentIntensive.flows.map((flow) => flow.id),
-          specificStudentsIds: currentIntensive.specificStudents.map(
-            (student) => student.id
-          ),
-          teacherIds: currentIntensive.teachers.map((teacher) => teacher.id),
-          roleIds: currentIntensive.roles.map((role) => role.id),
-          isOpen,
+        updateOpenness({
+          openness: isOpen,
+          intensiveId: currentIntensive.id,
         });
       }
     }
