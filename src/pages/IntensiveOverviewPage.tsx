@@ -7,6 +7,7 @@ import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
 import Title from '../components/common/Title';
 import Chip from '../components/common/Chip';
+import ChipList from '../components/common/ChipList';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 import TrashIcon from '../components/icons/TrashIcon';
@@ -88,7 +89,9 @@ const IntensiveOverviewPage: FC = () => {
             {currentIntensive?.description && (
               <div className="my-3">
                 {currentIntensive ? (
-                  <div className="text-lg">{currentIntensive.description}</div>
+                  <div className="text-lg break-words line-clamp-6">
+                    {currentIntensive.description}
+                  </div>
                 ) : (
                   <Skeleton />
                 )}
@@ -98,72 +101,52 @@ const IntensiveOverviewPage: FC = () => {
             <div className="my-3 text-lg font-bold text-black_2">Участники</div>
 
             <div className="flex flex-col gap-3 text-lg">
-              <div className="flex flex-col gap-3">
-                <div>Список учебных потоков</div>
-                {currentIntensive ? (
-                  <div className="flex flex-wrap gap-3">
-                    {currentIntensive.flows.map((flow) => (
-                      <Chip key={flow.id} label={flow.name} size="big" />
-                    ))}
-                  </div>
-                ) : (
-                  <Skeleton />
-                )}
-              </div>
+              {currentIntensive ? (
+                <ChipList
+                  title="Список учебных потоков"
+                  items={currentIntensive.flows}
+                  chipSize="big"
+                />
+              ) : (
+                <Skeleton />
+              )}
 
               {currentIntensive ? (
                 currentIntensive.specificStudents.length > 0 && (
-                  <div className="flex flex-col gap-3">
-                    <div>Список отдельных студентов</div>
-                    <div className="flex flex-wrap gap-3">
-                      {currentIntensive.specificStudents.map((student) => (
-                        <Chip
-                          key={student.id}
-                          label={student.nameWithGroup}
-                          size="small"
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <ChipList
+                    title="Список отдельных студентов"
+                    items={currentIntensive.specificStudents.map((s) => ({
+                      id: s.id,
+                      name: s.nameWithGroup,
+                    }))}
+                    chipSize="small"
+                  />
                 )
               ) : (
                 <Skeleton />
               )}
 
-              <div className="flex flex-col gap-3">
-                <div>Список преподавателей</div>
-                {currentIntensive ? (
-                  <div className="flex flex-wrap gap-3">
-                    {currentIntensive.teachers.map((teacherOnIntensive) => (
-                      <Chip
-                        key={teacherOnIntensive.id}
-                        label={teacherOnIntensive.name}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <Skeleton />
-                )}
-              </div>
+              {currentIntensive ? (
+                <ChipList
+                  title="Список преподавателей"
+                  items={currentIntensive.teachers}
+                  chipSize="small"
+                />
+              ) : (
+                <Skeleton />
+              )}
 
-              <div className="flex flex-col gap-3">
-                {currentIntensive ? (
-                  <>
-                    {currentIntensive.roles.length > 0 && (
-                      <>
-                        <div>Список ролей для студентов</div>
-                        <div className="flex flex-wrap gap-3">
-                          {currentIntensive.roles.map((role) => (
-                            <Chip key={role.id} label={role.name} />
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <Skeleton />
-                )}
-              </div>
+              {currentIntensive ? (
+                currentIntensive.roles.length > 0 && (
+                  <ChipList
+                    title="Список ролей для студентов"
+                    items={currentIntensive.roles}
+                    chipSize="small"
+                  />
+                )
+              ) : (
+                <Skeleton />
+              )}
 
               {currentIntensive?.files && (
                 <div>
@@ -179,7 +162,7 @@ const IntensiveOverviewPage: FC = () => {
               )}
 
               {isUserManager(currentUser) && (
-                <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                <div className="flex items-center gap-3 mt-5 text-lg font-bold md:mt-10 md:gap-7">
                   <PrimaryButton
                     children="Редактировать"
                     clickHandler={() => {
