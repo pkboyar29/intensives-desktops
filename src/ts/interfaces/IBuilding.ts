@@ -18,5 +18,6 @@ export interface IBuildingPatch {
   id: number;
   name?: string;
   address?: string;
-  university?: string;
+  university?: IUniversity;
+  universityId?: number; // гибкость чтоб можно было передать с интерфейсом или просто id возможно понадобится везде
 }

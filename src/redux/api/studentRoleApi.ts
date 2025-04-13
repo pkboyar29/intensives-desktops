@@ -36,7 +36,7 @@ export const studentRoleApi = createApi({
     }),
     updateStudentRole: builder.mutation<IStudentRole, IStudentRolePatch>({
       query: (data) => ({
-        url: `/student_roles/${data.id}`,
+        url: `/student_roles/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,

@@ -5,7 +5,6 @@ import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
 import { IFlow } from '../ts/interfaces/IFlow';
 import {
   entitiesConfig,
-  useEntityQueryHook,
   useEntityQueryHooks,
 } from '../tableConfigs/entitiesConfig';
 import { TableType } from '../tableConfigs';
@@ -22,8 +21,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const config = entitiesConfig[entityType as keyof typeof entitiesConfig];
   if (!config) return <div>Unknown entity</div>;
 
-  //const [fetchData, { data: queryData, isLoading, isError }] =
-  //  useEntityQueryHooks(entityType, 'view');
   const viewHook = useEntityQueryHooks(entityType, 'view');
   const createHook = useEntityQueryHooks(entityType, 'create');
   const updateHook = useEntityQueryHooks(entityType, 'update');
@@ -45,7 +42,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     const value = urlParams[dep.from];
     if (value) {
       paramsFromUrl[dep.as] = value;
-      //console.log(dep.from, value);
     }
   }
 
@@ -69,7 +65,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   }, [data]);
 
   const loadData = async () => {
-    console.log(paramsFromConfig);
     if (fetchData) {
       await fetchData({
         ...paramsFromUrl,
@@ -77,27 +72,56 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         limit: limit,
         offset: offset.current,
       });
-      console.log('fetch');
+      //console.log('fetch');
     }
   };
 
-  const deleteEntity = async (id: number) => {
+  const updateEntity = async (entity: any) => {
+    console.log(entity);
+    const prevItems = [...data]; // сохраняем стейт
+
+    // заменяем строку измененной
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === entity.id ? { ...item, ...entity } : item
+      )
+    );
+
+    try {
+      console.log(entity);
+      await updateEntityAPI({ ...entity }).unwrap();
+    } catch (error: any) {
+      console.error(
+        `Error on updating entity ${entityType} id=${entity.id}`,
+        error
+      );
+      setData(prevItems); // в случае ошибки откатываем состояние
+    }
+  };
+
+  const deleteEntity = async (entity: any) => {
     try {
       //cringe
       if (paramsFromConfig.type) {
         await deleteEntityAPI({
-          id,
+          id: entity.id,
           type: paramsFromConfig.type,
         } as any).unwrap();
       } else {
-        await deleteEntityAPI(id as any).unwrap();
+        await deleteEntityAPI(entity.id).unwrap();
       }
 
-      setData((prevData) => prevData.filter((entity) => entity.id !== id));
+      setData((prevData) =>
+        prevData.filter((entity) => entity.id !== entity.id)
+      );
     } catch (error: any) {
-      console.error(`Error on deleting entity ${entityType} id=${id}`, error);
-      if (error.originalStatus === 400) {
-        toast('Нельзя удалить - объект используется в связях', {
+      console.error(
+        `Error on deleting entity ${entityType} id=${entity.id}`,
+        error
+      );
+      // заменить на 400
+      if (error.originalStatus === 500) {
+        toast(`Нельзя удалить: объект ${entity.name} используется в связях`, {
           type: 'error',
         });
       }
@@ -128,7 +152,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           navigate(window.location.pathname + path);
         }}
         onNextPage={count && limit < count ? () => loadNextPage() : undefined}
-        onDelete={(entity) => deleteEntity(entity.id)}
+        onUpdate={(entity) => updateEntity(entity)}
+        onDelete={(entity) => deleteEntity(entity)}
       />
     </>
   );

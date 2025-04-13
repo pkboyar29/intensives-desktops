@@ -60,10 +60,14 @@ export const buildingApi = createApi({
       transformResponse: (response: any): IBuilding => mapBuilding(response),
     }),
     updateBuilding: builder.mutation<IBuilding, IBuildingPatch>({
-      query: ({ id, ...patch }) => ({
-        url: `/buildings/${id}`,
+      query: (data) => ({
+        url: `/buildings/${data.id}/`,
         method: 'PATCH',
-        body: patch,
+        body: {
+          name: data.name,
+          address: data.address,
+          university: data.university?.id ?? data.universityId, //так обрабатываем гибкость
+        },
       }),
       transformResponse: (response: any): IBuilding => mapBuilding(response),
     }),

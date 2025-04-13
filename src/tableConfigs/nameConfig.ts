@@ -15,17 +15,18 @@ export type ColumnConfig<T> = {
   label: string;
   type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
   renderKey?: string;
+  readOnly?: boolean;
 };
 
 // Набор метаданных (можно вроде автоматически вычислять)
 
 export const universityColumns: ColumnConfig<IUniversity>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
 ];
 
 export const buildingColumns: ColumnConfig<IBuilding>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   {
     key: 'university',
@@ -37,7 +38,7 @@ export const buildingColumns: ColumnConfig<IBuilding>[] = [
 ];
 
 export const audienceColumns: ColumnConfig<IAudience>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   {
     key: 'building',
@@ -48,7 +49,7 @@ export const audienceColumns: ColumnConfig<IAudience>[] = [
 ];
 
 export const flowsColumns: ColumnConfig<IFlow>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   {
     key: 'university',
@@ -65,7 +66,7 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
 ];
 
 export const groupsColumns: ColumnConfig<IGroup>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   {
     key: 'flow',
@@ -88,17 +89,17 @@ export const groupsColumns: ColumnConfig<IGroup>[] = [
 ];
 
 export const stagesEducationColumns: ColumnConfig<IStageEducation>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
 ];
 
 export const profilesColumns: ColumnConfig<IProfile>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
 ];
 
 export const specializationsColumns: ColumnConfig<ISpecialization>[] = [
-  { key: 'id', label: 'ID', type: 'number' },
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   { key: 'code', label: 'Код', type: 'string' },
 ];

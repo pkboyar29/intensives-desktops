@@ -18,5 +18,5 @@ export interface IAudienceUpdate extends IAudienceCreate {
 export interface IAudiencePatch {
   id: number;
   name?: string;
-  building?: string;
+  building?: IBuilding;
 }

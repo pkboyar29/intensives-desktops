@@ -91,33 +91,3 @@ export function useEntityQueryHooks<
 >(type: T, action: A): EntitiesConfig['hooks'][A] {
   return entitiesConfig[type].hooks[action];
 }
-
-/*
-export function useEntityQueryHooks<
-  T extends TableType,
-  A extends keyof EntitiesQueryHooks
->(type: T, action: A): EntitiesConfig['hooks'][A] {
-  return entitiesConfig[type].hooks[action]();
-}
-*/
-
-export const useEntityQueryHook = (type: string) => {
-  switch (type) {
-    case 'universities':
-      return useLazyGetUniversitiesQuery();
-    case 'buildings':
-      return useLazyGetBuildingsQuery();
-    case 'audiences':
-      return useLazyGetAudiencesQuery();
-    case 'flows':
-      return useLazyGetFlowsQuery();
-    case 'groups':
-      return useLazyGetGroupsQuery();
-    case 'stagesEducation':
-    case 'profiles':
-    case 'specializations':
-      return useLazyGetEducationQuery();
-    default:
-      throw new Error('Unknown entity type');
-  }
-};

@@ -42,7 +42,7 @@ export const markStrategyApi = createApi({
     }),
     updateMarkStrategy: builder.mutation<IMarkStrategy, IMarkStrategyPatch>({
       query: (data) => ({
-        url: `/mark_strategy/${data.id}`,
+        url: `/mark_strategy/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,

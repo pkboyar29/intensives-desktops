@@ -51,10 +51,13 @@ export const audienceApi = createApi({
       transformResponse: (response: any): IAudience => mapAudience(response),
     }),
     updateAudience: builder.mutation<IAudience, IAudiencePatch>({
-      query: ({ id, ...patch }) => ({
-        url: `/audiences/${id}`,
+      query: (data) => ({
+        url: `/audiences/${data.id}/`,
         method: 'PATCH',
-        body: patch,
+        body: {
+          name: data.name,
+          building: data.building?.id,
+        },
       }),
       transformResponse: (response: any): IAudience => mapAudience(response),
     }),

@@ -36,7 +36,7 @@ export const criteriaApi = createApi({
     }),
     updateCriteria: builder.mutation<ICriteria, ICriteriaPatch>({
       query: (data) => ({
-        url: `/criteria/${data.id}`,
+        url: `/criteria/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,
