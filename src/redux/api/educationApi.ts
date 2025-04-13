@@ -4,6 +4,7 @@ import {
   IProfileCreate,
   ISpecialization,
   ISpecializationCreate,
+  ISpecializationPatch,
   IStageEducation,
   IStageEducationCreate,
 } from '../../ts/interfaces/IEducation';
@@ -89,13 +90,16 @@ export const educationApi = createApi({
       IStageEducation | IProfile | ISpecialization,
       {
         type?: 'stages_education' | 'profiles' | 'specializations';
-        object: IStageEducationCreate | IProfileCreate | ISpecializationCreate;
+        object: IStageEducationCreate | IProfileCreate | ISpecializationPatch;
       }
     >({
       query: (data) => ({
-        url: '/buildings/',
+        url: `/${data.type}/`,
         method: 'PATCH',
-        body: data,
+        body: {
+          name: data.object.name,
+          //code: data.type === 'specializations' && data.object.code
+        },
       }),
       transformResponse: (response: any): ISpecialization =>
         mapSpecialization(response),

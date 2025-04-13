@@ -21,6 +21,6 @@ export interface IFlowUpdate extends IFlowCreate {
 export interface IFlowPatch {
   id: number;
   name?: string;
-  university?: number;
-  stageEducation?: number;
+  university?: IUniversity;
+  stageEducation?: IStageEducation;
 }

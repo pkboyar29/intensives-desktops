@@ -62,10 +62,15 @@ export const groupApi = createApi({
       transformResponse: (response: any): IGroup => mapGroup(response),
     }),
     updateGroup: builder.mutation<IGroup, IGroupPatch>({
-      query: ({ id, ...patch }) => ({
-        url: `/groups/${id}/`,
+      query: (data) => ({
+        url: `/groups/${data.id}/`,
         method: 'PATCH',
-        body: patch,
+        body: {
+          name: data.name,
+          flow: data.flow?.id,
+          profile: data.profile?.id,
+          specialization: data.specialization?.id,
+        },
       }),
       transformResponse: (response: any): IGroup => mapGroup(response),
     }),

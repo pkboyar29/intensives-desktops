@@ -1,7 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
-import { IFlow, IFlowCreate, IFlowUpdate } from '../../ts/interfaces/IFlow';
+import {
+  IFlow,
+  IFlowCreate,
+  IFlowPatch,
+  IFlowUpdate,
+} from '../../ts/interfaces/IFlow';
 import { childEntitiesMeta } from '../../ts/types/types';
 import { mapUniversity } from './universityApi';
 import { mapStageEducation } from './educationApi';
@@ -57,14 +62,14 @@ export const flowApi = createApi({
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),
     }),
-    updateFlow: builder.mutation<IFlow, IFlowUpdate>({
+    updateFlow: builder.mutation<IFlow, IFlowPatch>({
       query: (data) => ({
-        url: `/flows/${data.id}`,
+        url: `/flows/${data.id}/`,
         method: 'PATCH',
         body: {
-          name: data?.name,
-          university: data?.university,
-          stage_education: data?.stageEducation,
+          name: data.name,
+          university: data.university?.id,
+          stage_education: data.stageEducation?.id,
         },
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),

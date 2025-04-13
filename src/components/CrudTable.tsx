@@ -39,7 +39,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onNextPage,
   } = props;
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  //const [editingRow, setEditingRow] = useState<T | null>(null);
   const editingRow = useRef<T | null>(null);
   const columns = tableConfigs[type] as ColumnConfig<T>[];
 
@@ -49,20 +48,11 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     console.log(editingRow);
   }, [editingRow]);
 
-  useEffect(() => {
-    if (!editingRowId) {
-      //console.log('id is null ', editingRow);
-    }
-  }, [editingRowId]);
-
   const columnsTable: ColumnDef<T, any>[] = useMemo(() => {
     const cols: ColumnDef<T, any>[] = columns.map((column) =>
       columnHelper.accessor(
         (row) => {
           const value = row[column.key];
-          //console.log(value);
-          //console.log(column);
-          //console.log(row);
           if (
             //разные почти бесполезные проверки
             column.renderKey &&
@@ -101,7 +91,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                 return (
                   <input
                     defaultValue={value}
-                    //value={(editingRow[key as keyof T] as string) ?? ''} с этим тоже баги какие
+                    //value={(editingRow[key as keyof T] as string) ?? ''}
                     className="border border-black"
                     onChange={(e) => {
                       if (editingRow.current) {
@@ -110,13 +100,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                           [key as keyof T]: e.target.value,
                         };
                       }
-                      /*
-                      setEditingRow((prev) =>
-                        prev
-                          ? { ...prev, [key as keyof T]: e.target.value }
-                          : prev
-                      );
-                      */
                     }}
                   ></input>
                 );
@@ -213,35 +196,27 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     }
 
     return cols;
-  }, [childEntities, editingRowId]); //что то придумать
+  }, [childEntities, editingRowId]);
 
   const handleSaveEditing = () => {
-    // был параметр T
-    //console.log(editedRow);
-    //console.log(editingRow);
-    //setEditingRow(null);
-    console.log(editingRow.current);
+    //так как здесь замыкание можно сравнивать row в параметре и editingRow не являются ли они одинаковыми (но это будет нечитабельно)
     editingRow.current && onUpdate && onUpdate(editingRow.current);
     setEditingRowId(null);
     editingRow.current = null;
   };
 
   const handleEdit = (row: T) => {
-    console.log('edit', row);
     const id = getId(row);
     const editingId = editingRow.current && getId(editingRow.current);
-    //console.log(editingRow && getId(editingRow));
     setEditingRowId(editingId === id ? null : id.toString());
     editingRow.current = editingId === id ? null : row;
   };
 
   const handleDelete = (row: T) => {
-    console.log('delet', row);
     onDelete && onDelete(row);
   };
 
   const handleChildNavigate = (row: T, child: childEntitiesMeta) => {
-    //console.log(child, row);
     if (onChildNavigatePath) {
       const path = '/' + getId(row) + '/' + child.type;
       onChildNavigatePath(path);
@@ -257,9 +232,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           pagination={onNextPage ? { onNextPage: () => onNextPage } : undefined}
         />
       </div>
-      <button onClick={() => console.log(editingRow)}>
-        чекнуть редактируемую строку
-      </button>
     </>
   );
 }

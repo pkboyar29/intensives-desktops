@@ -26,3 +26,8 @@ export interface ISpecializationCreate {
   name: string;
   code: string;
 }
+
+export interface ISpecializationPatch {
+  name?: string;
+  code?: string;
+}

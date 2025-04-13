@@ -23,7 +23,7 @@ export interface IGroupUpdate extends IGroupCreate {
 export interface IGroupPatch {
   id: number;
   name?: string;
-  flow?: number;
-  profile?: number;
-  specialization?: number;
+  flow?: IFlow;
+  profile?: IProfile;
+  specialization?: ISpecialization;
 }

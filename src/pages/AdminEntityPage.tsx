@@ -86,16 +86,26 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         item.id === entity.id ? { ...item, ...entity } : item
       )
     );
+    // Если ничего не изменили запрос не отправляем
 
     try {
-      console.log(entity);
-      await updateEntityAPI({ ...entity }).unwrap();
+      //console.log(entity);
+      //cringe
+      if (paramsFromConfig.type) {
+        await updateEntityAPI({
+          ...entity,
+          type: paramsFromConfig.type,
+        } as any).unwrap();
+      } else {
+        await updateEntityAPI({ ...entity }).unwrap();
+      }
+      //await updateEntityAPI({ ...entity }).unwrap();
     } catch (error: any) {
       console.error(
         `Error on updating entity ${entityType} id=${entity.id}`,
         error
       );
-      setData(prevItems); // в случае ошибки откатываем состояние
+      setData(prevItems); // в случае ошибки откатываем состояние (!попадает сюда даже если запрос 200 но ошибка где то тут)
     }
   };
 
