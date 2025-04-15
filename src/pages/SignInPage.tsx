@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -38,8 +39,31 @@ const SignInPage: FC = () => {
     }
   }, [currentUser]);
 
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      email?: string;
+      password?: string;
+    };
+
+    if (errorData && errorData.email) {
+      setError('email', {
+        type: 'custom',
+        message: errorData.email,
+      });
+    } else if (errorData && errorData.password) {
+      setError('password', {
+        type: 'custom',
+        message: errorData.password,
+      });
+    }
+  };
+
   const onSubmit = async (data: ISignIn) => {
     const { data: responseData, error: responseError } = await signIn(data);
+
+    if (responseError) {
+      handleResponseError(responseError as FetchBaseQueryError);
+    }
 
     if (responseData) {
       Cookies.set('access', responseData.access, {
@@ -77,13 +101,6 @@ const SignInPage: FC = () => {
           });
         }
       }
-    }
-
-    if (responseError) {
-      setError('password', {
-        type: 'custom',
-        message: 'Email или пароль неверны!',
-      });
     }
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
 
 import { useLazyGetFreeStudentsQuery } from '../redux/api/intensiveApi';
 import {
@@ -13,16 +14,20 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
+import Tooltip from '../components/common/Tooltip';
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
+import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
 import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
-
   const { intensiveId } = useParams();
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
   const [getFreeStudents] = useLazyGetFreeStudentsQuery();
   const [getTeams] = useLazyGetTeamsQuery();
   const [changeAllTeams] = useChangeAllTeamsMutation();
@@ -36,6 +41,8 @@ const CreateTeamsPage: FC = () => {
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
 
   const [teamsCountModal, setTeamsCountModal] = useState<boolean>(false);
+  const [randomDistributeModal, setRandomDistributeModal] =
+    useState<boolean>(false);
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [saveModal, setSaveModal] = useState<boolean>(false);
 
@@ -254,6 +261,69 @@ const CreateTeamsPage: FC = () => {
     setFreeStudents([...freeStudents, studentToDelete]);
   };
 
+  const distributeStudents = () => {
+    let allStudents: IStudent[] = freeStudents;
+    teams.forEach((team) => {
+      allStudents = [...allStudents, ...team.studentsInTeam];
+    });
+
+    const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
+    const freeSpecificStudents = allStudents.filter(
+      (student) => !flowIds.includes(student.group.flowId)
+    );
+    // убираем всех отдельных студентов (они не должны участвовать в распределении)
+    allStudents = allStudents.filter((student) =>
+      flowIds.includes(student.group.flowId)
+    );
+
+    // минимальное количество студентов в команде
+    // const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
+    // console.log(allStudents.length);
+    // console.log(minStudentsCountPerTeam);
+
+    // структура данных, чтобы перемещаться по каждой группе
+    const studentsByGroup: Record<number, IStudent[]> = {};
+
+    allStudents.forEach((student) => {
+      if (!studentsByGroup[student.group.id]) {
+        studentsByGroup[student.group.id] = [];
+      }
+
+      studentsByGroup[student.group.id].push(student);
+    });
+
+    let newTeams: ITeamForManager[] = teams.map((team) => ({
+      ...team,
+      studentsInTeam: [],
+    }));
+
+    // итерируемся по массивам студентов, сгрупированных по groupId
+    Object.values(studentsByGroup).forEach((groupStudents) => {
+      const groupCopy = [...groupStudents]; // клонируем, чтобы не мутировать оригинал
+
+      let teamIndex = 0;
+
+      while (groupCopy.length > 0) {
+        // if (
+        //   newTeams[teamIndex % teamsCount].studentsInTeam.length >=
+        //   minStudentsCountPerTeam
+        // ) {
+        //   teamIndex++;
+        //   continue;
+        // }
+
+        const randomStudentIndex = Math.floor(Math.random() * groupCopy.length);
+        const [student] = groupCopy.splice(randomStudentIndex, 1); // берем студента из groupCopy и одновременно удаляем его
+
+        newTeams[teamIndex % teamsCount].studentsInTeam.push(student);
+        teamIndex++;
+      }
+    });
+
+    setTeams(newTeams);
+    setFreeStudents([...freeSpecificStudents]);
+  };
+
   const onSubmit = async () => {
     if (intensiveId) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
@@ -319,6 +389,28 @@ const CreateTeamsPage: FC = () => {
                   setTeamsCountModal(false);
                 }}
                 children="Сохранить участников"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {randomDistributeModal && (
+        <Modal
+          title={'Случайное распределение участников по командам'}
+          onCloseModal={() => setRandomDistributeModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Все студенты из потоков интенсива будут случайно равномерно распределены среди ${teamsCount} команд`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  distributeStudents();
+                  setRandomDistributeModal(false);
+                }}
+                children="Распределить"
               />
             </div>
           </div>
@@ -410,6 +502,18 @@ const CreateTeamsPage: FC = () => {
             clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
+
+        <Tooltip
+          tooltipText="Случайно распределить участников"
+          tooltipClasses="bg-gray_5 p-1 rounded"
+        >
+          <button
+            onClick={() => setRandomDistributeModal(true)}
+            className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
+          >
+            <ShuffleIcon />
+          </button>
+        </Tooltip>
       </div>
 
       <div className="flex gap-10 mt-5">
@@ -424,22 +528,13 @@ const CreateTeamsPage: FC = () => {
             <TeamDragContainer
               key={team.index}
               containerName={team.name}
-              onDrop={(droppedElement) => {
-                handleStudentMove(team, {
-                  id: droppedElement.id,
-                  nameWithGroup: droppedElement.content,
-                });
+              onDrop={(droppedStudent) => {
+                handleStudentMove(team, droppedStudent);
               }}
-              onDelete={(deletedElement) => {
-                handleStudentDelete(team, {
-                  id: deletedElement.id,
-                  nameWithGroup: deletedElement.content,
-                });
+              onDelete={(deletedStudent) => {
+                handleStudentDelete(team, deletedStudent);
               }}
-              droppedElements={team.studentsInTeam.map((studentInTeam) => ({
-                id: studentInTeam.id,
-                content: studentInTeam.nameWithGroup,
-              }))}
+              droppedStudents={team.studentsInTeam}
             />
           ))}
         </div>
@@ -466,6 +561,7 @@ const CreateTeamsPage: FC = () => {
                 <TeamDragElement
                   key={freeStudent.id}
                   data={{
+                    ...freeStudent,
                     id: freeStudent.id,
                     content: freeStudent.nameWithGroup,
                   }}

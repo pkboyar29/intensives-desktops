@@ -20,11 +20,11 @@ const Chip: FC<ChipProps> = ({
   return (
     <div
       onClick={clickHandler}
-      className={`bg-gray_5 rounded-xl text-black_2 text-lg flex items-center gap-3 ${
-        size === 'small' ? `px-4` : `px-14`
+      className={`bg-gray_5 rounded-xl text-black_2 text-[14.5px] md:text-lg flex items-center justify-center gap-3 ${
+        size === 'small' ? `md:px-4 px-2.5` : `px-14`
       }`}
     >
-      <span>{label}</span>
+      <span className="text-center">{label}</span>
 
       {shouldHaveCrossIcon && deleteHandler && (
         <button type="button" className="w-3 h-3" onClick={deleteHandler}>

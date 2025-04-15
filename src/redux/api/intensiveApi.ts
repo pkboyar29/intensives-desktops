@@ -105,6 +105,18 @@ export const intensiveApi = createApi({
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
+    updateIntensiveOpenness: builder.mutation<
+      string,
+      { openness: boolean; intensiveId: number }
+    >({
+      query: (data) => ({
+        url: `/intensives/${data.intensiveId}/openness/`,
+        method: 'PATCH',
+        body: {
+          openness: data.openness,
+        },
+      }),
+    }),
     getFreeStudents: builder.query<IStudent[], number>({
       query: (intensiveId) => `intensives/${intensiveId}/free/`,
       transformResponse: (response: any): IStudent[] =>
@@ -130,6 +142,7 @@ export const {
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
+  useUpdateIntensiveOpennessMutation,
   useDeleteIntensiveMutation,
   useLazyGetFreeStudentsQuery,
   useLazyGetSpecificFreeStudentsQuery,
