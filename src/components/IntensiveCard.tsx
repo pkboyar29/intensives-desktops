@@ -12,7 +12,7 @@ const IntensiveCard: FC<IntensiveCardProps> = ({ intensive, onClick }) => {
   return (
     <div
       onClick={() => onClick(intensive.id)}
-      className="h-32 p-2 border border-solid cursor-pointer md:p-5 group border-gray rounded-xl bg-gray_8"
+      className="p-2 border border-solid cursor-pointer min-h-32 md:p-5 group border-gray rounded-xl bg-gray_8"
     >
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
         <div className="w-auto md:w-[450px] lg:w-[750px]">

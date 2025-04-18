@@ -5,9 +5,12 @@ export interface IEducationRequest {
   subject: string;
   description?: string;
   team: ITeamShort;
-  // ownerName: string;
   status: 'Открыт' | 'Закрыт';
   createdDate: Date;
 }
 
-// TODO: добавить интерфейс для создания образовательного запроса
+export interface IEducationRequestSend {
+  subject: string;
+  description?: string;
+  intensiveId: number;
+}

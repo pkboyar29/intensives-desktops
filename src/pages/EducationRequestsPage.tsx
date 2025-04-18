@@ -1,11 +1,15 @@
 import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import { useLazyGetEducationRequestsQuery } from '../redux/api/educationRequestApi';
-import { isUserManager, isUserTeamlead } from '../helpers/userHelpers';
+import {
+  isUserManager,
+  isUserTeacher,
+  isUserTeamlead,
+} from '../helpers/userHelpers';
 
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
-import Modal from '../components/common/modals/Modal';
+import EducationRequestModal from '../components/common/modals/EducationRequestModal';
 import EducationRequestCard from '../components/EducationRequestCard';
 import Skeleton from 'react-loading-skeleton';
 
@@ -20,14 +24,35 @@ const EducationRequestsPage: FC = () => {
     IEducationRequest[]
   >([]);
 
+  const [requestModal, setRequestModal] = useState<{
+    status: boolean;
+    request: IEducationRequest | null;
+  }>({
+    status: false,
+    request: null,
+  });
+
   const [getEducationRequests, { isLoading }] =
     useLazyGetEducationRequestsQuery();
 
+  // TODO: за студента происходит два запроса при обновлении страницы (из-за того что currentTeam не подгружена)
   useEffect(() => {
-    const fetchEducationRequests = async () => {
-      if (currentIntensive) {
+    const fetchRequests = async () => {
+      // вызываем запрос либо если пользователь - препод и currentTeam подгружена, либо если пользователь не препод
+      const shouldFetch =
+        currentIntensive &&
+        (!isUserTeacher(currentUser) ||
+          (isUserTeacher(currentUser) && currentTeam));
+
+      console.log(shouldFetch);
+
+      if (shouldFetch) {
         try {
-          const { data } = await getEducationRequests(currentIntensive.id);
+          const { data } = await getEducationRequests({
+            intensiveId: currentIntensive.id,
+            teamId:
+              isUserTeacher(currentUser) && currentTeam ? currentTeam.id : null,
+          });
 
           if (data) {
             setEducationRequests(data);
@@ -38,11 +63,37 @@ const EducationRequestsPage: FC = () => {
       }
     };
 
-    fetchEducationRequests();
-  }, [currentIntensive]);
+    fetchRequests();
+  }, [currentIntensive, currentTeam]);
 
   return (
     <>
+      {requestModal.status && (
+        <EducationRequestModal
+          request={null}
+          onClose={() =>
+            setRequestModal({
+              request: null,
+              status: false,
+            })
+          }
+          onCancel={() =>
+            setRequestModal({
+              request: null,
+              status: false,
+            })
+          }
+          onChangeRequest={(request) => {
+            setEducationRequests([...educationRequests, request]);
+
+            setRequestModal({
+              request: null,
+              status: false,
+            });
+          }}
+        />
+      )}
+
       <Title text="Образовательные запросы" />
 
       <div className="mt-4 sm:mt-8">
@@ -51,7 +102,12 @@ const EducationRequestsPage: FC = () => {
             <div className="ml-auto">
               <PrimaryButton
                 children="Отправить образовательный запрос"
-                clickHandler={() => console.log('sending...')}
+                clickHandler={() =>
+                  setRequestModal({
+                    status: true,
+                    request: null,
+                  })
+                }
               />
             </div>
           </div>
