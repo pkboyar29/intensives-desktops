@@ -36,33 +36,31 @@ const EducationRequestsPage: FC = () => {
     useLazyGetEducationRequestsQuery();
 
   // TODO: за студента происходит два запроса при обновлении страницы (из-за того что currentTeam не подгружена)
-  useEffect(() => {
-    const fetchRequests = async () => {
-      // вызываем запрос либо если пользователь - препод и currentTeam подгружена, либо если пользователь не препод
-      const shouldFetch =
-        currentIntensive &&
-        (!isUserTeacher(currentUser) ||
-          (isUserTeacher(currentUser) && currentTeam));
+  const fetchRequests = async () => {
+    if (!currentIntensive) {
+      return;
+    }
 
-      console.log(shouldFetch);
+    if (isUserTeacher(currentUser) && !currentTeam) {
+      return;
+    }
 
-      if (shouldFetch) {
-        try {
-          const { data } = await getEducationRequests({
-            intensiveId: currentIntensive.id,
-            teamId:
-              isUserTeacher(currentUser) && currentTeam ? currentTeam.id : null,
-          });
+    try {
+      const { data } = await getEducationRequests({
+        intensiveId: currentIntensive.id,
+        teamId:
+          isUserTeacher(currentUser) && currentTeam ? currentTeam.id : null,
+      });
 
-          if (data) {
-            setEducationRequests(data);
-          }
-        } catch (e) {
-          console.log(e);
-        }
+      if (data) {
+        setEducationRequests(data);
       }
-    };
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
+  useEffect(() => {
     fetchRequests();
   }, [currentIntensive, currentTeam]);
 
@@ -114,7 +112,7 @@ const EducationRequestsPage: FC = () => {
         )}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         {isLoading ? (
           <Skeleton />
         ) : educationRequests.length === 0 ? (

@@ -16,17 +16,19 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
 
   return (
     <div className="p-2 border border-solid min-h-28 rounded-xl bg-gray_8 border-gray">
-      <div className="flex justify-between gap-12 min-h-28">
+      <div className="flex flex-col-reverse justify-between gap-2 md:gap-8 md:flex-row min-h-28">
         <div>
-          <div className="text-xl font-bold">{educationRequest.subject}</div>
+          <div className="text-lg font-bold md:text-xl">
+            {educationRequest.subject}
+          </div>
           {educationRequest.description && (
-            <div className="mt-3 text-lg text-black_3">
+            <div className="mt-3 text-base md:text-lg text-black_3">
               {educationRequest.description}
             </div>
           )}
         </div>
 
-        <div className="flex flex-col items-end justify-between">
+        <div className="flex flex-col items-end justify-between gap-2 sm:flex-row md:flex-col">
           <div className="flex gap-3">
             {isUserManager(currentUser) && (
               <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">

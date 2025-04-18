@@ -57,7 +57,7 @@ const Modal: FC<ModalProps> = ({
         ref={modalRef}
         className="px-5 py-6 mx-3 overflow-hidden bg-white border-2 border-solid rounded-xl lg:basis-1/3 border-another_white"
       >
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between gap-4 mb-5">
           <div className="text-xl font-bold">{title}</div>
           {shouldHaveCrossIcon && (
             <button onClick={onCloseModal}>
