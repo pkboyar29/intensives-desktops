@@ -11,6 +11,7 @@ import {
   ITeamsSupportMembersUpdate,
   ITeamleadChange,
   IStudentsRolesChange,
+  ITeamShort,
 } from '../../ts/interfaces/ITeam';
 
 export const mapTeam = (unmappedTeam: any): ITeam => {
@@ -30,6 +31,13 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     ),
     teamlead:
       unmappedTeam.teamlead === null ? null : mapStudent(unmappedTeam.teamlead),
+  };
+};
+
+export const mapTeamShort = (unmappedTeam: any): ITeamShort => {
+  return {
+    id: unmappedTeam.id,
+    name: unmappedTeam.name,
   };
 };
 

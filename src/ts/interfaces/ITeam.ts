@@ -11,6 +11,11 @@ export interface ITeam {
   teamlead: IStudent | null;
 }
 
+export interface ITeamShort {
+  id: number;
+  name: string;
+}
+
 export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
   studentsInTeam: IStudent[];
   index: number;
