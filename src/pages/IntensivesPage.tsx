@@ -45,7 +45,6 @@ const IntensivesPage: FC = () => {
     'all'
   );
 
-  // обрабатывать зависимость relevance
   useEffect(() => {
     updateFilteredIntensives();
   }, [searchText, openness, relevance, intensives]);
@@ -54,13 +53,14 @@ const IntensivesPage: FC = () => {
     updateSortedIntensives();
   }, [sortOption, filteredIntensives]);
 
-  // TODO: обрабатывать relevance
   const updateFilteredIntensives = () => {
     if (intensives) {
       let filteredIntensives: IIntensiveShort[] = [];
 
-      filteredIntensives = intensives.filter((intensive) =>
-        intensive.name.toLowerCase().includes(searchText)
+      filteredIntensives = intensives.filter(
+        (intensive) =>
+          intensive.name.toLowerCase().includes(searchText) ||
+          intensive.description?.toLowerCase().includes(searchText)
       );
 
       if (isUserManager(currentUser)) {

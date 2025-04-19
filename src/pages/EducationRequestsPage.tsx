@@ -7,6 +7,8 @@ import {
   isUserTeamlead,
 } from '../helpers/userHelpers';
 
+import SearchIcon from '../components/icons/SearchIcon';
+import Filter from '../components/common/Filter';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import EducationRequestModal from '../components/common/modals/EducationRequestModal';
@@ -24,6 +26,13 @@ const EducationRequestsPage: FC = () => {
     IEducationRequest[]
   >([]);
 
+  const [filteredRequests, setFilteredRequests] = useState<IEducationRequest[]>(
+    []
+  );
+
+  const [searchText, setSearchText] = useState<string>('');
+  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+
   const [requestModal, setRequestModal] = useState<{
     status: boolean;
     request: IEducationRequest | null;
@@ -34,6 +43,37 @@ const EducationRequestsPage: FC = () => {
 
   const [getEducationRequests, { isLoading }] =
     useLazyGetEducationRequestsQuery();
+
+  const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  const updateFilteredRequests = () => {
+    if (educationRequests) {
+      let filteredRequests: IEducationRequest[] = [];
+
+      filteredRequests = educationRequests.filter(
+        (request) =>
+          request.subject.toLowerCase().includes(searchText) ||
+          request.description?.toLowerCase().includes(searchText)
+      );
+
+      if (isUserManager(currentUser)) {
+        if (openness === 'opened') {
+          filteredRequests = filteredRequests.filter(
+            (request) => request.status === 'Открыт'
+          );
+        }
+        if (openness === 'closed') {
+          filteredRequests = filteredRequests.filter(
+            (request) => request.status === 'Закрыт'
+          );
+        }
+      }
+
+      setFilteredRequests(filteredRequests);
+    }
+  };
 
   // TODO: за студента происходит два запроса при обновлении страницы (из-за того что currentTeam не подгружена)
   const fetchRequests = async () => {
@@ -59,6 +99,10 @@ const EducationRequestsPage: FC = () => {
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    updateFilteredRequests();
+  }, [searchText, educationRequests, openness]);
 
   useEffect(() => {
     fetchRequests();
@@ -112,6 +156,34 @@ const EducationRequestsPage: FC = () => {
         )}
       </div>
 
+      {/* {isUserManager(currentUser) && ( */}
+      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
+        <SearchIcon className="text-gray-500" />
+        <input
+          value={searchText}
+          onChange={searchInputChangeHandler}
+          className="w-full pl-4 bg-another_white focus:outline-none"
+          placeholder="Поиск"
+        />
+      </div>
+      {/* )} */}
+
+      <div className="mt-4">
+        {isUserManager(currentUser) && (
+          <Filter
+            onFilterOptionClick={(filterOption) =>
+              setOpenness(filterOption as 'all' | 'opened' | 'closed')
+            }
+            activeFilterOption={openness}
+            filterList={[
+              { label: 'Открытые', value: 'opened' },
+              { label: 'Закрытые', value: 'closed' },
+              { label: 'Все', value: 'all' },
+            ]}
+          />
+        )}
+      </div>
+
       <div className="mt-4 md:mt-6">
         {isLoading ? (
           <Skeleton />
@@ -121,15 +193,17 @@ const EducationRequestsPage: FC = () => {
               ? 'На данный момент образовательных запросов нету'
               : 'Команда еще не отправила ни одного образовательного запроса'}
           </div>
-        ) : (
+        ) : filteredRequests.length > 0 ? (
           <div className="flex flex-col gap-4">
-            {educationRequests?.map((request) => (
+            {filteredRequests?.map((request) => (
               <EducationRequestCard
                 key={request.id}
                 educationRequest={request}
               />
             ))}
           </div>
+        ) : (
+          <div className="text-xl text-black">Ничего не найдено</div>
         )}
       </div>
     </>
