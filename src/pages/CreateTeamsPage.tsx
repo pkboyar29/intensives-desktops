@@ -35,6 +35,7 @@ const CreateTeamsPage: FC = () => {
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
+  const [teamsCountError, setTeamsCountError] = useState<string | null>(null);
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
@@ -152,11 +153,32 @@ const CreateTeamsPage: FC = () => {
   const teamsCountInputChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (teamsCountError) {
+      setTeamsCountError(null);
+    }
+
     setTeamsCount(parseInt(e.target.value));
   };
 
   const teamsCountButtonClickHandler = () => {
+    const allStudents = getAllStudents();
+    if (teamsCount > allStudents.length) {
+      setTeamsCountError(
+        `Максимальное количество команд в этом интенсиве - ${allStudents.length}`
+      );
+      return;
+    }
+
     setTeamsCountModal(true);
+  };
+
+  const getAllStudents = (): IStudent[] => {
+    let allStudents: IStudent[] = freeStudents;
+    teams.forEach((team) => {
+      allStudents = [...allStudents, ...team.studentsInTeam];
+    });
+
+    return allStudents;
   };
 
   const clearTeams = () => {
@@ -262,10 +284,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const distributeStudents = () => {
-    let allStudents: IStudent[] = freeStudents;
-    teams.forEach((team) => {
-      allStudents = [...allStudents, ...team.studentsInTeam];
-    });
+    let allStudents: IStudent[] = getAllStudents();
 
     const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
     const freeSpecificStudents = allStudents.filter(
@@ -515,6 +534,10 @@ const CreateTeamsPage: FC = () => {
           </button>
         </Tooltip>
       </div>
+
+      {teamsCountError && (
+        <div className="mt-2 text-red">{teamsCountError}</div>
+      )}
 
       <div className="flex gap-10 mt-5">
         <div className="flex flex-col gap-3 basis-1/3">
