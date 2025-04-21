@@ -100,10 +100,13 @@ const ManageEventForm: FC = () => {
     { refetchOnMountOrArgChange: true, skip: !currentUser }
   );
 
-  const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser,
-  });
+  const { data: teamsToChoose } = useGetTeamsQuery(
+    { intensiveId: Number(intensiveId), short: true },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !currentUser,
+    }
+  );
   const teachersToChoose = currentIntensive?.teachers;
   const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
     Number(intensiveId),

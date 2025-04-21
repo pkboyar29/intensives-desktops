@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { isUserManager } from '../helpers/userHelpers';
-
 import { useGetTeamsQuery } from '../redux/api/teamApi';
 
 import Skeleton from 'react-loading-skeleton';
@@ -10,15 +9,20 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import TeamCard from '../components/TeamCard';
 
+import { ITeam } from '../ts/interfaces/ITeam';
+
 const TeamsPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
 
   const navigate = useNavigate();
   const { intensiveId } = useParams();
 
-  const { data: teams, isLoading } = useGetTeamsQuery(Number(intensiveId), {
-    refetchOnMountOrArgChange: true,
-  });
+  const { data: teams, isLoading } = useGetTeamsQuery(
+    { intensiveId: Number(intensiveId), short: false },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   return (
     <div>
@@ -35,7 +39,7 @@ const TeamsPage: FC = () => {
       ) : teams && teams.length > 0 ? (
         <div className="flex flex-wrap gap-6 mt-7">
           {teams.map((team) => (
-            <TeamCard key={team.id} team={team} />
+            <TeamCard key={team.id} team={team as ITeam} />
           ))}
         </div>
       ) : (

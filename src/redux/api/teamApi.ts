@@ -39,6 +39,7 @@ export const mapTeamShort = (unmappedTeam: any): ITeamShort => {
   return {
     id: unmappedTeam.id,
     name: unmappedTeam.name,
+    position: unmappedTeam.position,
   };
 };
 
@@ -46,13 +47,27 @@ export const teamApi = createApi({
   reducerPath: 'teamApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeams: builder.query<ITeam[], number>({
-      query: (intensiveId) => `teams/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeam[] => {
-        const teams: ITeam[] = response.results.map((team: any) =>
-          mapTeam(team)
+    getTeams: builder.query<
+      ITeam[] | ITeamShort[],
+      { intensiveId: number; short: boolean }
+    >({
+      query: ({ intensiveId, short }) =>
+        `teams/?intensive_id=${intensiveId}&short=${short}`,
+      transformResponse: (response: any): ITeam[] | ITeamShort[] => {
+        // TODO: уже тут надо делать сужение типов
+        const teams = response.map((team: any) => {
+          if ('students_in_team' in team) {
+            return mapTeam(team);
+          } else {
+            return mapTeamShort(team);
+          }
+        });
+
+        // TODO: проверить чтобы сортировалось и для iteam и для iteamshort объектов
+        teams.sort(
+          (a: ITeam | ITeamShort, b: ITeam | ITeamShort) =>
+            a.position - b.position
         );
-        teams.sort((a, b) => a.position - b.position);
 
         return teams;
       },

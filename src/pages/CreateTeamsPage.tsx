@@ -20,7 +20,7 @@ import MembersIcon from '../components/icons/MembersIcon';
 import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -72,12 +72,15 @@ const CreateTeamsPage: FC = () => {
     const fetchTeams = async () => {
       if (intensiveId) {
         try {
-          const { data: teamsResponse } = await getTeams(parseInt(intensiveId));
+          const { data: teamsResponse } = await getTeams({
+            intensiveId: parseInt(intensiveId),
+            short: false,
+          });
 
           if (teamsResponse && teamsResponse.length > 0) {
             setTeamsCount(teamsResponse.length);
             setTeams(
-              teamsResponse.map((team) => ({
+              (teamsResponse as ITeam[]).map((team) => ({
                 ...team,
                 index: team.id,
                 studentsInTeam: team.studentsInTeam.map(

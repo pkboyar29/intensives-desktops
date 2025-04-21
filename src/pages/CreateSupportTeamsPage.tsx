@@ -17,9 +17,7 @@ import SearchIcon from '../components/icons/SearchIcon';
 import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { ISupportTeamForManager } from '../ts/interfaces/ITeam';
-import { IStudent } from '../ts/interfaces/IStudent';
-import { E } from 'framer-motion/dist/types.d-6pKw1mTI';
+import { ISupportTeamForManager, ITeam } from '../ts/interfaces/ITeam';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -62,11 +60,14 @@ const CreateSupportTeamsPage: FC = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       if (intensiveId) {
-        const { data, error } = await getTeams(parseInt(intensiveId));
+        const { data, error } = await getTeams({
+          intensiveId: parseInt(intensiveId),
+          short: false,
+        });
 
         if (data) {
           setSupportTeams(
-            data.map((team) => ({
+            (data as ITeam[]).map((team) => ({
               ...team,
               mentor: team.mentor
                 ? { id: team.mentor.id, name: team.mentor.nameWithGroup }

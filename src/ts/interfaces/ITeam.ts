@@ -15,6 +15,7 @@ export interface ITeam {
 export interface ITeamShort {
   id: number;
   name: string;
+  position: number;
 }
 
 export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
