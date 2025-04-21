@@ -91,6 +91,7 @@ const CreateTeamsPage: FC = () => {
                 id: null,
                 index: 1,
                 name: 'Команда 1',
+                position: 1,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
@@ -100,6 +101,7 @@ const CreateTeamsPage: FC = () => {
                 id: null,
                 index: 2,
                 name: 'Команда 2',
+                position: 2,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
@@ -209,6 +211,7 @@ const CreateTeamsPage: FC = () => {
             id: null,
             index: i,
             name: `Команда ${i}`,
+            position: i,
             studentsInTeam: [],
             tutor: null,
             mentor: null,
@@ -348,6 +351,7 @@ const CreateTeamsPage: FC = () => {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
         id: team.id,
         name: team.name,
+        position: team.position,
         studentIds: team.studentsInTeam.map(
           (studentInTeam) => studentInTeam.id
         ),

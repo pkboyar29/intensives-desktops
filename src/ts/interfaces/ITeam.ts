@@ -5,6 +5,7 @@ import { IStudentRole } from './IStudentRole';
 export interface ITeam {
   id: number;
   name: string;
+  position: number;
   studentsInTeam: IStudentInTeam[];
   tutor: ITeacher | null;
   mentor: IStudent | null;
@@ -42,6 +43,7 @@ export interface ITeamsCreate {
 export interface ITeamCreate {
   id: number | null;
   name: string;
+  position: number;
   studentIds: number[];
 }
 

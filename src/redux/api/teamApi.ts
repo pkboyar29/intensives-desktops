@@ -18,6 +18,7 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
   return {
     id: unmappedTeam.id,
     name: unmappedTeam.name,
+    position: unmappedTeam.position,
     tutor: unmappedTeam.tutor === null ? null : mapTeacher(unmappedTeam.tutor),
     mentor:
       unmappedTeam.mentor === null ? null : mapStudent(unmappedTeam.mentor),
@@ -51,7 +52,7 @@ export const teamApi = createApi({
         const teams: ITeam[] = response.results.map((team: any) =>
           mapTeam(team)
         );
-        teams.sort((a, b) => a.name.localeCompare(b.name));
+        teams.sort((a, b) => a.position - b.position);
 
         return teams;
       },
@@ -67,6 +68,7 @@ export const teamApi = createApi({
         body: data.teams.map((team) => ({
           id: team.id,
           name: team.name,
+          position: team.position,
           student_ids: team.studentIds,
         })),
       }),
