@@ -8,7 +8,7 @@ import {
   IEventUpdateVisibility,
   IEventShort,
 } from '../../ts/interfaces/IEvent';
-import { mapTeam } from './teamApi';
+import { mapTeamShort } from './teamApi';
 import { mapAudience } from './audienceApi';
 import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
@@ -26,7 +26,7 @@ export const mapEvent = (unmappedEvent: any): IEvent => {
     visibility: unmappedEvent.visibility,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
-      mapTeam(unmappedTeam)
+      mapTeamShort(unmappedTeam)
     ),
     teachers: unmappedEvent.teachers.map((unmappedTeacher: any) =>
       mapTeacher(unmappedTeacher)
