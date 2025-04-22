@@ -6,7 +6,6 @@ import { isUserManager } from '../helpers/userHelpers';
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
 import Title from '../components/common/Title';
-import Chip from '../components/common/Chip';
 import ChipList from '../components/common/ChipList';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
@@ -35,7 +34,11 @@ const IntensiveOverviewPage: FC = () => {
           onCloseModal={() => setDeleteModal(false)}
         >
           <p className="text-lg text-bright_gray">
-            {`Вы уверены, что хотите удалить интенсив ${currentIntensive.name}?`}
+            Вы уверены, что хотите удалить интенсив{' '}
+            <span className="font-bold text-black">
+              {currentIntensive.name}
+            </span>
+            ?
           </p>
           <div className="flex justify-end gap-3 mt-6">
             <div>

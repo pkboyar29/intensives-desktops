@@ -42,7 +42,7 @@ const IntensivesPage: FC = () => {
 
   const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
   const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
-    'all'
+    'relevant'
   );
 
   useEffect(() => {

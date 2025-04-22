@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
-import Chip from '../Chip';
+import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
 interface MultipleSelectInputProps<T> {
@@ -107,14 +107,8 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         </ul>
       </motion.div>
 
-      <div className="flex flex-wrap gap-2 mx-3 mt-3">
-        {selectedItems.map((selectedItem) => (
-          <Chip
-            key={selectedItem.id}
-            label={selectedItem.name}
-            size={chipSize}
-          />
-        ))}
+      <div className="mt-2.5">
+        <ChipList items={selectedItems} chipSize={chipSize} />
       </div>
 
       <div className="text-base text-red">{errorMessage}</div>

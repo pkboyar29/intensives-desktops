@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useLazyGetStudentsQuery } from '../../../redux/api/studentApi';
 
 import Checkbox from './Checkbox';
-import Chip from '../Chip';
+import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
 import SearchIcon from '../../icons/SearchIcon';
 import CrossIcon from '../../icons/CrossIcon';
@@ -163,16 +163,13 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
         )}
       </motion.div>
 
-      <div className="flex flex-wrap gap-2 mx-3 mt-3">
-        {selectedItems.map((selectedItem) => (
-          <Chip
-            key={selectedItem.id}
-            label={selectedItem.name}
-            size={'small'}
-            shouldHaveCrossIcon={true}
-            deleteHandler={() => deleteSelectedItem(selectedItem.id)}
-          />
-        ))}
+      <div className="mt-3">
+        <ChipList
+          items={selectedItems}
+          chipSize="small"
+          chipCrossIcon={true}
+          chipDeleteHandler={(itemId) => deleteSelectedItem(itemId)}
+        />
       </div>
 
       <div className="mt-3 text-base text-red">{errorMessage}</div>

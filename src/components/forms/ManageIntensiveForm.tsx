@@ -303,7 +303,7 @@ const ManageIntensiveForm: FC = () => {
 
       <div
         className={`flex justify-center ${
-          !intensiveId ? `pt-[88px]` : `max-w-[1280px]`
+          !intensiveId ? `pt-[88px] px-3` : `max-w-[1280px]`
         }`}
       >
         <form
@@ -314,7 +314,7 @@ const ManageIntensiveForm: FC = () => {
             text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
           />
 
-          <div className="flex flex-col gap-3 mt-6 mb-3">
+          <div className="flex flex-col gap-1.5 sm:gap-3 mt-3 mb-3 sm:mt-6">
             <div className="text-lg font-bold">Интенсив</div>
 
             <InputDescription
@@ -363,7 +363,7 @@ const ManageIntensiveForm: FC = () => {
           <div className="flex flex-col gap-3 my-3">
             <div className="text-lg font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-6">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:gap-6">
               <InputDescription
                 fieldName="openDate"
                 register={register}
@@ -508,7 +508,7 @@ const ManageIntensiveForm: FC = () => {
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
-          <div className="flex my-5 gap-7">
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"
