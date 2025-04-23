@@ -14,3 +14,9 @@ export interface IEducationRequestSend {
   description?: string;
   intensiveId: number;
 }
+
+export interface IEducationRequestUpdate {
+  subject: string;
+  description?: string;
+  requestId: number;
+}

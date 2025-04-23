@@ -5,6 +5,7 @@ import { mapTeamShort } from './teamApi';
 import {
   IEducationRequest,
   IEducationRequestSend,
+  IEducationRequestUpdate,
 } from '../../ts/interfaces/IEducationRequest';
 
 export const mapEducationRequest = (
@@ -15,7 +16,7 @@ export const mapEducationRequest = (
     subject: unmappedRequest.subject,
     description: unmappedRequest.description,
     createdDate: new Date(unmappedRequest.created_at),
-    status: unmappedRequest.status === 1 ? 'Открыт' : 'Закрыт',
+    status: unmappedRequest.status === 'OPENED' ? 'Открыт' : 'Закрыт',
     team: mapTeamShort(unmappedRequest.team),
   };
 };
@@ -55,10 +56,30 @@ export const educationRequestApi = createApi({
       transformResponse: (response: any): IEducationRequest =>
         mapEducationRequest(response),
     }),
+    updateEducationRequest: builder.mutation<
+      IEducationRequest,
+      IEducationRequestUpdate
+    >({
+      query: ({ requestId, ...data }) => ({
+        url: `/education_requests/${requestId}/`,
+        method: 'PUT',
+        body: data,
+      }),
+      transformResponse: (response: any): IEducationRequest =>
+        mapEducationRequest(response),
+    }),
+    deleteEducationRequest: builder.mutation<void, number>({
+      query: (requestId) => ({
+        url: `/education_requests/${requestId}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
 export const {
   useLazyGetEducationRequestsQuery,
   useSendEducationRequestMutation,
+  useUpdateEducationRequestMutation,
+  useDeleteEducationRequestMutation,
 } = educationRequestApi;

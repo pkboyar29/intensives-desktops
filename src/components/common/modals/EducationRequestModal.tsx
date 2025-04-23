@@ -1,7 +1,10 @@
 import { FC } from 'react';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useSendEducationRequestMutation } from '../../../redux/api/educationRequestApi';
+import {
+  useSendEducationRequestMutation,
+  useUpdateEducationRequestMutation,
+} from '../../../redux/api/educationRequestApi';
 
 import Modal from '../modals/Modal';
 import InputDescription from '../inputs/InputDescription';
@@ -43,6 +46,7 @@ const EducationRequestModal: FC<EducationRequestModalProps> = ({
   });
 
   const [sendEducationRequest] = useSendEducationRequestMutation();
+  const [updateEducationRequest] = useUpdateEducationRequestMutation();
 
   const onSubmit = async (data: EducationRequestFields) => {
     if (intensiveId) {
@@ -59,6 +63,22 @@ const EducationRequestModal: FC<EducationRequestModalProps> = ({
 
         if (responseError) {
           toast('Произошла серверная ошибка при отправке запроса', {
+            type: 'error',
+          });
+        }
+      } else {
+        const { data: responseData, error: responseError } =
+          await updateEducationRequest({
+            ...data,
+            requestId: request.id,
+          });
+
+        if (responseData) {
+          onChangeRequest(responseData);
+        }
+
+        if (responseError) {
+          toast('Произошла серверная ошибка при обновлении запроса', {
             type: 'error',
           });
         }

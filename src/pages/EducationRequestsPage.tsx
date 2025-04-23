@@ -1,6 +1,9 @@
 import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
-import { useLazyGetEducationRequestsQuery } from '../redux/api/educationRequestApi';
+import {
+  useLazyGetEducationRequestsQuery,
+  useDeleteEducationRequestMutation,
+} from '../redux/api/educationRequestApi';
 import {
   isUserManager,
   isUserTeacher,
@@ -11,9 +14,11 @@ import SearchIcon from '../components/icons/SearchIcon';
 import Filter from '../components/common/Filter';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Modal from '../components/common/modals/Modal';
 import EducationRequestModal from '../components/common/modals/EducationRequestModal';
 import EducationRequestCard from '../components/EducationRequestCard';
 import Skeleton from 'react-loading-skeleton';
+import { ToastContainer, toast } from 'react-toastify';
 
 import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
 
@@ -40,9 +45,17 @@ const EducationRequestsPage: FC = () => {
     status: false,
     request: null,
   });
+  const [deleteModal, setDeleteModal] = useState<{
+    status: boolean;
+    request: IEducationRequest | null;
+  }>({
+    status: false,
+    request: null,
+  });
 
   const [getEducationRequests, { isLoading }] =
     useLazyGetEducationRequestsQuery();
+  const [deleteEducationRequest] = useDeleteEducationRequestMutation();
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -110,9 +123,11 @@ const EducationRequestsPage: FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-center" />
+
       {requestModal.status && (
         <EducationRequestModal
-          request={null}
+          request={requestModal.request}
           onClose={() =>
             setRequestModal({
               request: null,
@@ -125,8 +140,26 @@ const EducationRequestsPage: FC = () => {
               status: false,
             })
           }
-          onChangeRequest={(request) => {
-            setEducationRequests([...educationRequests, request]);
+          onChangeRequest={(changedRequest) => {
+            if (
+              educationRequests.find(
+                (request) => request.id === changedRequest.id
+              )
+            ) {
+              // если запрос изменили
+              setEducationRequests(
+                educationRequests.map((request) => {
+                  if (request.id === changedRequest.id) {
+                    return changedRequest;
+                  } else {
+                    return request;
+                  }
+                })
+              );
+            } else {
+              // если новый запрос добавили
+              setEducationRequests([...educationRequests, changedRequest]);
+            }
 
             setRequestModal({
               request: null,
@@ -134,6 +167,68 @@ const EducationRequestsPage: FC = () => {
             });
           }}
         />
+      )}
+
+      {deleteModal.status && (
+        <Modal
+          title="Удаление образовательного запроса"
+          onCloseModal={() =>
+            setDeleteModal({
+              status: false,
+              request: null,
+            })
+          }
+        >
+          <p className="text-lg text-bright_gray">
+            Вы уверены, что хотите удалить этот образовательный запрос?
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() =>
+                  setDeleteModal({
+                    status: false,
+                    request: null,
+                  })
+                }
+                children="Отменить"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={async () => {
+                  if (deleteModal.request) {
+                    const { error } = await deleteEducationRequest(
+                      deleteModal.request.id
+                    );
+
+                    if (error) {
+                      toast(
+                        'Произошла серверная ошибка при удалении образовательного запроса',
+                        {
+                          type: 'error',
+                        }
+                      );
+                    } else {
+                      setEducationRequests(
+                        educationRequests.filter(
+                          (request) => request.id !== deleteModal.request!.id
+                        )
+                      );
+                    }
+
+                    setDeleteModal({
+                      status: false,
+                      request: null,
+                    });
+                  }
+                }}
+                children="Удалить"
+              />
+            </div>
+          </div>
+        </Modal>
       )}
 
       <Title text="Образовательные запросы" />
@@ -199,6 +294,12 @@ const EducationRequestsPage: FC = () => {
               <EducationRequestCard
                 key={request.id}
                 educationRequest={request}
+                onEditButtonClick={(requestToEdit) => {
+                  setRequestModal({ status: true, request: requestToEdit });
+                }}
+                onDeleteButtonClick={(requestToDelete) => {
+                  setDeleteModal({ status: true, request: requestToDelete });
+                }}
               />
             ))}
           </div>
