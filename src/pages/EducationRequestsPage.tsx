@@ -67,8 +67,8 @@ const EducationRequestsPage: FC = () => {
 
       filteredRequests = educationRequests.filter(
         (request) =>
-          request.subject.toLowerCase().includes(searchText) ||
-          request.description?.toLowerCase().includes(searchText)
+          request.subject.toLowerCase().includes(searchText.toLowerCase()) ||
+          request.description?.toLowerCase().includes(searchText.toLowerCase())
       );
 
       if (isUserManager(currentUser)) {
@@ -158,7 +158,7 @@ const EducationRequestsPage: FC = () => {
               );
             } else {
               // если новый запрос добавили
-              setEducationRequests([...educationRequests, changedRequest]);
+              setEducationRequests([changedRequest, ...educationRequests]);
             }
 
             setRequestModal({

@@ -99,7 +99,6 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         />
         <SidebarLink to="schedule" text="Управление расписанием" />
         <SidebarLink to="educationRequests" text="Образовательные запросы" />
-        <SidebarLink to="statistics" text="Статистика" />
       </div>
       {currentTeam && (
         <div className="my-3">

@@ -7,6 +7,7 @@ export interface IEducationRequest {
   team: ITeamShort;
   status: 'Открыт' | 'Закрыт';
   createdDate: Date;
+  updatedDate: Date;
 }
 
 export interface IEducationRequestSend {

@@ -25,12 +25,12 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
   return (
     <div className="p-2 border border-solid min-h-28 rounded-xl bg-gray_8 border-gray">
       <div className="flex flex-col-reverse justify-between gap-2 md:gap-8 md:flex-row min-h-28">
-        <div>
+        <div className="md:w-2/3">
           <div className="text-lg font-bold md:text-xl">
             {educationRequest.subject}
           </div>
           {educationRequest.description && (
-            <div className="mt-3 text-base md:text-lg text-black_3">
+            <div className="mt-3 text-base break-words line-clamp-3 md:text-lg text-black_3">
               {educationRequest.description}
             </div>
           )}
@@ -73,6 +73,8 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
 
           <div className="pb-2 text-black_3 whitespace-nowrap">
             {getRussianDateDisplay(educationRequest.createdDate)}
+            {educationRequest.updatedDate > educationRequest.createdDate &&
+              ', изм.'}{' '}
           </div>
         </div>
       </div>

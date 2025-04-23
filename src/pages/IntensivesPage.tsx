@@ -59,8 +59,10 @@ const IntensivesPage: FC = () => {
 
       filteredIntensives = intensives.filter(
         (intensive) =>
-          intensive.name.toLowerCase().includes(searchText) ||
-          intensive.description?.toLowerCase().includes(searchText)
+          intensive.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          intensive.description
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase())
       );
 
       if (isUserManager(currentUser)) {
