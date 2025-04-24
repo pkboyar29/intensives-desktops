@@ -3,6 +3,7 @@ import { useAppSelector } from '../redux/store';
 import {
   useLazyGetEducationRequestsQuery,
   useDeleteEducationRequestMutation,
+  useChangeEducationRequestStatusMutation,
 } from '../redux/api/educationRequestApi';
 import {
   isUserManager,
@@ -56,6 +57,7 @@ const EducationRequestsPage: FC = () => {
   const [getEducationRequests, { isLoading }] =
     useLazyGetEducationRequestsQuery();
   const [deleteEducationRequest] = useDeleteEducationRequestMutation();
+  const [changeStatus] = useChangeEducationRequestStatusMutation();
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -120,6 +122,37 @@ const EducationRequestsPage: FC = () => {
   useEffect(() => {
     fetchRequests();
   }, [currentIntensive, currentTeam]);
+
+  const onChangeStatusButtonClick = async (
+    educationRequest: IEducationRequest
+  ) => {
+    const { error } = await changeStatus({
+      status: educationRequest.status === 'Открыт' ? 'CLOSED' : 'OPENED',
+      requestId: educationRequest.id,
+    });
+
+    if (error) {
+      toast(
+        'Произошла серверная ошибка при изменении статуса образовательного запроса',
+        {
+          type: 'error',
+        }
+      );
+    } else {
+      setEducationRequests(
+        educationRequests.map((request) => {
+          if (request.id === educationRequest.id) {
+            return {
+              ...request,
+              status: request.status === 'Открыт' ? 'Закрыт' : 'Открыт',
+            };
+          } else {
+            return request;
+          }
+        })
+      );
+    }
+  };
 
   return (
     <>
@@ -255,12 +288,10 @@ const EducationRequestsPage: FC = () => {
         )}
       </div>
 
-      {/* {isUserManager(currentUser) && ( */}
       <SearchBar
         searchText={searchText}
         searchInputChangeHandler={searchInputChangeHandler}
       />
-      {/* )} */}
 
       <div className="mt-4">
         {isUserManager(currentUser) && (
@@ -299,6 +330,7 @@ const EducationRequestsPage: FC = () => {
                 onDeleteButtonClick={(requestToDelete) => {
                   setDeleteModal({ status: true, request: requestToDelete });
                 }}
+                onChangeStatusButtonClick={onChangeStatusButtonClick}
               />
             ))}
           </div>

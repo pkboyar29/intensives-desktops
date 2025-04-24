@@ -4,6 +4,7 @@ import { mapTeamShort } from './teamApi';
 
 import {
   IEducationRequest,
+  IEducationRequestChangeStatus,
   IEducationRequestSend,
   IEducationRequestUpdate,
 } from '../../ts/interfaces/IEducationRequest';
@@ -69,6 +70,16 @@ export const educationRequestApi = createApi({
       transformResponse: (response: any): IEducationRequest =>
         mapEducationRequest(response),
     }),
+    changeEducationRequestStatus: builder.mutation<
+      void,
+      IEducationRequestChangeStatus
+    >({
+      query: ({ status, requestId }) => ({
+        url: `/education_requests/${requestId}/status/`,
+        method: 'PATCH',
+        body: { status: status },
+      }),
+    }),
     deleteEducationRequest: builder.mutation<void, number>({
       query: (requestId) => ({
         url: `/education_requests/${requestId}/`,
@@ -83,4 +94,5 @@ export const {
   useSendEducationRequestMutation,
   useUpdateEducationRequestMutation,
   useDeleteEducationRequestMutation,
+  useChangeEducationRequestStatusMutation,
 } = educationRequestApi;

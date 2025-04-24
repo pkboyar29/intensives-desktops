@@ -6,20 +6,22 @@ import { getRussianDateDisplay } from '../helpers/dateHelpers';
 import CrossIcon from './icons/CrossIcon';
 import EditIcon from './icons/EditIcon';
 import TrashIcon from './icons/TrashIcon';
+import EnterIcon from './icons/EnterIcon';
 
 import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
-import EnterIcon from './icons/EnterIcon';
 
 interface EducationRequestCardProps {
   educationRequest: IEducationRequest;
   onEditButtonClick: (request: IEducationRequest) => void;
   onDeleteButtonClick: (deletedRequest: IEducationRequest) => void;
+  onChangeStatusButtonClick: (request: IEducationRequest) => void;
 }
 
 const EducationRequestCard: FC<EducationRequestCardProps> = ({
   educationRequest,
   onEditButtonClick,
   onDeleteButtonClick,
+  onChangeStatusButtonClick,
 }) => {
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
@@ -42,9 +44,21 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
           <div className="flex flex-col gap-2.5 items-end">
             <div className="flex gap-3">
               {isUserManager(currentUser) && (
-                <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
-                  {educationRequest.team.name}
-                </div>
+                <>
+                  <div
+                    className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
+                whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
+                  >
+                    <span>Отправить ответ</span>
+                    <span>
+                      <EnterIcon className="w-[18px] h-[18px]" />
+                    </span>
+                  </div>
+
+                  <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
+                    {educationRequest.team.name}
+                  </div>
+                </>
               )}
               {isUserTeamlead(currentUser, currentTeam) && (
                 <div className="flex items-center gap-3">
@@ -74,29 +88,28 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
               </div>{' '}
             </div>
 
-            <div className="flex gap-3">
+            {isUserManager(currentUser) && (
               <div
+                onClick={() => onChangeStatusButtonClick(educationRequest)}
                 className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
                 whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
               >
-                <span>Отправить ответ</span>
-                <span>
-                  <EnterIcon className="w-[18px] h-[18px]" />
-                </span>
+                {educationRequest.status === 'Открыт' ? (
+                  <>
+                    {' '}
+                    <span>Закрыть</span>
+                    <span>
+                      <CrossIcon />
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {' '}
+                    <span>Открыть снова</span>
+                  </>
+                )}
               </div>
-
-              {isUserManager(currentUser) && (
-                <div
-                  className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
-                whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
-                >
-                  <span>Закрыть</span>
-                  <span>
-                    <CrossIcon />
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           <div className="pb-2 text-black_3 whitespace-nowrap">
