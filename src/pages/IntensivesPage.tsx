@@ -8,7 +8,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
-import SearchIcon from '../components/icons/SearchIcon';
+import SearchBar from '../components/common/SearchBar';
 import IntensiveCard from '../components/IntensiveCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
@@ -175,15 +175,10 @@ const IntensivesPage: FC = () => {
         )}
       </div>
 
-      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
-        <SearchIcon className="text-gray-500" />
-        <input
-          value={searchText}
-          onChange={searchInputChangeHandler}
-          className="w-full pl-4 bg-another_white focus:outline-none"
-          placeholder="Поиск"
-        />
-      </div>
+      <SearchBar
+        searchText={searchText}
+        searchInputChangeHandler={searchInputChangeHandler}
+      />
 
       <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8">

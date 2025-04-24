@@ -10,7 +10,7 @@ import {
   isUserTeamlead,
 } from '../helpers/userHelpers';
 
-import SearchIcon from '../components/icons/SearchIcon';
+import SearchBar from '../components/common/SearchBar';
 import Filter from '../components/common/Filter';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -238,6 +238,10 @@ const EducationRequestsPage: FC = () => {
           <div className="flex justify-end">
             <div className="ml-auto">
               <PrimaryButton
+                disabled={educationRequests.length >= 10}
+                className={`${
+                  educationRequests.length >= 10 && 'cursor-not-allowed'
+                }`}
                 children="Отправить образовательный запрос"
                 clickHandler={() =>
                   setRequestModal({
@@ -252,15 +256,10 @@ const EducationRequestsPage: FC = () => {
       </div>
 
       {/* {isUserManager(currentUser) && ( */}
-      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
-        <SearchIcon className="text-gray-500" />
-        <input
-          value={searchText}
-          onChange={searchInputChangeHandler}
-          className="w-full pl-4 bg-another_white focus:outline-none"
-          placeholder="Поиск"
-        />
-      </div>
+      <SearchBar
+        searchText={searchText}
+        searchInputChangeHandler={searchInputChangeHandler}
+      />
       {/* )} */}
 
       <div className="mt-4">

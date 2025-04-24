@@ -3,10 +3,12 @@ import { useAppSelector } from '../redux/store';
 import { isUserManager, isUserTeamlead } from '../helpers/userHelpers';
 import { getRussianDateDisplay } from '../helpers/dateHelpers';
 
+import CrossIcon from './icons/CrossIcon';
 import EditIcon from './icons/EditIcon';
 import TrashIcon from './icons/TrashIcon';
 
 import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
+import EnterIcon from './icons/EnterIcon';
 
 interface EducationRequestCardProps {
   educationRequest: IEducationRequest;
@@ -37,38 +39,64 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
         </div>
 
         <div className="flex flex-col items-end justify-between gap-2 sm:flex-row md:flex-col">
-          <div className="flex gap-3">
-            {isUserManager(currentUser) && (
-              <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
-                {educationRequest.team.name}
+          <div className="flex flex-col gap-2.5 items-end">
+            <div className="flex gap-3">
+              {isUserManager(currentUser) && (
+                <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
+                  {educationRequest.team.name}
+                </div>
+              )}
+              {isUserTeamlead(currentUser, currentTeam) && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => onEditButtonClick(educationRequest)}
+                    className="p-1.5 transition duration-300 ease-in-out cursor-pointer hover:bg-black_gray rounded-[10px]"
+                  >
+                    <EditIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onDeleteButtonClick(educationRequest)}
+                    className="p-1.5 transition duration-300 ease-in-out cursor-pointer hover:bg-black_gray rounded-[10px]"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+              <div className="p-1.5 h-7 flex items-center text-center gap-1.5 rounded-lg text-[14px] bg-gray_1 select-none w-fit border border-solid border-black whitespace-nowrap">
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    educationRequest.status === 'Открыт'
+                      ? 'bg-green-500'
+                      : 'bg-red'
+                  }`}
+                />
+                <span>{educationRequest.status}</span>
+              </div>{' '}
+            </div>
+
+            <div className="flex gap-3">
+              <div
+                className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
+                whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
+              >
+                <span>Отправить ответ</span>
+                <span>
+                  <EnterIcon className="w-[18px] h-[18px]" />
+                </span>
               </div>
-            )}
-            {isUserTeamlead(currentUser, currentTeam) && (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => onEditButtonClick(educationRequest)}
-                  className="p-1.5 transition duration-300 ease-in-out cursor-pointer hover:bg-black_gray rounded-[10px]"
+
+              {isUserManager(currentUser) && (
+                <div
+                  className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
+                whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
                 >
-                  <EditIcon className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => onDeleteButtonClick(educationRequest)}
-                  className="p-1.5 transition duration-300 ease-in-out cursor-pointer hover:bg-black_gray rounded-[10px]"
-                >
-                  <TrashIcon className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-            <div className="p-1.5 h-7 flex items-center text-center gap-1.5 rounded-lg text-[14px] bg-gray_1 select-none w-fit border border-solid border-black whitespace-nowrap">
-              <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  educationRequest.status === 'Открыт'
-                    ? 'bg-green-500'
-                    : 'bg-red'
-                }`}
-              />
-              <span>{educationRequest.status}</span>
-            </div>{' '}
+                  <span>Закрыть</span>
+                  <span>
+                    <CrossIcon />
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="pb-2 text-black_3 whitespace-nowrap">
