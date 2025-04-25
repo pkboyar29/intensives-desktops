@@ -8,6 +8,7 @@ import {
   IEducationRequestSend,
   IEducationRequestUpdate,
 } from '../../ts/interfaces/IEducationRequest';
+import { mapEducationRequestAnswer } from './educationRequestAnswerApi';
 
 export const mapEducationRequest = (
   unmappedRequest: any
@@ -20,6 +21,9 @@ export const mapEducationRequest = (
     updatedDate: new Date(unmappedRequest.updated_at),
     status: unmappedRequest.status === 'OPENED' ? 'Открыт' : 'Закрыт',
     team: mapTeamShort(unmappedRequest.team),
+    answer: unmappedRequest.answer
+      ? mapEducationRequestAnswer(unmappedRequest.answer)
+      : null,
   };
 };
 

@@ -1,6 +1,5 @@
 import { ITeamShort } from './ITeam';
 
-// TODO: добавить ответ
 export interface IEducationRequest {
   id: number;
   subject: string;
@@ -9,7 +8,19 @@ export interface IEducationRequest {
   status: 'Открыт' | 'Закрыт';
   createdDate: Date;
   updatedDate: Date;
+  answer: IEducationRequestAnswer | null;
 }
+
+export const defaultEducationRequest: IEducationRequest = {
+  id: 0,
+  subject: '',
+  description: '',
+  team: { id: 0, position: 0, name: '' },
+  status: 'Открыт',
+  createdDate: new Date(),
+  updatedDate: new Date(),
+  answer: null,
+};
 
 export interface IEducationRequestSend {
   subject: string;
@@ -28,7 +39,19 @@ export interface IEducationRequestChangeStatus {
   requestId: number;
 }
 
+// TODO: начать хранить createdDate
 export interface IEducationRequestAnswer {
+  id: number;
   comment: string;
   managerId: number;
+}
+
+export interface IEducationRequestAnswerSubmit {
+  comment: string;
+  requestId: number;
+}
+
+export interface IEducationRequestAnswerUpdate {
+  comment: string;
+  answerId: number;
 }

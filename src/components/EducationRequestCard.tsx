@@ -15,6 +15,7 @@ interface EducationRequestCardProps {
   onEditButtonClick: (request: IEducationRequest) => void;
   onDeleteButtonClick: (deletedRequest: IEducationRequest) => void;
   onChangeStatusButtonClick: (request: IEducationRequest) => void;
+  onAnswerButtonClick: (request: IEducationRequest) => void;
 }
 
 const EducationRequestCard: FC<EducationRequestCardProps> = ({
@@ -22,6 +23,7 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
   onEditButtonClick,
   onDeleteButtonClick,
   onChangeStatusButtonClick,
+  onAnswerButtonClick,
 }) => {
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
@@ -45,15 +47,27 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
             <div className="flex gap-3">
               {isUserManager(currentUser) && (
                 <>
-                  <div
+                  <button
+                    onClick={() => onAnswerButtonClick(educationRequest)}
                     className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
                 whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
                   >
-                    <span>Отправить ответ</span>
-                    <span>
-                      <EnterIcon className="w-[18px] h-[18px]" />
-                    </span>
-                  </div>
+                    {educationRequest.answer ? (
+                      <>
+                        <span>Посмотреть ответ</span>
+                        <span>
+                          <EnterIcon className="w-[18px] h-[18px]" />
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Отправить ответ</span>
+                        <span>
+                          <EnterIcon className="w-[18px] h-[18px]" />
+                        </span>
+                      </>
+                    )}
+                  </button>
 
                   <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
                     {educationRequest.team.name}
@@ -89,7 +103,7 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
             </div>
 
             {isUserManager(currentUser) && (
-              <div
+              <button
                 onClick={() => onChangeStatusButtonClick(educationRequest)}
                 className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
                 whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
@@ -108,7 +122,7 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
                     <span>Открыть снова</span>
                   </>
                 )}
-              </div>
+              </button>
             )}
           </div>
 

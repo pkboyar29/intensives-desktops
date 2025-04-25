@@ -17,11 +17,15 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import EducationRequestModal from '../components/common/modals/EducationRequestModal';
+import EducationRequestAnswerModal from '../components/common/modals/EducationRequestAnswerModal';
 import EducationRequestCard from '../components/EducationRequestCard';
 import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { IEducationRequest } from '../ts/interfaces/IEducationRequest';
+import {
+  IEducationRequest,
+  defaultEducationRequest,
+} from '../ts/interfaces/IEducationRequest';
 
 const EducationRequestsPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
@@ -53,6 +57,10 @@ const EducationRequestsPage: FC = () => {
     status: false,
     request: null,
   });
+  const [answerModal, setAnswerModal] = useState<{
+    status: boolean;
+    request: IEducationRequest;
+  }>({ status: false, request: defaultEducationRequest });
 
   const [getEducationRequests, { isLoading }] =
     useLazyGetEducationRequestsQuery();
@@ -264,6 +272,21 @@ const EducationRequestsPage: FC = () => {
         </Modal>
       )}
 
+      {answerModal.status && (
+        <EducationRequestAnswerModal
+          onClose={() =>
+            setAnswerModal({ status: false, request: defaultEducationRequest })
+          }
+          onCancel={() =>
+            setAnswerModal({ status: false, request: defaultEducationRequest })
+          }
+          onChangeRequest={(request) => {
+            console.log('new education request is ', request);
+          }}
+          request={answerModal.request}
+        />
+      )}
+
       <Title text="Образовательные запросы" />
 
       <div className="mt-4 sm:mt-8">
@@ -331,6 +354,12 @@ const EducationRequestsPage: FC = () => {
                   setDeleteModal({ status: true, request: requestToDelete });
                 }}
                 onChangeStatusButtonClick={onChangeStatusButtonClick}
+                onAnswerButtonClick={(requestToWatchAnswer) => {
+                  setAnswerModal({
+                    status: true,
+                    request: requestToWatchAnswer,
+                  });
+                }}
               />
             ))}
           </div>
