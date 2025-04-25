@@ -1,18 +1,24 @@
-import { FC } from 'react';
-import { useParams } from 'react-router-dom';
+import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAppSelector } from '../../../redux/store';
+import { isUserManager } from '../../../helpers/userHelpers';
 import {
   useSendEducationRequestAnswerMutation,
   useUpdateEducationRequestAnswerMutation,
   useDeleteEducationRequestAnswerMutation,
 } from '../../../redux/api/educationRequestAnswerApi';
+import { getRussianDateDisplay } from '../../../helpers/dateHelpers';
 
 import Modal from './Modal';
 import InputDescription from '../inputs/InputDescription';
+import TrashIcon from '../../icons/TrashIcon';
 import PrimaryButton from '../PrimaryButton';
 import { ToastContainer, toast } from 'react-toastify';
 
-import { IEducationRequest } from '../../../ts/interfaces/IEducationRequest';
+import {
+  IEducationRequest,
+  IEducationRequestAnswer,
+} from '../../../ts/interfaces/IEducationRequest';
 
 interface EducationRequestAnswerModalProps {
   request: IEducationRequest;
@@ -31,7 +37,9 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
   onCancel,
   onChangeRequest,
 }) => {
-  const { intensiveId } = useParams();
+  const currentUser = useAppSelector((state) => state.user.data);
+
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const {
     register,
@@ -40,7 +48,7 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
   } = useForm<EducationRequestAnswerFields>({
     mode: 'onBlur',
     defaultValues: {
-      // comment: request.answer.comment
+      comment: request.answer?.comment,
     },
   });
 
@@ -50,38 +58,57 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
 
   const onSubmit = async (data: EducationRequestAnswerFields) => {
     if (request.answer) {
-      const response = await updateAnswer({
+      const { data: responseData, error: responseError } = await updateAnswer({
         ...data,
         answerId: request.answer.id,
       });
 
-      console.log('обновление');
-      console.log(response);
+      if (responseError) {
+        toast('Произошла серверная ошибка при обновлении ответа', {
+          type: 'error',
+        });
+      }
 
-      // TODO: вызов onChange
+      if (responseData) {
+        onChangeRequest({ ...request, answer: responseData });
+      }
     } else {
-      const response = await sendAnswer({ ...data, requestId: request.id });
+      const { data: responseData, error: responseError } = await sendAnswer({
+        ...data,
+        requestId: request.id,
+      });
 
-      console.log('создание');
-      console.log(response);
+      if (responseError) {
+        toast('Произошла серверная ошибка при отправке ответа', {
+          type: 'error',
+        });
+      }
 
-      // TODO: вызов onChange
+      if (responseData) {
+        onChangeRequest({ ...request, answer: responseData });
+      }
     }
   };
 
-  return (
-    <>
-      <ToastContainer position="top-center" />
+  const editButtonClickHandler = () => {
+    setIsEditing(true);
+  };
 
-      <Modal
-        title={
-          <>
-            {request.answer ? 'Изменение' : 'Отправка'} ответа на запрос:{' '}
-            {request.subject}
-          </>
-        }
-        onCloseModal={onClose}
-      >
+  const deleteButtonClickHandler = async () => {
+    const { error } = await deleteAnswer(request.answer!.id);
+
+    if (error) {
+      toast('Произошла серверная ошибка при удалении ответа', {
+        type: 'error',
+      });
+    } else {
+      onChangeRequest({ ...request, answer: null });
+    }
+  };
+
+  const EducationRequestAnswerForm: FC = () => {
+    return (
+      <>
         <InputDescription
           isTextArea={true}
           register={register}
@@ -105,7 +132,13 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
           <div>
             <PrimaryButton
               buttonColor="gray"
-              clickHandler={onCancel}
+              clickHandler={() => {
+                if (isEditing) {
+                  setIsEditing(false);
+                } else {
+                  onCancel();
+                }
+              }}
               children="Отмена"
             />
           </div>
@@ -117,6 +150,63 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
             />
           </div>
         </div>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <ToastContainer position="top-center" />
+
+      <Modal
+        title={
+          <>
+            {request.answer
+              ? isEditing
+                ? 'Изменение'
+                : 'Просмотр'
+              : 'Отправка'}{' '}
+            ответа на запрос: {request.subject}
+          </>
+        }
+        onCloseModal={onClose}
+      >
+        {request.answer ? (
+          isEditing ? (
+            <EducationRequestAnswerForm />
+          ) : (
+            <div className="flex flex-col gap-3">
+              <div className="text-lg text-bright_gray">
+                Комментарий: {request.answer.comment}
+              </div>
+
+              <div className="flex justify-end mt-3 text-black_3 whitespace-nowrap">
+                {getRussianDateDisplay(request.answer.createdDate)}
+              </div>
+
+              {isUserManager(currentUser) && (
+                <div className="flex justify-end gap-2">
+                  <div>
+                    <PrimaryButton
+                      children="Редактировать"
+                      clickHandler={editButtonClickHandler}
+                    />
+                  </div>
+
+                  <div>
+                    <PrimaryButton
+                      buttonColor="gray"
+                      children={<TrashIcon />}
+                      onClick={deleteButtonClickHandler}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        ) : (
+          isUserManager(currentUser) && <EducationRequestAnswerForm />
+        )}
       </Modal>
     </>
   );

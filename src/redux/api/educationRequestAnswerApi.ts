@@ -12,6 +12,7 @@ export const mapEducationRequestAnswer = (
   id: unmappedAnswer.id,
   comment: unmappedAnswer.comment,
   managerId: unmappedAnswer.manager,
+  createdDate: new Date(unmappedAnswer.created_at),
 });
 
 export const educationRequestAnswerApi = createApi({

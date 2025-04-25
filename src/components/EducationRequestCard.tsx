@@ -28,6 +28,9 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
 
+  const buttonStyles =
+    'p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray';
+
   return (
     <div className="p-2 border border-solid min-h-28 rounded-xl bg-gray_8 border-gray">
       <div className="flex flex-col-reverse justify-between gap-2 md:gap-8 md:flex-row min-h-28">
@@ -42,38 +45,10 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
           )}
         </div>
 
-        <div className="flex flex-col items-end justify-between gap-2 sm:flex-row md:flex-col">
-          <div className="flex flex-col gap-2.5 items-end">
-            <div className="flex gap-3">
-              {isUserManager(currentUser) && (
-                <>
-                  <button
-                    onClick={() => onAnswerButtonClick(educationRequest)}
-                    className="p-1.5 h-7 flex gap-2 justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black 
-                whitespace-nowrap cursor-pointer transition duration-300 ease-in-out hover:bg-black_gray"
-                  >
-                    {educationRequest.answer ? (
-                      <>
-                        <span>Посмотреть ответ</span>
-                        <span>
-                          <EnterIcon className="w-[18px] h-[18px]" />
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Отправить ответ</span>
-                        <span>
-                          <EnterIcon className="w-[18px] h-[18px]" />
-                        </span>
-                      </>
-                    )}
-                  </button>
-
-                  <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
-                    {educationRequest.team.name}
-                  </div>
-                </>
-              )}
+        <div className="flex flex-col items-start justify-between gap-2 sm:flex-row md:items-end md:flex-col">
+          <div className="flex flex-col gap-2.5 items-start md:items-end">
+            {/* первый row */}
+            <div className="flex items-center gap-3">
               {isUserTeamlead(currentUser, currentTeam) && (
                 <div className="flex items-center gap-3">
                   <button
@@ -90,6 +65,11 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
                   </button>
                 </div>
               )}
+              {isUserManager(currentUser) && (
+                <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
+                  {educationRequest.team.name}
+                </div>
+              )}
               <div className="p-1.5 h-7 flex items-center text-center gap-1.5 rounded-lg text-[14px] bg-gray_1 select-none w-fit border border-solid border-black whitespace-nowrap">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${
@@ -102,6 +82,7 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
               </div>{' '}
             </div>
 
+            {/* второй row */}
             {isUserManager(currentUser) && (
               <button
                 onClick={() => onChangeStatusButtonClick(educationRequest)}
@@ -123,6 +104,44 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
                   </>
                 )}
               </button>
+            )}
+
+            {/* третий row */}
+            {isUserManager(currentUser) ? (
+              <>
+                <button
+                  onClick={() => onAnswerButtonClick(educationRequest)}
+                  className={buttonStyles}
+                >
+                  {educationRequest.answer ? (
+                    <>
+                      <span>Посмотреть ответ</span>
+                      <span>
+                        <EnterIcon className="w-[18px] h-[18px]" />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Отправить ответ</span>
+                      <span>
+                        <EnterIcon className="w-[18px] h-[18px]" />
+                      </span>
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              educationRequest.answer && (
+                <button
+                  onClick={() => onAnswerButtonClick(educationRequest)}
+                  className={buttonStyles}
+                >
+                  <span>Посмотреть ответ</span>
+                  <span>
+                    <EnterIcon className="w-[18px] h-[18px]" />
+                  </span>
+                </button>
+              )
             )}
           </div>
 

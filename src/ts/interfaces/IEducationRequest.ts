@@ -39,11 +39,11 @@ export interface IEducationRequestChangeStatus {
   requestId: number;
 }
 
-// TODO: начать хранить createdDate
 export interface IEducationRequestAnswer {
   id: number;
   comment: string;
   managerId: number;
+  createdDate: Date;
 }
 
 export interface IEducationRequestAnswerSubmit {

@@ -280,8 +280,18 @@ const EducationRequestsPage: FC = () => {
           onCancel={() =>
             setAnswerModal({ status: false, request: defaultEducationRequest })
           }
-          onChangeRequest={(request) => {
-            console.log('new education request is ', request);
+          onChangeRequest={(updatedRequest) => {
+            setEducationRequests(
+              educationRequests.map((request) => {
+                if (request.id === updatedRequest.id) {
+                  return updatedRequest;
+                } else {
+                  return request;
+                }
+              })
+            );
+
+            setAnswerModal({ status: false, request: defaultEducationRequest });
           }}
           request={answerModal.request}
         />

@@ -57,7 +57,9 @@ const IntensiveOverviewPage: FC = () => {
                   setDeleteModal(false);
 
                   if (responseError) {
-                    toast('Произошла серверная ошибка', { type: 'error' });
+                    toast('Произошла серверная ошибка при удалении интенсива', {
+                      type: 'error',
+                    });
                   } else {
                     navigate(`/intensives`);
                   }
