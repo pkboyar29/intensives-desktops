@@ -27,7 +27,18 @@ export interface ISpecializationCreate {
   code: string;
 }
 
+export interface IStageEducationPatch {
+  id: number;
+  name?: string;
+}
+
+export interface IProfilePatch {
+  id: number;
+  name?: string;
+}
+
 export interface ISpecializationPatch {
+  id: number;
   name?: string;
   code?: string;
 }

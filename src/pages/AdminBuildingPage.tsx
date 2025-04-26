@@ -19,7 +19,7 @@ const AdminBuildingsPage: FC = () => {
 
   useEffect(() => {
     getBuildings({
-      universities: universityId ? parseInt(universityId) : null,
+      university: universityId ? parseInt(universityId) : null,
       withChildrenMeta: true,
       limit: limit,
       offset: offset,

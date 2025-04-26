@@ -28,6 +28,7 @@ import { universityApi } from './api/universityApi';
 import { buildingApi } from './api/buildingApi';
 import { groupApi } from './api/groupApi';
 import { educationApi } from './api/educationApi';
+import { relatedListApi } from './api/relatedListApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -59,6 +60,7 @@ export const store = configureStore({
     [buildingApi.reducerPath]: buildingApi.reducer,
     [groupApi.reducerPath]: groupApi.reducer,
     [educationApi.reducerPath]: educationApi.reducer,
+    [relatedListApi.reducerPath]: relatedListApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -85,7 +87,8 @@ export const store = configureStore({
       universityApi.middleware,
       buildingApi.middleware,
       groupApi.middleware,
-      educationApi.middleware
+      educationApi.middleware,
+      relatedListApi.middleware
     ),
 });
 

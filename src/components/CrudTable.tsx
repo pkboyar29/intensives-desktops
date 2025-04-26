@@ -11,12 +11,13 @@ import {
   Row,
 } from '@tanstack/react-table';
 import { tableConfigs, TableType } from '../tableConfigs';
+import RelatedKeysList from './RelatedKeysList';
 
 interface CrudTableProps<T> {
   data: T[];
   type: TableType;
   childEntities?: childEntitiesMeta[];
-  onCreate?: () => void;
+  onCreate?: (item: T) => void;
   onUpdate?: (item: T) => void;
   onDelete?: (item: T) => void;
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
@@ -60,7 +61,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
             value !== null &&
             column.type === 'relation'
           ) {
-            const nested = value as Record<string, any>;
+            const nested = value as Record<keyof T, any>;
             return nested[column.renderKey];
           }
           return value;
@@ -118,7 +119,26 @@ function CrudTable<T>(props: CrudTableProps<T>) {
               case 'date': // тоже проверить
                 return <input type="date" defaultValue={value}></input>;
               case 'relation':
-                return <p>Прикол</p>;
+                return (
+                  <RelatedKeysList
+                    entity={type}
+                    entityId={getId(info.row.original)}
+                    parent={column.key.toString()}
+                    defaultValue={value}
+                    onChange={(newParentId, newParentName) => {
+                      console.log(key);
+                      if (editingRow.current) {
+                        editingRow.current = {
+                          ...editingRow.current,
+                          [key as keyof T]: {
+                            id: newParentId,
+                            [column.renderKey as keyof T]: newParentName,
+                          },
+                        };
+                      }
+                    }}
+                  />
+                );
               default:
                 return String(value ?? '');
             }
@@ -200,6 +220,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
   const handleSaveEditing = () => {
     //так как здесь замыкание можно сравнивать row в параметре и editingRow не являются ли они одинаковыми (но это будет нечитабельно)
+    console.log(editingRow.current);
     editingRow.current && onUpdate && onUpdate(editingRow.current);
     setEditingRowId(null);
     editingRow.current = null;
@@ -207,6 +228,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
   const handleEdit = (row: T) => {
     const id = getId(row);
+    console.log(row);
     const editingId = editingRow.current && getId(editingRow.current);
     setEditingRowId(editingId === id ? null : id.toString());
     editingRow.current = editingId === id ? null : row;
@@ -226,6 +248,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   return (
     <>
       <div>
+        <button className="mt-5">Добавить запись (crud)</button>
         <Table
           data={data}
           columns={columnsTable}

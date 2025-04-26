@@ -59,7 +59,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   }, [queryData]);
 
   useEffect(() => {
-    //console.log(data);
+    console.log(data);
     //console.log(queryData?.results);
     //console.log((queryData as any)?.childEntitiesMeta);
   }, [data]);
@@ -76,6 +76,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
+  const createEntity = async (entity: any) => {};
+
   const updateEntity = async (entity: any) => {
     console.log(entity);
     const prevItems = [...data]; // сохраняем стейт
@@ -89,23 +91,27 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     // Если ничего не изменили запрос не отправляем
 
     try {
-      //console.log(entity);
       //cringe
       if (paramsFromConfig.type) {
         await updateEntityAPI({
-          ...entity,
           type: paramsFromConfig.type,
+          object: { ...entity },
         } as any).unwrap();
       } else {
         await updateEntityAPI({ ...entity }).unwrap();
       }
-      //await updateEntityAPI({ ...entity }).unwrap();
+      toast(`Объект ${entity.name} обновлен`, {
+        type: 'success',
+      });
     } catch (error: any) {
       console.error(
         `Error on updating entity ${entityType} id=${entity.id}`,
         error
       );
       setData(prevItems); // в случае ошибки откатываем состояние (!попадает сюда даже если запрос 200 но ошибка где то тут)
+      toast(`Произошла ошибка при обновлении объекта ${entity.name}`, {
+        type: 'error',
+      });
     }
   };
 
@@ -145,11 +151,20 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
+  const addRowTemplate = () => {
+    //setData((prev) => [...data, ])
+  };
+
   return (
     <>
       <ToastContainer position="top-center" />
       <title>{config.title}</title>
-      <p className="text-3xl font-medium">{config.title}</p>
+      <div className="flex">
+        <p className="text-3xl font-medium">{config.title}</p>
+        <button className="ml-3" onClick={() => addRowTemplate()}>
+          Добавить запись
+        </button>
+      </div>
       <CrudTable
         data={data}
         type={config.type}
@@ -162,6 +177,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           navigate(window.location.pathname + path);
         }}
         onNextPage={count && limit < count ? () => loadNextPage() : undefined}
+        onCreate={(entity) => createEntity(entity)}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
       />

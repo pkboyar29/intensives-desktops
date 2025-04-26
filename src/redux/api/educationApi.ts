@@ -2,11 +2,13 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import {
   IProfile,
   IProfileCreate,
+  IProfilePatch,
   ISpecialization,
   ISpecializationCreate,
   ISpecializationPatch,
   IStageEducation,
   IStageEducationCreate,
+  IStageEducationPatch,
 } from '../../ts/interfaces/IEducation';
 import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
@@ -90,19 +92,33 @@ export const educationApi = createApi({
       IStageEducation | IProfile | ISpecialization,
       {
         type?: 'stages_education' | 'profiles' | 'specializations';
-        object: IStageEducationCreate | IProfileCreate | ISpecializationPatch;
+        object: IStageEducationPatch | IProfilePatch | ISpecializationPatch;
       }
     >({
       query: (data) => ({
-        url: `/${data.type}/`,
+        url: `/${data.type}/${data.object.id}/`,
         method: 'PATCH',
-        body: {
-          name: data.object.name,
-          //code: data.type === 'specializations' && data.object.code
-        },
+        body: (() => {
+          const name = data.object.name;
+          if (data.type === 'specializations') {
+            const { code } = data.object as ISpecialization;
+            return { name: name, code: code };
+          }
+          return { name: name };
+        })(),
       }),
-      transformResponse: (response: any): ISpecialization =>
-        mapSpecialization(response),
+      transformResponse: (response: any, meta, arg) => {
+        switch (arg.type) {
+          case 'stages_education':
+            return mapStageEducation(response);
+          case 'profiles':
+            return mapProfile(response);
+          case 'specializations':
+            return mapSpecialization(response);
+          default:
+            throw new Error(`Unknown type: ${arg.type}`);
+        }
+      },
     }),
     deleteEducation: builder.mutation<
       void,

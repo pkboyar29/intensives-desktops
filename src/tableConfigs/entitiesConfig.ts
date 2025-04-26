@@ -41,7 +41,7 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   buildings: {
     type: 'buildings',
     title: 'Корпуса',
-    queryParamsDependencies: [{ from: 'universityId', as: 'universities' }],
+    queryParamsDependencies: [{ from: 'universityId', as: 'university' }],
     defaultQueryParams: { withChildrenMeta: true },
     hooks: queryHooksMap['buildings'],
   },

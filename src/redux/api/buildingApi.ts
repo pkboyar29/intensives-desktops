@@ -34,7 +34,7 @@ export const buildingApi = createApi({
         childEntitiesMeta?: childEntitiesMeta[];
       },
       {
-        universities?: number | null;
+        university?: number | null;
         withChildrenMeta?: boolean;
         limit?: number;
         offset?: number;

@@ -14,7 +14,8 @@ export type ColumnConfig<T> = {
   key: keyof T;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
-  renderKey?: string;
+  renderKey?: keyof T;
+  parentParam?: string;
   readOnly?: boolean;
 };
 
@@ -45,6 +46,7 @@ export const audienceColumns: ColumnConfig<IAudience>[] = [
     label: 'Корпус',
     type: 'relation',
     renderKey: 'name',
+    parentParam: 'building',
   },
 ];
 
