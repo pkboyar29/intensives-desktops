@@ -15,7 +15,7 @@ const BackToScheduleButton: FC = () => {
         children={
           <div className="flex items-center gap-2">
             <BackArrowIcon />
-            <p>Назад</p>
+            <p className="hidden md:block">Назад</p>
           </div>
         }
         onClick={() => {
