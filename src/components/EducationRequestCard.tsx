@@ -66,11 +66,11 @@ const EducationRequestCard: FC<EducationRequestCardProps> = ({
                 </div>
               )}
               {isUserManager(currentUser) && (
-                <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] select-none border border-solid border-black whitespace-nowrap">
+                <div className="p-1.5 h-7 flex justify-center items-center rounded-lg text-[14px] border border-solid border-black whitespace-nowrap">
                   {educationRequest.team.name}
                 </div>
               )}
-              <div className="p-1.5 h-7 flex items-center text-center gap-1.5 rounded-lg text-[14px] bg-gray_1 select-none w-fit border border-solid border-black whitespace-nowrap">
+              <div className="p-1.5 h-7 flex items-center text-center gap-1.5 rounded-lg text-[14px] bg-gray_1 w-fit border border-solid border-black whitespace-nowrap">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${
                     educationRequest.status === 'Открыт'

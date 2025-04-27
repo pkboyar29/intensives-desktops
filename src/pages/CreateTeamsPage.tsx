@@ -510,7 +510,8 @@ const CreateTeamsPage: FC = () => {
         Создайте команды и распределите участников интенсива по командам
       </p>
 
-      <div className="flex items-center gap-4 mt-5">
+      <div className="mt-5 text-base text-gray_3">Количество команд</div>
+      <div className="flex items-center gap-4 mt-1.5">
         <div className="relative w-[480px]">
           <input
             type="number"
