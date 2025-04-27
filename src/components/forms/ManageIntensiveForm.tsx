@@ -421,6 +421,10 @@ const ManageIntensiveForm: FC = () => {
                       }
                       items={flows}
                       selectedItems={field.value || []}
+                      disabledItems={currentIntensive?.flows.map((f) => ({
+                        id: f.id,
+                        name: f.name,
+                      }))}
                       setSelectedItems={field.onChange}
                       chipSize="big"
                     />

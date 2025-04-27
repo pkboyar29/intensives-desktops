@@ -11,6 +11,8 @@ interface MultipleSelectInputProps<T> {
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
   selectedItems: T[];
+  // TODO: спросить у чат гпт как лучше назвать эту переменную
+  disabledItems?: T[];
   setSelectedItems: (items: T[]) => void;
   chipSize?: 'small' | 'big';
 }
@@ -22,6 +24,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   items,
   selectedItems,
   setSelectedItems,
+  disabledItems = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -84,7 +87,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               setSelectedItems(items);
             }}
             deleteSelectedItem={() => {
-              setSelectedItems([]);
+              setSelectedItems(disabledItems);
             }}
             isChecked={selectedItems.length === items.length}
           />
@@ -98,7 +101,13 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               key={item.id}
               item={item}
               addSelectedItem={addSelectedItem}
-              deleteSelectedItem={deleteSelectedItem}
+              deleteSelectedItem={() => {
+                if (disabledItems.map((item) => item.id).includes(item.id)) {
+                  return;
+                }
+
+                deleteSelectedItem(item.id);
+              }}
               isChecked={selectedItems.some(
                 (selectedItem) => selectedItem.id === item.id
               )}
