@@ -11,6 +11,8 @@ import { TableType } from '../tableConfigs';
 import { ToastContainer, toast } from 'react-toastify';
 import { breadcrumb } from '../ts/types/types';
 import { useLazyGetBreadcrumbQuery } from '../redux/api/breadcrumbApi';
+import Modal from '../components/common/modals/Modal';
+import AdminEntryModal from '../components/common/modals/AdminEntryModal';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -38,6 +40,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const [data, setData] = useState(() => queryData?.results ?? []);
   const [breadcrumbs, setBreadcrumbs] = useState<breadcrumb[]>([]);
+  const [isEntryModal, setIsEntryModal] = useState<boolean>(false);
 
   const limit = 100; // Размер страницы данных
   const offset = useRef<number>(0); // Текущее смещение
@@ -55,14 +58,13 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     loadData();
-    loadBreadcrumbsData();
+    lazyLoadBreadcrumbsData();
     createBreadcrumbs();
   }, []);
 
   useEffect(() => {
     if (breadcrumbsData) {
       breadcrumbsData.results.map((breadcrumbData) => {
-        console.log(breadcrumbData);
         setBreadcrumbs((prev) =>
           prev.map((breadcrumb) =>
             breadcrumb.name === `${breadcrumbData.name}${breadcrumbData.id}`
@@ -95,19 +97,14 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         limit: limit,
         offset: offset.current,
       });
-      //console.log('fetch');
     }
-    //if (fetchBreadcrumb) {
-    //  await fetchBreadcrumb({ path: window.location.pathname }); //вызывать только если нужно получить названия
-    // }
   };
 
-  const loadBreadcrumbsData = async () => {
+  const lazyLoadBreadcrumbsData = () => {
     const pathParts = window.location.pathname.split('/');
 
     for (var pathPart of pathParts) {
       if (!entitiesConfig[pathPart] && !isNaN(parseInt(pathPart))) {
-        console.log('da', pathPart);
         fetchBreadcrumbsData({ path: window.location.pathname });
         break;
       }
@@ -200,6 +197,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const addRowTemplate = () => {
     //setData((prev) => [...data, ])
+    setIsEntryModal(true);
   };
   //console.log(window.location.pathname);
   //console.log(window.location.pathname.split('/'));
@@ -227,35 +225,45 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   return (
     <>
       <ToastContainer position="top-center" />
+      {isEntryModal && (
+        <AdminEntryModal
+          type={config.type}
+          onChangeEntry={(entity) => createEntity(entity)}
+          onCloseModal={() => setIsEntryModal(false)}
+        />
+      )}
       <title>{config.title}</title>
-      <div className="flex">
+      <div className="flex flex-col items-start">
         <p className="text-3xl font-medium">{config.title}</p>
-        <button className="ml-3" onClick={() => addRowTemplate()}>
-          Добавить запись
+
+        <div className="flex mt-3">
+          {breadcrumbs.length > 1 &&
+            breadcrumbs.map((breadcrumb, index, arr) => (
+              <div key={breadcrumb.name} className="flex">
+                <p
+                  className={`${
+                    breadcrumb.urlPath &&
+                    index !== arr.length - 1 &&
+                    `text-blue hover:text-dark_blue cursor-pointer duration-75`
+                  }  ${index === arr.length - 1 && `font-semibold`}`}
+                  onClick={() =>
+                    breadcrumb.urlPath && navigate(breadcrumb.urlPath)
+                  }
+                >
+                  {breadcrumb.label}
+                </p>
+                {index !== arr.length - 1 && <p className="px-1">{'>'}</p>}
+              </div>
+            ))}
+        </div>
+
+        <button
+          className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400" //sds
+          onClick={() => addRowTemplate()}
+        >
+          ➕
         </button>
       </div>
-
-      <div className="flex mt-3">
-        {breadcrumbs.length > 1 &&
-          breadcrumbs.map((breadcrumb, index, arr) => (
-            <div key={breadcrumb.name} className="flex">
-              <p
-                className={`${
-                  breadcrumb.urlPath &&
-                  index !== arr.length - 1 &&
-                  `text-blue hover:text-dark_blue cursor-pointer duration-75`
-                }  ${index === arr.length - 1 && `font-semibold`}`}
-                onClick={() =>
-                  breadcrumb.urlPath && navigate(breadcrumb.urlPath)
-                }
-              >
-                {breadcrumb.label}
-              </p>
-              {index !== arr.length - 1 && <p className="px-1">{'>'}</p>}
-            </div>
-          ))}
-      </div>
-
       <CrudTable
         data={data}
         type={config.type}

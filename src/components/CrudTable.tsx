@@ -48,7 +48,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   const columnHelper = createColumnHelper<T>();
 
   useEffect(() => {
-    console.log(editingRow);
+    //console.log(editingRow);
   }, [editingRow]);
 
   const columnsTable: ColumnDef<T, any>[] = useMemo(() => {
@@ -250,7 +250,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   return (
     <>
       <div>
-        <button className="mt-5">Добавить запись (crud)</button>
+        <button className=""></button>
         <Table
           data={data}
           columns={columnsTable}

@@ -12,7 +12,7 @@ type RelatedKeysListProps = {
   entity: TableType;
   entityId: string | number;
   parent: string;
-  defaultValue: string;
+  defaultValue?: string;
   onChange: (parentId: number | string, parentName: string) => void;
 };
 
@@ -33,7 +33,9 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
 
   const [relatedList, setRelatedList] = useState<IRelatedList[]>([]);
   const [currentEntity, setCurrentEntity] = useState<TableType>(entity);
-  const [currentLabel, setCurrentLabel] = useState<string>(defaultValue);
+  const [currentLabel, setCurrentLabel] = useState<string | undefined>(
+    defaultValue || undefined
+  );
   const [parentEntity, setParentEntity] = useState<IParent | null>();
   const [grandparentEntity, setGrandparentEntity] = useState<IParent | null>();
 
