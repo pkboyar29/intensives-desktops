@@ -22,7 +22,7 @@ const AdminPage: FC = () => {
           <AdminSidebarContent />
         </Sidebar>
 
-        <div className="w-full px-10 pt-5 overflow-y-auto">
+        <div className="w-full md:pl-10 pl-[80px] pr-3 md:pr-10 py-5 overflow-y-auto">
           <Outlet />
         </div>
       </div>
