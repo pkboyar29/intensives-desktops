@@ -1,4 +1,4 @@
-import { RouteObject, Navigate } from 'react-router-dom';
+import { RouteObject, Navigate, Outlet } from 'react-router-dom';
 
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
@@ -20,17 +20,67 @@ import KanbanBoardPage from '../pages/KanbanBoardPage';
 import EducationRequestsPage from '../pages/EducationRequestsPage';
 import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
+import AdminEntityPage from '../pages/AdminEntityPage';
+import { TableType } from '../tableConfigs';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
+};
+
+const AdminEntityPageWrapper = ({ entityType }: { entityType: TableType }) => {
+  return <AdminEntityPage key={entityType} entityType={entityType} />;
 };
 
 const routeConfig: RouteType[] = [
   {
     path: '/admin',
     element: <AdminPage />,
+    children: [
+      //можно все сделать одной функцией по последнему слову в url ?
+      {
+        path: 'universities',
+        element: <AdminEntityPageWrapper entityType="universities" />,
+      },
+      {
+        path: 'users',
+        element: <AdminEntityPageWrapper entityType="buildings" />,
+      },
+      {
+        path: 'universities/:universityId/buildings',
+        element: <AdminEntityPageWrapper entityType="buildings" />,
+      },
+      {
+        path: 'universities/:universityId/buildings/:buildingId/audiences',
+        element: <AdminEntityPageWrapper entityType="audiences" />,
+      },
+      {
+        path: 'universities/:universityId/flows',
+        element: <AdminEntityPageWrapper entityType="flows" />,
+      },
+      {
+        path: 'universities/:universityId/flows/:flowId/groups',
+        element: <AdminEntityPageWrapper entityType="groups" />,
+      },
+      {
+        path: 'stagesEducation',
+        element: <AdminEntityPageWrapper entityType="stagesEducation" />,
+      },
+      {
+        path: 'profiles',
+        element: <AdminEntityPageWrapper entityType="profiles" />,
+      },
+      {
+        path: 'specializations',
+        element: <AdminEntityPageWrapper entityType="specializations" />,
+      },
+      {
+        path: 'buildings',
+        element: <AdminEntityPageWrapper key={'upd'} entityType="buildings" />,
+      },
+    ],
     requiredAuth: false,
   },
+
   {
     path: '/intensives',
     element: <IntensivesPage />,

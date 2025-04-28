@@ -24,6 +24,12 @@ import { taskApi } from './api/taskApi';
 import { fileApi } from './api/fileApi';
 import { eventAnswerApi } from './api/eventAnswerApi';
 import { eventMarkApi } from './api/eventMarkApi';
+import { universityApi } from './api/universityApi';
+import { buildingApi } from './api/buildingApi';
+import { groupApi } from './api/groupApi';
+import { educationApi } from './api/educationApi';
+import { relatedListApi } from './api/relatedListApi';
+import { breadcrumbApi } from './api/breadcrumbApi';
 import { educationRequestApi } from './api/educationRequestApi';
 import { educationRequestAnswerApi } from './api/educationRequestAnswerApi';
 
@@ -53,6 +59,12 @@ export const store = configureStore({
     [fileApi.reducerPath]: fileApi.reducer,
     [eventAnswerApi.reducerPath]: eventAnswerApi.reducer,
     [eventMarkApi.reducerPath]: eventMarkApi.reducer,
+    [universityApi.reducerPath]: universityApi.reducer,
+    [buildingApi.reducerPath]: buildingApi.reducer,
+    [groupApi.reducerPath]: groupApi.reducer,
+    [educationApi.reducerPath]: educationApi.reducer,
+    [relatedListApi.reducerPath]: relatedListApi.reducer,
+    [breadcrumbApi.reducerPath]: breadcrumbApi.reducer,
     [educationRequestApi.reducerPath]: educationRequestApi.reducer,
     [educationRequestAnswerApi.reducerPath]: educationRequestAnswerApi.reducer,
   },
@@ -78,6 +90,12 @@ export const store = configureStore({
       fileApi.middleware,
       eventAnswerApi.middleware,
       eventMarkApi.middleware,
+      universityApi.middleware,
+      buildingApi.middleware,
+      groupApi.middleware,
+      educationApi.middleware,
+      relatedListApi.middleware,
+      breadcrumbApi.middleware
       educationRequestApi.middleware,
       educationRequestAnswerApi.middleware
     ),

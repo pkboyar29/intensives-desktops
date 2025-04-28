@@ -95,7 +95,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
         </div>
         <div
           className="overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 43rem)' }}
+          style={{ maxHeight: 'calc(100vh - 20rem)' }}
           onScroll={(e) => pagination && onScrollPagination(e)}
         >
           <table className="w-full table-fixed">

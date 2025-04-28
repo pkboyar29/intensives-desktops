@@ -18,9 +18,9 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null); // Ссылка на кнопку меню
 
   const toggleMenu = () => {
-    setIsOpen((prev) => !prev);
+    //setIsOpen((prev) => !prev);
 
-    // Рассчет позицию меню
+    // Рассчет позицию меню (можно ли проверять !isOpen тут?)
     if (!isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
@@ -28,6 +28,8 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         left: rect.left + window.scrollX, // Левая координата
       });
     }
+
+    setIsOpen((prev) => !prev);
   };
   const closeMenu = () => setIsOpen(false);
 
