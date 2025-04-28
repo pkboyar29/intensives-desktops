@@ -86,7 +86,7 @@ const ManageEventForm: FC = () => {
     reset,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
@@ -323,6 +323,7 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одну команду',
       });
+      console.log('trigger teams');
       return;
     }
 
@@ -331,6 +332,7 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одного преподавателя',
       });
+      console.log('trigger teachers');
       return;
     }
 
@@ -818,6 +820,14 @@ const ManageEventForm: FC = () => {
               <FileUpload onFilesChange={handleFilesChange} />
             </div>
           </div>
+
+          {!isValid && (
+            <div className="text-base text-red">Форма содержит ошибки</div>
+          )}
+
+          {!isValid && errors.teams && teamsToChoose?.length === 0 && (
+            <div className="text-base text-red">В интенсиве нету команд</div>
+          )}
 
           <div className="flex my-5 gap-7">
             <PrimaryButton

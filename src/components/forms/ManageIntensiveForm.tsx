@@ -89,7 +89,7 @@ const ManageIntensiveForm: FC = () => {
     setError,
     clearErrors,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
@@ -519,6 +519,10 @@ const ManageIntensiveForm: FC = () => {
             )}
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
+
+          {!isValid && (
+            <div className="text-base text-red">Форма содержит ошибки</div>
+          )}
 
           <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
