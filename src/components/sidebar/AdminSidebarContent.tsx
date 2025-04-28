@@ -10,6 +10,7 @@ const AdminSidebarContent: FC = () => {
         <SidebarLink to="stagesEducation" text="Ступени" />
         <SidebarLink to="profiles" text="Профили" />
         <SidebarLink to="specializations" text="Направления" />
+        <SidebarLink to="buildings" text="Корпуса" />
       </div>
     </>
   );

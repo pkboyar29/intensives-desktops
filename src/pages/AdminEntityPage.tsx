@@ -9,6 +9,8 @@ import {
 } from '../tableConfigs/entitiesConfig';
 import { TableType } from '../tableConfigs';
 import { ToastContainer, toast } from 'react-toastify';
+import { breadcrumb } from '../ts/types/types';
+import { useLazyGetBreadcrumbQuery } from '../redux/api/breadcrumbApi';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -31,7 +33,11 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const [updateEntityAPI] = updateHook();
   const [deleteEntityAPI] = deleteHook();
 
+  const [fetchBreadcrumbsData, { data: breadcrumbsData }] =
+    useLazyGetBreadcrumbQuery();
+
   const [data, setData] = useState(() => queryData?.results ?? []);
+  const [breadcrumbs, setBreadcrumbs] = useState<breadcrumb[]>([]);
 
   const limit = 100; // Размер страницы данных
   const offset = useRef<number>(0); // Текущее смещение
@@ -49,7 +55,24 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     loadData();
-  }, [fetchData]);
+    loadBreadcrumbsData();
+    createBreadcrumbs();
+  }, []);
+
+  useEffect(() => {
+    if (breadcrumbsData) {
+      breadcrumbsData.results.map((breadcrumbData) => {
+        console.log(breadcrumbData);
+        setBreadcrumbs((prev) =>
+          prev.map((breadcrumb) =>
+            breadcrumb.name === `${breadcrumbData.name}${breadcrumbData.id}`
+              ? { ...breadcrumb, label: breadcrumbData.label }
+              : breadcrumb
+          )
+        );
+      });
+    }
+  }, [breadcrumbsData]);
 
   useEffect(() => {
     //console.log(queryData);
@@ -59,7 +82,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   }, [queryData]);
 
   useEffect(() => {
-    console.log(data);
+    //console.log(data);
     //console.log(queryData?.results);
     //console.log((queryData as any)?.childEntitiesMeta);
   }, [data]);
@@ -74,6 +97,30 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       });
       //console.log('fetch');
     }
+    //if (fetchBreadcrumb) {
+    //  await fetchBreadcrumb({ path: window.location.pathname }); //вызывать только если нужно получить названия
+    // }
+  };
+
+  const loadBreadcrumbsData = async () => {
+    const pathParts = window.location.pathname.split('/');
+
+    for (var pathPart of pathParts) {
+      if (!entitiesConfig[pathPart] && !isNaN(parseInt(pathPart))) {
+        console.log('da', pathPart);
+        fetchBreadcrumbsData({ path: window.location.pathname });
+        break;
+      }
+    }
+
+    /*
+    for (var i = 0; i < pathParts.length - 1; i++) {
+      if (!entitiesConfig[pathParts[i]] && !isNaN(parseInt(pathParts[i]))) {
+        console.log('da', pathParts[i]);
+        break;
+      }
+    }
+    */
   };
 
   const createEntity = async (entity: any) => {};
@@ -108,7 +155,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         `Error on updating entity ${entityType} id=${entity.id}`,
         error
       );
-      setData(prevItems); // в случае ошибки откатываем состояние (!попадает сюда даже если запрос 200 но ошибка где то тут)
+      setData(prevItems); // в случае ошибки откатываем состояние
       toast(`Произошла ошибка при обновлении объекта ${entity.name}`, {
         type: 'error',
       });
@@ -154,6 +201,28 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const addRowTemplate = () => {
     //setData((prev) => [...data, ])
   };
+  //console.log(window.location.pathname);
+  //console.log(window.location.pathname.split('/'));
+
+  const createBreadcrumbs = () => {
+    const pathParts = window.location.pathname.split('/');
+    //console.log(pathParts);
+    pathParts.forEach((pathPart, index) => {
+      if (pathPart.length === 0 || pathPart === 'admin') return;
+
+      const entity = entitiesConfig[pathPart];
+
+      setBreadcrumbs((prev) => [
+        ...prev,
+        {
+          // Если id устанавливаем name = pathPart + его id в url например university1 при university/1
+          name: entity ? pathPart : `${pathParts[index - 1]}${pathPart}`,
+          urlPath: entity && pathParts.slice(0, index + 1).join('/'),
+          label: entity?.title || pathPart,
+        },
+      ]);
+    });
+  };
 
   return (
     <>
@@ -165,6 +234,28 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           Добавить запись
         </button>
       </div>
+
+      <div className="flex mt-3">
+        {breadcrumbs.length > 1 &&
+          breadcrumbs.map((breadcrumb, index, arr) => (
+            <div key={breadcrumb.name} className="flex">
+              <p
+                className={`${
+                  breadcrumb.urlPath &&
+                  index !== arr.length - 1 &&
+                  `text-blue hover:text-dark_blue cursor-pointer duration-75`
+                }  ${index === arr.length - 1 && `font-semibold`}`}
+                onClick={() =>
+                  breadcrumb.urlPath && navigate(breadcrumb.urlPath)
+                }
+              >
+                {breadcrumb.label}
+              </p>
+              {index !== arr.length - 1 && <p className="px-1">{'>'}</p>}
+            </div>
+          ))}
+      </div>
+
       <CrudTable
         data={data}
         type={config.type}
@@ -174,12 +265,14 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         }
         getId={(b) => b.id}
         onChildNavigatePath={(path) => {
+          console.log(path);
           navigate(window.location.pathname + path);
         }}
         onNextPage={count && limit < count ? () => loadNextPage() : undefined}
         onCreate={(entity) => createEntity(entity)}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
+        isLoadingData={isLoading}
       />
     </>
   );

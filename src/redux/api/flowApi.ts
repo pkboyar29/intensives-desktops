@@ -15,8 +15,11 @@ export const mapFlow = (unmappedFlow: any): IFlow => {
   return {
     id: unmappedFlow.id,
     name: unmappedFlow.name,
-    university: mapUniversity(unmappedFlow.university),
-    stageEducation: mapStageEducation(unmappedFlow.stage_education),
+    university:
+      unmappedFlow.university && mapUniversity(unmappedFlow.university),
+    stageEducation:
+      unmappedFlow.stage_education &&
+      mapStageEducation(unmappedFlow.stage_education),
   };
 };
 
@@ -33,7 +36,7 @@ export const flowApi = createApi({
         childEntitiesMeta?: childEntitiesMeta[];
       },
       {
-        universities?: number | null;
+        university?: number | null;
         withChildrenMeta?: boolean;
         limit?: number;
         offset?: number;

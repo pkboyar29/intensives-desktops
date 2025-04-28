@@ -16,6 +16,7 @@ import RelatedKeysList from './RelatedKeysList';
 interface CrudTableProps<T> {
   data: T[];
   type: TableType;
+  getId: (row: T) => string | number;
   childEntities?: childEntitiesMeta[];
   onCreate?: (item: T) => void;
   onUpdate?: (item: T) => void;
@@ -23,7 +24,7 @@ interface CrudTableProps<T> {
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
   onChildNavigatePath?: (childNavigatePath: string) => void;
   onNextPage?: () => void;
-  getId: (row: T) => string | number;
+  isLoadingData?: boolean;
 }
 
 function CrudTable<T>(props: CrudTableProps<T>) {
@@ -38,6 +39,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onChildNavigate,
     onChildNavigatePath,
     onNextPage,
+    isLoadingData,
   } = props;
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const editingRow = useRef<T | null>(null);
@@ -61,7 +63,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
             value !== null &&
             column.type === 'relation'
           ) {
-            const nested = value as Record<keyof T, any>;
+            const nested = value as Record<string, any>;
             return nested[column.renderKey];
           }
           return value;
@@ -132,7 +134,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                           ...editingRow.current,
                           [key as keyof T]: {
                             id: newParentId,
-                            [column.renderKey as keyof T]: newParentName,
+                            [column.renderKey as string]: newParentName,
                           },
                         };
                       }
@@ -254,6 +256,11 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           columns={columnsTable}
           pagination={onNextPage ? { onNextPage: () => onNextPage } : undefined}
         />
+        {data.length === 0 && (
+          <p className="mt-3 text-2xl text-center">
+            {isLoadingData ? 'Загрузка...' : 'Нет записей'}
+          </p>
+        )}
       </div>
     </>
   );

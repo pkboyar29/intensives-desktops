@@ -19,9 +19,6 @@ import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
 import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
-import AdminUniversitiesPage from '../pages/AdminUniversitiesPage';
-import AdminBuildingsPage from '../pages/AdminBuildingPage';
-import AdminFlowsPage from '../pages/AdminFlowsPage';
 import AdminEntityPage from '../pages/AdminEntityPage';
 import { TableType } from '../tableConfigs';
 
@@ -38,6 +35,7 @@ const routeConfig: RouteType[] = [
     path: '/admin',
     element: <AdminPage />,
     children: [
+      //можно все сделать одной функцией по последнему слову в url ?
       {
         path: 'universities',
         element: <AdminEntityPageWrapper entityType="universities" />,
@@ -73,6 +71,10 @@ const routeConfig: RouteType[] = [
       {
         path: 'specializations',
         element: <AdminEntityPageWrapper entityType="specializations" />,
+      },
+      {
+        path: 'buildings',
+        element: <AdminEntityPageWrapper key={'upd'} entityType="buildings" />,
       },
     ],
     requiredAuth: false,

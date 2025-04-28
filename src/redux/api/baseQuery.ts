@@ -79,3 +79,8 @@ export const buildUrl = (
 
   return `${basePath}${params.toString() ? `?${params.toString()}` : ''}`;
 };
+
+export const mapIfExists = <T, R>(
+  value: T | undefined,
+  mapper: (val: T) => R
+): R | undefined => (value ? mapper(value) : undefined);

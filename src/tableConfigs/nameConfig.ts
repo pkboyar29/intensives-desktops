@@ -14,7 +14,7 @@ export type ColumnConfig<T> = {
   key: keyof T;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
-  renderKey?: keyof T;
+  renderKey?: string; // не string и не keyof T а keyof T и от типов поля с внешним ключом
   parentParam?: string;
   readOnly?: boolean;
 };
@@ -84,7 +84,7 @@ export const groupsColumns: ColumnConfig<IGroup>[] = [
   },
   {
     key: 'specialization',
-    label: 'Специализация',
+    label: 'Направление',
     type: 'relation',
     renderKey: 'name',
   },

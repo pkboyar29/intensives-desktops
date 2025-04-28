@@ -48,20 +48,20 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   audiences: {
     type: 'audiences',
     title: 'Аудитории',
-    queryParamsDependencies: [{ from: 'buildingId', as: 'buildings' }],
+    queryParamsDependencies: [{ from: 'buildingId', as: 'building' }],
     hooks: queryHooksMap['audiences'],
   },
   flows: {
     type: 'flows',
     title: 'Потоки',
-    queryParamsDependencies: [{ from: 'universityId', as: 'universities' }],
+    queryParamsDependencies: [{ from: 'universityId', as: 'university' }],
     defaultQueryParams: { withChildrenMeta: true },
     hooks: queryHooksMap['flows'],
   },
   groups: {
     type: 'groups',
     title: 'Группы',
-    queryParamsDependencies: [{ from: 'flowId', as: 'flows' }],
+    queryParamsDependencies: [{ from: 'flowId', as: 'flow' }],
     defaultQueryParams: { withChildrenMeta: true },
     hooks: queryHooksMap['groups'],
   },

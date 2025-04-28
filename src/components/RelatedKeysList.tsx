@@ -92,7 +92,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
         )}
 
         <div
-          className="inline-block w-full border border-black cursor-pointer"
+          className="inline-block w-full bg-white border border-black cursor-pointer"
           onClick={() => toggleDropdown()}
           ref={dropdownRef}
         >
@@ -101,7 +101,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
             createPortal(
               <ul
                 id={'relatedList'}
-                className="mt-5 border border-black "
+                className="mt-5 border border-black overflow-y-auto max-h-[100px]"
                 style={{
                   position: 'absolute',
                   top: dropdownPosition.top,
@@ -110,9 +110,8 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
                 }}
               >
                 {relatedList.map((related) => (
-                  <>
+                  <div key={related.id}>
                     <li
-                      key={related.id}
                       value={related.id}
                       onClick={() => {
                         onChange(related.id, related.name);
@@ -123,7 +122,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
                       {related.name}
                     </li>
                     <hr></hr>
-                  </>
+                  </div>
                 ))}
               </ul>,
               document.body

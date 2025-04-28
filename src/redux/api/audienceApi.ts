@@ -27,7 +27,7 @@ export const audienceApi = createApi({
         previous: string | null;
       },
       {
-        buildings?: number | null;
+        building?: number | null;
         limit?: number;
         offset?: number;
       }

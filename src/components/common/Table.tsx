@@ -38,7 +38,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
     }
   }, [data]);
 
-  console.log(data);
+  //console.log(data);
   const table = useReactTable({
     data,
     columns,

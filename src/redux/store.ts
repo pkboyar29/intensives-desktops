@@ -29,6 +29,7 @@ import { buildingApi } from './api/buildingApi';
 import { groupApi } from './api/groupApi';
 import { educationApi } from './api/educationApi';
 import { relatedListApi } from './api/relatedListApi';
+import { breadcrumbApi } from './api/breadcrumbApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -61,6 +62,7 @@ export const store = configureStore({
     [groupApi.reducerPath]: groupApi.reducer,
     [educationApi.reducerPath]: educationApi.reducer,
     [relatedListApi.reducerPath]: relatedListApi.reducer,
+    [breadcrumbApi.reducerPath]: breadcrumbApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -88,7 +90,8 @@ export const store = configureStore({
       buildingApi.middleware,
       groupApi.middleware,
       educationApi.middleware,
-      relatedListApi.middleware
+      relatedListApi.middleware,
+      breadcrumbApi.middleware
     ),
 });
 

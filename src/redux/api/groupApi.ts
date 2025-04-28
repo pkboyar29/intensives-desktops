@@ -34,7 +34,7 @@ export const groupApi = createApi({
         childEntitiesMeta?: childEntitiesMeta[];
       },
       {
-        flows?: number | null;
+        flow?: number | null;
         withChildrenMeta?: boolean;
         limit?: number;
         offset?: number;
