@@ -181,11 +181,11 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
       {event.criterias.length === 0 ? (
         // если тип оценивания - по шкале
         <>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-2 sm:flex-row">
             <div className="text-lg">Общая оценка: </div>
 
             {event.markStrategy && (
-              <div className="w-60">
+              <div className="w-full sm:w-60">
                 <RangeSlider
                   minValue={event.markStrategy.lowBound}
                   maxValue={event.markStrategy.highBound}
@@ -216,12 +216,12 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
         <>
           {event.criterias.map((criteria) => (
             <div key={criteria.id}>
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col items-center justify-between w-full gap-2 sm:flex-row">
                 <div className="text-lg">{criteria.name}</div>
 
-                <div className="text-center">
+                <div className="w-full text-center sm:w-auto">
                   {event.markStrategy && (
-                    <div className="w-60">
+                    <div className="w-full sm:w-60">
                       <RangeSlider
                         minValue={event.markStrategy?.lowBound}
                         maxValue={event.markStrategy?.highBound}

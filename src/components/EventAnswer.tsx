@@ -10,7 +10,6 @@ import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
   isUserManager,
-  isUserTeacher,
   isUserStudent,
   isUserTeamlead,
   isUserTutor,
@@ -34,7 +33,6 @@ import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 import { IEvent } from '../ts/interfaces/IEvent';
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 import { IEventMark } from '../ts/interfaces/IEventMark';
-import { ICriteria } from '../ts/interfaces/ICriteria';
 
 interface EventAnswerProps {
   eventAnswerData?: IEventAnswer;

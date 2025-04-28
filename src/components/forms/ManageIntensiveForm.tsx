@@ -87,8 +87,9 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
+    clearErrors,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
@@ -119,11 +120,23 @@ const ManageIntensiveForm: FC = () => {
     }
   }, [intensiveId, currentIntensive]);
 
+  const openDate = watch('openDate');
+  const closeDate = watch('closeDate');
+  useEffect(() => {
+    if (!openDate || !closeDate) {
+      return;
+    }
+    clearErrors('openDate');
+  }, [openDate, closeDate]);
+
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
+      open_dt?: string[];
       specific_student_ids?: string[];
     };
-    if (errorData && errorData.specific_student_ids) {
+    if (errorData && errorData.open_dt) {
+      setError('openDate', { type: 'custom', message: errorData.open_dt[0] });
+    } else if (errorData && errorData.specific_student_ids) {
       setError('specificStudents', {
         type: 'custom',
         message: errorData.specific_student_ids[0],
@@ -303,7 +316,7 @@ const ManageIntensiveForm: FC = () => {
 
       <div
         className={`flex justify-center ${
-          !intensiveId ? `pt-[88px]` : `max-w-[1280px]`
+          !intensiveId ? `pt-[88px] px-3` : `max-w-[1280px]`
         }`}
       >
         <form
@@ -314,7 +327,7 @@ const ManageIntensiveForm: FC = () => {
             text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
           />
 
-          <div className="flex flex-col gap-3 mt-6 mb-3">
+          <div className="flex flex-col gap-1.5 sm:gap-3 mt-3 mb-3 sm:mt-6">
             <div className="text-lg font-bold">Интенсив</div>
 
             <InputDescription
@@ -363,7 +376,7 @@ const ManageIntensiveForm: FC = () => {
           <div className="flex flex-col gap-3 my-3">
             <div className="text-lg font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-6">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:gap-6">
               <InputDescription
                 fieldName="openDate"
                 register={register}
@@ -385,11 +398,6 @@ const ManageIntensiveForm: FC = () => {
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно',
-                  validate: {
-                    lessThanOpenDt: (value: string, formValues) =>
-                      new Date(value) > new Date(formValues.openDate) ||
-                      'Дата окончания должна быть позже даты начала',
-                  },
                 }}
                 type="date"
                 description="Дата окончания"
@@ -421,6 +429,10 @@ const ManageIntensiveForm: FC = () => {
                       }
                       items={flows}
                       selectedItems={field.value || []}
+                      disabledItems={currentIntensive?.flows.map((f) => ({
+                        id: f.id,
+                        name: f.name,
+                      }))}
                       setSelectedItems={field.onChange}
                       chipSize="big"
                     />
@@ -508,7 +520,11 @@ const ManageIntensiveForm: FC = () => {
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
-          <div className="flex my-5 gap-7">
+          {!isValid && (
+            <div className="text-base text-red">Форма содержит ошибки</div>
+          )}
+
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"

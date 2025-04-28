@@ -3,7 +3,7 @@ import { ICriteria } from './ICriteria';
 import { IFile } from './IFile';
 import { IMarkStrategy } from './IMarkStrategy';
 import { ITeacher } from './ITeacher';
-import { ITeam } from './ITeam';
+import { ITeamShort } from './ITeam';
 
 export interface IEvent {
   id: number;
@@ -13,7 +13,7 @@ export interface IEvent {
   finishDate: Date;
   audience: IAudience;
   stageId: number | null;
-  teams: ITeam[];
+  teams: ITeamShort[];
   teachers: ITeacher[];
   markStrategy: IMarkStrategy | null;
   deadlineDate: Date | null;

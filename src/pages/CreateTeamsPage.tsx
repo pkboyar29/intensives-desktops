@@ -20,7 +20,7 @@ import MembersIcon from '../components/icons/MembersIcon';
 import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ const CreateTeamsPage: FC = () => {
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
+  const [teamsCountError, setTeamsCountError] = useState<string | null>(null);
   const [teams, setTeams] = useState<ITeamForManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
@@ -71,12 +72,15 @@ const CreateTeamsPage: FC = () => {
     const fetchTeams = async () => {
       if (intensiveId) {
         try {
-          const { data: teamsResponse } = await getTeams(parseInt(intensiveId));
+          const { data: teamsResponse } = await getTeams({
+            intensiveId: parseInt(intensiveId),
+            short: false,
+          });
 
           if (teamsResponse && teamsResponse.length > 0) {
             setTeamsCount(teamsResponse.length);
             setTeams(
-              teamsResponse.map((team) => ({
+              (teamsResponse as ITeam[]).map((team) => ({
                 ...team,
                 index: team.id,
                 studentsInTeam: team.studentsInTeam.map(
@@ -90,6 +94,7 @@ const CreateTeamsPage: FC = () => {
                 id: null,
                 index: 1,
                 name: 'Команда 1',
+                position: 1,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
@@ -99,6 +104,7 @@ const CreateTeamsPage: FC = () => {
                 id: null,
                 index: 2,
                 name: 'Команда 2',
+                position: 2,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
@@ -152,11 +158,32 @@ const CreateTeamsPage: FC = () => {
   const teamsCountInputChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (teamsCountError) {
+      setTeamsCountError(null);
+    }
+
     setTeamsCount(parseInt(e.target.value));
   };
 
   const teamsCountButtonClickHandler = () => {
+    const allStudents = getAllStudents();
+    if (teamsCount > allStudents.length) {
+      setTeamsCountError(
+        `Максимальное количество команд в этом интенсиве - ${allStudents.length}`
+      );
+      return;
+    }
+
     setTeamsCountModal(true);
+  };
+
+  const getAllStudents = (): IStudent[] => {
+    let allStudents: IStudent[] = freeStudents;
+    teams.forEach((team) => {
+      allStudents = [...allStudents, ...team.studentsInTeam];
+    });
+
+    return allStudents;
   };
 
   const clearTeams = () => {
@@ -187,6 +214,7 @@ const CreateTeamsPage: FC = () => {
             id: null,
             index: i,
             name: `Команда ${i}`,
+            position: i,
             studentsInTeam: [],
             tutor: null,
             mentor: null,
@@ -262,10 +290,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const distributeStudents = () => {
-    let allStudents: IStudent[] = freeStudents;
-    teams.forEach((team) => {
-      allStudents = [...allStudents, ...team.studentsInTeam];
-    });
+    let allStudents: IStudent[] = getAllStudents();
 
     const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
     const freeSpecificStudents = allStudents.filter(
@@ -329,6 +354,7 @@ const CreateTeamsPage: FC = () => {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
         id: team.id,
         name: team.name,
+        position: team.position,
         studentIds: team.studentsInTeam.map(
           (studentInTeam) => studentInTeam.id
         ),
@@ -484,7 +510,8 @@ const CreateTeamsPage: FC = () => {
         Создайте команды и распределите участников интенсива по командам
       </p>
 
-      <div className="flex items-center gap-4 mt-5">
+      <div className="mt-5 text-base text-gray_3">Количество команд</div>
+      <div className="flex items-center gap-4 mt-1.5">
         <div className="relative w-[480px]">
           <input
             type="number"
@@ -515,6 +542,10 @@ const CreateTeamsPage: FC = () => {
           </button>
         </Tooltip>
       </div>
+
+      {teamsCountError && (
+        <div className="mt-2 text-red">{teamsCountError}</div>
+      )}
 
       <div className="flex gap-10 mt-5">
         <div className="flex flex-col gap-3 basis-1/3">

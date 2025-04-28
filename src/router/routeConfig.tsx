@@ -17,6 +17,7 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
+import EducationRequestsPage from '../pages/EducationRequestsPage';
 import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
 
@@ -78,6 +79,10 @@ const routeConfig: RouteType[] = [
       {
         path: 'schedule/editEvent',
         element: <ManageEventForm />,
+      },
+      {
+        path: 'educationRequests',
+        element: <EducationRequestsPage />,
       },
       {
         path: 'statistics',

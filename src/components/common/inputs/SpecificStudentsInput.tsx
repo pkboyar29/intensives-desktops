@@ -3,10 +3,9 @@ import { motion } from 'framer-motion';
 import { useLazyGetStudentsQuery } from '../../../redux/api/studentApi';
 
 import Checkbox from './Checkbox';
-import Chip from '../Chip';
+import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
-import SearchIcon from '../../icons/SearchIcon';
-import CrossIcon from '../../icons/CrossIcon';
+import SearchBar from '../SearchBar';
 
 interface Item {
   id: number;
@@ -121,26 +120,17 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
         animate={isOpen ? 'open' : 'closed'}
         variants={dropdownVariants}
       >
-        <div className="flex items-center w-full px-4 py-3 mt-3 border border-solid bg-another_white rounded-xl border-bright_gray">
-          <SearchIcon className="text-gray-500" />
-          <input
-            value={searchText}
-            onChange={searchInputChangeHandler}
-            className="w-full pl-4 bg-another_white focus:outline-none"
-            placeholder="Поиск"
-          />
-          <button
-            onClick={() => {
-              if (!startTyping) {
-                setStartTyping(true);
-              }
-              setSearchText('');
-            }}
-            type="button"
-          >
-            <CrossIcon />
-          </button>
-        </div>
+        <SearchBar
+          className="border border-solid border-bright_gray"
+          searchText={searchText}
+          searchInputChangeHandler={searchInputChangeHandler}
+          crossIconClickHandler={() => {
+            if (!startTyping) {
+              setStartTyping(true);
+            }
+            setSearchText('');
+          }}
+        />
 
         {startTyping && students.length === 0 ? (
           <div className="mt-3">Ничего не найдено</div>
@@ -163,16 +153,13 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
         )}
       </motion.div>
 
-      <div className="flex flex-wrap gap-2 mx-3 mt-3">
-        {selectedItems.map((selectedItem) => (
-          <Chip
-            key={selectedItem.id}
-            label={selectedItem.name}
-            size={'small'}
-            shouldHaveCrossIcon={true}
-            deleteHandler={() => deleteSelectedItem(selectedItem.id)}
-          />
-        ))}
+      <div className="mt-3">
+        <ChipList
+          items={selectedItems}
+          chipSize="small"
+          chipCrossIcon={true}
+          chipDeleteHandler={(itemId) => deleteSelectedItem(itemId)}
+        />
       </div>
 
       <div className="mt-3 text-base text-red">{errorMessage}</div>

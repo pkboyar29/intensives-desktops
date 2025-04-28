@@ -72,6 +72,10 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           <div className="flex flex-col gap-4 my-3">
             <SidebarLink to="team-overview" text="Просмотр команды" />
             <SidebarLink to="kanban" text="Ведение задач" />
+            <SidebarLink
+              to="educationRequests"
+              text="Образовательные запросы"
+            />
           </div>
         </div>
       )}

@@ -28,7 +28,7 @@ const Sidebar: FC<SidebarProps> = ({ children }) => {
   return (
     <motion.div
       animate={{
-        left: isOpen ? 0 : isMobile ? -235 : -220,
+        left: isOpen ? 0 : isMobile ? -200 : -220,
       }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={`top-0 left-0 h-full max-w-[300px] p-5 bg-white border-r border-solid shadow-md border-r-gray ${

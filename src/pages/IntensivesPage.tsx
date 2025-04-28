@@ -8,7 +8,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
-import SearchIcon from '../components/icons/SearchIcon';
+import SearchBar from '../components/common/SearchBar';
 import IntensiveCard from '../components/IntensiveCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
@@ -42,10 +42,9 @@ const IntensivesPage: FC = () => {
 
   const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
   const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
-    'all'
+    'relevant'
   );
 
-  // обрабатывать зависимость relevance
   useEffect(() => {
     updateFilteredIntensives();
   }, [searchText, openness, relevance, intensives]);
@@ -54,13 +53,16 @@ const IntensivesPage: FC = () => {
     updateSortedIntensives();
   }, [sortOption, filteredIntensives]);
 
-  // TODO: обрабатывать relevance
   const updateFilteredIntensives = () => {
     if (intensives) {
       let filteredIntensives: IIntensiveShort[] = [];
 
-      filteredIntensives = intensives.filter((intensive) =>
-        intensive.name.toLowerCase().includes(searchText)
+      filteredIntensives = intensives.filter(
+        (intensive) =>
+          intensive.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          intensive.description
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase())
       );
 
       if (isUserManager(currentUser)) {
@@ -173,15 +175,10 @@ const IntensivesPage: FC = () => {
         )}
       </div>
 
-      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
-        <SearchIcon className="text-gray-500" />
-        <input
-          value={searchText}
-          onChange={searchInputChangeHandler}
-          className="w-full pl-4 bg-another_white focus:outline-none"
-          placeholder="Поиск"
-        />
-      </div>
+      <SearchBar
+        searchText={searchText}
+        searchInputChangeHandler={searchInputChangeHandler}
+      />
 
       <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8">

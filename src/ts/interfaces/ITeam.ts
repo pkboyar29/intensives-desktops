@@ -5,10 +5,17 @@ import { IStudentRole } from './IStudentRole';
 export interface ITeam {
   id: number;
   name: string;
+  position: number;
   studentsInTeam: IStudentInTeam[];
   tutor: ITeacher | null;
   mentor: IStudent | null;
   teamlead: IStudent | null;
+}
+
+export interface ITeamShort {
+  id: number;
+  name: string;
+  position: number;
 }
 
 export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
@@ -37,6 +44,7 @@ export interface ITeamsCreate {
 export interface ITeamCreate {
   id: number | null;
   name: string;
+  position: number;
   studentIds: number[];
 }
 

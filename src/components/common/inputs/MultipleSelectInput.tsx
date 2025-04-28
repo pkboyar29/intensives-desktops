@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
-import Chip from '../Chip';
+import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
 interface MultipleSelectInputProps<T> {
@@ -11,6 +11,8 @@ interface MultipleSelectInputProps<T> {
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
   selectedItems: T[];
+  // TODO: спросить у чат гпт как лучше назвать эту переменную
+  disabledItems?: T[];
   setSelectedItems: (items: T[]) => void;
   chipSize?: 'small' | 'big';
 }
@@ -22,6 +24,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   items,
   selectedItems,
   setSelectedItems,
+  disabledItems = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -84,7 +87,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               setSelectedItems(items);
             }}
             deleteSelectedItem={() => {
-              setSelectedItems([]);
+              setSelectedItems(disabledItems);
             }}
             isChecked={selectedItems.length === items.length}
           />
@@ -98,7 +101,13 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               key={item.id}
               item={item}
               addSelectedItem={addSelectedItem}
-              deleteSelectedItem={deleteSelectedItem}
+              deleteSelectedItem={() => {
+                if (disabledItems.map((item) => item.id).includes(item.id)) {
+                  return;
+                }
+
+                deleteSelectedItem(item.id);
+              }}
               isChecked={selectedItems.some(
                 (selectedItem) => selectedItem.id === item.id
               )}
@@ -107,14 +116,8 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         </ul>
       </motion.div>
 
-      <div className="flex flex-wrap gap-2 mx-3 mt-3">
-        {selectedItems.map((selectedItem) => (
-          <Chip
-            key={selectedItem.id}
-            label={selectedItem.name}
-            size={chipSize}
-          />
-        ))}
+      <div className="mt-2.5">
+        <ChipList items={selectedItems} chipSize={chipSize} />
       </div>
 
       <div className="text-base text-red">{errorMessage}</div>
