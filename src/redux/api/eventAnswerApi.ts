@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 import { mapFile } from './fileApi';
 import { mapEventMark } from './eventMarkApi';
+import { mapTeamShort } from './teamApi';
 
 import {
   IEventAnswer,
@@ -16,7 +17,7 @@ export const mapEventAnswer = (unmappedEventAnswer: any): IEventAnswer => {
     id: unmappedEventAnswer.id,
     text: unmappedEventAnswer.text,
     student: unmappedEventAnswer.student,
-    team: unmappedEventAnswer.team,
+    team: mapTeamShort(unmappedEventAnswer.team),
     createdDate: unmappedEventAnswer.created_at,
     files: unmappedEventAnswer.files.map((file: any) => mapFile(file)),
     // TODO: надо понять, почему мы тут получаем undefined после именно создания ответа (дело в бэке наверн) и убрать этот тернарный оператор потом

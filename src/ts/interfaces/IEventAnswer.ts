@@ -1,13 +1,13 @@
 import { IEventMark, IEventMarkAvg } from './IEventMark';
 import { IFile } from './IFile';
 import { IStudent } from './IStudent';
-import { ITeam } from './ITeam';
+import { ITeamShort } from './ITeam';
 
 export interface IEventAnswer {
   id: number;
   text: string;
   student: IStudent;
-  team: ITeam;
+  team: ITeamShort;
   createdDate: Date;
   files: IFile[];
   marks: IEventMark[] | IEventMarkAvg[];

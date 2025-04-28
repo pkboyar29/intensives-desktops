@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import { useAppSelector } from '../../redux/store';
 
@@ -12,6 +13,7 @@ import { useGetFlowsQuery } from '../../redux/api/flowApi';
 import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
+import { useFileHandler } from '../../helpers/useFileHandler';
 
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
@@ -20,12 +22,13 @@ import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
+import SpecificStudentsInput from '../common/inputs/SpecificStudentsInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
-import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 import EditableFileList from '../EditableFileList';
-import { useFileHandler } from '../../helpers/useFileHandler';
+
+import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
 
 interface Item {
   id: number;
@@ -38,6 +41,7 @@ interface ManageIntensiveFields {
   openDate: string;
   closeDate: string;
   flows: Item[];
+  specificStudents: Item[];
   teachers: Item[];
   roles: Item[];
   files?: IFile[];
@@ -83,7 +87,9 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
-    formState: { errors },
+    clearErrors,
+    watch,
+    formState: { errors, isValid },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
@@ -96,6 +102,10 @@ const ManageIntensiveForm: FC = () => {
         openDate: getISODateInUTC3(currentIntensive.openDate),
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
         flows: currentIntensive.flows,
+        specificStudents: currentIntensive.specificStudents.map((student) => ({
+          id: student.id,
+          name: student.nameWithGroup,
+        })),
         teachers: currentIntensive.teachers,
         roles: currentIntensive.roles,
       });
@@ -109,6 +119,40 @@ const ManageIntensiveForm: FC = () => {
       }
     }
   }, [intensiveId, currentIntensive]);
+
+  const openDate = watch('openDate');
+  const closeDate = watch('closeDate');
+  useEffect(() => {
+    if (!openDate || !closeDate) {
+      return;
+    }
+    clearErrors('openDate');
+  }, [openDate, closeDate]);
+
+  const handleResponseError = (error: FetchBaseQueryError) => {
+    const errorData = (error as FetchBaseQueryError).data as {
+      open_dt?: string[];
+      specific_student_ids?: string[];
+    };
+    if (errorData && errorData.open_dt) {
+      setError('openDate', { type: 'custom', message: errorData.open_dt[0] });
+    } else if (errorData && errorData.specific_student_ids) {
+      setError('specificStudents', {
+        type: 'custom',
+        message: errorData.specific_student_ids[0],
+      });
+    } else {
+      if (currentIntensive) {
+        toast('Произошла серверная ошибка при сохранении изменений', {
+          type: 'error',
+        });
+      } else {
+        toast('Произошла серверная ошибка при создании', {
+          type: 'error',
+        });
+      }
+    }
+  };
 
   const onSubmit = async (data: ManageIntensiveFields) => {
     if (!data.flows || data.flows.length === 0) {
@@ -127,6 +171,9 @@ const ManageIntensiveForm: FC = () => {
     }
 
     const flowIds: number[] = data.flows.map((flow) => flow.id);
+    const specificStudentsIds: number[] = data.specificStudents
+      ? data.specificStudents.map((student) => student.id)
+      : [];
     const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
     const roleIds: number[] = data.roles
       ? data.roles.map((role) => role.id)
@@ -145,6 +192,7 @@ const ManageIntensiveForm: FC = () => {
         id: Number(intensiveId),
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
@@ -152,24 +200,21 @@ const ManageIntensiveForm: FC = () => {
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при сохранении изменений', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
     } else {
       ({ data: responseData, error: responseError } = await createIntensive({
         ...data,
         flowIds,
+        specificStudentsIds,
         teacherIds,
         roleIds,
         isOpen: true,
       }));
 
       if (responseError) {
-        toast('Произошла серверная ошибка при создании', {
-          type: 'error',
-        });
+        handleResponseError(responseError as FetchBaseQueryError);
         return;
       }
 
@@ -270,8 +315,8 @@ const ManageIntensiveForm: FC = () => {
       )}
 
       <div
-        className={`pt-[88px] flex justify-center ${
-          !intensiveId ? `` : `max-w-[1280px]`
+        className={`flex justify-center ${
+          !intensiveId ? `pt-[88px] px-3` : `max-w-[1280px]`
         }`}
       >
         <form
@@ -282,7 +327,7 @@ const ManageIntensiveForm: FC = () => {
             text={intensiveId ? 'Редактировать интенсив' : 'Создать интенсив'}
           />
 
-          <div className="flex flex-col gap-3 mt-6 mb-3">
+          <div className="flex flex-col gap-1.5 sm:gap-3 mt-3 mb-3 sm:mt-6">
             <div className="text-lg font-bold">Интенсив</div>
 
             <InputDescription
@@ -331,7 +376,7 @@ const ManageIntensiveForm: FC = () => {
           <div className="flex flex-col gap-3 my-3">
             <div className="text-lg font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-6">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:gap-6">
               <InputDescription
                 fieldName="openDate"
                 register={register}
@@ -353,11 +398,6 @@ const ManageIntensiveForm: FC = () => {
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно',
-                  validate: {
-                    lessThanOpenDt: (value: string, formValues) =>
-                      new Date(value) > new Date(formValues.openDate) ||
-                      'Дата окончания должна быть позже даты начала',
-                  },
                 }}
                 type="date"
                 description="Дата окончания"
@@ -389,6 +429,10 @@ const ManageIntensiveForm: FC = () => {
                       }
                       items={flows.results}
                       selectedItems={field.value || []}
+                      disabledItems={currentIntensive?.flows.map((f) => ({
+                        id: f.id,
+                        name: f.name,
+                      }))}
                       setSelectedItems={field.onChange}
                       chipSize="big"
                     />
@@ -396,6 +440,29 @@ const ManageIntensiveForm: FC = () => {
                 )}
               />
             )}
+
+            <Controller
+              name="specificStudents"
+              control={control}
+              render={({ field }) => (
+                <div className="mt-3">
+                  <SpecificStudentsInput
+                    selectedItems={field.value || []}
+                    setSelectedItems={field.onChange}
+                    flowsToExclude={
+                      watch('flows')
+                        ? watch('flows').map((flow) => flow.id)
+                        : []
+                    }
+                    errorMessage={
+                      typeof errors.specificStudents?.message === 'string'
+                        ? errors.specificStudents.message
+                        : ''
+                    }
+                  />
+                </div>
+              )}
+            />
 
             {teachers && (
               <Controller
@@ -453,7 +520,11 @@ const ManageIntensiveForm: FC = () => {
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
-          <div className="flex my-5 gap-7">
+          {!isValid && (
+            <div className="text-base text-red">Форма содержит ошибки</div>
+          )}
+
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"

@@ -38,7 +38,6 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
     }
   }, [data]);
 
-  //console.log(data);
   const table = useReactTable({
     data,
     columns,
@@ -72,7 +71,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
 
   return (
     <>
-      <div className="inline-block w-full mt-8 border rounded-lg">
+      <div className="inline-block w-full mt-8 overflow-x-auto rounded-lg">
         <div className="overflow-x-auto">
           <table className="w-full table-fixed">
             <thead className="border-b border-solid bg-gray_8 border-gray_9">

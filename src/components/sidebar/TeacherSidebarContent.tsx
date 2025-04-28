@@ -22,11 +22,13 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   useEffect(() => {
     const fetchTeam = async () => {
-      const { data: team } = await getTeam(
-        Number(localStorage.getItem('tutorTeamId'))
-      );
-      if (team) {
-        dispatch(setTeam(team));
+      const currentTeam = Number(sessionStorage.getItem('currentTeam'));
+
+      if (currentTeam) {
+        const { data: team } = await getTeam(currentTeam);
+        if (team) {
+          dispatch(setTeam(team));
+        }
       }
     };
     fetchTeam();
@@ -70,6 +72,10 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           <div className="flex flex-col gap-4 my-3">
             <SidebarLink to="team-overview" text="Просмотр команды" />
             <SidebarLink to="kanban" text="Ведение задач" />
+            <SidebarLink
+              to="educationRequests"
+              text="Образовательные запросы"
+            />
           </div>
         </div>
       )}

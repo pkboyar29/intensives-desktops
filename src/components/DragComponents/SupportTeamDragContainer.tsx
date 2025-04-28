@@ -4,15 +4,16 @@ import Tag from '../common/Tag';
 import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
+import { ISupportTeamForManager } from '../../ts/interfaces/ITeam';
 
-import { ITeam } from '../../ts/interfaces/ITeam';
+// TODO: можно тут также отображать тимлида
 
 interface SupportTeamDragContainerProps<
   DroppedElementType extends { id: number; content: string; isTutor: boolean }
 > {
-  team: ITeam;
+  team: ISupportTeamForManager;
   onDrop: (droppedElement: DroppedElementType) => void;
-  onDelete: (deleteTutorOrMentor: boolean) => void;
+  onDelete: (deletedElement: DroppedElementType) => void;
 }
 
 const SupportTeamDragContainer = <
@@ -67,7 +68,11 @@ const SupportTeamDragContainer = <
               content={team.tutor.name}
               shouldHaveCrossIcon={true}
               deleteHandler={() => {
-                onDelete(true);
+                onDelete({
+                  id: team.tutor?.id,
+                  content: team.tutor?.name,
+                  isTutor: true,
+                } as DroppedElementType);
               }}
             />
           </div>
@@ -81,10 +86,14 @@ const SupportTeamDragContainer = <
               Н
             </div>
             <Tag
-              content={team.mentor.nameWithGroup}
+              content={team.mentor.name}
               shouldHaveCrossIcon={true}
               deleteHandler={() => {
-                onDelete(false);
+                onDelete({
+                  id: team.mentor?.id,
+                  content: team.mentor?.name,
+                  isTutor: false,
+                } as DroppedElementType);
               }}
             />
           </div>

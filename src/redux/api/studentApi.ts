@@ -7,6 +7,10 @@ import { IStudent } from '../../ts/interfaces/IStudent';
 export const mapStudent = (unmappedStudent: any): IStudent => {
   return {
     id: unmappedStudent.id,
+    group: {
+      id: unmappedStudent.group.id,
+      flowId: unmappedStudent.group.flow.id,
+    },
     nameWithGroup: getNameWithGroup(
       unmappedStudent.group.name,
       unmappedStudent.user.first_name,
@@ -25,23 +29,24 @@ const getNameWithGroup = (
   return `${groupName} ${lastName} ${firstName[0]}. ${[patronymic[0]]}.`;
 };
 
+interface IStudentListQuery {
+  search: string;
+  flowsToExclude: number[];
+}
+
 export const studentApi = createApi({
   reducerPath: 'studentApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getFreeStudents: builder.query<IStudent[], number>({
-      query: (intensiveId) => `students/free/?intensive_id=${intensiveId}`,
+    getStudents: builder.query<IStudent[], IStudentListQuery>({
+      query: ({ search, flowsToExclude }) =>
+        `students/?search=${search}&flows_exclude=${flowsToExclude.join(',')}`,
       transformResponse: (response: any): IStudent[] =>
-        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
-    }),
-    getNotAssignedStudents: builder.query<IStudent[], number>({
-      query: (intensiveId) =>
-        `students/not_assigned/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): IStudent[] =>
-        response.map((unmappedStudent: any) => mapStudent(unmappedStudent)),
+        response.results.map((unmappedStudent: any) =>
+          mapStudent(unmappedStudent)
+        ),
     }),
   }),
 });
 
-export const { useLazyGetFreeStudentsQuery, useGetNotAssignedStudentsQuery } =
-  studentApi;
+export const { useLazyGetStudentsQuery } = studentApi;

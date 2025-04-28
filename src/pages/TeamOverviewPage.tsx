@@ -134,13 +134,12 @@ const TeamOverviewPage: FC = () => {
               currentTeamleadId === 0
                 ? null
                 : {
-                    id: currentTeamleadId,
-                    nameWithGroup: (
+                    ...(
                       currentTeam.studentsInTeam.find(
                         (studentInTeam) =>
                           studentInTeam.student.id === currentTeamleadId
                       ) as IStudentInTeam
-                    ).student.nameWithGroup,
+                    ).student,
                   },
           })
         );

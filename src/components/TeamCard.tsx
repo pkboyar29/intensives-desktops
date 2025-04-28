@@ -1,12 +1,11 @@
 import { FC } from 'react';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { setTeam } from '../redux/slices/teamSlice';
-import { isUserTutor } from '../helpers/userHelpers';
+import { isUserManager, isUserTutor } from '../helpers/userHelpers';
 
 import TeamIcon from './icons/TeamIcon';
 import EnterIcon from './icons/EnterIcon';
 import Tag from './common/Tag';
-import Chip from './common/Chip';
 import Tooltip from './common/Tooltip';
 
 import { ITeam } from '../ts/interfaces/ITeam';
@@ -20,8 +19,19 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
   const dispatch = useAppDispatch();
 
   const onEnterButtonClick = (team: ITeam) => {
-    localStorage.setItem('tutorTeamId', team.id.toString());
+    sessionStorage.setItem('currentTeam', team.id.toString());
     dispatch(setTeam(team));
+  };
+
+  const EnterButton = () => {
+    return (
+      <button
+        onClick={() => onEnterButtonClick(team)}
+        className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
+      >
+        <EnterIcon />
+      </button>
+    );
   };
 
   return (
@@ -39,12 +49,16 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
             tooltipText="Войти как тьютор"
             tooltipClasses="bg-gray_5 p-1 rounded"
           >
-            <button
-              onClick={() => onEnterButtonClick(team)}
-              className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
-            >
-              <EnterIcon />
-            </button>
+            <EnterButton />
+          </Tooltip>
+        )}
+
+        {isUserManager(currentUser) && (
+          <Tooltip
+            tooltipText="Войти как организатор"
+            tooltipClasses="bg-gray_5 p-1 rounded"
+          >
+            <EnterButton />
           </Tooltip>
         )}
       </div>

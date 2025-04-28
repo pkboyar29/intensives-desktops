@@ -79,6 +79,27 @@ const addOneDay = (date: Date): Date => {
   return newDate;
 };
 
+const MONTHS_GENITIVE = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
+  'мая',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря',
+];
+
+const getRussianDateDisplay = (date: Date): string => {
+  return `${date.getDate()} ${
+    MONTHS_GENITIVE[date.getMonth()]
+  }, ${date.getFullYear()}`;
+};
+
 export {
   transformSeparateDateAndTimeToISO,
   getISODateInUTC3,
@@ -87,4 +108,5 @@ export {
   getTimeFromDate,
   getEventDateDisplayString,
   addOneDay,
+  getRussianDateDisplay,
 };

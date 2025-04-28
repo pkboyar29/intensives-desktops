@@ -82,14 +82,22 @@ const ManageEventForm: FC = () => {
     handleSubmit,
     setValue,
     setError,
+    clearErrors,
     reset,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
-  const { startDate, startTime, scoreType, markStrategy } = watch();
+  const {
+    startDate,
+    startTime,
+    finishDate,
+    finishTime,
+    scoreType,
+    markStrategy,
+  } = watch();
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -100,10 +108,13 @@ const ManageEventForm: FC = () => {
     { refetchOnMountOrArgChange: true, skip: !currentUser }
   );
 
-  const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser,
-  });
+  const { data: teamsToChoose } = useGetTeamsQuery(
+    { intensiveId: Number(intensiveId), short: true },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !currentUser,
+    }
+  );
   const teachersToChoose = currentIntensive?.teachers;
   const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
     Number(intensiveId),
@@ -197,6 +208,15 @@ const ManageEventForm: FC = () => {
     }
   }, [startDate]);
 
+  useEffect(() => {
+    if (!startDate || !startTime || !finishDate || !finishTime) {
+      return;
+    }
+    clearErrors('startDate');
+    clearErrors('finishDate');
+    clearErrors('startTime');
+  }, [startDate, startTime, finishDate, finishTime]);
+
   const renderMarkStrategies = (
     markStrategies: IMarkStrategy[] | undefined,
     currentValue: string
@@ -269,6 +289,7 @@ const ManageEventForm: FC = () => {
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
+      time?: string[];
       start_dt?: string[];
       finish_dt?: string[];
     };
@@ -281,6 +302,11 @@ const ManageEventForm: FC = () => {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
+      });
+    } else if (errorData && errorData.time) {
+      setError('startTime', {
+        type: 'custom',
+        message: errorData.time[0],
       });
     } else {
       toast('Произошла серверная ошибка', {
@@ -295,6 +321,7 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одну команду',
       });
+      console.log('trigger teams');
       return;
     }
 
@@ -303,6 +330,7 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одного преподавателя',
       });
+      console.log('trigger teachers');
       return;
     }
 
@@ -790,6 +818,14 @@ const ManageEventForm: FC = () => {
               <FileUpload onFilesChange={handleFilesChange} />
             </div>
           </div>
+
+          {!isValid && (
+            <div className="text-base text-red">Форма содержит ошибки</div>
+          )}
+
+          {!isValid && errors.teams && teamsToChoose?.length === 0 && (
+            <div className="text-base text-red">В интенсиве нету команд</div>
+          )}
 
           <div className="flex my-5 gap-7">
             <PrimaryButton
