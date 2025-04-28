@@ -82,6 +82,7 @@ const ManageEventForm: FC = () => {
     handleSubmit,
     setValue,
     setError,
+    clearErrors,
     reset,
     watch,
     control,
@@ -89,7 +90,14 @@ const ManageEventForm: FC = () => {
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
-  const { startDate, startTime, scoreType, markStrategy } = watch();
+  const {
+    startDate,
+    startTime,
+    finishDate,
+    finishTime,
+    scoreType,
+    markStrategy,
+  } = watch();
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -202,6 +210,15 @@ const ManageEventForm: FC = () => {
     }
   }, [startDate]);
 
+  useEffect(() => {
+    if (!startDate || !startTime || !finishDate || !finishTime) {
+      return;
+    }
+    clearErrors('startDate');
+    clearErrors('finishDate');
+    clearErrors('startTime');
+  }, [startDate, startTime, finishDate, finishTime]);
+
   const renderMarkStrategies = (
     markStrategies: IMarkStrategy[] | undefined,
     currentValue: string
@@ -274,6 +291,7 @@ const ManageEventForm: FC = () => {
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
+      time?: string[];
       start_dt?: string[];
       finish_dt?: string[];
     };
@@ -286,6 +304,11 @@ const ManageEventForm: FC = () => {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
+      });
+    } else if (errorData && errorData.time) {
+      setError('startTime', {
+        type: 'custom',
+        message: errorData.time[0],
       });
     } else {
       toast('Произошла серверная ошибка', {

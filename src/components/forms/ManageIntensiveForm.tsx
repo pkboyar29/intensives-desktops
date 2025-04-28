@@ -87,6 +87,7 @@ const ManageIntensiveForm: FC = () => {
     reset,
     control,
     setError,
+    clearErrors,
     watch,
     formState: { errors },
   } = useForm<ManageIntensiveFields>({
@@ -119,11 +120,23 @@ const ManageIntensiveForm: FC = () => {
     }
   }, [intensiveId, currentIntensive]);
 
+  const openDate = watch('openDate');
+  const closeDate = watch('closeDate');
+  useEffect(() => {
+    if (!openDate || !closeDate) {
+      return;
+    }
+    clearErrors('openDate');
+  }, [openDate, closeDate]);
+
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
+      open_dt?: string[];
       specific_student_ids?: string[];
     };
-    if (errorData && errorData.specific_student_ids) {
+    if (errorData && errorData.open_dt) {
+      setError('openDate', { type: 'custom', message: errorData.open_dt[0] });
+    } else if (errorData && errorData.specific_student_ids) {
       setError('specificStudents', {
         type: 'custom',
         message: errorData.specific_student_ids[0],
@@ -385,11 +398,6 @@ const ManageIntensiveForm: FC = () => {
                 register={register}
                 registerOptions={{
                   required: 'Поле обязательно',
-                  validate: {
-                    lessThanOpenDt: (value: string, formValues) =>
-                      new Date(value) > new Date(formValues.openDate) ||
-                      'Дата окончания должна быть позже даты начала',
-                  },
                 }}
                 type="date"
                 description="Дата окончания"
