@@ -12,13 +12,15 @@ import {
 } from '@tanstack/react-table';
 import { tableConfigs, TableType } from '../tableConfigs';
 import RelatedKeysList from './RelatedKeysList';
+import { IGroup } from '../ts/interfaces/IGroup';
+import { ISpecialization } from '../ts/interfaces/IEducation';
+import { validateTableFields } from '../helpers/tableHelpers';
 
 interface CrudTableProps<T> {
   data: T[];
   type: TableType;
   getId: (row: T) => string | number;
   childEntities?: childEntitiesMeta[];
-  onCreate?: (item: T) => void;
   onUpdate?: (item: T) => void;
   onDelete?: (item: T) => void;
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
@@ -33,7 +35,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     type,
     getId,
     childEntities,
-    onCreate,
     onUpdate,
     onDelete,
     onChildNavigate,
@@ -44,6 +45,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const editingRow = useRef<T | null>(null);
   const columns = tableConfigs[type] as ColumnConfig<T>[];
+  const dropdownRef = useRef<HTMLDivElement>(null); // Ссылка на кнопку меню
 
   const columnHelper = createColumnHelper<T>();
 
@@ -58,10 +60,10 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           const value = row[column.key];
           if (
             //разные почти бесполезные проверки
-            column.renderKey &&
             typeof value === 'object' &&
             value !== null &&
-            column.type === 'relation'
+            column.type === 'relation' &&
+            column.renderKey
           ) {
             const nested = value as Record<string, any>;
             return nested[column.renderKey];
@@ -87,7 +89,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
             if (!isEditing || column.readOnly) {
               return value;
             }
-
             // Иначе отображаем вместо значения редактируемое что-то
             switch (column.type) {
               case 'string':
@@ -117,35 +118,62 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                   ></input>
                 );
               case 'boolean': // проверить что будет ведь boolean нет вобще
-                return <input type="checkbox" defaultChecked={value}></input>;
+                return (
+                  <input
+                    type="checkbox"
+                    defaultChecked={value}
+                    className="border border-black"
+                    onChange={(e) => {
+                      if (editingRow.current) {
+                        editingRow.current = {
+                          ...editingRow.current,
+                          [key as keyof T]: e.target.value,
+                        };
+                      }
+                    }}
+                  ></input>
+                );
               case 'date': // тоже проверить
                 return <input type="date" defaultValue={value}></input>;
               case 'relation':
                 return (
-                  <RelatedKeysList
-                    entity={type}
-                    entityId={getId(info.row.original)}
-                    parent={column.key.toString()}
-                    defaultValue={value}
-                    onChange={(newParentId, newParentName) => {
-                      console.log(key);
-                      if (editingRow.current) {
-                        editingRow.current = {
-                          ...editingRow.current,
-                          [key as keyof T]: {
-                            id: newParentId,
-                            [column.renderKey as string]: newParentName,
-                          },
-                        };
+                  <>
+                    <RelatedKeysList
+                      entity={type}
+                      entityId={getId(info.row.original)}
+                      entityParentId={
+                        //проблема с замыканием изначального значения при первой отрисовке.
+                        editingRow.current &&
+                        column.parentField &&
+                        (editingRow.current[column.parentField] as any).id // any плохо но id есть у всех сущностей (надо это где то прописать ведь это всегда так)
                       }
-                    }}
-                  />
+                      parent={
+                        column.adaptedKeyName
+                          ? column.adaptedKeyName
+                          : column.key.toString()
+                      }
+                      defaultValue={value}
+                      onChange={(parentEntity) => {
+                        console.log(parentEntity?.id, parentEntity?.name);
+                        if (editingRow.current) {
+                          editingRow.current = {
+                            ...editingRow.current,
+                            [key as keyof T]: parentEntity
+                              ? {
+                                  id: parentEntity.id,
+                                  [column.renderKey as string]:
+                                    parentEntity.name,
+                                }
+                              : undefined,
+                          };
+                        }
+                      }}
+                    />
+                  </>
                 );
               default:
                 return String(value ?? '');
             }
-
-            return value;
           },
         }
       )
@@ -193,7 +221,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     );
 
     if (childEntities && childEntities.length > 0) {
-      //console.log(childEntities);
       cols.push(
         columnHelper.display({
           id: 'childEntities',
@@ -222,10 +249,14 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
   const handleSaveEditing = () => {
     //так как здесь замыкание можно сравнивать row в параметре и editingRow не являются ли они одинаковыми (но это будет нечитабельно)
-    console.log(editingRow.current);
-    editingRow.current && onUpdate && onUpdate(editingRow.current);
-    setEditingRowId(null);
-    editingRow.current = null;
+    if (
+      editingRow.current &&
+      validateTableFields<T>(columns, editingRow.current)
+    ) {
+      onUpdate && onUpdate(editingRow.current);
+      setEditingRowId(null);
+      editingRow.current = null;
+    }
   };
 
   const handleEdit = (row: T) => {
@@ -250,7 +281,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   return (
     <>
       <div>
-        <button className=""></button>
         <Table
           data={data}
           columns={columnsTable}

@@ -25,6 +25,7 @@ export const mapProfile = (unmappedProfile: any): IProfile => {
   return {
     id: unmappedProfile.id,
     name: unmappedProfile.name,
+    specialization: mapSpecialization(unmappedProfile.specialization),
   };
 };
 

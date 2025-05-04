@@ -14,7 +14,7 @@ export const mapGroup = (unmappedGroup: any): IGroup => {
   return {
     id: unmappedGroup.id,
     name: unmappedGroup.name,
-    flow: mapFlow(unmappedGroup.flow),
+    flow: unmappedGroup.flow && mapFlow(unmappedGroup.flow),
     profile: unmappedGroup.profile && mapProfile(unmappedGroup.profile),
     specialization:
       unmappedGroup.specialization &&

@@ -12,11 +12,13 @@ import { IUniversity } from '../ts/interfaces/IUniversity';
 // Тип для метаданных интерфейсов для таблицы
 export type ColumnConfig<T> = {
   key: keyof T;
+  adaptedKeyName?: string;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
   renderKey?: string; // не string и не keyof T а keyof T и от типов поля с внешним ключом
-  parentParam?: string;
+  parentField?: keyof T;
   readOnly?: boolean;
+  isNull?: boolean;
 };
 
 // Набор метаданных (можно вроде автоматически вычислять)
@@ -46,7 +48,6 @@ export const audienceColumns: ColumnConfig<IAudience>[] = [
     label: 'Корпус',
     type: 'relation',
     renderKey: 'name',
-    parentParam: 'building',
   },
 ];
 
@@ -61,6 +62,7 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
   },
   {
     key: 'stageEducation',
+    adaptedKeyName: 'stage_education',
     label: 'Ступень',
     type: 'relation',
     renderKey: 'name',
@@ -81,6 +83,8 @@ export const groupsColumns: ColumnConfig<IGroup>[] = [
     label: 'Профиль',
     type: 'relation',
     renderKey: 'name',
+    parentField: 'specialization',
+    isNull: true,
   },
   {
     key: 'specialization',
@@ -98,6 +102,12 @@ export const stagesEducationColumns: ColumnConfig<IStageEducation>[] = [
 export const profilesColumns: ColumnConfig<IProfile>[] = [
   { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
+  {
+    key: 'specialization',
+    label: 'Направление образования',
+    type: 'relation',
+    renderKey: 'name',
+  },
 ];
 
 export const specializationsColumns: ColumnConfig<ISpecialization>[] = [

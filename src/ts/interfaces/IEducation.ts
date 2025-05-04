@@ -6,6 +6,7 @@ export interface IStageEducation {
 export interface IProfile {
   id: number;
   name: string;
+  specialization: ISpecialization;
 }
 
 export interface ISpecialization {

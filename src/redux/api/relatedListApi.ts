@@ -4,7 +4,6 @@ import { TableType } from '../../tableConfigs';
 import { IParent, IRelatedList } from '../../ts/interfaces/IRelatedList';
 
 export const mapRelatedList = (unmappedRelatedList: any): IRelatedList => {
-  console.log(unmappedRelatedList);
   return {
     id: unmappedRelatedList.id,
     name: unmappedRelatedList.name,
@@ -24,7 +23,7 @@ export const relatedListApi = createApi({
   reducerPath: 'relatedListApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getRelatedList: builder.query<
+    getRelatedListById: builder.query<
       {
         results: IRelatedList[];
         parentInfo?: IParent;
@@ -60,8 +59,52 @@ export const relatedListApi = createApi({
         previous: response.previous,
       }),
     }),
+    getRelatedList: builder.query<
+      {
+        results: IRelatedList[];
+        parentInfo?: IParent;
+        grandparentInfo?: IParent;
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        entity: string;
+        entityId?: string | number;
+        key: string;
+        key_parent_id?: number | string;
+        filter?: string;
+        limit?: number;
+        offset?: number;
+      }
+    >({
+      query: ({ entity, entityId, ...args }) =>
+        buildUrl(
+          `/${entity}${entityId ? `/${entityId}` : ''}/related_list`,
+          args
+        ),
+      transformResponse: (response: any) => ({
+        results: response.results.map(
+          (unmappedRelatedList: any): IRelatedList =>
+            mapRelatedList(unmappedRelatedList)
+        ),
+        parentInfo: response.parent_info
+          ? mapParent(response.parent_info)
+          : undefined,
+        grandparentInfo: response.grandparent_info
+          ? mapParent(response.grandparent_info)
+          : undefined,
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }),
+    }),
   }),
 });
 
-export const { useGetRelatedListQuery, useLazyGetRelatedListQuery } =
-  relatedListApi;
+export const {
+  useGetRelatedListByIdQuery,
+  useLazyGetRelatedListByIdQuery,
+  useGetRelatedListQuery,
+  useLazyGetRelatedListQuery,
+} = relatedListApi;

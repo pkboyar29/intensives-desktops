@@ -74,6 +74,7 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   profiles: {
     type: 'profiles',
     title: 'Профили',
+    //queryParamsDependencies: [{ from: 'specializationId', as: 'specialization' }],
     defaultQueryParams: { type: 'profiles' },
     hooks: queryHooksMap['education'],
   },

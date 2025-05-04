@@ -95,7 +95,7 @@ export const store = configureStore({
       groupApi.middleware,
       educationApi.middleware,
       relatedListApi.middleware,
-      breadcrumbApi.middleware
+      breadcrumbApi.middleware,
       educationRequestApi.middleware,
       educationRequestAnswerApi.middleware
     ),
