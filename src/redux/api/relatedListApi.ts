@@ -23,42 +23,6 @@ export const relatedListApi = createApi({
   reducerPath: 'relatedListApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getRelatedListById: builder.query<
-      {
-        results: IRelatedList[];
-        parentInfo?: IParent;
-        grandparentInfo?: IParent;
-        count: number;
-        next: string | null;
-        previous: string | null;
-      },
-      {
-        entity: string;
-        entityId: string | number;
-        key: string; // parent or key?
-        filter?: string;
-        limit?: number;
-        offset?: number;
-      }
-    >({
-      query: ({ entity, entityId, ...args }) =>
-        buildUrl(`/${entity}/${entityId}/related_list`, args),
-      transformResponse: (response: any) => ({
-        results: response.results.map(
-          (unmappedRelatedList: any): IRelatedList =>
-            mapRelatedList(unmappedRelatedList)
-        ),
-        parentInfo: response.parent_info
-          ? mapParent(response.parent_info)
-          : undefined,
-        grandparentInfo: response.grandparent_info
-          ? mapParent(response.grandparent_info)
-          : undefined,
-        count: response.count,
-        next: response.next,
-        previous: response.previous,
-      }),
-    }),
     getRelatedList: builder.query<
       {
         results: IRelatedList[];
@@ -102,9 +66,5 @@ export const relatedListApi = createApi({
   }),
 });
 
-export const {
-  useGetRelatedListByIdQuery,
-  useLazyGetRelatedListByIdQuery,
-  useGetRelatedListQuery,
-  useLazyGetRelatedListQuery,
-} = relatedListApi;
+export const { useGetRelatedListQuery, useLazyGetRelatedListQuery } =
+  relatedListApi;

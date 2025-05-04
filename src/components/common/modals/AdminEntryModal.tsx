@@ -46,27 +46,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
     });
   };
 
-  console.log(defaultParentFields);
-  /*
-  const validateFields = (): boolean => {
-    var i = 0;
-    columns.forEach((column) => {
-      if (
-        creatingRow[column.key] === undefined &&
-        !column.isNull &&
-        !column.readOnly
-      ) {
-        toast(`Поле ${column.label} обязательное`, {
-          type: 'error',
-        });
-        i++;
-      }
-    });
-
-    if (i > 0) return false;
-    else return true;
-  };
-  */
+  //console.log(defaultParentFields);
 
   return (
     <>

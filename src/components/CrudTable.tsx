@@ -261,7 +261,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
   const handleEdit = (row: T) => {
     const id = getId(row);
-    console.log(row);
     const editingId = editingRow.current && getId(editingRow.current);
     setEditingRowId(editingId === id ? null : id.toString());
     editingRow.current = editingId === id ? null : row;

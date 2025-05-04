@@ -5,10 +5,7 @@ import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import { IEventMark } from '../ts/interfaces/IEventMark';
 import { IMarkStrategy } from '../ts/interfaces/IMarkStrategy';
 import { TableType } from '../tableConfigs';
-import {
-  useLazyGetRelatedListByIdQuery,
-  useLazyGetRelatedListQuery,
-} from '../redux/api/relatedListApi';
+import { useLazyGetRelatedListQuery } from '../redux/api/relatedListApi';
 import { IParent, IRelatedList } from '../ts/interfaces/IRelatedList';
 import { EntityShort } from '../ts/types/types';
 
@@ -39,7 +36,8 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
   const [offset, setOffset] = useState(0); // Текущее смешещение
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
-  const dropdownRef = useRef<HTMLDivElement>(null); // Ссылка на кнопку меню
+  const dropdownRef = useRef<HTMLUListElement>(null); // Ссылка на сам список
+  const dropdownButtonRef = useRef<HTMLDivElement>(null); // Ссылка на кнопку меню
 
   const [relatedList, setRelatedList] = useState<IRelatedList[]>([]);
   const [currentEntity, setCurrentEntity] = useState<TableType>(entity);
@@ -58,6 +56,50 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
       setGrandparentEntity(listData.grandparentInfo);
     }
   }, [listData]);
+
+  // Закрытие списка при клике вне области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        !dropdownRef.current?.contains(event.target as Node) && // Если клик не внутри меню
+        !dropdownButtonRef.current?.contains(event.target as Node)
+      ) {
+        closeDropdown();
+      }
+    };
+
+    if (isOpenDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpenDropdown]);
+
+  // Закрытие списка при прокрутке
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpenDropdown) {
+        closeDropdown();
+      }
+    };
+
+    if (isOpenDropdown) {
+      // Обработчик для всего окна
+      window.addEventListener('scroll', handleScroll, true); // true — для захвата событий
+    } else {
+      window.removeEventListener('scroll', handleScroll, true);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpenDropdown]);
+
+  const closeDropdown = () => setIsOpenDropdown(false);
 
   const loadData = () => {
     if (entityId && entityParentId === undefined) {
@@ -84,9 +126,9 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
   const loadOrChange = () => {};
 
   const toggleDropdown = () => {
-    if (!isOpenDropdown && dropdownRef.current) {
+    if (!isOpenDropdown && dropdownButtonRef.current) {
       loadData();
-      const rect = dropdownRef.current.getBoundingClientRect();
+      const rect = dropdownButtonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + window.scrollY - 20, // Верхняя координата
         left: rect.left + window.scrollX, // Левая координата
@@ -112,7 +154,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
       <div
         className="bg-white border border-black cursor-pointer"
         onClick={() => toggleDropdown()}
-        ref={dropdownRef}
+        ref={dropdownButtonRef}
       >
         {currentLabel}
         {isOpenDropdown &&
@@ -126,6 +168,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
                 left: dropdownPosition.left,
                 zIndex: 1000,
               }}
+              ref={dropdownRef}
             >
               {loadingList && <p>Загрузка...</p>}
 

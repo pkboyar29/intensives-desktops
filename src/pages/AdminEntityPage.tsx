@@ -71,17 +71,20 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (breadcrumbsData) {
-      // optimizirovat
-      breadcrumbsData.results.map((breadcrumbData) => {
-        setBreadcrumbs((prev) =>
-          prev.map((breadcrumb) =>
-            breadcrumb.entityName ===
-            `${breadcrumbData.name}${breadcrumbData.id}`
-              ? { ...breadcrumb, label: breadcrumbData.label }
-              : breadcrumb
-          )
-        );
-      });
+      const breadcrumbsMap = Object.fromEntries(
+        breadcrumbsData.results.map((b) => [`${b.name}${b.id}`, b])
+      );
+
+      setBreadcrumbs(
+        breadcrumbs.map((breadcrumb) =>
+          breadcrumbsMap[breadcrumb.entityName]
+            ? {
+                ...breadcrumb,
+                label: breadcrumbsMap[breadcrumb.entityName].label,
+              }
+            : breadcrumb
+        )
+      );
     }
   }, [breadcrumbsData]);
 
@@ -128,12 +131,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
-  const lazyLoadBreadcrumbsData = () => {
+  const lazyLoadBreadcrumbsData = async () => {
     const pathParts = window.location.pathname.split('/');
 
     for (var pathPart of pathParts) {
       if (!entitiesConfig[pathPart] && !isNaN(parseInt(pathPart))) {
-        fetchBreadcrumbsData({ path: window.location.pathname });
+        await fetchBreadcrumbsData({ path: window.location.pathname });
         break;
       }
     }
@@ -150,7 +153,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         ...entity,
         type: paramsFromConfig.type,
       } as any).unwrap();
-      //записывать полученную созданную сущность в стейт (и в обновлении также)
     } catch (error: any) {
       //setData(prevItems); // в случае ошибки откатываем состояние
       toast(`Произошла ошибка при создании объекта "${entity.name}"`, {
