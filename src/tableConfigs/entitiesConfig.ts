@@ -84,6 +84,12 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
     defaultQueryParams: { type: 'specializations' },
     hooks: queryHooksMap['education'],
   },
+  students: {
+    type: 'students',
+    title: 'Студенты',
+    queryParamsDependencies: [{ from: 'groupId', as: 'group' }],
+    hooks: queryHooksMap['students'],
+  },
 };
 
 export function useEntityQueryHooks<

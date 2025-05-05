@@ -32,3 +32,12 @@ export interface ISignInResponse {
   access: string;
   refresh: string;
 }
+
+export interface IUserAdmin {
+  id: number;
+  firstName: string;
+  lastName: string;
+  patronymic: string | null;
+  email: string;
+  roles?: UserRole[];
+}

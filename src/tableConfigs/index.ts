@@ -7,6 +7,7 @@ import {
 } from '../ts/interfaces/IEducation';
 import { IFlow } from '../ts/interfaces/IFlow';
 import { IGroup } from '../ts/interfaces/IGroup';
+import { IStudentAdmin } from '../ts/interfaces/IStudent';
 import { IUniversity } from '../ts/interfaces/IUniversity';
 import {
   audienceColumns,
@@ -17,6 +18,7 @@ import {
   profilesColumns,
   specializationsColumns,
   stagesEducationColumns,
+  studentsColumns,
   universityColumns,
 } from './nameConfig';
 
@@ -31,6 +33,7 @@ type TableConfigMap = {
   stagesEducation: ColumnConfig<IStageEducation>[];
   profiles: ColumnConfig<IProfile>[];
   specializations: ColumnConfig<ISpecialization>[];
+  students: ColumnConfig<IStudentAdmin>[];
 };
 
 export const tableConfigs: TableConfigMap = {
@@ -42,4 +45,5 @@ export const tableConfigs: TableConfigMap = {
   stagesEducation: stagesEducationColumns,
   profiles: profilesColumns,
   specializations: specializationsColumns,
+  students: studentsColumns,
 };

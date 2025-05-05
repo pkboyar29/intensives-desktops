@@ -7,7 +7,20 @@ import {
 } from '../ts/interfaces/IEducation';
 import { IFlow } from '../ts/interfaces/IFlow';
 import { IGroup } from '../ts/interfaces/IGroup';
+import { IStudentAdmin } from '../ts/interfaces/IStudent';
 import { IUniversity } from '../ts/interfaces/IUniversity';
+
+/*
+type DotNotationKeys<T, Prefix extends string = ''> = {
+  [K in keyof T]: T[K] extends object
+    ? T[K] extends Array<any>
+      ? `${Prefix}${Extract<K, string>}`
+      :
+          | `${Prefix}${Extract<K, string>}`
+          | DotNotationKeys<T[K], `${Prefix}${Extract<K, string>}.`>
+    : `${Prefix}${Extract<K, string>}`;
+}[keyof T];
+*/
 
 // Тип для метаданных интерфейсов для таблицы
 export type ColumnConfig<T> = {
@@ -114,4 +127,13 @@ export const specializationsColumns: ColumnConfig<ISpecialization>[] = [
   { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
   { key: 'code', label: 'Код', type: 'string' },
+];
+
+export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
+  { key: 'firstName', label: 'Имя', type: 'string' },
+  { key: 'lastName', label: 'Фамилия', type: 'string' },
+  { key: 'patronymic', label: 'Отчество', type: 'string' },
+  { key: 'email', label: 'Почта', type: 'string' },
+  { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
 ];

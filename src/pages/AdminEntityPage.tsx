@@ -72,6 +72,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   useEffect(() => {
     if (breadcrumbsData) {
       const breadcrumbsMap = Object.fromEntries(
+        // записать это
         breadcrumbsData.results.map((b) => [`${b.name}${b.id}`, b])
       );
 
