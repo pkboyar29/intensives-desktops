@@ -39,5 +39,6 @@ export interface IUserAdmin {
   lastName: string;
   patronymic: string | null;
   email: string;
+  password?: string | undefined;
   roles?: UserRole[];
 }

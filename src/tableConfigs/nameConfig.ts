@@ -135,5 +135,6 @@ export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
   { key: 'lastName', label: 'Фамилия', type: 'string' },
   { key: 'patronymic', label: 'Отчество', type: 'string' },
   { key: 'email', label: 'Почта', type: 'string' },
+  { key: 'password', label: 'Пароль', type: 'string' },
   { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
 ];

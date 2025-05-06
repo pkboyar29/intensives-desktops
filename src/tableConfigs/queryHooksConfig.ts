@@ -28,7 +28,10 @@ import {
   useLazyGetGroupsQuery,
   useUpdateGroupMutation,
 } from '../redux/api/groupApi';
-import { useLazyGetStudentsAdminQuery } from '../redux/api/studentApi';
+import {
+  useLazyGetStudentsAdminQuery,
+  useRegisterStudentMutation,
+} from '../redux/api/studentApi';
 import {
   useCreateUniversityMutation,
   useDeleteUniversityMutation,
@@ -83,7 +86,7 @@ const educationHooks = {
 
 const studentsHooks = {
   view: useLazyGetStudentsAdminQuery,
-  create: useCreateEducationMutation,
+  create: useRegisterStudentMutation,
   update: useUpdateEducationMutation,
   delete: useDeleteEducationMutation,
 };

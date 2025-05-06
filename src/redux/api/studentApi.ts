@@ -1,7 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
-import { IStudent, IStudentAdmin } from '../../ts/interfaces/IStudent';
+import {
+  IStudent,
+  IStudentAdmin,
+  IStudentRegister,
+} from '../../ts/interfaces/IStudent';
 import { mapRoleName, mapUserAdmin } from './userApi';
 import { mapGroup } from './groupApi';
 import { mapStudentRole } from './studentRoleApi';
@@ -88,8 +92,27 @@ export const studentApi = createApi({
         previous: response.previous,
       }),
     }),
+    registerStudent: builder.mutation<IStudentAdmin, IStudentRegister>({
+      query: (data) => ({
+        url: '/student_register/',
+        method: 'POST',
+        body: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          patronymic: data?.patronymic,
+          email: data.email,
+          password: data.password,
+          group: data.group,
+        },
+      }),
+      transformResponse: (response: any): IStudentAdmin =>
+        mapStudentAdmin(response[0]), // так как в ответе массив но всегда один элемент
+    }),
   }),
 });
 
-export const { useLazyGetStudentsQuery, useLazyGetStudentsAdminQuery } =
-  studentApi;
+export const {
+  useLazyGetStudentsQuery,
+  useLazyGetStudentsAdminQuery,
+  useRegisterStudentMutation,
+} = studentApi;

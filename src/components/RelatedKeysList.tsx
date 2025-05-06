@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 
@@ -47,6 +47,22 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
 
   useEffect(() => {
     //console.log(entityId, entityParentId);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('Пользователь сейчас видит', entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    document
+      .querySelectorAll('.track-scroll')
+      .forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -81,10 +97,14 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
 
   // Закрытие списка при прокрутке
   useEffect(() => {
-    const handleScroll = () => {
-      if (isOpenDropdown) {
-        closeDropdown();
+    const handleScroll = (event: Event) => {
+      if (
+        !dropdownRef.current?.contains(event.target as Node) &&
+        !dropdownButtonRef.current?.contains(event.target as Node)
+      ) {
+        console.log('tuta');
       }
+      //closeDropdown();
     };
 
     if (isOpenDropdown) {

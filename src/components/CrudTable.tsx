@@ -76,10 +76,8 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           cell: (info) => {
             // Кастомный рендер ячейки
             const value = info.getValue();
-
-            if (value === null || value === undefined) return '—';
-
             const key = info.column.id; // id столбца (равно названию поля данных)
+
             // isEditing по id, так как сравнение обычное вернет false сразу при редактировании
             const isEditing =
               editingRow.current &&
@@ -87,8 +85,10 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
             // Если не режим редактирования или столбец только для чтения
             if (!isEditing || column.readOnly) {
+              if (value === null || value === undefined) return '—';
               return value;
             }
+
             // Иначе отображаем вместо значения редактируемое что-то
             switch (column.type) {
               case 'string':
@@ -121,7 +121,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                 return (
                   <input
                     type="checkbox"
-                    defaultChecked={value}
+                    defaultChecked={value ? value : false}
                     className="border border-black"
                     onChange={(e) => {
                       if (editingRow.current) {
@@ -133,7 +133,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                     }}
                   ></input>
                 );
-              case 'date': // тоже проверить
+              case 'date': // тоже проверить (и доделать)
                 return <input type="date" defaultValue={value}></input>;
               case 'relation':
                 return (

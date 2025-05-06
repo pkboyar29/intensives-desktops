@@ -136,6 +136,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     const pathParts = window.location.pathname.split('/');
 
     for (var pathPart of pathParts) {
+      // Проверка есть ли в пути id
       if (!entitiesConfig[pathPart] && !isNaN(parseInt(pathPart))) {
         await fetchBreadcrumbsData({ path: window.location.pathname });
         break;
@@ -154,11 +155,20 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         ...entity,
         type: paramsFromConfig.type,
       } as any).unwrap();
+
+      toast(`Объект ${entity.name ? `"${entity.name}"` : ''} успешно создан`, {
+        type: 'success',
+      });
     } catch (error: any) {
       //setData(prevItems); // в случае ошибки откатываем состояние
-      toast(`Произошла ошибка при создании объекта "${entity.name}"`, {
-        type: 'error',
-      });
+      toast(
+        `Произошла ошибка при создании объекта ${
+          entity.name ? `"${entity.name}"` : ''
+        }`,
+        {
+          type: 'error',
+        }
+      );
     }
   };
 
@@ -185,7 +195,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         console.log(data);
       }
 
-      toast(`Объект "${entity.name}" обновлен`, {
+      toast(`Объект "${entity.name ? `"${entity.name}"` : ''} обновлен`, {
         type: 'success',
       });
     } catch (error: any) {
@@ -194,9 +204,14 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         error
       );
       setData(prevItems); // в случае ошибки откатываем состояние
-      toast(`Произошла ошибка при обновлении объекта "${entity.name}"`, {
-        type: 'error',
-      });
+      toast(
+        `Произошла ошибка при обновлении объекта ${
+          entity.name ? `"${entity.name}"` : ''
+        }`,
+        {
+          type: 'error',
+        }
+      );
     }
   };
 
@@ -216,7 +231,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         prevData.filter((entities) => entities.id !== entity.id)
       );
 
-      toast(`Объект "${entity.name}" успешно удален`, {
+      toast(`Объект ${entity.name ? `"${entity.name}"` : ''} успешно удален`, {
         type: 'success',
       });
     } catch (error: any) {
@@ -226,9 +241,14 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       );
       // заменить на 400?
       if (error.originalStatus === 500) {
-        toast(`Нельзя удалить: объект "${entity.name}" используется в связях`, {
-          type: 'error',
-        });
+        toast(
+          `Нельзя удалить: объект ${
+            entity.name ? `"${entity.name}"` : ''
+          } используется в связях`,
+          {
+            type: 'error',
+          }
+        );
       }
     }
   };
@@ -328,6 +348,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         <button
           className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
           onClick={() => setIsEntryModal(true)}
+          title={'Создать запись'}
         >
           ➕
         </button>

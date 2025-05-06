@@ -71,10 +71,10 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
 
   return (
     <>
-      <div className="inline-block w-full mt-8 overflow-x-auto rounded-lg">
+      <div className="inline-block w-full mt-6 overflow-x-auto border rounded-lg border-neutral-300">
         <div className="overflow-x-auto">
           <table className="w-full table-fixed">
-            <thead className="border-b border-solid bg-gray_8 border-gray_9">
+            <thead className="border-b bg-gray_8 border-gray_9">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="">
                   {headerGroup.headers.map((header) => (
@@ -95,7 +95,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
         </div>
         <div
           className="overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 20rem)' }}
+          style={{ maxHeight: 'calc(100vh - 22rem)' }}
           onScroll={(e) => pagination && onScrollPagination(e)}
         >
           <table className="w-full table-fixed">

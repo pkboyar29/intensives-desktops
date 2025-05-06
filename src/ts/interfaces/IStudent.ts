@@ -15,3 +15,12 @@ export interface IStudentAdmin extends IUserAdmin {
   group: IGroup;
   listed: boolean;
 }
+
+export interface IStudentRegister {
+  firstName: string;
+  lastName: string;
+  patronymic?: string;
+  email: string;
+  password: string;
+  group: number;
+}
