@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import CrudTable from '../components/CrudTable';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
@@ -14,6 +14,7 @@ import { useLazyGetBreadcrumbQuery } from '../redux/api/breadcrumbApi';
 import Modal from '../components/common/modals/Modal';
 import AdminEntryModal from '../components/common/modals/AdminEntryModal';
 import AdminCreateEntityModal from '../components/common/modals/AdminEntryModal';
+import { useRegisterStudentsFileXlsxMutation } from '../redux/api/studentApi';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -44,10 +45,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const [fetchBreadcrumbsData, { data: breadcrumbsData }] =
     useLazyGetBreadcrumbQuery();
+  const [registerStudentsXlsx] = useRegisterStudentsFileXlsxMutation();
 
   const [data, setData] = useState(() => queryData?.results ?? []);
   const [breadcrumbs, setBreadcrumbs] = useState<AdminBreadcrumb[]>([]);
   const [isEntryModal, setIsEntryModal] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const limit = 100; // Размер страницы данных
   const offset = useRef<number>(0); // Текущее смещение
@@ -181,7 +184,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         item.id === entity.id ? { ...item, ...entity } : item
       )
     );
-    // Если ничего не изменили запрос не отправляем
+    // Если ничего не изменили запрос не отправлять
 
     try {
       //cringe
@@ -305,6 +308,16 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
+  const handleFileXlsxChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const xlsxFile = event.target.files![0];
+    const { data: registeredStudents } = await registerStudentsXlsx(xlsxFile);
+
+    console.log(registeredStudents);
+    event.target.value = '';
+  };
+
   return (
     <>
       <ToastContainer position="top-center" />
@@ -345,13 +358,35 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             ))}
         </div>
 
-        <button
-          className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
-          onClick={() => setIsEntryModal(true)}
-          title={'Создать запись'}
-        >
-          ➕
-        </button>
+        <div className="flex items-center space-x-3">
+          <button
+            className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
+            onClick={() => setIsEntryModal(true)}
+            title={'Создать запись'}
+          >
+            ➕
+          </button>
+          {config.type === 'students' && (
+            <>
+              <button
+                onClick={() =>
+                  fileInputRef.current && fileInputRef.current.click()
+                } // Триггерим input file
+                className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
+              >
+                📤 Загрузить .xlsx
+              </button>
+              <input
+                id="xslx-file"
+                type="file"
+                accept=".xlsx"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileXlsxChange}
+              ></input>
+            </>
+          )}
+        </div>
       </div>
       <CrudTable
         data={data}

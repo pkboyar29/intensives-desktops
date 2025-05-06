@@ -9,6 +9,7 @@ import {
 import { mapRoleName, mapUserAdmin } from './userApi';
 import { mapGroup } from './groupApi';
 import { mapStudentRole } from './studentRoleApi';
+import { IResistrationXlsxError } from '../../ts/interfaces/IUser';
 
 // TODO: учесть, что patronymic (отчество) может быть необязательным
 export const mapStudent = (unmappedStudent: any): IStudent => {
@@ -39,6 +40,13 @@ export const mapStudentAdmin = (unmappedStudent: any): IStudentAdmin => {
     //roles: unmappedStudent.roles.map((role: any) => mapRoleName(role.name)),
     group: mapGroup(unmappedStudent.group),
     listed: unmappedStudent.listed,
+  };
+};
+
+export const mapXlsxError = (unmappedError: any): IResistrationXlsxError => {
+  return {
+    rowId: unmappedError.row_id,
+    errorInfo: unmappedError.error_info,
   };
 };
 
@@ -108,6 +116,35 @@ export const studentApi = createApi({
       transformResponse: (response: any): IStudentAdmin =>
         mapStudentAdmin(response[0]), // так как в ответе массив но всегда один элемент
     }),
+    registerStudentsFileXlsx: builder.mutation<
+      { results: IStudentAdmin[]; errors: IResistrationXlsxError[] },
+      File
+    >({
+      query: (file) => {
+        const formData = new FormData();
+
+        formData.append('file', file);
+        return {
+          url: `/student_register/files/xlsx/`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: any) => ({
+        results: response.results.map((unmappedStudent: any) =>
+          mapStudentAdmin(unmappedStudent)
+        ),
+        errors: response.errors.map((unmappedError: any) =>
+          mapXlsxError(unmappedError)
+        ),
+      }),
+    }),
+    deleteStudent: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/students/${id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -115,4 +152,6 @@ export const {
   useLazyGetStudentsQuery,
   useLazyGetStudentsAdminQuery,
   useRegisterStudentMutation,
+  useRegisterStudentsFileXlsxMutation,
+  useDeleteStudentMutation,
 } = studentApi;

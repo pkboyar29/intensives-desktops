@@ -42,3 +42,8 @@ export interface IUserAdmin {
   password?: string | undefined;
   roles?: UserRole[];
 }
+
+export interface IResistrationXlsxError {
+  rowId: string | number;
+  errorInfo: string;
+}
