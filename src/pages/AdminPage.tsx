@@ -1,12 +1,20 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import { setIsSidebarOpen } from '../redux/slices/windowSlice';
+import { useWindowSize } from '../helpers/useWindowSize';
+
 import Sidebar from '../components/sidebar/Sidebar';
 import AdminSidebarContent from '../components/sidebar/AdminSidebarContent';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 const AdminPage: FC = () => {
   const navigate = useNavigate();
-
   const { universityId } = useParams();
+
+  const { width: windowWidth } = useWindowSize();
+
+  const dispatch = useAppDispatch();
+  const isSidebarOpen = useAppSelector((state) => state.window.isSidebarOpen);
 
   // Проверка на положительное число
   const idRegex = /^\d+$/;
@@ -17,12 +25,23 @@ const AdminPage: FC = () => {
 
   return (
     <>
-      <div className="pt-[74px] h-screen grid grid-cols-[auto,1fr]">
+      <div className="pt-[74px] h-screen grid grid-cols-1 md:grid-cols-[auto,1fr]">
         <Sidebar>
           <AdminSidebarContent />
         </Sidebar>
 
-        <div className="w-full md:pl-10 pl-[80px] pr-3 md:pr-10 py-5 overflow-y-auto">
+        <div
+          className={`w-full px-5 py-5 overflow-y-auto md:px-10 ${
+            isSidebarOpen && windowWidth < 768
+              ? 'opacity-40 overflow-y-hidden transition duration-300 ease-in-out'
+              : ''
+          }`}
+          onClick={() => {
+            if (isSidebarOpen && windowWidth < 768) {
+              dispatch(setIsSidebarOpen(false));
+            }
+          }}
+        >
           <Outlet />
         </div>
       </div>

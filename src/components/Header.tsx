@@ -1,15 +1,18 @@
 import { FC, useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { resetUserState, setCurrentRole } from '../redux/slices/userSlice';
 import { resetIntensiveState } from '../redux/slices/intensiveSlice';
 import { resetTeamState } from '../redux/slices/teamSlice';
+import { setIsSidebarOpen } from '../redux/slices/windowSlice';
 
 import PrimaryButton from './common/PrimaryButton';
 import Modal from './common/modals/Modal';
 import UserIcon from './icons/UserIcon';
 import SettingsIcon from './icons/SettingsIcon';
 import LogoutIcon from './icons/LogoutIcon';
+import ChevronRightIcon from './icons/ChevronRightIcon';
+import ChevronLeftIcon from './icons/ChevronLeftIcon';
 
 import Cookies from 'js-cookie';
 import { UserRole } from '../ts/interfaces/IUser';
@@ -17,6 +20,8 @@ import { redirectByRole } from '../helpers/urlHelpers';
 
 const Header: FC = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   const [logOutModal, setLogOutModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -26,6 +31,7 @@ const Header: FC = () => {
   }>({ status: false, role: null });
 
   const currentUser = useAppSelector((state) => state.user.data);
+  const isSidebarOpen = useAppSelector((state) => state.window.isSidebarOpen);
   const dispatch = useAppDispatch();
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -136,14 +142,27 @@ const Header: FC = () => {
       )}
 
       <header
-        className={`fixed w-full top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
+        className={`fixed w-full top-0 z-[100] px-5 py-4 border-b border-solid bg-white border-gray`}
       >
-        <div className="container md:relative">
+        <div className="md:container">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="font-sans text-2xl font-bold">LOGO</div>
-              <div className="hidden font-sans text-base md:block">
-                Костромской государственный университет
+            <div className="flex items-center gap-4">
+              {!['/intensives', '/sign-in', '/createIntensive'].includes(
+                pathname
+              ) && (
+                <button
+                  className="md:hidden w-12 h-12 flex items-center justify-center rounded-[10px] bg-gray_5 transition duration-300 hover:bg-gray_6"
+                  onClick={() => dispatch(setIsSidebarOpen(!isSidebarOpen))}
+                >
+                  {isSidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </button>
+              )}
+
+              <div className="flex items-center gap-2">
+                <div className="font-sans text-2xl font-bold">LOGO</div>
+                <div className="hidden font-sans text-base md:block">
+                  Костромской государственный университет
+                </div>
               </div>
             </div>
             {currentUser && (
@@ -157,7 +176,7 @@ const Header: FC = () => {
 
                 <div
                   ref={menuRef}
-                  className={`absolute z-50 w-full md:w-80 top-15 md:top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
+                  className={`absolute z-50 w-full sm:w-80 top-15 md:top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
                     isOpen ? 'block' : 'hidden'
                   }`}
                 >

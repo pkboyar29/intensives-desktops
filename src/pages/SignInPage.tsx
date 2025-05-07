@@ -121,8 +121,8 @@ const SignInPage: FC = () => {
   };
 
   return (
-    <div className="pt-[88px] w-full px-3 md:flex md:justify-center">
-      <div className="md:w-[480px]">
+    <div className="pt-[88px] w-full px-3 sm:flex sm:justify-center">
+      <div className="sm:w-[480px]">
         {tempUser ? (
           <motion.div
             className="flex flex-col gap-6"

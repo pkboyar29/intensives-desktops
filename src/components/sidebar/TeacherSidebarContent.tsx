@@ -1,9 +1,11 @@
 import { useEffect, FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
 import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
+import { setIsSidebarOpen } from '../../redux/slices/windowSlice';
+import { useWindowSize } from '../../helpers/useWindowSize';
 
 import Skeleton from 'react-loading-skeleton';
 import SidebarLink from './SidebarLink';
@@ -13,7 +15,10 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   isIntensiveLoading,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
+
+  const { width: windowWidth } = useWindowSize();
 
   const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
@@ -33,6 +38,12 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
     };
     fetchTeam();
   }, []);
+
+  useEffect(() => {
+    if (windowWidth < 768) {
+      dispatch(setIsSidebarOpen(false));
+    }
+  }, [pathname]);
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());

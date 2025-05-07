@@ -5,6 +5,8 @@ import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
 import { useUpdateIntensiveOpennessMutation } from '../../redux/api/intensiveApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
+import { setIsSidebarOpen } from '../../redux/slices/windowSlice';
+import { useWindowSize } from '../../helpers/useWindowSize';
 
 import SwitchButton from '../common/SwitchButton';
 import Skeleton from 'react-loading-skeleton';
@@ -17,6 +19,8 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
+
+  const { width: windowWidth } = useWindowSize();
 
   const [getTeam] = useLazyGetTeamQuery();
   const [updateOpenness] = useUpdateIntensiveOpennessMutation();
@@ -37,6 +41,12 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
     };
     fetchTeam();
   }, []);
+
+  useEffect(() => {
+    if (windowWidth < 768) {
+      dispatch(setIsSidebarOpen(false));
+    }
+  }, [pathname]);
 
   const updateIntensiveOpenness = (isOpen: boolean) => {
     if (currentIntensive) {
