@@ -619,7 +619,7 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startDate"
                 register={register}
@@ -652,7 +652,7 @@ const ManageEventForm: FC = () => {
               />
             </div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startTime"
                 register={register}
@@ -820,14 +820,18 @@ const ManageEventForm: FC = () => {
           </div>
 
           {!isValid && (
-            <div className="text-base text-red">Форма содержит ошибки</div>
+            <div className="text-base text-center text-red sm:text-left">
+              Форма содержит ошибки
+            </div>
           )}
 
           {!isValid && errors.teams && teamsToChoose?.length === 0 && (
-            <div className="text-base text-red">В интенсиве нету команд</div>
+            <div className="text-base text-center text-red sm:text-left">
+              В интенсиве нету команд
+            </div>
           )}
 
-          <div className="flex my-5 gap-7">
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"

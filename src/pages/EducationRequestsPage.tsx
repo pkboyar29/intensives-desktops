@@ -89,7 +89,7 @@ const EducationRequestsPage: FC = () => {
         }
         if (openness === 'closed') {
           filteredRequests = filteredRequests.filter(
-            (request) => request.status === 'Закрыт'
+            (request) => request.status === 'Решен'
           );
         }
       }
@@ -152,7 +152,7 @@ const EducationRequestsPage: FC = () => {
           if (request.id === educationRequest.id) {
             return {
               ...request,
-              status: request.status === 'Открыт' ? 'Закрыт' : 'Открыт',
+              status: request.status === 'Открыт' ? 'Решен' : 'Открыт',
             };
           } else {
             return request;
@@ -335,7 +335,7 @@ const EducationRequestsPage: FC = () => {
             activeFilterOption={openness}
             filterList={[
               { label: 'Открытые', value: 'opened' },
-              { label: 'Закрытые', value: 'closed' },
+              { label: 'Решенные', value: 'closed' },
               { label: 'Все', value: 'all' },
             ]}
           />

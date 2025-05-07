@@ -132,10 +132,13 @@ const ManageIntensiveForm: FC = () => {
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
       open_dt?: string[];
+      close_dt?: string[];
       specific_student_ids?: string[];
     };
     if (errorData && errorData.open_dt) {
       setError('openDate', { type: 'custom', message: errorData.open_dt[0] });
+    } else if (errorData && errorData.close_dt) {
+      setError('closeDate', { type: 'custom', message: errorData.close_dt[0] });
     } else if (errorData && errorData.specific_student_ids) {
       setError('specificStudents', {
         type: 'custom',
@@ -376,7 +379,7 @@ const ManageIntensiveForm: FC = () => {
           <div className="flex flex-col gap-3 my-3">
             <div className="text-lg font-bold">Время проведения</div>
 
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:gap-6">
+            <div className="flex flex-col justify-between w-full gap-3 sm:flex-row sm:gap-6">
               <InputDescription
                 fieldName="openDate"
                 register={register}
@@ -521,7 +524,9 @@ const ManageIntensiveForm: FC = () => {
           </div>
 
           {!isValid && (
-            <div className="text-base text-red">Форма содержит ошибки</div>
+            <div className="text-base text-center text-red sm:text-left">
+              Форма содержит ошибки
+            </div>
           )}
 
           <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
