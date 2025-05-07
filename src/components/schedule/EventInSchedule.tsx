@@ -44,9 +44,9 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
           {getEventDateDisplayString(event.startDate, event.finishDate)}
         </time>
       </div>
-      {isUserTeacher(currentUser) &&
-        currentUser?.teacherId &&
-        event.teacherIds.includes(currentUser.teacherId) && (
+      {currentUser &&
+        isUserTeacher(currentUser) &&
+        event.teacherIds.includes(currentUser.id) && (
           <span className="self-start w-4 h-4">
             {' '}
             <Tooltip

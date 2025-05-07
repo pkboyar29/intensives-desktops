@@ -62,7 +62,7 @@ const TeamOverviewPage: FC = () => {
         setIsAllowedToChangeStudentRoles(true);
         setIsAllowedToChangeTeamlead(true);
       } else if (isUserStudent(currentUser)) {
-        if (currentUser?.studentId === currentTeam.teamlead?.id) {
+        if (currentUser.id === currentTeam.teamlead?.id) {
           setIsAllowedToChangeStudentRoles(true);
         }
       }
