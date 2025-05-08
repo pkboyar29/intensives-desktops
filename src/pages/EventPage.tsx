@@ -272,7 +272,10 @@ const EventPage: FC = () => {
                     <div className="font-bold text-black_2">
                       Место проведения
                     </div>
-                    <div>{event.audience.name}</div>
+
+                    <div>
+                      {event.isOnline ? 'Онлайн' : event.audience?.name}
+                    </div>
                   </div>
 
                   {event.teams.length > 0 && (

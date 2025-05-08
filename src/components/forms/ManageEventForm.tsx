@@ -165,7 +165,7 @@ const ManageEventForm: FC = () => {
           finishDate: getISODateInUTC3(event.finishDate),
           startTime: getTimeFromDate(event.startDate),
           finishTime: getTimeFromDate(event.finishDate),
-          audience: event.audience.id,
+          audience: event.isOnline ? -1 : event.audience!.id,
           stage: event.stageId ? event.stageId : 0,
           scoreType: scoreType,
           markStrategy: event.markStrategy
@@ -398,7 +398,8 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: event.visibility,
           teacherIds: data.teachers
             ? data.teachers.map((teacher) => teacher.id)
@@ -431,7 +432,8 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: true,
           teacherIds: data.teachers
             ? data.teachers.map((teacher) => teacher.id)
@@ -703,7 +705,10 @@ const ManageEventForm: FC = () => {
                 <div className="text-xl font-bold">Место проведения</div>
                 <Select
                   initialText="Выберите место проведения"
-                  options={audiencesToChoose.results}
+                  options={[
+                    { id: -1, name: 'Онлайн' },
+                    ...audiencesToChoose.results,
+                  ]}
                   register={register}
                   registerOptions={{
                     validate: {
