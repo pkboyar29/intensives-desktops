@@ -80,6 +80,7 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
     type: 'relation',
     renderKey: 'name',
   },
+  { key: 'graduationDate', label: 'Дата выпуска', type: 'date' },
 ];
 
 export const groupsColumns: ColumnConfig<IGroup>[] = [

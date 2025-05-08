@@ -9,7 +9,7 @@ import {
 import { mapRoleName, mapUserAdmin } from './userApi';
 import { mapGroup } from './groupApi';
 import { mapStudentRole } from './studentRoleApi';
-import { IResistrationXlsxError } from '../../ts/interfaces/IUser';
+import { IUploadXlsxError } from '../../ts/interfaces/IUser';
 
 // TODO: учесть, что patronymic (отчество) может быть необязательным
 export const mapStudent = (unmappedStudent: any): IStudent => {
@@ -43,7 +43,7 @@ export const mapStudentAdmin = (unmappedStudent: any): IStudentAdmin => {
   };
 };
 
-export const mapXlsxError = (unmappedError: any): IResistrationXlsxError => {
+export const mapXlsxError = (unmappedError: any): IUploadXlsxError => {
   return {
     rowId: unmappedError.row_id,
     errorInfo: unmappedError.error_info,
@@ -117,13 +117,16 @@ export const studentApi = createApi({
         mapStudentAdmin(response[0]), // так как в ответе массив но всегда один элемент
     }),
     registerStudentsFileXlsx: builder.mutation<
-      { results: IStudentAdmin[]; errors: IResistrationXlsxError[] },
-      File
+      { results: IStudentAdmin[]; errors: IUploadXlsxError[] },
+      { group?: string; file: File }
     >({
-      query: (file) => {
+      query: ({ group, file }) => {
         const formData = new FormData();
 
         formData.append('file', file);
+        if (group) {
+          formData.append('group', group);
+        }
         return {
           url: `/student_register/files/xlsx/`,
           method: 'POST',

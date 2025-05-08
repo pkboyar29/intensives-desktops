@@ -15,6 +15,8 @@ import Modal from '../components/common/modals/Modal';
 import AdminEntryModal from '../components/common/modals/AdminEntryModal';
 import AdminCreateEntityModal from '../components/common/modals/AdminEntryModal';
 import { useRegisterStudentsFileXlsxMutation } from '../redux/api/studentApi';
+import AdminUploadXlsxModal from '../components/common/modals/AdminUploadXlsxModal';
+import { IUploadXlsxError } from '../ts/interfaces/IUser';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -50,6 +52,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const [data, setData] = useState(() => queryData?.results ?? []);
   const [breadcrumbs, setBreadcrumbs] = useState<AdminBreadcrumb[]>([]);
   const [isEntryModal, setIsEntryModal] = useState<boolean>(false);
+  const [uploadXlsxErrors, setUploadXlsxErrors] = useState<IUploadXlsxError[]>(
+    []
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const limit = 100; // Размер страницы данных
@@ -109,7 +114,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   }, [data]);
 
   useEffect(() => {
-    const newEntity = createEntityData || updateEntityData;
+    //const newEntity = createEntityData || updateEntityData;
     //console.log(newEntity);
     if (createEntityData) {
       setData((prevData) => [...prevData, createEntityData]);
@@ -132,6 +137,13 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         limit: limit,
         offset: offset.current,
       });
+    }
+  };
+
+  const loadNextPage = () => {
+    offset.current += limit;
+    if (count && offset.current < count) {
+      loadData();
     }
   };
 
@@ -256,13 +268,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
-  const loadNextPage = () => {
-    offset.current += limit;
-    if (count && offset.current < count) {
-      loadData();
-    }
-  };
-
   const createBreadcrumbs = () => {
     const pathParts = window.location.pathname.split('/');
     pathParts.forEach((pathPart, index) => {
@@ -308,14 +313,53 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
-  const handleFileXlsxChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileXlsxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const xlsxFile = event.target.files![0];
-    const { data: registeredStudents } = await registerStudentsXlsx(xlsxFile);
+    uploadFileXlsx(xlsxFile);
 
-    console.log(registeredStudents);
     event.target.value = '';
+  };
+
+  const uploadFileXlsx = async (file: File) => {
+    const { data: registeredStudentsData, error: registeredStudentError } =
+      await registerStudentsXlsx({
+        group:
+          breadcrumbs.length > 2
+            ? breadcrumbs[breadcrumbs.length - 2].entityId?.toString()
+            : undefined,
+        file: file,
+      });
+
+    if (registeredStudentError && !registeredStudentsData) {
+      console.warn(registeredStudentError);
+      toast(`Неправильная структура файла .xlsx`, {
+        type: 'error',
+      });
+      return;
+    }
+
+    const countResults = registeredStudentsData.results.length;
+    const countErrors = registeredStudentsData.errors.length;
+    const countRows = countResults + countErrors;
+
+    if (countErrors > 0 && countResults > 0) {
+      toast(
+        `${countResults} из ${countRows} записей успешно созданы, но в ${countErrors} есть ошибки`,
+        {
+          type: 'warning',
+        }
+      );
+      setUploadXlsxErrors(registeredStudentsData.errors);
+    } else if (countErrors > 0 && countResults === 0) {
+      toast(`Ошибка всех записей`, {
+        type: 'error',
+      });
+      setUploadXlsxErrors(registeredStudentsData.errors);
+    } else if (countErrors === 0 && countResults > 0) {
+      toast(`Все записи успешно созданы!`, {
+        type: 'success',
+      });
+    }
   };
 
   return (
@@ -331,6 +375,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             setIsEntryModal(false);
           }}
           onClose={() => setIsEntryModal(false)}
+        />
+      )}
+      {uploadXlsxErrors.length > 0 && (
+        <AdminUploadXlsxModal
+          errors={uploadXlsxErrors}
+          onClose={() => setUploadXlsxErrors([])}
         />
       )}
       <title>{config.title}</title>
@@ -402,7 +452,13 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         onNextPage={count && limit < count ? () => loadNextPage() : undefined}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
-        isLoadingData={isLoading}
+        isLoadingData={
+          queryData
+            ? data.length === 0 && queryData.results.length > 0
+              ? true
+              : false
+            : true
+        }
       />
     </>
   );

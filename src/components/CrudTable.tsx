@@ -134,7 +134,13 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                   ></input>
                 );
               case 'date': // тоже проверить (и доделать)
-                return <input type="date" defaultValue={value}></input>;
+                return (
+                  <input
+                    type="date"
+                    defaultValue={value}
+                    className="border border-black"
+                  ></input>
+                );
               case 'relation':
                 return (
                   <>
@@ -283,7 +289,9 @@ function CrudTable<T>(props: CrudTableProps<T>) {
         <Table
           data={data}
           columns={columnsTable}
-          pagination={onNextPage ? { onNextPage: () => onNextPage } : undefined}
+          pagination={
+            onNextPage ? { onNextPage: () => onNextPage() } : undefined
+          }
         />
         {data.length === 0 && (
           <p className="mt-3 text-2xl text-center">

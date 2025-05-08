@@ -43,7 +43,7 @@ export interface IUserAdmin {
   roles?: UserRole[];
 }
 
-export interface IResistrationXlsxError {
+export interface IUploadXlsxError {
   rowId: string | number;
   errorInfo: string;
 }
