@@ -17,6 +17,8 @@ import AdminCreateEntityModal from '../components/common/modals/AdminEntryModal'
 import { useRegisterStudentsFileXlsxMutation } from '../redux/api/studentApi';
 import AdminUploadXlsxModal from '../components/common/modals/AdminUploadXlsxModal';
 import { IUploadXlsxError } from '../ts/interfaces/IUser';
+import SearchBar from '../components/common/SearchBar';
+import PagionationButtonPages from '../components/PaginationButtonPages';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -55,6 +57,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const [uploadXlsxErrors, setUploadXlsxErrors] = useState<IUploadXlsxError[]>(
     []
   );
+  const [searchText, setSearchText] = useState<string>('');
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const limit = 100; // Размер страницы данных
@@ -99,11 +103,14 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (queryData) {
+      setData(queryData.results);
+      /*
       if (offset.current > 0) {
         setData((prev) => [...prev, ...queryData.results]);
       } else {
         setData(queryData.results);
       }
+      */
     }
   }, [queryData]);
 
@@ -129,6 +136,11 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   }, [createEntityData || updateEntityData]);
 
+  useEffect(() => {
+    console.log(searchText);
+    loadData();
+  }, [searchText]);
+
   const loadData = async () => {
     if (fetchData) {
       await fetchData({
@@ -136,15 +148,27 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         ...paramsFromConfig,
         limit: limit,
         offset: offset.current,
+        search: searchText,
       });
     }
   };
 
+  /*
   const loadNextPage = () => {
     offset.current += limit;
     if (count && offset.current < count) {
       loadData();
     }
+  };
+  */
+
+  const loadPage = (page: number) => {
+    const newCurrent = (page - 1) * limit;
+    if (offset.current === newCurrent) return;
+
+    offset.current = newCurrent;
+    //setData([]);
+    loadData();
   };
 
   const lazyLoadBreadcrumbsData = async () => {
@@ -408,34 +432,45 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             ))}
         </div>
 
-        <div className="flex items-center space-x-3">
-          <button
-            className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
-            onClick={() => setIsEntryModal(true)}
-            title={'Создать запись'}
-          >
-            ➕
-          </button>
-          {config.type === 'students' && (
-            <>
-              <button
-                onClick={() =>
-                  fileInputRef.current && fileInputRef.current.click()
-                } // Триггерим input file
-                className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
-              >
-                📤 Загрузить .xlsx
-              </button>
-              <input
-                id="xslx-file"
-                type="file"
-                accept=".xlsx"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleFileXlsxChange}
-              ></input>
-            </>
-          )}
+        <div className="flex items-center w-full mt-1">
+          <div className="space-x-3">
+            <button
+              className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
+              onClick={() => setIsEntryModal(true)}
+              title={'Создать запись'}
+            >
+              ➕
+            </button>
+
+            {config.type === 'students' && (
+              <>
+                <button
+                  onClick={() =>
+                    fileInputRef.current && fileInputRef.current.click()
+                  } // Триггерим input file
+                  className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
+                >
+                  📤 Загрузить .xlsx
+                </button>
+                <input
+                  id="xslx-file"
+                  type="file"
+                  accept=".xlsx"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileXlsxChange}
+                ></input>
+              </>
+            )}
+          </div>
+
+          <SearchBar
+            searchText={searchText}
+            searchInputChangeHandler={(element) =>
+              setSearchText(element.target.value)
+            }
+            className="w-1/2 ml-5"
+          />
         </div>
       </div>
       <CrudTable
@@ -449,7 +484,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         onChildNavigatePath={(path) => {
           navigate(window.location.pathname + path);
         }}
-        onNextPage={count && limit < count ? () => loadNextPage() : undefined}
+        //onNextPage={count && limit < count ? () => loadNextPage() : undefined}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
         isLoadingData={
@@ -460,6 +495,16 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             : true
         }
       />
+      {count && (
+        <div className="mt-2 ml-1">
+          <PagionationButtonPages
+            countPages={Math.ceil(count / limit)}
+            currentPage={Math.ceil(offset.current / limit + 1)}
+            countElements={count}
+            onClick={(newPage: number) => loadPage(newPage)}
+          />
+        </div>
+      )}
     </>
   );
 };

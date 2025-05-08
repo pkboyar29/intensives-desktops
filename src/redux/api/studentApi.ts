@@ -85,7 +85,7 @@ export const studentApi = createApi({
       },
       {
         group?: number | null;
-        withChildrenMeta?: boolean;
+        search?: string;
         limit?: number;
         offset?: number;
       }
