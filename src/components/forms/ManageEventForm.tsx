@@ -22,6 +22,7 @@ import {
 } from '../../redux/api/eventApi';
 import { useAppSelector } from '../../redux/store';
 
+import { Helmet } from 'react-helmet-async';
 import Select from '../common/inputs/Select';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
@@ -470,6 +471,15 @@ const ManageEventForm: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            (event
+              ? `${event.name} | Редактирование мероприятия`
+              : `Создание мероприятия | ${currentIntensive.name}`)}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {cancelModal && (

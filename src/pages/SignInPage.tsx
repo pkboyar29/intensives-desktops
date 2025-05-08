@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
+import { Helmet } from 'react-helmet-async';
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
 import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
@@ -121,69 +122,75 @@ const SignInPage: FC = () => {
   };
 
   return (
-    <div className="pt-[88px] w-full px-3 sm:flex sm:justify-center">
-      <div className="sm:w-[480px]">
-        {tempUser ? (
-          <motion.div
-            className="flex flex-col gap-6"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-          >
-            <div className="text-center text-[28px] font-bold">
-              Выбор роли пользователя
-            </div>
+    <>
+      <Helmet>
+        <title>Авторизация | {import.meta.env.VITE_SITE_NAME}</title>
+      </Helmet>
 
-            <ChoosingRoleComponent
-              rolesToChoose={tempUser.roles}
-              onContinueButtonClick={onContinueButtonClick}
-            />
-          </motion.div>
-        ) : (
-          <div className="flex flex-col gap-6">
-            <div className="mx-auto text-[28px] font-bold">Авторизация</div>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-4"
+      <div className="pt-[88px] w-full px-3 sm:flex sm:justify-center">
+        <div className="sm:w-[480px]">
+          {tempUser ? (
+            <motion.div
+              className="flex flex-col gap-6"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
             >
-              <InputDescription
-                register={register}
-                registerOptions={{
-                  required: 'Поле обязательно для заполнения',
-                }}
-                fieldName="email"
-                placeholder="Введите email"
-                description="Email"
-                errorMessage={
-                  typeof errors.email?.message === 'string'
-                    ? errors.email.message
-                    : ''
-                }
-              />
+              <div className="text-center text-[28px] font-bold">
+                Выбор роли пользователя
+              </div>
 
-              <InputDescription
-                register={register}
-                registerOptions={{
-                  required: 'Поле обязательно для заполнения',
-                }}
-                fieldName="password"
-                placeholder="Введите пароль"
-                description="Пароль"
-                type="password"
-                errorMessage={
-                  typeof errors.password?.message === 'string'
-                    ? errors.password.message
-                    : ''
-                }
+              <ChoosingRoleComponent
+                rolesToChoose={tempUser.roles}
+                onContinueButtonClick={onContinueButtonClick}
               />
+            </motion.div>
+          ) : (
+            <div className="flex flex-col gap-6">
+              <div className="mx-auto text-[28px] font-bold">Авторизация</div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="flex flex-col gap-4"
+              >
+                <InputDescription
+                  register={register}
+                  registerOptions={{
+                    required: 'Поле обязательно для заполнения',
+                  }}
+                  fieldName="email"
+                  placeholder="Введите email"
+                  description="Email"
+                  errorMessage={
+                    typeof errors.email?.message === 'string'
+                      ? errors.email.message
+                      : ''
+                  }
+                />
 
-              <PrimaryButton children="Войти в систему" type="submit" />
-            </form>
-          </div>
-        )}
+                <InputDescription
+                  register={register}
+                  registerOptions={{
+                    required: 'Поле обязательно для заполнения',
+                  }}
+                  fieldName="password"
+                  placeholder="Введите пароль"
+                  description="Пароль"
+                  type="password"
+                  errorMessage={
+                    typeof errors.password?.message === 'string'
+                      ? errors.password.message
+                      : ''
+                  }
+                />
+
+                <PrimaryButton children="Войти в систему" type="submit" />
+              </form>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

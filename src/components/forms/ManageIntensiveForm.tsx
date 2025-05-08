@@ -2,9 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-
 import { useAppSelector } from '../../redux/store';
-
 import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
@@ -14,10 +12,10 @@ import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
 import { useFileHandler } from '../../helpers/useFileHandler';
-
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
@@ -248,6 +246,15 @@ const ManageIntensiveForm: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {intensiveId
+            ? currentIntensive &&
+              `${currentIntensive.name} | Редактирование интенсива`
+            : 'Создание интенсива'}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {cancelModal && (

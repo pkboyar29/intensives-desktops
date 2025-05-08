@@ -4,6 +4,7 @@ import { useAppSelector } from '../redux/store';
 import { isUserManager } from '../helpers/userHelpers';
 import { useGetTeamsQuery } from '../redux/api/teamApi';
 
+import { Helmet } from 'react-helmet-async';
 import Skeleton from 'react-loading-skeleton';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -13,6 +14,7 @@ import { ITeam } from '../ts/interfaces/ITeam';
 
 const TeamsPage: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const navigate = useNavigate();
   const { intensiveId } = useParams();
@@ -25,7 +27,13 @@ const TeamsPage: FC = () => {
   );
 
   return (
-    <div>
+    <>
+      <Helmet>
+        <title>
+          {currentIntensive && `${currentIntensive.name} | Команды`}
+        </title>
+      </Helmet>
+
       <Title text="Команды" />
 
       <h2 className="text-lg font-bold mt-7">
@@ -68,7 +76,7 @@ const TeamsPage: FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

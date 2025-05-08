@@ -2,9 +2,9 @@ import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/store';
 import { isUserManager } from '../helpers/userHelpers';
-
 import { useDeleteIntensiveMutation } from '../redux/api/intensiveApi';
 
+import { Helmet } from 'react-helmet-async';
 import Title from '../components/common/Title';
 import ChipList from '../components/common/ChipList';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -26,6 +26,12 @@ const IntensiveOverviewPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive && `${currentIntensive.name} | Просмотр`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {deleteModal && currentIntensive && (

@@ -18,6 +18,7 @@ import { useLazyGetEventAnswersQuery } from '../redux/api/eventAnswerApi';
 
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 
+import { Helmet } from 'react-helmet-async';
 import Modal from '../components/common/modals/Modal';
 import BackToScheduleButton from '../components/BackToScheduleButton';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -38,6 +39,7 @@ const EventPage: FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
@@ -178,6 +180,14 @@ const EventPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            event &&
+            `${event.name} | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {deleteModal && (

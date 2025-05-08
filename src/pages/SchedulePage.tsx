@@ -6,6 +6,7 @@ import { useUpdateVisibilityMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
 import { isUserManager } from '../helpers/userHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import Title from '../components/common/Title';
@@ -24,6 +25,7 @@ const SchedulePage: FC = () => {
   const navigate = useNavigate();
 
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [deleteStageAPI] = useDeleteStageMutation();
   const [updateVisibilityAPI] = useUpdateVisibilityMutation();
@@ -130,6 +132,12 @@ const SchedulePage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive && `${currentIntensive.name} | Расписание`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {stageModal.status && (

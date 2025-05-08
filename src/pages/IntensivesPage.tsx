@@ -8,6 +8,7 @@ import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
 import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import SearchBar from '../components/common/SearchBar';
 import IntensiveCard from '../components/IntensiveCard';
 import Table from '../components/common/Table';
@@ -159,104 +160,110 @@ const IntensivesPage: FC = () => {
   };
 
   return (
-    <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
-      <Title text="Интенсивы" />
+    <>
+      <Helmet>
+        <title>Интенсивы | {import.meta.env.VITE_SITE_NAME}</title>
+      </Helmet>
 
-      <div className="mt-4 sm:mt-8">
-        {isUserManager(currentUser) && (
-          <div className="flex justify-end">
-            <div className="ml-auto">
-              <PrimaryButton
-                children="Создать интенсив"
-                clickHandler={() => navigate(`/createIntensive`)}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
+        <Title text="Интенсивы" />
 
-      <SearchBar
-        searchText={searchText}
-        searchInputChangeHandler={searchInputChangeHandler}
-      />
-
-      <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
+        <div className="mt-4 sm:mt-8">
           {isUserManager(currentUser) && (
+            <div className="flex justify-end">
+              <div className="ml-auto">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <SearchBar
+          searchText={searchText}
+          searchInputChangeHandler={searchInputChangeHandler}
+        />
+
+        <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
+            {isUserManager(currentUser) && (
+              <Filter
+                onFilterOptionClick={(filterOption) =>
+                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                }
+                activeFilterOption={openness}
+                filterList={[
+                  { label: 'Открытые', value: 'opened' },
+                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Все', value: 'all' },
+                ]}
+              />
+            )}
+
             <Filter
               onFilterOptionClick={(filterOption) =>
-                setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                setRelevance(filterOption as 'all' | 'past' | 'relevant')
               }
-              activeFilterOption={openness}
+              activeFilterOption={relevance}
               filterList={[
-                { label: 'Открытые', value: 'opened' },
-                { label: 'Закрытые', value: 'closed' },
+                { label: 'Актуальные', value: 'relevant' },
+                { label: 'Прошедшие', value: 'past' },
                 { label: 'Все', value: 'all' },
               ]}
             />
-          )}
+          </div>
 
-          <Filter
-            onFilterOptionClick={(filterOption) =>
-              setRelevance(filterOption as 'all' | 'past' | 'relevant')
-            }
-            activeFilterOption={relevance}
-            filterList={[
-              { label: 'Актуальные', value: 'relevant' },
-              { label: 'Прошедшие', value: 'past' },
-              { label: 'Все', value: 'all' },
-            ]}
-          />
+          <select
+            onChange={selectChangeHandler}
+            value={sortOption}
+            className="bg-another_white rounded-xl p-1.5"
+          >
+            <option value="fromOldToNew">
+              Сортировка по дате (сначала старые)
+            </option>
+            <option value="fromNewToOld">
+              Сортировка по дате (сначала новые)
+            </option>
+          </select>
         </div>
 
-        <select
-          onChange={selectChangeHandler}
-          value={sortOption}
-          className="bg-another_white rounded-xl p-1.5"
-        >
-          <option value="fromOldToNew">
-            Сортировка по дате (сначала старые)
-          </option>
-          <option value="fromNewToOld">
-            Сортировка по дате (сначала новые)
-          </option>
-        </select>
-      </div>
-
-      <div className="mt-3 sm:mt-10">
-        {isLoading ? (
-          <Skeleton />
-        ) : intensives?.length === 0 ? (
-          <div className="text-xl font-bold">
-            Для вас нету открытых интенсивов
-          </div>
-        ) : (
-          <>
-            {sortedIntensives.length !== 0 ? (
-              isUserManager(currentUser) ? (
-                <Table
-                  onClick={intensiveClickHandler}
-                  columns={columns}
-                  data={sortedIntensives}
-                />
+        <div className="mt-3 sm:mt-10">
+          {isLoading ? (
+            <Skeleton />
+          ) : intensives?.length === 0 ? (
+            <div className="text-xl font-bold">
+              Для вас нету открытых интенсивов
+            </div>
+          ) : (
+            <>
+              {sortedIntensives.length !== 0 ? (
+                isUserManager(currentUser) ? (
+                  <Table
+                    onClick={intensiveClickHandler}
+                    columns={columns}
+                    data={sortedIntensives}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {sortedIntensives.map((intensive) => (
+                      <IntensiveCard
+                        key={intensive.id}
+                        intensive={intensive}
+                        onClick={intensiveClickHandler}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
-                <div className="flex flex-col gap-4">
-                  {sortedIntensives.map((intensive) => (
-                    <IntensiveCard
-                      key={intensive.id}
-                      intensive={intensive}
-                      onClick={intensiveClickHandler}
-                    />
-                  ))}
-                </div>
-              )
-            ) : (
-              <div className="text-xl font-bold">Ничего не найдено</div>
-            )}
-          </>
-        )}
+                <div className="text-xl font-bold">Ничего не найдено</div>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

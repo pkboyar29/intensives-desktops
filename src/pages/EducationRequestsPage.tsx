@@ -11,6 +11,7 @@ import {
   isUserTeamlead,
 } from '../helpers/userHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import SearchBar from '../components/common/SearchBar';
 import Filter from '../components/common/Filter';
 import Title from '../components/common/Title';
@@ -164,6 +165,13 @@ const EducationRequestsPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `${currentIntensive.name} | Образовательные запросы`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {requestModal.status && (
