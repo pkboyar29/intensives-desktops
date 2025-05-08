@@ -191,6 +191,9 @@ const ManageEventForm: FC = () => {
         reset({
           scoreType: 'withoutMarkStrategy',
           markStrategy: markStrategies[0].id.toString(),
+          stage: searchParams.get('stageId')
+            ? Number(searchParams.get('stageId'))
+            : 0,
         });
       }
     }
