@@ -36,44 +36,46 @@ const TeamsPage: FC = () => {
 
       <Title text="Команды" />
 
-      <h2 className="text-lg font-bold mt-7">
-        {isUserManager(currentUser)
-          ? 'Созданные команды'
-          : 'Существующие команды'}
-      </h2>
+      <div className="flex flex-col items-start justify-between xl:flex-row">
+        <h2 className="text-lg font-bold mt-7">
+          {isUserManager(currentUser)
+            ? 'Созданные команды'
+            : 'Существующие команды'}
+        </h2>
+
+        {isUserManager(currentUser) && (
+          <div className="flex flex-col gap-3 mt-3 sm:flex-row xl:mt-0 xl:gap-5">
+            <div>
+              <PrimaryButton
+                children="Изменить состав команд"
+                clickHandler={() =>
+                  navigate(`/intensives/${intensiveId}/createTeams`)
+                }
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                children="Изменить команды сопровождения"
+                clickHandler={() =>
+                  navigate(`/intensives/${intensiveId}/createSupportTeams`)
+                }
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {isLoading ? (
-        <Skeleton className="mt-7" />
+        <Skeleton className="mt-5 md:mt-10" />
       ) : teams && teams.length > 0 ? (
-        <div className="flex flex-wrap gap-6 mt-7">
+        <div className="flex flex-wrap justify-center gap-3 mt-5 md:justify-start md:gap-6 md:mt-10">
           {teams.map((team) => (
             <TeamCard key={team.id} team={team as ITeam} />
           ))}
         </div>
       ) : (
-        <div className="text-xl text-black mt-7">
+        <div className="mt-5 text-xl text-black md:mt-10">
           Команды еще не определены для этого интенсива
-        </div>
-      )}
-
-      {isUserManager(currentUser) && (
-        <div className="flex gap-5 mt-10">
-          <div>
-            <PrimaryButton
-              children="Изменить состав команд"
-              clickHandler={() =>
-                navigate(`/intensives/${intensiveId}/createTeams`)
-              }
-            />
-          </div>
-          <div>
-            <PrimaryButton
-              children="Изменить команды сопровождения"
-              clickHandler={() =>
-                navigate(`/intensives/${intensiveId}/createSupportTeams`)
-              }
-            />
-          </div>
         </div>
       )}
     </>
