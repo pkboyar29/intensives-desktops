@@ -1,7 +1,8 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { setTeam } from '../redux/slices/teamSlice';
-import { isUserManager, isUserTutor } from '../helpers/userHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 import TeamIcon from './icons/TeamIcon';
 import EnterIcon from './icons/EnterIcon';
@@ -15,12 +16,17 @@ interface TeamCardProps {
 }
 
 const TeamCard: FC<TeamCardProps> = ({ team }) => {
+  const navigate = useNavigate();
+
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
   const dispatch = useAppDispatch();
 
   const onEnterButtonClick = (team: ITeam) => {
     sessionStorage.setItem('currentTeam', team.id.toString());
     dispatch(setTeam(team));
+
+    navigate(`/intensives/${currentIntensive?.id}/team-overview`);
   };
 
   const EnterButton = () => {
@@ -43,16 +49,6 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           </div>
           <h3 className="text-lg">{team.name}</h3>
         </div>
-
-        {isUserTutor(currentUser, team) && (
-          <Tooltip
-            tooltipText="Войти как тьютор"
-            tooltipClasses="bg-gray_5 p-1 rounded"
-          >
-            <EnterButton />
-          </Tooltip>
-        )}
-
         {isUserManager(currentUser) && (
           <Tooltip
             tooltipText="Войти как организатор"

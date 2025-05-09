@@ -29,7 +29,7 @@ const Sidebar: FC<SidebarProps> = ({ children }) => {
         left: isSidebarOpen ? 0 : -300,
       }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className={`top-0 left-0 h-full w-[300px] p-5 bg-white border-r border-solid shadow-md border-r-gray ${
+      className={`top-0 left-0 h-full w-[300px] p-5 bg-white border-r border-solid shadow-md border-r-gray overflow-y-auto ${
         windowWidth < 768 ? `absolute pt-[88px] z-50` : 'relative'
       }`}
     >
