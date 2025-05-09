@@ -63,7 +63,7 @@ const EducationRequestsPage: FC = () => {
     request: IEducationRequest;
   }>({ status: false, request: defaultEducationRequest });
 
-  const [getEducationRequests, { isLoading }] =
+  const [getEducationRequests, { isLoading, isUninitialized }] =
     useLazyGetEducationRequestsQuery();
   const [deleteEducationRequest] = useDeleteEducationRequestMutation();
   const [changeStatus] = useChangeEducationRequestStatusMutation();
@@ -351,7 +351,7 @@ const EducationRequestsPage: FC = () => {
       </div>
 
       <div className="mt-4 md:mt-6">
-        {isLoading ? (
+        {isLoading || isUninitialized ? (
           <Skeleton />
         ) : educationRequests.length === 0 ? (
           <div className="text-xl text-black">

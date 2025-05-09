@@ -22,13 +22,14 @@ const IntensivesPage: FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const { data: intensives, isLoading } = useGetIntensivesQuery(
-    currentUser?.currentRole?.name === 'Mentor',
-    {
-      refetchOnMountOrArgChange: true,
-      skip: !currentUser?.currentRole,
-    }
-  );
+  const {
+    data: intensives,
+    isLoading,
+    isUninitialized,
+  } = useGetIntensivesQuery(currentUser?.currentRole?.name === 'Mentor', {
+    refetchOnMountOrArgChange: true,
+    skip: !currentUser?.currentRole,
+  });
   const [filteredIntensives, setFilteredIntensives] = useState<
     IIntensiveShort[]
   >([]);
@@ -230,13 +231,9 @@ const IntensivesPage: FC = () => {
         </div>
 
         <div className="mt-3 sm:mt-10">
-          {isLoading ? (
+          {isLoading || isUninitialized || !intensives ? (
             <Skeleton />
-          ) : intensives?.length === 0 ? (
-            <div className="text-xl font-bold">
-              Для вас нету открытых интенсивов
-            </div>
-          ) : (
+          ) : intensives.length > 0 ? (
             <>
               {sortedIntensives.length !== 0 ? (
                 isUserManager(currentUser) ? (
@@ -260,6 +257,10 @@ const IntensivesPage: FC = () => {
                 <div className="text-xl font-bold">Ничего не найдено</div>
               )}
             </>
+          ) : (
+            <div className="text-xl font-bold">
+              Для вас нету открытых интенсивов
+            </div>
           )}
         </div>
       </div>
