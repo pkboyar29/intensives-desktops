@@ -45,6 +45,14 @@ const TeamDragContainer: FC<TeamDragContainerProps> = ({
     onDelete(studentToDelete);
   };
 
+  const onSelectStudent = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const freeStudent = freeStudents.find(
+      (s) => s.id === Number(e.target.value)
+    );
+
+    onDrop(freeStudent!);
+  };
+
   return (
     <div
       ref={dropRef}
@@ -79,13 +87,7 @@ const TeamDragContainer: FC<TeamDragContainerProps> = ({
 
         <select
           value={0}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            const freeStudent = freeStudents.find(
-              (s) => s.id === Number(e.target.value)
-            );
-
-            onDrop(freeStudent!);
-          }}
+          onChange={onSelectStudent}
           className="mt-[4px] cursor-pointer px-3 py-1 text-base rounded-xl border-none outline-none bg-gray_5 w-full"
         >
           <option key={0} value={0}>

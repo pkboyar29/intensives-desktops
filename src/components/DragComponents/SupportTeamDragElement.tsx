@@ -21,7 +21,7 @@ const SupportTeamDragElement = <
   return (
     <div
       ref={dragRef}
-      className="flex items-center justify-center w-[200px] text-base bg-gray_5 px-3 py-1 rounded-xl overflow-hidden whitespace-nowrap text-ellipsis"
+      className="flex items-center cursor-pointer justify-center w-[200px] text-base bg-gray_5 px-3 py-1 rounded-xl overflow-hidden whitespace-nowrap text-ellipsis"
     >
       {data.content}
     </div>

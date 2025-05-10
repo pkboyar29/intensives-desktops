@@ -14,7 +14,7 @@ import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDr
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
-import SearchIcon from '../components/icons/SearchIcon';
+import SearchBar from '../components/common/SearchBar';
 import Skeleton from 'react-loading-skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -228,6 +228,23 @@ const CreateSupportTeamsPage: FC = () => {
     }
   };
 
+  const SubmitButtons: FC = () => (
+    <div className="flex justify-end w-full gap-3 mt-3">
+      <div>
+        <PrimaryButton
+          children="Отменить"
+          buttonColor="gray"
+          clickHandler={() => {
+            setCancelModal(true);
+          }}
+        />
+      </div>
+      <div>
+        <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Helmet>
@@ -248,7 +265,7 @@ const CreateSupportTeamsPage: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -322,7 +339,7 @@ const CreateSupportTeamsPage: FC = () => {
             <select
               onChange={handleSelectChange}
               value={currentTeamId}
-              className="mt-3 bg-another_white rounded-xl p-2.5"
+              className="mt-3 bg-another_white rounded-xl p-2.5 min-w-[130px]"
             >
               {supportTeams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
@@ -332,9 +349,9 @@ const CreateSupportTeamsPage: FC = () => {
             </select>
           </div>
 
-          <div className="flex gap-20 mt-8">
+          <div className="block mt-4 md:mt-8 xl:flex lg:gap-5 xl:gap-10">
             {currentTeam && (
-              <div className="flex flex-col gap-2 basis-1/3">
+              <div className="flex flex-col gap-2 xl:basis-1/3">
                 <div className="text-lg font-bold text-black">
                   {currentTeam.name}
                 </div>
@@ -346,6 +363,8 @@ const CreateSupportTeamsPage: FC = () => {
 
                 <SupportTeamDragContainer
                   team={currentTeam}
+                  allStudents={allStudents}
+                  allTeachers={allTeachers}
                   onDrop={(newDroppedElement) => {
                     if (currentTeamId) {
                       updateTeamSupportMembers(
@@ -363,7 +382,7 @@ const CreateSupportTeamsPage: FC = () => {
               </div>
             )}
 
-            <div className="flex flex-col items-center grow basis-2/3">
+            <div className="flex-col items-center hidden md:flex grow xl:basis-2/3">
               <div className="text-lg font-bold text-black">
                 Тьюторы и наставники
               </div>
@@ -394,18 +413,12 @@ const CreateSupportTeamsPage: FC = () => {
                 ></div>
               </div>
 
-              <div className="relative flex items-center w-full mt-8">
-                <SearchIcon />
-                <input
-                  type="text"
-                  placeholder="Поиск"
-                  className="w-full py-3 pl-12 pr-2 rounded-xl bg-another_white"
-                  value={searchString}
-                  onChange={searchInputChangeHandler}
-                />
-              </div>
+              <SearchBar
+                searchText={searchString}
+                searchInputChangeHandler={searchInputChangeHandler}
+              />
 
-              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center min-w-[550px] mt-3">
+              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center mt-3">
                 {slug === 'tutors' ? (
                   <>
                     {allTeachers
@@ -448,20 +461,11 @@ const CreateSupportTeamsPage: FC = () => {
                 )}
               </div>
 
-              <div className="flex justify-end w-full gap-3 mt-3">
-                <div>
-                  <PrimaryButton
-                    children="Отменить"
-                    buttonColor="gray"
-                    clickHandler={() => {
-                      setCancelModal(true);
-                    }}
-                  />
-                </div>
-                <div>
-                  <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
-                </div>
-              </div>
+              <SubmitButtons />
+            </div>
+
+            <div className="block md:hidden">
+              <SubmitButtons />
             </div>
           </div>
         </>
