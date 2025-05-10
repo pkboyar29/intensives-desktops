@@ -7,7 +7,9 @@ import {
   useChangeAllTeamsMutation,
   useLazyGetTeamsQuery,
 } from '../redux/api/teamApi';
+import { distributeStudents } from '../helpers/distributeStudents';
 
+import { Helmet } from 'react-helmet-async';
 import TeamDragElement from '../components/DragComponents/BaseDragElement';
 import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
@@ -289,9 +291,8 @@ const CreateTeamsPage: FC = () => {
     setFreeStudents([...freeStudents, studentToDelete]);
   };
 
-  const distributeStudents = () => {
-    let allStudents: IStudent[] = getAllStudents();
-
+  const setDistributedStudents = () => {
+    let allStudents = getAllStudents();
     const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
     const freeSpecificStudents = allStudents.filter(
       (student) => !flowIds.includes(student.group.flowId)
@@ -301,49 +302,7 @@ const CreateTeamsPage: FC = () => {
       flowIds.includes(student.group.flowId)
     );
 
-    // минимальное количество студентов в команде
-    // const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
-    // console.log(allStudents.length);
-    // console.log(minStudentsCountPerTeam);
-
-    // структура данных, чтобы перемещаться по каждой группе
-    const studentsByGroup: Record<number, IStudent[]> = {};
-
-    allStudents.forEach((student) => {
-      if (!studentsByGroup[student.group.id]) {
-        studentsByGroup[student.group.id] = [];
-      }
-
-      studentsByGroup[student.group.id].push(student);
-    });
-
-    let newTeams: ITeamForManager[] = teams.map((team) => ({
-      ...team,
-      studentsInTeam: [],
-    }));
-
-    // итерируемся по массивам студентов, сгрупированных по groupId
-    Object.values(studentsByGroup).forEach((groupStudents) => {
-      const groupCopy = [...groupStudents]; // клонируем, чтобы не мутировать оригинал
-
-      let teamIndex = 0;
-
-      while (groupCopy.length > 0) {
-        // if (
-        //   newTeams[teamIndex % teamsCount].studentsInTeam.length >=
-        //   minStudentsCountPerTeam
-        // ) {
-        //   teamIndex++;
-        //   continue;
-        // }
-
-        const randomStudentIndex = Math.floor(Math.random() * groupCopy.length);
-        const [student] = groupCopy.splice(randomStudentIndex, 1); // берем студента из groupCopy и одновременно удаляем его
-
-        newTeams[teamIndex % teamsCount].studentsInTeam.push(student);
-        teamIndex++;
-      }
-    });
+    const newTeams = distributeStudents(allStudents, teams);
 
     setTeams(newTeams);
     setFreeStudents([...freeSpecificStudents]);
@@ -382,8 +341,32 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
+  const SubmitButtons: FC = () => (
+    <div className="flex justify-end gap-3">
+      <div>
+        <PrimaryButton
+          children="Отменить"
+          buttonColor="gray"
+          clickHandler={() => {
+            setCancelModal(true);
+          }}
+        />
+      </div>
+      <div>
+        <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
+      </div>
+    </div>
+  );
+
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `Изменение состава команд | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {teamsCountModal && (
@@ -396,7 +379,7 @@ const CreateTeamsPage: FC = () => {
             можете начать заполнение заново или сохранить уже добавленных
             участников в командах
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -433,7 +416,7 @@ const CreateTeamsPage: FC = () => {
             <div>
               <PrimaryButton
                 clickHandler={() => {
-                  distributeStudents();
+                  setDistributedStudents();
                   setRandomDistributeModal(false);
                 }}
                 children="Распределить"
@@ -452,7 +435,7 @@ const CreateTeamsPage: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -511,16 +494,16 @@ const CreateTeamsPage: FC = () => {
       </p>
 
       <div className="mt-5 text-base text-gray_3">Количество команд</div>
-      <div className="flex items-center gap-4 mt-1.5">
-        <div className="relative w-[480px]">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-4 mt-1.5">
+        <div className="relative">
           <input
             type="number"
             placeholder="Количество команд"
             onChange={teamsCountInputChangeHandler}
-            className="w-full p-2 border rounded-md border-gray_5"
+            className="p-2 border rounded-md border-gray_5"
             value={teamsCount}
           />
-          <MembersIcon />
+          <MembersIcon className="absolute transform -translate-y-1/2 right-3 top-1/2" />
         </div>
 
         <div>
@@ -547,8 +530,8 @@ const CreateTeamsPage: FC = () => {
         <div className="mt-2 text-red">{teamsCountError}</div>
       )}
 
-      <div className="flex gap-10 mt-5">
-        <div className="flex flex-col gap-3 basis-1/3">
+      <div className="block mt-5 lg:flex lg:gap-5 xl:gap-10">
+        <div className="flex flex-col gap-3 lg:basis-1/2 xl:basis-1/3">
           <h2 className="text-lg font-bold text-black_2">Созданные команды</h2>
           <p className="text-base text-bright_gray">
             Для добавления участников в команды вы можете использовать
@@ -566,11 +549,12 @@ const CreateTeamsPage: FC = () => {
                 handleStudentDelete(team, deletedStudent);
               }}
               droppedStudents={team.studentsInTeam}
+              freeStudents={freeStudents}
             />
           ))}
         </div>
 
-        <div className="sticky flex flex-col gap-3 h-fit top-5 basis-2/3">
+        <div className="hidden gap-3 lg:sticky lg:flex-col h-fit top-5 lg:flex lg:basis-1/2 xl:basis-2/3">
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-bold text-black_2">
               Свободные участники
@@ -601,20 +585,11 @@ const CreateTeamsPage: FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <div>
-              <PrimaryButton
-                children="Отменить"
-                buttonColor="gray"
-                clickHandler={() => {
-                  setCancelModal(true);
-                }}
-              />
-            </div>
-            <div>
-              <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
-            </div>
-          </div>
+          <SubmitButtons />
+        </div>
+
+        <div className="block mt-3 lg:hidden">
+          <SubmitButtons />
         </div>
       </div>
     </>

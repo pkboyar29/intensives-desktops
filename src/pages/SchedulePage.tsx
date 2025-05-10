@@ -134,7 +134,7 @@ const SchedulePage: FC = () => {
     <>
       <Helmet>
         <title>
-          {currentIntensive && `${currentIntensive.name} | Расписание`}
+          {currentIntensive && `Расписание | ${currentIntensive.name}`}
         </title>
       </Helmet>
 

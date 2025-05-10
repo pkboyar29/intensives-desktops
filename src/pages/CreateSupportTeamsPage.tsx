@@ -8,6 +8,7 @@ import {
 } from '../redux/api/teamApi';
 import { useLazyGetSpecificFreeStudentsQuery } from '../redux/api/intensiveApi';
 
+import { Helmet } from 'react-helmet-async';
 import Modal from '../components/common/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
@@ -229,6 +230,13 @@ const CreateSupportTeamsPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `Изменение команд сопровождения | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {cancelModal && (

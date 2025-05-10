@@ -30,7 +30,7 @@ const TeamsPage: FC = () => {
     <>
       <Helmet>
         <title>
-          {currentIntensive && `${currentIntensive.name} | Команды`}
+          {currentIntensive && `Команды | ${currentIntensive.name}`}
         </title>
       </Helmet>
 

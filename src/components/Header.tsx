@@ -176,7 +176,7 @@ const Header: FC = () => {
 
                 <div
                   ref={menuRef}
-                  className={`absolute z-50 w-full sm:w-80 top-15 md:top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
+                  className={`absolute z-50 w-full sm:w-80 top-15 md:top-11 right-0 mt-0 md:mt-6 bg-another_white rounded-xl shadow-lg p-4 ${
                     isOpen ? 'block' : 'hidden'
                   }`}
                 >

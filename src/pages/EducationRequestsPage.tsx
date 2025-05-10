@@ -168,7 +168,7 @@ const EducationRequestsPage: FC = () => {
       <Helmet>
         <title>
           {currentIntensive &&
-            `${currentIntensive.name} | Образовательные запросы`}
+            `Образовательные запросы | ${currentIntensive.name}`}
         </title>
       </Helmet>
 

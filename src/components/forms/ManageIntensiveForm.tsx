@@ -250,7 +250,7 @@ const ManageIntensiveForm: FC = () => {
         <title>
           {intensiveId
             ? currentIntensive &&
-              `${currentIntensive.name} | Редактирование интенсива`
+              `Редактирование интенсива | ${currentIntensive.name}`
             : 'Создание интенсива'}
         </title>
       </Helmet>

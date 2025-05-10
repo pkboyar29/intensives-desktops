@@ -28,7 +28,7 @@ const IntensiveOverviewPage: FC = () => {
     <>
       <Helmet>
         <title>
-          {currentIntensive && `${currentIntensive.name} | Просмотр`}
+          {currentIntensive && `Просмотр | ${currentIntensive.name}`}
         </title>
       </Helmet>
 
