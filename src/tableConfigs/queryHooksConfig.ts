@@ -33,6 +33,7 @@ import {
   useLazyGetStudentsAdminQuery,
   useRegisterStudentMutation,
 } from '../redux/api/studentApi';
+import { useLazyGetTeachersAdminQuery } from '../redux/api/teacherApi';
 import {
   useCreateUniversityMutation,
   useDeleteUniversityMutation,
@@ -92,6 +93,13 @@ const studentsHooks = {
   delete: useDeleteStudentMutation,
 };
 
+const teachersHooks = {
+  view: useLazyGetTeachersAdminQuery,
+  create: useRegisterStudentMutation,
+  update: useUpdateEducationMutation,
+  delete: useDeleteStudentMutation,
+};
+
 export const queryHooksMap = {
   universities: universityHooks,
   buildings: buildingHooks,
@@ -100,4 +108,5 @@ export const queryHooksMap = {
   groups: groupHooks,
   education: educationHooks,
   students: studentsHooks,
+  teachers: teachersHooks,
 };

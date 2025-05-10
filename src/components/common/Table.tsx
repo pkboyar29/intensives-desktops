@@ -16,9 +16,16 @@ interface TableProps {
   columns: any[];
   onClick?: (id: number) => void;
   pagination?: PaginationType;
+  columnVisibility?: Record<string, boolean>;
 }
 
-const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
+const Table: FC<TableProps> = ({
+  data,
+  columns,
+  onClick,
+  pagination,
+  columnVisibility = {},
+}) => {
   const [page, setPage] = useState(1);
   //const [isLoadNextPage, setIsLoadNextPage] = useState<boolean>(
   //  () => !!pagination
@@ -48,6 +55,12 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
       pagination: {
         pageIndex: 0,
         pageSize: 1010,
+      },
+      //columnVisibility, //с этим получается задержка
+    },
+    initialState: {
+      columnVisibility: {
+        id: false,
       },
     },
   });

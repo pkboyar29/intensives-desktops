@@ -57,6 +57,9 @@ export const groupApi = createApi({
         method: 'POST',
         body: {
           name: data.name,
+          flow: data.flow,
+          profile: data.profile,
+          specialization: data.specialization,
         },
       }),
       transformResponse: (response: any): IGroup => mapGroup(response),

@@ -1,3 +1,4 @@
+import { ColumnOrderColumn } from '@tanstack/react-table';
 import { IAudience } from '../ts/interfaces/IAudience';
 import { IBuilding } from '../ts/interfaces/IBuilding';
 import {
@@ -9,6 +10,7 @@ import { IFlow } from '../ts/interfaces/IFlow';
 import { IGroup } from '../ts/interfaces/IGroup';
 import { IStudentAdmin } from '../ts/interfaces/IStudent';
 import { IUniversity } from '../ts/interfaces/IUniversity';
+import { ITeacherAdmin } from '../ts/interfaces/ITeacher';
 
 /*
 type DotNotationKeys<T, Prefix extends string = ''> = {
@@ -80,7 +82,7 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
     type: 'relation',
     renderKey: 'name',
   },
-  { key: 'graduationDate', label: 'Дата выпуска', type: 'date' },
+  { key: 'graduationDate', label: 'Дата выпуска', type: 'date', isNull: true },
 ];
 
 export const groupsColumns: ColumnConfig<IGroup>[] = [
@@ -138,4 +140,19 @@ export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
   { key: 'email', label: 'Почта', type: 'string' },
   { key: 'password', label: 'Пароль', type: 'string' },
   { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
+];
+
+export const teachersColumns: ColumnConfig<ITeacherAdmin>[] = [
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
+  { key: 'firstName', label: 'Имя', type: 'string' },
+  { key: 'lastName', label: 'Фамилия', type: 'string' },
+  { key: 'patronymic', label: 'Отчество', type: 'string' },
+  { key: 'email', label: 'Почта', type: 'string' },
+  { key: 'password', label: 'Пароль', type: 'string' },
+  {
+    key: 'university',
+    label: 'Университет',
+    type: 'relation',
+    renderKey: 'name',
+  },
 ];

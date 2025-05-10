@@ -66,6 +66,10 @@ const routeConfig: RouteType[] = [
         element: <AdminEntityPageWrapper entityType="students" />,
       },
       {
+        path: 'universities/:universityId/teachers',
+        element: <AdminEntityPageWrapper entityType="teachers" />,
+      },
+      {
         path: 'stagesEducation',
         element: <AdminEntityPageWrapper entityType="stagesEducation" />,
       },

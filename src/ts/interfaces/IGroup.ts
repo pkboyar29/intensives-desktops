@@ -13,7 +13,7 @@ export interface IGroupCreate {
   name: string;
   flow: number;
   profile?: number;
-  specialization?: number;
+  specialization: number;
 }
 
 export interface IGroupUpdate extends IGroupCreate {

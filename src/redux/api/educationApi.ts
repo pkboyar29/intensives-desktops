@@ -82,9 +82,20 @@ export const educationApi = createApi({
       }
     >({
       query: (data) => ({
-        url: '/buildings/',
+        url: `/${data.type}/`,
         method: 'POST',
-        body: data,
+        body: (() => {
+          const name = data.object.name;
+          if (data.type === 'specializations') {
+            const { code } = data.object as ISpecialization;
+            return { name: name, code: code };
+          }
+          if (data.type === 'profiles') {
+            const { specialization } = data.object as IProfile;
+            return { name: name, specialization: specialization };
+          }
+          return { name: name };
+        })(),
       }),
       transformResponse: (response: any): ISpecialization =>
         mapSpecialization(response),
@@ -104,6 +115,10 @@ export const educationApi = createApi({
           if (data.type === 'specializations') {
             const { code } = data.object as ISpecialization;
             return { name: name, code: code };
+          }
+          if (data.type === 'profiles') {
+            const { specialization } = data.object as IProfile;
+            return { name: name, specialization: specialization };
           }
           return { name: name };
         })(),

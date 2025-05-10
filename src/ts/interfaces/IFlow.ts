@@ -13,6 +13,7 @@ export interface IFlowCreate {
   name: string;
   university: number;
   stageEducation: number;
+  graduationDate: Date;
 }
 
 export interface IFlowUpdate extends IFlowCreate {

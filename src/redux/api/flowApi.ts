@@ -62,6 +62,7 @@ export const flowApi = createApi({
           name: data.name,
           university: data.university,
           stage_education: data.stageEducation,
+          graduation_date: data.graduationDate,
         },
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),

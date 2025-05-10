@@ -8,6 +8,7 @@ import {
 import { IFlow } from '../ts/interfaces/IFlow';
 import { IGroup } from '../ts/interfaces/IGroup';
 import { IStudentAdmin } from '../ts/interfaces/IStudent';
+import { ITeacherAdmin } from '../ts/interfaces/ITeacher';
 import { IUniversity } from '../ts/interfaces/IUniversity';
 import {
   audienceColumns,
@@ -19,6 +20,7 @@ import {
   specializationsColumns,
   stagesEducationColumns,
   studentsColumns,
+  teachersColumns,
   universityColumns,
 } from './nameConfig';
 
@@ -34,6 +36,7 @@ type TableConfigMap = {
   profiles: ColumnConfig<IProfile>[];
   specializations: ColumnConfig<ISpecialization>[];
   students: ColumnConfig<IStudentAdmin>[];
+  teachers: ColumnConfig<ITeacherAdmin>[];
 };
 
 export const tableConfigs: TableConfigMap = {
@@ -46,4 +49,5 @@ export const tableConfigs: TableConfigMap = {
   profiles: profilesColumns,
   specializations: specializationsColumns,
   students: studentsColumns,
+  teachers: teachersColumns,
 };

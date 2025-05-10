@@ -45,6 +45,9 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const editingRow = useRef<T | null>(null);
   const columns = tableConfigs[type] as ColumnConfig<T>[];
+  const [columnVisibility, setColumnVisibility] = useState<
+    Record<string, boolean>
+  >({});
   const dropdownRef = useRef<HTMLDivElement>(null); // Ссылка на кнопку меню
 
   const columnHelper = createColumnHelper<T>();
@@ -57,6 +60,10 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     const cols: ColumnDef<T, any>[] = columns.map((column) =>
       columnHelper.accessor(
         (row) => {
+          if (column.key === 'id') {
+            setColumnVisibility({ [column.key]: false });
+          }
+
           const value = row[column.key];
           if (
             //разные почти бесполезные проверки
@@ -289,6 +296,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
         <Table
           data={data}
           columns={columnsTable}
+          columnVisibility={columnVisibility}
           pagination={
             onNextPage ? { onNextPage: () => onNextPage() } : undefined
           }

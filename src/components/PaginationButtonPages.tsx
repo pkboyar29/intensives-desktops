@@ -19,7 +19,7 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
   //const currentPage = Math.ceil(offset / limit) + 1;
   const buttonStyle =
     'px-2 py-1 duration-100 rounded-md bg-gray_6 hover:bg-gray_7';
-  console.log(countPages, currentPage);
+  //console.log(countPages, currentPage);
 
   const centerButtons = () => {
     const buttons = [];
@@ -85,9 +85,8 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
           {buttonPageNumber(1)} <p>...</p> {rightButtons()}
         </>
       )}
-      {countElements && (
-        <p className="ml-5">{`Всего ${countElements} элементов`}</p>
-      )}
+      {countPages <= diff + 1 && <></>}
+      {countPages > 1 && <p className="ml-5">{`${countElements} элементов`}</p>}
     </div>
   );
 };

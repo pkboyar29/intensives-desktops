@@ -31,7 +31,6 @@ export const mapStudent = (unmappedStudent: any): IStudent => {
 
 export const mapStudentAdmin = (unmappedStudent: any): IStudentAdmin => {
   return {
-    //user: mapUserAdmin(unmappedStudent.user),
     id: unmappedStudent.user.id,
     firstName: unmappedStudent.user.first_name,
     lastName: unmappedStudent.user.last_name,

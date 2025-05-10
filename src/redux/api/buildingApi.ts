@@ -36,6 +36,7 @@ export const buildingApi = createApi({
       {
         university?: number | null;
         withChildrenMeta?: boolean;
+        search?: string;
         limit?: number;
         offset?: number;
       }

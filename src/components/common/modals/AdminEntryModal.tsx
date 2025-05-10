@@ -105,7 +105,17 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
                 );
                 break;
               case 'date':
-                inputElement = <input type="date"></input>;
+                inputElement = (
+                  <input
+                    type="date"
+                    onChange={(e) => {
+                      setCreatingRow((prev) => ({
+                        ...prev,
+                        [column.key as keyof T]: e.target.value,
+                      }));
+                    }}
+                  ></input>
+                );
                 break;
               case 'relation':
                 inputElement = (

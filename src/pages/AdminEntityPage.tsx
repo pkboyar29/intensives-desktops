@@ -103,14 +103,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (queryData) {
+      //console.log(queryData);
       setData(queryData.results);
-      /*
-      if (offset.current > 0) {
-        setData((prev) => [...prev, ...queryData.results]);
-      } else {
-        setData(queryData.results);
-      }
-      */
     }
   }, [queryData]);
 
@@ -153,15 +147,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
-  /*
-  const loadNextPage = () => {
-    offset.current += limit;
-    if (count && offset.current < count) {
-      loadData();
-    }
-  };
-  */
-
   const loadPage = (page: number) => {
     const newCurrent = (page - 1) * limit;
     if (offset.current === newCurrent) return;
@@ -188,12 +173,15 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
     // заменяем строку измененной
     //setData((prevData) => [...prevData, entity]);
-
     try {
-      await createEntityAPI({
-        ...entity,
-        type: paramsFromConfig.type,
-      } as any).unwrap();
+      if (paramsFromConfig.type) {
+        await createEntityAPI({
+          type: paramsFromConfig.type,
+          object: { ...entity },
+        } as any).unwrap();
+      } else {
+        await createEntityAPI({ ...entity }).unwrap();
+      }
 
       toast(`Объект ${entity.name ? `"${entity.name}"` : ''} успешно создан`, {
         type: 'success',
@@ -231,7 +219,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         } as any).unwrap();
       } else {
         await updateEntityAPI({ ...entity }).unwrap();
-        console.log(data);
       }
 
       toast(`Объект "${entity.name ? `"${entity.name}"` : ''} обновлен`, {
@@ -469,7 +456,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             searchInputChangeHandler={(element) =>
               setSearchText(element.target.value)
             }
-            className="w-1/2 ml-5"
+            className="w-1/3 ml-5"
           />
         </div>
       </div>
@@ -484,7 +471,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         onChildNavigatePath={(path) => {
           navigate(window.location.pathname + path);
         }}
-        //onNextPage={count && limit < count ? () => loadNextPage() : undefined}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
         isLoadingData={
