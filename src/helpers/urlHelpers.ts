@@ -12,4 +12,8 @@ const redirectByRole = (role: UserRole) => {
   window.location.assign(role.name === 'Admin' ? '/admin' : '/intensives');
 };
 
-export { replaceLastURLSegment, redirectByRole };
+const getRedirectedPathByRole = (role: UserRole) => {
+  return role.name === 'Admin' ? '/admin' : '/intensives';
+};
+
+export { replaceLastURLSegment, redirectByRole, getRedirectedPathByRole };

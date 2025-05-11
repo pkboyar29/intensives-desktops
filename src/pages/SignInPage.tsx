@@ -3,18 +3,18 @@ import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
+import { useAppDispatch, useAppSelector } from '../redux/store';
+import { setCurrentUser } from '../redux/slices/userSlice';
+import { getRedirectedPathByRole } from '../helpers/urlHelpers';
 
+import { Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import InputDescription from '../components/common/inputs/InputDescription';
 import PrimaryButton from '../components/common/PrimaryButton';
 import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 
 import { ISignIn, IUser, UserRole } from '../ts/interfaces/IUser';
-
-import { useSignInMutation, useLazyGetUserQuery } from '../redux/api/userApi';
-import { useAppDispatch, useAppSelector } from '../redux/store';
-import { setCurrentUser } from '../redux/slices/userSlice';
-import { redirectByRole } from '../helpers/urlHelpers';
 
 const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -34,11 +34,10 @@ const SignInPage: FC = () => {
     mode: 'onBlur',
   });
 
-  useEffect(() => {
-    if (currentUser && currentUser.currentRole) {
-      redirectByRole(currentUser.currentRole);
-    }
-  }, [currentUser]);
+  // редирект с SignInPage в зависимости от роли
+  if (currentUser && currentUser.currentRole) {
+    return <Navigate to={getRedirectedPathByRole(currentUser.currentRole)} />;
+  }
 
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
