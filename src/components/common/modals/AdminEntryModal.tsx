@@ -98,7 +98,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
                     onChange={(e) => {
                       setCreatingRow((prev) => ({
                         ...prev,
-                        [column.key as keyof T]: e.target.value,
+                        [column.key as keyof T]: e.target.checked,
                       }));
                     }}
                   ></input>

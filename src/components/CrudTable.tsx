@@ -61,7 +61,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
       columnHelper.accessor(
         (row) => {
           if (column.key === 'id') {
-            setColumnVisibility({ [column.key]: false });
+            //setColumnVisibility({ [column.key]: false });
           }
 
           const value = row[column.key];
@@ -92,13 +92,32 @@ function CrudTable<T>(props: CrudTableProps<T>) {
 
             // Если не режим редактирования или столбец только для чтения
             if (!isEditing || column.readOnly) {
-              if (value === null || value === undefined) return '—';
+              if (column.type === 'boolean' && column.key !== 'resetPassword') {
+                return (
+                  <input
+                    type="checkbox"
+                    defaultChecked={value ? value : false}
+                    className="border border-black"
+                    disabled
+                  ></input>
+                );
+              }
+
+              if (
+                value === null ||
+                value === undefined ||
+                column.key === 'resetPassword'
+              )
+                return '—';
               return value;
             }
 
             // Иначе отображаем вместо значения редактируемое что-то
             switch (column.type) {
               case 'string':
+                //if(column.key === "password") {
+                //  return (<) //можно и как string а там при отправке запроса обработать как boolean или еще что то
+                //}
                 return (
                   <input
                     defaultValue={value}
@@ -124,21 +143,26 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                     className="border border-black"
                   ></input>
                 );
-              case 'boolean': // проверить что будет ведь boolean нет вобще
+              case 'boolean':
                 return (
-                  <input
-                    type="checkbox"
-                    defaultChecked={value ? value : false}
-                    className="border border-black"
-                    onChange={(e) => {
-                      if (editingRow.current) {
-                        editingRow.current = {
-                          ...editingRow.current,
-                          [key as keyof T]: e.target.value,
-                        };
-                      }
-                    }}
-                  ></input>
+                  <div className="flex space-x-2">
+                    {column.key === 'resetPassword' && (
+                      <p className="">Сброс пароля</p>
+                    )}
+                    <input
+                      type="checkbox"
+                      defaultChecked={value ? value : false}
+                      className="border border-black"
+                      onChange={(e) => {
+                        if (editingRow.current) {
+                          editingRow.current = {
+                            ...editingRow.current,
+                            [key as keyof T]: e.target.checked,
+                          };
+                        }
+                      }}
+                    ></input>
+                  </div>
                 );
               case 'date': // тоже проверить (и доделать)
                 return (

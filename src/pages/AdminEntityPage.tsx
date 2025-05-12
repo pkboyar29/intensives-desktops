@@ -123,7 +123,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       setData((prevData) =>
         prevData.map((item) =>
           item.id === updateEntityData.id
-            ? { ...item, ...updateEntityData }
+            ? //?{ ...item, ...updateEntityData }
+              updateEntityData
             : item
         )
       );
@@ -189,9 +190,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     } catch (error: any) {
       //setData(prevItems); // в случае ошибки откатываем состояние
       toast(
-        `Произошла ошибка при создании объекта ${
+        `Ошибка при создании объекта ${
           entity.name ? `"${entity.name}"` : ''
-        }`,
+        } - ${error?.data?.detail}`,
         {
           type: 'error',
         }
@@ -201,6 +202,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const updateEntity = async (entity: any) => {
     const prevItems = [...data]; // сохраняем стейт
+    const prevItem = [data.find((item) => item.id === entity.id)];
+    console.log(prevItem);
 
     // заменяем строку измененной
     setData((prevData) =>
@@ -209,7 +212,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       )
     );
     // Если ничего не изменили запрос не отправлять
-
+    console.log(entity);
     try {
       //cringe
       if (paramsFromConfig.type) {
@@ -221,9 +224,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         await updateEntityAPI({ ...entity }).unwrap();
       }
 
-      toast(`Объект "${entity.name ? `"${entity.name}"` : ''} обновлен`, {
-        type: 'success',
-      });
+      toast(
+        `Объект ${entity.name ? `"${entity.name}"` : ''} успешно обновлен`,
+        {
+          type: 'success',
+        }
+      );
     } catch (error: any) {
       console.error(
         `Error on updating entity ${entityType} id=${entity.id}`,
@@ -231,9 +237,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       );
       setData(prevItems); // в случае ошибки откатываем состояние
       toast(
-        `Произошла ошибка при обновлении объекта ${
+        `Ошибка при обновлении объекта ${
           entity.name ? `"${entity.name}"` : ''
-        }`,
+        } ${error?.data?.detail ? ` - ${error.data.detail}` : ''}`,
         {
           type: 'error',
         }
@@ -419,44 +425,41 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             ))}
         </div>
 
-        <div className="flex items-center w-full mt-1">
-          <div className="space-x-3">
-            <button
-              className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
-              onClick={() => setIsEntryModal(true)}
-              title={'Создать запись'}
-            >
-              ➕
-            </button>
+        <div className="flex items-center w-full mt-1 space-x-3">
+          <button
+            className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
+            onClick={() => setIsEntryModal(true)}
+            title={'Создать запись'}
+          >
+            ➕
+          </button>
 
-            {config.type === 'students' && (
-              <>
-                <button
-                  onClick={() =>
-                    fileInputRef.current && fileInputRef.current.click()
-                  } // Триггерим input file
-                  className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400"
-                >
-                  📤 Загрузить .xlsx
-                </button>
-                <input
-                  id="xslx-file"
-                  type="file"
-                  accept=".xlsx"
-                  className="hidden"
-                  ref={fileInputRef}
-                  onChange={handleFileXlsxChange}
-                ></input>
-              </>
-            )}
-          </div>
-
+          {config.type === 'students' && (
+            <>
+              <button
+                onClick={() =>
+                  fileInputRef.current && fileInputRef.current.click()
+                } // Триггерим input file
+                className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400 whitespace-nowrap"
+              >
+                📤 Загрузить .xlsx
+              </button>
+              <input
+                id="xslx-file"
+                type="file"
+                accept=".xlsx"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileXlsxChange}
+              ></input>
+            </>
+          )}
           <SearchBar
             searchText={searchText}
             searchInputChangeHandler={(element) =>
               setSearchText(element.target.value)
             }
-            className="w-1/3 ml-5"
+            className=""
           />
         </div>
       </div>

@@ -138,7 +138,7 @@ export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
   { key: 'lastName', label: 'Фамилия', type: 'string' },
   { key: 'patronymic', label: 'Отчество', type: 'string' },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'password', label: 'Пароль', type: 'string' },
+  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
   { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
 ];
 
@@ -148,11 +148,12 @@ export const teachersColumns: ColumnConfig<ITeacherAdmin>[] = [
   { key: 'lastName', label: 'Фамилия', type: 'string' },
   { key: 'patronymic', label: 'Отчество', type: 'string' },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'password', label: 'Пароль', type: 'string' },
+  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
   {
     key: 'university',
     label: 'Университет',
     type: 'relation',
     renderKey: 'name',
   },
+  { key: 'isManager', label: 'Организатор', type: 'boolean', isNull: true },
 ];

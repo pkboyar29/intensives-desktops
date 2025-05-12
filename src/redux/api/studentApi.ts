@@ -4,6 +4,7 @@ import { baseQueryWithReauth, buildUrl } from './baseQuery';
 import {
   IStudent,
   IStudentAdmin,
+  IStudentPatch,
   IStudentRegister,
 } from '../../ts/interfaces/IStudent';
 import { mapRoleName, mapUserAdmin } from './userApi';
@@ -108,7 +109,6 @@ export const studentApi = createApi({
           last_name: data.lastName,
           patronymic: data?.patronymic,
           email: data.email,
-          password: data.password,
           group: data.group,
         },
       }),
@@ -141,6 +141,22 @@ export const studentApi = createApi({
         ),
       }),
     }),
+    updateStudent: builder.mutation<IStudentAdmin, IStudentPatch>({
+      query: (data) => ({
+        url: `/students/${data.id}/`,
+        method: 'PATCH',
+        body: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          patronymic: data?.patronymic,
+          email: data.email,
+          group: data.group?.id,
+          reset_password: data.resetPassword,
+        },
+      }),
+      transformResponse: (response: any): IStudentAdmin =>
+        mapStudentAdmin(response),
+    }),
     deleteStudent: builder.mutation<void, number>({
       query: (id) => ({
         url: `/students/${id}/`,
@@ -155,5 +171,6 @@ export const {
   useLazyGetStudentsAdminQuery,
   useRegisterStudentMutation,
   useRegisterStudentsFileXlsxMutation,
+  useUpdateStudentMutation,
   useDeleteStudentMutation,
 } = studentApi;

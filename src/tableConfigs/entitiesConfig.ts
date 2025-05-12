@@ -93,7 +93,7 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   teachers: {
     type: 'teachers',
     title: 'Преподаватели',
-    queryParamsDependencies: [{ from: 'universityId', as: 'university_id' }],
+    queryParamsDependencies: [{ from: 'universityId', as: 'university' }],
     hooks: queryHooksMap['teachers'],
   },
 };

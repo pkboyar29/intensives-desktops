@@ -1,6 +1,6 @@
 import { IFlow } from './IFlow';
 import { IGroup } from './IGroup';
-import { IUser, IUserAdmin } from './IUser';
+import { IUser, IUserAdmin, IUserPatch, IUserRegister } from './IUser';
 
 export interface IStudent {
   id: number;
@@ -16,11 +16,10 @@ export interface IStudentAdmin extends IUserAdmin {
   listed: boolean;
 }
 
-export interface IStudentRegister {
-  firstName: string;
-  lastName: string;
-  patronymic?: string;
-  email: string;
-  password: string;
+export interface IStudentRegister extends IUserRegister {
   group: number;
+}
+
+export interface IStudentPatch extends IUserPatch {
+  group?: IGroup;
 }

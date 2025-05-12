@@ -39,8 +39,24 @@ export interface IUserAdmin {
   lastName: string;
   patronymic: string | null;
   email: string;
-  password?: string | undefined;
+  resetPassword?: boolean;
   roles?: UserRole[];
+}
+
+export interface IUserRegister {
+  firstName: string;
+  lastName: string;
+  patronymic: string;
+  email: string;
+}
+
+export interface IUserPatch {
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  patronymic?: string;
+  email?: string;
+  resetPassword?: boolean;
 }
 
 export interface IUploadXlsxError {

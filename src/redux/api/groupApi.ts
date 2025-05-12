@@ -18,7 +18,7 @@ export const mapGroup = (unmappedGroup: any): IGroup => {
     profile: unmappedGroup.profile && mapProfile(unmappedGroup.profile),
     specialization:
       unmappedGroup.specialization &&
-      mapSpecialization(unmappedGroup.specialization),
+      mapSpecialization(unmappedGroup?.specialization),
   };
 };
 export const groupApi = createApi({

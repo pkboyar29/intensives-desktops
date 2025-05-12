@@ -2,7 +2,7 @@ import { FC, useState, useRef, useEffect } from 'react';
 
 interface PaginationButtonPagesProps {
   countPages: number;
-  currentPage: number;
+  currentPage: number; //может быть необязательным
   countElements?: number;
   diff?: number;
   onClick: (newOffset: number) => void;
@@ -48,6 +48,15 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
     return buttons;
   };
 
+  const buttonsWithoutDots = () => {
+    const buttons = [];
+
+    for (let i = 1; i <= countPages; i++) {
+      buttons.push(buttonPageNumber(i));
+    }
+    return buttons;
+  };
+
   const buttonPageNumber = (page: number) => {
     return (
       <button
@@ -72,7 +81,7 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
           <p>...</p>
           {buttonPageNumber(countPages)}
         </>
-      )}{' '}
+      )}
       {currentPage - diff < 0 && currentPage + diff < countPages && (
         <>
           {leftButtons()}
@@ -85,7 +94,7 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
           {buttonPageNumber(1)} <p>...</p> {rightButtons()}
         </>
       )}
-      {countPages <= diff + 1 && <></>}
+      {countPages > 1 && countPages <= diff + 1 && <>{buttonsWithoutDots()}</>}
       {countPages > 1 && <p className="ml-5">{`${countElements} элементов`}</p>}
     </div>
   );
