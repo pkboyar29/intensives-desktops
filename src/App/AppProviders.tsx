@@ -6,6 +6,8 @@ import { store } from '../redux/store';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import { HelmetProvider } from 'react-helmet-async';
+
 interface AppProvidersProps {
   children: ReactNode;
 }
@@ -13,7 +15,9 @@ interface AppProvidersProps {
 const AppProviders: FC<AppProvidersProps> = ({ children }) => {
   return (
     <Provider store={store}>
-      <DndProvider backend={HTML5Backend}>{children}</DndProvider>
+      <HelmetProvider>
+        <DndProvider backend={HTML5Backend}>{children}</DndProvider>
+      </HelmetProvider>
     </Provider>
   );
 };

@@ -10,16 +10,16 @@ import { IStudent } from '../../ts/interfaces/IStudent';
 interface TeamDragContainerProps {
   containerName: string;
   droppedStudents: IStudent[];
+  freeStudents: IStudent[];
   onDrop: (droppedStudent: IStudent) => void;
   onDelete: (deletedStudent: IStudent) => void;
 }
 
-// TODO: тут начать использовать компонент Tag?
-// если передавать team типа ITeam, то возможно не имеет смысла разделять компонент на два?
-// начать отображать тьютора и наставника также тут?
+// TODO: начать отображать тьютора и наставника также тут?
 const TeamDragContainer: FC<TeamDragContainerProps> = ({
   containerName,
   droppedStudents,
+  freeStudents,
   onDrop,
   onDelete,
 }) => {
@@ -45,13 +45,21 @@ const TeamDragContainer: FC<TeamDragContainerProps> = ({
     onDelete(studentToDelete);
   };
 
+  const onSelectStudent = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const freeStudent = freeStudents.find(
+      (s) => s.id === Number(e.target.value)
+    );
+
+    onDrop(freeStudent!);
+  };
+
   return (
     <div
       ref={dropRef}
       className={
         isDragging
-          ? 'flex gap-4 py-2.5 px-4 outline outline-[3px] outline-gray_5 rounded-lg select-none'
-          : 'flex gap-4 py-2.5 px-4 select-none'
+          ? 'flex gap-4 py-1.5 md:py-2.5 min-w-[300px] max-w-[400px] px-2 md:px-4 outline outline-[3px] outline-gray_5 rounded-lg select-none'
+          : 'flex gap-4 py-1.5 md:py-2.5 min-w-[300px] max-w-[400px] px-2 md:px-4 select-none'
       }
     >
       <div className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12">
@@ -77,12 +85,20 @@ const TeamDragContainer: FC<TeamDragContainerProps> = ({
           ))}
         </div>
 
-        {/* TODO: добавить при адаптивной верстке */}
-        {/* <select className="mt-[4px] cursor-pointer px-4 py-1.5 text-base rounded-lg border-none outline-none bg-gray_5 w-min appearance-none">
-          <option>
-            <div>Добавить участника</div>
+        <select
+          value={0}
+          onChange={onSelectStudent}
+          className="mt-[4px] cursor-pointer px-3 py-1 text-base rounded-xl border-none outline-none bg-gray_5 w-full"
+        >
+          <option key={0} value={0}>
+            Добавить участника
           </option>
-        </select> */}
+          {freeStudents.map((student) => (
+            <option key={student.id} value={student.id}>
+              {student.nameWithGroup}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );

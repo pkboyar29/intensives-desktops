@@ -9,6 +9,7 @@ import {
 } from '../redux/api/columnApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { IColumn } from '../ts/interfaces/IColumn';
+import { Helmet } from 'react-helmet-async';
 import KanbanColumn from '../components/KanbanColumn';
 import Modal from '../components/common/modals/Modal';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -134,6 +135,10 @@ const KanbanBoardPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{currentTeam && `Ведение задач | ${currentTeam.name}`}</title>
+      </Helmet>
+
       {deleteModal && (
         <Modal
           title="Удаление колонки"

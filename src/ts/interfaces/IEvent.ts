@@ -11,7 +11,8 @@ export interface IEvent {
   description: string;
   startDate: Date;
   finishDate: Date;
-  audience: IAudience;
+  audience: IAudience | null;
+  isOnline: boolean;
   stageId: number | null;
   teams: ITeamShort[];
   teachers: ITeacher[];
@@ -40,7 +41,8 @@ export interface IEventCreate {
   startDate: string;
   finishDate: string;
   stageId: number | null;
-  audienceId: number;
+  audienceId: number | null;
+  isOnline: boolean;
   visibility: boolean;
   intensiveId: number;
   teamIds: number[];

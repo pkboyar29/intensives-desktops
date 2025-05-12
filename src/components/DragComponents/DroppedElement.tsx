@@ -24,7 +24,7 @@ const DroppedElement: FC<DroppedElementProps> = ({ element, onDelete }) => {
   return (
     <div
       ref={dragRef}
-      className="flex items-center gap-3 px-3 py-1 text-base rounded-xl bg-gray_5"
+      className="flex items-center w-full gap-3 px-3 py-1 text-base rounded-xl bg-gray_5"
     >
       <span className="flex-grow">{element.nameWithGroup}</span>
       <button

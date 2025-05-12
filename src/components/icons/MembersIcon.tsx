@@ -3,7 +3,6 @@ import { FC } from 'react';
 const MembersIcon: FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
-      className="absolute transform -translate-y-1/2 right-3 top-1/2"
       width="24"
       height="16"
       viewBox="0 0 24 16"
