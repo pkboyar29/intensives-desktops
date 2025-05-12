@@ -7,6 +7,7 @@ interface ModalProps {
   title: ReactNode;
   onCloseModal: () => void;
   shouldHaveCrossIcon?: boolean;
+  closeByClickOutside?: boolean;
 }
 
 const Modal: FC<ModalProps> = ({
@@ -14,6 +15,7 @@ const Modal: FC<ModalProps> = ({
   title,
   onCloseModal,
   shouldHaveCrossIcon = true,
+  closeByClickOutside = true,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const isMouseDownInside = useRef<boolean>(false);
@@ -49,8 +51,8 @@ const Modal: FC<ModalProps> = ({
 
   return (
     <div
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      onMouseDown={closeByClickOutside ? handleMouseDown : () => {}}
+      onMouseUp={closeByClickOutside ? handleMouseUp : () => {}}
       className="fixed top-0 left-0 z-[200] flex items-center justify-center w-full h-full bg-modal_eclipse"
     >
       <div

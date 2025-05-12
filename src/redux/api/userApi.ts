@@ -5,11 +5,12 @@ import {
   ISignIn,
   ISignInResponse,
   IUser,
+  IUserAdmin,
   UserRole,
   UserRoleMap,
 } from '../../ts/interfaces/IUser';
 
-const mapRoleName = (roleName: string): UserRole => {
+export const mapRoleName = (roleName: string): UserRole => {
   const displayName = UserRoleMap[roleName as keyof typeof UserRoleMap];
 
   if (!displayName) {
@@ -31,6 +32,17 @@ const mapUser = (unmappedUser: any): IUser => {
     email: unmappedUser.email,
     roles: unmappedUser.roles.map((role: any) => mapRoleName(role.name)),
     currentRole: null,
+  };
+};
+
+export const mapUserAdmin = (unmappedUser: any): IUserAdmin => {
+  return {
+    id: unmappedUser.id,
+    firstName: unmappedUser.first_name,
+    lastName: unmappedUser.last_name,
+    patronymic: unmappedUser.patronymic,
+    email: unmappedUser.email,
+    roles: unmappedUser.roles.map((role: any) => mapRoleName(role.name)),
   };
 };
 

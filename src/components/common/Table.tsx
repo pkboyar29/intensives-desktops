@@ -5,49 +5,39 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-
-type PaginationType = {
-  limit?: number;
-  onNextPage(page?: number): void;
-};
+import PagionationButtonPages from '../PaginationButtonPages';
 
 interface TableProps {
   data: any[];
   columns: any[];
   onClick?: (id: number) => void;
-  pagination?: PaginationType;
+  columnVisibility?: Record<string, boolean>;
 }
 
-const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
-  const [page, setPage] = useState(1);
-  //const [isLoadNextPage, setIsLoadNextPage] = useState<boolean>(
-  //  () => !!pagination
-  //); race condition
-  const isLoadNextPageRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    if (pagination) {
-      //pagination.onNextPage(page);
-    }
-  }, [page]);
-
-  useEffect(() => {
-    if (data?.length > 0 && pagination) {
-      isLoadNextPageRef.current = true;
-      //setIsLoadNextPage(true);
-    }
-  }, [data]);
+const Table: FC<TableProps> = ({
+  data,
+  columns,
+  onClick,
+  columnVisibility = {},
+}) => {
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, //initial page index
+    pageSize: 50, //default page size
+  });
 
   const table = useReactTable({
     data,
     columns,
     debugTable: false,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(), //убрать пагинацию
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 1010,
+      pagination,
+      //columnVisibility, //с этим получается задержка
+    },
+    initialState: {
+      columnVisibility: {
+        //id: false,
       },
     },
   });
@@ -55,26 +45,12 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
   const rows = table.getRowModel().rows;
   const lastRowIndex = rows.length - 1;
 
-  const onScrollPagination = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-
-    if (
-      scrollTop + clientHeight >= scrollHeight - scrollHeight / 3 &&
-      isLoadNextPageRef.current
-    ) {
-      //setIsLoadNextPage(false);
-      isLoadNextPageRef.current = false;
-      pagination && pagination.onNextPage();
-      console.log('update scroll');
-    }
-  };
-
   return (
     <>
-      <div className="inline-block w-full mt-8 overflow-x-auto rounded-lg">
+      <div className="inline-block w-full mt-6 overflow-x-auto border rounded-lg border-neutral-300">
         <div className="overflow-x-auto">
           <table className="w-full table-fixed">
-            <thead className="border-b border-solid bg-gray_8 border-gray_9">
+            <thead className="border-b bg-gray_8 border-gray_9">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="">
                   {headerGroup.headers.map((header) => (
@@ -95,8 +71,7 @@ const Table: FC<TableProps> = ({ data, columns, onClick, pagination }) => {
         </div>
         <div
           className="overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 20rem)' }}
-          onScroll={(e) => pagination && onScrollPagination(e)}
+          style={{ maxHeight: 'calc(100vh - 23rem)' }}
         >
           <table className="w-full table-fixed">
             <tbody>

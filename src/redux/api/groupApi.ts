@@ -14,11 +14,11 @@ export const mapGroup = (unmappedGroup: any): IGroup => {
   return {
     id: unmappedGroup.id,
     name: unmappedGroup.name,
-    flow: mapFlow(unmappedGroup.flow),
+    flow: unmappedGroup.flow && mapFlow(unmappedGroup.flow),
     profile: unmappedGroup.profile && mapProfile(unmappedGroup.profile),
     specialization:
       unmappedGroup.specialization &&
-      mapSpecialization(unmappedGroup.specialization),
+      mapSpecialization(unmappedGroup?.specialization),
   };
 };
 export const groupApi = createApi({
@@ -57,6 +57,9 @@ export const groupApi = createApi({
         method: 'POST',
         body: {
           name: data.name,
+          flow: data.flow,
+          profile: data.profile,
+          specialization: data.specialization,
         },
       }),
       transformResponse: (response: any): IGroup => mapGroup(response),

@@ -11,6 +11,12 @@ import {
   useUpdateBuildingMutation,
 } from '../redux/api/buildingApi';
 import {
+  useCreateCriteriaMutation,
+  useDeleteCriteriaMutation,
+  useLazyGetCriteriasQuery,
+  useUpdateCriteriaMutation,
+} from '../redux/api/criteriaApi';
+import {
   useCreateEducationMutation,
   useDeleteEducationMutation,
   useLazyGetEducationQuery,
@@ -28,6 +34,30 @@ import {
   useLazyGetGroupsQuery,
   useUpdateGroupMutation,
 } from '../redux/api/groupApi';
+import {
+  useCreateMarkStrategyMutation,
+  useDeleteMarkStrategyMutation,
+  useLazyGetMarkStrategiesQuery,
+  useUpdateMarkStrategyMutation,
+} from '../redux/api/markStrategyApi';
+import {
+  useDeleteStudentMutation,
+  useLazyGetStudentsAdminQuery,
+  useRegisterStudentMutation,
+  useUpdateStudentMutation,
+} from '../redux/api/studentApi';
+import {
+  useCreateStudentRoleMutation,
+  useDeleteStudentRoleMutation,
+  useLazyGetStudentRolesQuery,
+  useUpdateStudentRoleMutation,
+} from '../redux/api/studentRoleApi';
+import {
+  useDeleteTeacherMutation,
+  useLazyGetTeachersAdminQuery,
+  useRegisterTeacherMutation,
+  useUpdateTeacherMutation,
+} from '../redux/api/teacherApi';
 import {
   useCreateUniversityMutation,
   useDeleteUniversityMutation,
@@ -80,6 +110,41 @@ const educationHooks = {
   delete: useDeleteEducationMutation,
 };
 
+const studentsHooks = {
+  view: useLazyGetStudentsAdminQuery,
+  create: useRegisterStudentMutation,
+  update: useUpdateStudentMutation,
+  delete: useDeleteStudentMutation,
+};
+
+const teachersHooks = {
+  view: useLazyGetTeachersAdminQuery,
+  create: useRegisterTeacherMutation,
+  update: useUpdateTeacherMutation,
+  delete: useDeleteTeacherMutation,
+};
+
+const markStrategiesHooks = {
+  view: useLazyGetMarkStrategiesQuery,
+  create: useCreateMarkStrategyMutation,
+  update: useUpdateMarkStrategyMutation,
+  delete: useDeleteMarkStrategyMutation,
+};
+
+const studentRolesHooks = {
+  view: useLazyGetStudentRolesQuery,
+  create: useCreateStudentRoleMutation,
+  update: useUpdateStudentRoleMutation,
+  delete: useDeleteStudentRoleMutation,
+};
+
+const criteriasHooks = {
+  view: useLazyGetCriteriasQuery,
+  create: useCreateCriteriaMutation,
+  update: useUpdateCriteriaMutation,
+  delete: useDeleteCriteriaMutation,
+};
+
 export const queryHooksMap = {
   universities: universityHooks,
   buildings: buildingHooks,
@@ -87,4 +152,9 @@ export const queryHooksMap = {
   flows: flowHooks,
   groups: groupHooks,
   education: educationHooks,
+  students: studentsHooks,
+  teachers: teachersHooks,
+  markStrategy: markStrategiesHooks,
+  studentRoles: studentRolesHooks,
+  criterias: criteriasHooks,
 };

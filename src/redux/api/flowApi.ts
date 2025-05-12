@@ -20,6 +20,7 @@ export const mapFlow = (unmappedFlow: any): IFlow => {
     stageEducation:
       unmappedFlow.stage_education &&
       mapStageEducation(unmappedFlow.stage_education),
+    graduationDate: unmappedFlow.graduation_date,
   };
 };
 
@@ -61,6 +62,7 @@ export const flowApi = createApi({
           name: data.name,
           university: data.university,
           stage_education: data.stageEducation,
+          graduation_date: data.graduationDate,
         },
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),

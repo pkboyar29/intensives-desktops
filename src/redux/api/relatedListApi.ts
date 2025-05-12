@@ -4,7 +4,6 @@ import { TableType } from '../../tableConfigs';
 import { IParent, IRelatedList } from '../../ts/interfaces/IRelatedList';
 
 export const mapRelatedList = (unmappedRelatedList: any): IRelatedList => {
-  console.log(unmappedRelatedList);
   return {
     id: unmappedRelatedList.id,
     name: unmappedRelatedList.name,
@@ -35,15 +34,19 @@ export const relatedListApi = createApi({
       },
       {
         entity: string;
-        entityId: string | number;
-        key: string; // parent or key?
+        entityId?: string | number;
+        key: string;
+        key_parent_id?: number | string;
         filter?: string;
         limit?: number;
         offset?: number;
       }
     >({
       query: ({ entity, entityId, ...args }) =>
-        buildUrl(`/${entity}/${entityId}/related_list`, args),
+        buildUrl(
+          `/${entity}${entityId ? `/${entityId}` : ''}/related_list`,
+          args
+        ),
       transformResponse: (response: any) => ({
         results: response.results.map(
           (unmappedRelatedList: any): IRelatedList =>

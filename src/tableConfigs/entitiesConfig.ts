@@ -74,6 +74,7 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   profiles: {
     type: 'profiles',
     title: 'Профили',
+    //queryParamsDependencies: [{ from: 'specializationId', as: 'specialization' }],
     defaultQueryParams: { type: 'profiles' },
     hooks: queryHooksMap['education'],
   },
@@ -82,6 +83,33 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
     title: 'Направления образования',
     defaultQueryParams: { type: 'specializations' },
     hooks: queryHooksMap['education'],
+  },
+  students: {
+    type: 'students',
+    title: 'Студенты',
+    queryParamsDependencies: [{ from: 'groupId', as: 'group' }],
+    hooks: queryHooksMap['students'],
+  },
+  teachers: {
+    type: 'teachers',
+    title: 'Преподаватели',
+    queryParamsDependencies: [{ from: 'universityId', as: 'university' }],
+    hooks: queryHooksMap['teachers'],
+  },
+  markStrategies: {
+    type: 'markStrategies',
+    title: 'Шкалы оценки',
+    hooks: queryHooksMap['markStrategy'],
+  },
+  studentRoles: {
+    type: 'studentRoles',
+    title: 'Роли студента',
+    hooks: queryHooksMap['studentRoles'],
+  },
+  criterias: {
+    type: 'criterias',
+    title: 'Критерии оценивания',
+    hooks: queryHooksMap['criterias'],
   },
 };
 

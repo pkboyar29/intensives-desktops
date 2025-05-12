@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 import {
   IMarkStrategy,
@@ -20,16 +20,32 @@ export const markStrategyApi = createApi({
   reducerPath: 'markStrategyApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getMarkStrategies: builder.query<IMarkStrategy[], void>({
-      query: () => `/mark_strategy/`,
-      transformResponse: (response: any): IMarkStrategy[] =>
-        response.results.map((unmappedMarkStrategies: any) =>
-          mapMarkStrategy(unmappedMarkStrategies)
+    getMarkStrategies: builder.query<
+      {
+        results: IMarkStrategy[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        search?: string;
+        limit?: number;
+        offset?: number;
+      }
+    >({
+      query: (args) => buildUrl('/mark_strategies', args),
+      transformResponse: (response: any) => ({
+        results: response.results.map((unmappedMarkStrategy: any) =>
+          mapMarkStrategy(unmappedMarkStrategy)
         ),
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }),
     }),
     createMarkStrategy: builder.mutation<IMarkStrategy, IMarkStrategyCreate>({
       query: (data) => ({
-        url: '/mark_strategy/',
+        url: '/mark_strategies/',
         method: 'POST',
         body: {
           name: data.name,
@@ -42,7 +58,7 @@ export const markStrategyApi = createApi({
     }),
     updateMarkStrategy: builder.mutation<IMarkStrategy, IMarkStrategyPatch>({
       query: (data) => ({
-        url: `/mark_strategy/${data.id}/`,
+        url: `/mark_strategies/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,
@@ -55,7 +71,7 @@ export const markStrategyApi = createApi({
     }),
     deleteMarkStrategy: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/mark_strategy/${id}/`,
+        url: `/mark_strategies/${id}/`,
         method: 'DELETE',
       }),
     }),

@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 import {
   ICriteria,
@@ -19,16 +19,32 @@ export const criteriaApi = createApi({
   reducerPath: 'criteriaApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getCriterias: builder.query<ICriteria[], void>({
-      query: () => `/criteria/`,
-      transformResponse: (response: any): ICriteria[] =>
-        response.results.map((unmappedCriteria: any) =>
+    getCriterias: builder.query<
+      {
+        results: ICriteria[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        search?: string;
+        limit?: number;
+        offset?: number;
+      }
+    >({
+      query: (args) => buildUrl('/criterias', args),
+      transformResponse: (response: any) => ({
+        results: response.results.map((unmappedCriteria: any) =>
           mapCriteria(unmappedCriteria)
         ),
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }),
     }),
     createCriteria: builder.mutation<ICriteria, ICriteriaCreate>({
       query: (data) => ({
-        url: '/criteria/',
+        url: '/criterias/',
         method: 'POST',
         body: data,
       }),
@@ -36,7 +52,7 @@ export const criteriaApi = createApi({
     }),
     updateCriteria: builder.mutation<ICriteria, ICriteriaPatch>({
       query: (data) => ({
-        url: `/criteria/${data.id}/`,
+        url: `/criterias/${data.id}/`,
         method: 'PATCH',
         body: {
           name: data?.name,
@@ -46,7 +62,7 @@ export const criteriaApi = createApi({
     }),
     deleteCriteria: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/criteria/${id}/`,
+        url: `/criterias/${id}/`,
         method: 'DELETE',
       }),
     }),

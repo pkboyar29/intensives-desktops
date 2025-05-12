@@ -6,6 +6,7 @@ export interface IStageEducation {
 export interface IProfile {
   id: number;
   name: string;
+  specialization: ISpecialization;
 }
 
 export interface ISpecialization {
@@ -20,6 +21,7 @@ export interface IStageEducationCreate {
 
 export interface IProfileCreate {
   name: string;
+  specialization: number | string;
 }
 
 export interface ISpecializationCreate {
@@ -35,6 +37,7 @@ export interface IStageEducationPatch {
 export interface IProfilePatch {
   id: number;
   name?: string;
+  specialization?: number | string;
 }
 
 export interface ISpecializationPatch {
