@@ -19,6 +19,7 @@ import AdminUploadXlsxModal from '../components/common/modals/AdminUploadXlsxMod
 import { IUploadXlsxError } from '../ts/interfaces/IUser';
 import SearchBar from '../components/common/SearchBar';
 import PagionationButtonPages from '../components/PaginationButtonPages';
+import { removeEqualFields } from '../helpers/tableHelpers';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -203,7 +204,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const updateEntity = async (entity: any) => {
     const prevItems = [...data]; // сохраняем стейт
     const prevItem = [data.find((item) => item.id === entity.id)];
-    console.log(prevItem);
+    //console.log(prevItem);
 
     // заменяем строку измененной
     setData((prevData) =>
@@ -211,17 +212,27 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         item.id === entity.id ? { ...item, ...entity } : item
       )
     );
-    // Если ничего не изменили запрос не отправлять
-    console.log(entity);
+
+    // Получаем объект только с измененными строками
+    var entityPatch = removeEqualFields(entity, prevItem[0]);
+
+    // Если ничего не изменили не отправляем
+    if (Object.keys(entityPatch).length === 0) {
+      return;
+    }
+
+    // Возвращаем id так как он обрубается
+    entityPatch = { ...entityPatch, ['id']: entity.id };
+
     try {
       //cringe
       if (paramsFromConfig.type) {
         await updateEntityAPI({
           type: paramsFromConfig.type,
-          object: { ...entity },
+          object: { ...entityPatch },
         } as any).unwrap();
       } else {
-        await updateEntityAPI({ ...entity }).unwrap();
+        await updateEntityAPI({ ...entityPatch }).unwrap();
       }
 
       toast(
@@ -359,6 +370,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     const countErrors = registeredStudentsData.errors.length;
     const countRows = countResults + countErrors;
 
+    console.log(registeredStudentsData.results);
     if (countErrors > 0 && countResults > 0) {
       toast(
         `${countResults} из ${countRows} записей успешно созданы, но в ${countErrors} есть ошибки`,
@@ -366,7 +378,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           type: 'warning',
         }
       );
+
       setUploadXlsxErrors(registeredStudentsData.errors);
+      setData((prevData) => [
+        ...prevData,
+        ...(registeredStudentsData.results as any),
+      ]);
     } else if (countErrors > 0 && countResults === 0) {
       toast(`Ошибка всех записей`, {
         type: 'error',
@@ -376,6 +393,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       toast(`Все записи успешно созданы!`, {
         type: 'success',
       });
+      setData((prevData) => [
+        ...prevData,
+        ...(registeredStudentsData.results as any),
+      ]);
     }
   };
 

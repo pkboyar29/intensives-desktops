@@ -18,3 +18,15 @@ export function validateTableFields<T>(
   if (i > 0) return false;
   else return true;
 }
+
+export function removeEqualFields<T>(obj1: T, obj2: T): T {
+  const result: T = { ...obj1 }; // создаем копию
+
+  for (const key in obj1) {
+    if (obj1[key] === obj2[key]) {
+      delete result[key];
+    }
+  }
+
+  return result;
+}

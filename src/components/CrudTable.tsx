@@ -25,7 +25,6 @@ interface CrudTableProps<T> {
   onDelete?: (item: T) => void;
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
   onChildNavigatePath?: (childNavigatePath: string) => void;
-  onNextPage?: () => void;
   isLoadingData?: boolean;
 }
 
@@ -39,7 +38,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onDelete,
     onChildNavigate,
     onChildNavigatePath,
-    onNextPage,
     isLoadingData,
   } = props;
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -301,6 +299,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     const editingId = editingRow.current && getId(editingRow.current);
     setEditingRowId(editingId === id ? null : id.toString());
     editingRow.current = editingId === id ? null : row;
+    //editingRow.current = { id: id } as any;
   };
 
   const handleDelete = (row: T) => {
@@ -321,9 +320,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
           data={data}
           columns={columnsTable}
           columnVisibility={columnVisibility}
-          pagination={
-            onNextPage ? { onNextPage: () => onNextPage() } : undefined
-          }
         />
         {data.length === 0 && (
           <p className="mt-3 text-2xl text-center">

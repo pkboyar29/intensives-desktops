@@ -11,6 +11,9 @@ import { IGroup } from '../ts/interfaces/IGroup';
 import { IStudentAdmin } from '../ts/interfaces/IStudent';
 import { IUniversity } from '../ts/interfaces/IUniversity';
 import { ITeacherAdmin } from '../ts/interfaces/ITeacher';
+import { IMarkStrategy } from '../ts/interfaces/IMarkStrategy';
+import { IStudentRole } from '../ts/interfaces/IStudentRole';
+import { ICriteria } from '../ts/interfaces/ICriteria';
 
 /*
 type DotNotationKeys<T, Prefix extends string = ''> = {
@@ -156,4 +159,21 @@ export const teachersColumns: ColumnConfig<ITeacherAdmin>[] = [
     renderKey: 'name',
   },
   { key: 'isManager', label: 'Организатор', type: 'boolean', isNull: true },
+];
+
+export const markStrategiesColumns: ColumnConfig<IMarkStrategy>[] = [
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
+  { key: 'name', label: 'Название', type: 'string' },
+  { key: 'lowBound', label: 'Нижняя граница', type: 'number' },
+  { key: 'highBound', label: 'Верхняя граница', type: 'number' },
+];
+
+export const studentRolesColumns: ColumnConfig<IStudentRole>[] = [
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
+  { key: 'name', label: 'Название', type: 'string' },
+];
+
+export const criteriasColumns: ColumnConfig<ICriteria>[] = [
+  { key: 'id', label: 'ID', type: 'number', readOnly: true },
+  { key: 'name', label: 'Название', type: 'string' },
 ];

@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 
 import {
   IStudentRole,
@@ -18,12 +18,28 @@ export const studentRoleApi = createApi({
   reducerPath: 'studentRolesApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getStudentRoles: builder.query<IStudentRole[], void>({
-      query: () => '/student_roles/',
-      transformResponse: (response: any): IStudentRole[] =>
-        response.results.map((unmappedStudentRole: any) =>
+    getStudentRoles: builder.query<
+      {
+        results: IStudentRole[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        search?: string;
+        limit?: number;
+        offset?: number;
+      }
+    >({
+      query: (args) => buildUrl('/student_roles', args),
+      transformResponse: (response: any) => ({
+        results: response.results.map((unmappedStudentRole: any) =>
           mapStudentRole(unmappedStudentRole)
         ),
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }),
     }),
     createStudentRole: builder.mutation<IStudentRole, IStudentRoleCreate>({
       query: (data) => ({

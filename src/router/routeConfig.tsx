@@ -81,7 +81,18 @@ const routeConfig: RouteType[] = [
         path: 'specializations',
         element: <AdminEntityPageWrapper entityType="specializations" />,
       },
-
+      {
+        path: 'markStrategies',
+        element: <AdminEntityPageWrapper entityType="markStrategies" />,
+      },
+      {
+        path: 'studentRoles',
+        element: <AdminEntityPageWrapper entityType="studentRoles" />,
+      },
+      {
+        path: 'criterias',
+        element: <AdminEntityPageWrapper entityType="criterias" />,
+      },
       {
         path: 'buildings',
         element: <AdminEntityPageWrapper key={'upd'} entityType="buildings" />,
