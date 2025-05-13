@@ -68,7 +68,7 @@ const ManageIntensiveForm: FC = () => {
   const { data: flows } = useGetFlowsQuery({});
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
-  const { data: studentRoles } = useGetStudentRolesQuery();
+  const { data: studentRoles } = useGetStudentRolesQuery({});
 
   const {
     attachedFilesList,
@@ -266,7 +266,7 @@ const ManageIntensiveForm: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -509,7 +509,7 @@ const ManageIntensiveForm: FC = () => {
                           ? errors.roles.message
                           : ''
                       }
-                      items={studentRoles}
+                      items={studentRoles.results}
                       selectedItems={field.value || []}
                       setSelectedItems={field.onChange}
                     />

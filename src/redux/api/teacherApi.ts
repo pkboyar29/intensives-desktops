@@ -47,7 +47,6 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    // TODO: when i can pass university to backend, then pass university here or get this university from token in backend?
     getTeachersInUniversity: builder.query<ITeacher[], void>({
       query: () => `teachers/`,
       transformResponse: (response: any): ITeacher[] =>
