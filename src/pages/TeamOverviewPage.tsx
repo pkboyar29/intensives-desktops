@@ -12,6 +12,7 @@ import { setTeam } from '../redux/slices/teamSlice';
 import { IStudentInTeam } from '../ts/interfaces/ITeam';
 import { IStudentRole } from '../ts/interfaces/IStudentRole';
 
+import { Helmet } from 'react-helmet-async';
 import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -62,7 +63,7 @@ const TeamOverviewPage: FC = () => {
         setIsAllowedToChangeStudentRoles(true);
         setIsAllowedToChangeTeamlead(true);
       } else if (isUserStudent(currentUser)) {
-        if (currentUser?.studentId === currentTeam.teamlead?.id) {
+        if (currentUser.id === currentTeam.teamlead?.id) {
           setIsAllowedToChangeStudentRoles(true);
         }
       }
@@ -190,6 +191,14 @@ const TeamOverviewPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            currentTeam &&
+            `${currentTeam.name} | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {!currentTeam ? (

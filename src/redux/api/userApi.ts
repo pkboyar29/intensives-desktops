@@ -26,8 +26,6 @@ export const mapRoleName = (roleName: string): UserRole => {
 const mapUser = (unmappedUser: any): IUser => {
   return {
     id: unmappedUser.id,
-    teacherId: unmappedUser.teacher_id,
-    studentId: unmappedUser.student_id,
     firstName: unmappedUser.first_name,
     lastName: unmappedUser.last_name,
     patronymic: unmappedUser.patronymic,

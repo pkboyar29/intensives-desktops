@@ -16,6 +16,8 @@ import routeConfig from '../router/routeConfig';
 const App: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
   const [getUser] = useLazyGetUserQuery();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const dispatch = useAppDispatch();
 
   const location = useLocation();
@@ -30,15 +32,22 @@ const App: FC = () => {
   useEffect(() => {
     if (requiredAuth) {
       fetchCurrentUserInfo();
-    } else {
-      if (Cookies.get('refresh')) {
-        fetchCurrentUserInfo();
-      }
+    }
+
+    // в SignInPage
+    if (!requiredAuth && Cookies.get('refresh')) {
+      fetchCurrentUserInfo();
     }
   }, []);
 
   const fetchCurrentUserInfo = async () => {
-    const { data: userData } = await getUser();
+    setIsLoading(true);
+    const { data: userData, error } = await getUser();
+
+    if (error) {
+      setIsLoading(false);
+      return;
+    }
 
     if (userData) {
       const userRoles: UserRole[] = userData.roles.some(
@@ -61,6 +70,7 @@ const App: FC = () => {
             currentRole,
           })
         );
+        setIsLoading(false);
       } else {
         setChooseRoleModal({
           status: true,
@@ -85,12 +95,18 @@ const App: FC = () => {
           currentRole: newRole,
         })
       );
+      setIsLoading(false);
       localStorage.setItem('currentRole', newRole.name);
       redirectByRole(newRole);
 
       disableChooseRoleModal();
     }
   };
+
+  // показываем пустоту, если еще идет загрузка текущего пользователя в SignInPage
+  if (isLoading && !requiredAuth) {
+    return <div></div>;
+  }
 
   return (
     <>

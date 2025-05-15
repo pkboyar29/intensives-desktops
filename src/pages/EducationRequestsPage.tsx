@@ -11,6 +11,7 @@ import {
   isUserTeamlead,
 } from '../helpers/userHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import SearchBar from '../components/common/SearchBar';
 import Filter from '../components/common/Filter';
 import Title from '../components/common/Title';
@@ -62,7 +63,7 @@ const EducationRequestsPage: FC = () => {
     request: IEducationRequest;
   }>({ status: false, request: defaultEducationRequest });
 
-  const [getEducationRequests, { isLoading }] =
+  const [getEducationRequests, { isLoading, isUninitialized }] =
     useLazyGetEducationRequestsQuery();
   const [deleteEducationRequest] = useDeleteEducationRequestMutation();
   const [changeStatus] = useChangeEducationRequestStatusMutation();
@@ -89,7 +90,7 @@ const EducationRequestsPage: FC = () => {
         }
         if (openness === 'closed') {
           filteredRequests = filteredRequests.filter(
-            (request) => request.status === 'Закрыт'
+            (request) => request.status === 'Решен'
           );
         }
       }
@@ -152,7 +153,7 @@ const EducationRequestsPage: FC = () => {
           if (request.id === educationRequest.id) {
             return {
               ...request,
-              status: request.status === 'Открыт' ? 'Закрыт' : 'Открыт',
+              status: request.status === 'Открыт' ? 'Решен' : 'Открыт',
             };
           } else {
             return request;
@@ -164,6 +165,13 @@ const EducationRequestsPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `Образовательные запросы | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {requestModal.status && (
@@ -335,7 +343,7 @@ const EducationRequestsPage: FC = () => {
             activeFilterOption={openness}
             filterList={[
               { label: 'Открытые', value: 'opened' },
-              { label: 'Закрытые', value: 'closed' },
+              { label: 'Решенные', value: 'closed' },
               { label: 'Все', value: 'all' },
             ]}
           />
@@ -343,7 +351,7 @@ const EducationRequestsPage: FC = () => {
       </div>
 
       <div className="mt-4 md:mt-6">
-        {isLoading ? (
+        {isLoading || isUninitialized ? (
           <Skeleton />
         ) : educationRequests.length === 0 ? (
           <div className="text-xl text-black">

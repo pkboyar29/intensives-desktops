@@ -2,9 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-
 import { useAppSelector } from '../../redux/store';
-
 import {
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
@@ -14,10 +12,10 @@ import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
 import { useFileHandler } from '../../helpers/useFileHandler';
-
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
 import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import Title from '../common/Title';
 import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
@@ -132,10 +130,13 @@ const ManageIntensiveForm: FC = () => {
   const handleResponseError = (error: FetchBaseQueryError) => {
     const errorData = (error as FetchBaseQueryError).data as {
       open_dt?: string[];
+      close_dt?: string[];
       specific_student_ids?: string[];
     };
     if (errorData && errorData.open_dt) {
       setError('openDate', { type: 'custom', message: errorData.open_dt[0] });
+    } else if (errorData && errorData.close_dt) {
+      setError('closeDate', { type: 'custom', message: errorData.close_dt[0] });
     } else if (errorData && errorData.specific_student_ids) {
       setError('specificStudents', {
         type: 'custom',
@@ -245,6 +246,15 @@ const ManageIntensiveForm: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {intensiveId
+            ? currentIntensive &&
+              `Редактирование интенсива | ${currentIntensive.name}`
+            : 'Создание интенсива'}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {cancelModal && (
@@ -256,7 +266,7 @@ const ManageIntensiveForm: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -376,7 +386,7 @@ const ManageIntensiveForm: FC = () => {
           <div className="flex flex-col gap-3 my-3">
             <div className="text-lg font-bold">Время проведения</div>
 
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:gap-6">
+            <div className="flex flex-col justify-between w-full gap-3 sm:flex-row sm:gap-6">
               <InputDescription
                 fieldName="openDate"
                 register={register}
@@ -521,7 +531,9 @@ const ManageIntensiveForm: FC = () => {
           </div>
 
           {!isValid && (
-            <div className="text-base text-red">Форма содержит ошибки</div>
+            <div className="text-base text-center text-red sm:text-left">
+              Форма содержит ошибки
+            </div>
           )}
 
           <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">

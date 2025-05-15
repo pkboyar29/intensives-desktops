@@ -16,13 +16,18 @@ import { mapCriteria } from './criteriaApi';
 import { mapFile } from './fileApi';
 
 export const mapEvent = (unmappedEvent: any): IEvent => {
+  unmappedEvent.teams.sort((a: any, b: any) => a.position - b.position);
+
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
     startDate: new Date(unmappedEvent.start_dt),
     finishDate: new Date(unmappedEvent.finish_dt),
-    audience: mapAudience(unmappedEvent.audience),
+    audience: unmappedEvent.audience
+      ? mapAudience(unmappedEvent.audience)
+      : null,
+    isOnline: unmappedEvent.is_online,
     visibility: unmappedEvent.visibility,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
@@ -75,6 +80,7 @@ export const eventApi = createApi({
           intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
+          is_online: data.isOnline,
           teams: data.teamIds,
           teachers: data.teacherIds,
           start_dt: data.startDate,
@@ -94,6 +100,7 @@ export const eventApi = createApi({
           intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
+          is_online: data.isOnline,
           teams: data.teamIds,
           teachers: data.teacherIds,
           start_dt: data.startDate,

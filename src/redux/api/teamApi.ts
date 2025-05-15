@@ -49,12 +49,11 @@ export const teamApi = createApi({
   endpoints: (builder) => ({
     getTeams: builder.query<
       ITeam[] | ITeamShort[],
-      { intensiveId: number; short: boolean }
+      { intensiveId: number; short: boolean; tutor?: boolean }
     >({
-      query: ({ intensiveId, short }) =>
-        `teams/?intensive_id=${intensiveId}&short=${short}`,
+      query: ({ intensiveId, short, tutor = false }) =>
+        `teams/?intensive_id=${intensiveId}&short=${short}&tutor=${tutor}`,
       transformResponse: (response: any): ITeam[] | ITeamShort[] => {
-        // TODO: уже тут надо делать сужение типов
         const teams = response.map((team: any) => {
           if ('students_in_team' in team) {
             return mapTeam(team);
@@ -63,7 +62,6 @@ export const teamApi = createApi({
           }
         });
 
-        // TODO: проверить чтобы сортировалось и для iteam и для iteamshort объектов
         teams.sort(
           (a: ITeam | ITeamShort, b: ITeam | ITeamShort) =>
             a.position - b.position

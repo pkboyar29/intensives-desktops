@@ -27,8 +27,8 @@ const Filter: FC<FilterProps> = ({
 
     if (activeIndex !== -1 && filterRefs.current[activeIndex]) {
       const activeRef = filterRefs.current[activeIndex];
-      setActiveOptionWidth(activeRef.offsetWidth);
-      setActiveOptionOffset(activeRef.offsetLeft);
+      setActiveOptionWidth(activeRef?.offsetWidth);
+      setActiveOptionOffset(activeRef?.offsetLeft);
     }
   }, [activeFilterOption]);
 

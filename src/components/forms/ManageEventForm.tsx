@@ -22,6 +22,7 @@ import {
 } from '../../redux/api/eventApi';
 import { useAppSelector } from '../../redux/store';
 
+import { Helmet } from 'react-helmet-async';
 import Select from '../common/inputs/Select';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
@@ -170,7 +171,7 @@ const ManageEventForm: FC = () => {
           finishDate: getISODateInUTC3(event.finishDate),
           startTime: getTimeFromDate(event.startDate),
           finishTime: getTimeFromDate(event.finishDate),
-          audience: event.audience.id,
+          audience: event.isOnline ? -1 : event.audience!.id,
           stage: event.stageId ? event.stageId : 0,
           scoreType: scoreType,
           markStrategy: event.markStrategy
@@ -196,6 +197,9 @@ const ManageEventForm: FC = () => {
         reset({
           scoreType: 'withoutMarkStrategy',
           markStrategy: markStrategies.results[0].id.toString(),
+          stage: searchParams.get('stageId')
+            ? Number(searchParams.get('stageId'))
+            : 0,
         });
       }
     }
@@ -400,7 +404,8 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: event.visibility,
           teacherIds: data.teachers
             ? data.teachers.map((teacher) => teacher.id)
@@ -433,7 +438,8 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: true,
           teacherIds: data.teachers
             ? data.teachers.map((teacher) => teacher.id)
@@ -476,6 +482,15 @@ const ManageEventForm: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            (event
+              ? `${event.name} | Редактирование мероприятия`
+              : `Создание мероприятия | ${currentIntensive.name}`)}
+        </title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
 
       {cancelModal && (
@@ -487,7 +502,7 @@ const ManageEventForm: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -625,7 +640,7 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startDate"
                 register={register}
@@ -658,7 +673,7 @@ const ManageEventForm: FC = () => {
               />
             </div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startTime"
                 register={register}
@@ -696,7 +711,10 @@ const ManageEventForm: FC = () => {
                 <div className="text-xl font-bold">Место проведения</div>
                 <Select
                   initialText="Выберите место проведения"
-                  options={audiencesToChoose.results}
+                  options={[
+                    { id: -1, name: 'Онлайн' },
+                    ...audiencesToChoose.results,
+                  ]}
                   register={register}
                   registerOptions={{
                     validate: {
@@ -826,14 +844,18 @@ const ManageEventForm: FC = () => {
           </div>
 
           {!isValid && (
-            <div className="text-base text-red">Форма содержит ошибки</div>
+            <div className="text-base text-center text-red sm:text-left">
+              Форма содержит ошибки
+            </div>
           )}
 
           {!isValid && errors.teams && teamsToChoose?.length === 0 && (
-            <div className="text-base text-red">В интенсиве нету команд</div>
+            <div className="text-base text-center text-red sm:text-left">
+              В интенсиве нету команд
+            </div>
           )}
 
-          <div className="flex my-5 gap-7">
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"

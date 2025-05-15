@@ -21,33 +21,29 @@ export const isUserTeamlead = (
   currentUser: IUser | null,
   team: ITeam | null
 ): boolean =>
-  isUserStudent(currentUser) && team?.teamlead?.id === currentUser?.studentId;
+  isUserStudent(currentUser) && team?.teamlead?.id === currentUser?.id;
 
 export const isUserTutor = (
   currentUser: IUser | null,
   team: ITeam | null
-): boolean =>
-  isUserTeacher(currentUser) && team?.tutor?.id === currentUser?.teacherId;
+): boolean => isUserTeacher(currentUser) && team?.tutor?.id === currentUser?.id;
 
 export const isUserMentorInCurrentTeam = (
   currentUser: IUser | null,
   team: ITeam | null
-): boolean =>
-  isUserMentor(currentUser) && team?.mentor?.id === currentUser?.studentId;
+): boolean => isUserMentor(currentUser) && team?.mentor?.id === currentUser?.id;
 
 export const isUserJury = (
   currentUser: IUser | null,
   event: IEvent | IEventShort
 ): boolean => {
-  if (!isUserTeacher(currentUser) || !currentUser?.teacherId) {
+  if (!isUserTeacher(currentUser) || !currentUser?.id) {
     return false;
   }
 
   if ('teachers' in event) {
-    return event.teachers.some(
-      (teacher) => teacher.id === currentUser.teacherId
-    );
+    return event.teachers.some((teacher) => teacher.id === currentUser.id);
   } else {
-    return event.teacherIds.includes(currentUser.teacherId);
+    return event.teacherIds.includes(currentUser.id);
   }
 };

@@ -5,7 +5,7 @@ export interface IEducationRequest {
   subject: string;
   description?: string;
   team: ITeamShort;
-  status: 'Открыт' | 'Закрыт';
+  status: 'Открыт' | 'Решен';
   createdDate: Date;
   updatedDate: Date;
   answer: IEducationRequestAnswer | null;

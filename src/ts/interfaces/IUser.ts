@@ -1,7 +1,5 @@
 export interface IUser {
   id: number;
-  teacherId: number | null;
-  studentId: number | null;
   firstName: string;
   lastName: string;
   patronymic: string;

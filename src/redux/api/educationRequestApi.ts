@@ -19,7 +19,7 @@ export const mapEducationRequest = (
     description: unmappedRequest.description,
     createdDate: new Date(unmappedRequest.created_at),
     updatedDate: new Date(unmappedRequest.updated_at),
-    status: unmappedRequest.status === 'OPENED' ? 'Открыт' : 'Закрыт',
+    status: unmappedRequest.status === 'OPENED' ? 'Открыт' : 'Решен',
     team: mapTeamShort(unmappedRequest.team),
     answer: unmappedRequest.answer
       ? mapEducationRequestAnswer(unmappedRequest.answer)

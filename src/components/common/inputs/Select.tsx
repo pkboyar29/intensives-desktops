@@ -30,6 +30,7 @@ const Select: FC<SelectProps> = ({
         <option key={0} value={0}>
           {initialText}
         </option>
+
         {options.map((option) => (
           <option key={option.id} value={option.id}>
             {option.name}
