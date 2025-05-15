@@ -3,6 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import PagionationButtonPages from '../PaginationButtonPages';
@@ -31,13 +32,14 @@ const Table: FC<TableProps> = ({
     debugTable: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       pagination,
       //columnVisibility, //с этим получается задержка
     },
     initialState: {
       columnVisibility: {
-        //id: false,
+        id: false,
       },
     },
   });
@@ -103,20 +105,6 @@ const Table: FC<TableProps> = ({
             </tbody>
           </table>
         </div>
-      </div>
-      <div className="flex">
-        <button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {table.getCanPreviousPage() ? '❮' : ''}
-        </button>
-        <button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {table.getCanNextPage() ? '❯' : ''}
-        </button>
       </div>
     </>
   );

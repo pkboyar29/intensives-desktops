@@ -20,6 +20,7 @@ import { IUploadXlsxError } from '../ts/interfaces/IUser';
 import SearchBar from '../components/common/SearchBar';
 import PagionationButtonPages from '../components/PaginationButtonPages';
 import { removeEqualFields } from '../helpers/tableHelpers';
+import AdminUploadXlsxHelpModal from '../components/common/modals/AdminUploadXlsxHelpModal';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -58,6 +59,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const [uploadXlsxErrors, setUploadXlsxErrors] = useState<IUploadXlsxError[]>(
     []
   );
+  const [uploadXlsxHelp, setUploadXlsxHelp] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -349,6 +351,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   };
 
   const uploadFileXlsx = async (file: File) => {
+    const toastId = toast.loading('Создание записей...');
     const { data: registeredStudentsData, error: registeredStudentError } =
       await registerStudentsXlsx({
         group:
@@ -357,6 +360,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             : undefined,
         file: file,
       });
+
+    toast.dismiss(toastId);
 
     if (registeredStudentError && !registeredStudentsData) {
       console.warn(registeredStudentError);
@@ -370,7 +375,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     const countErrors = registeredStudentsData.errors.length;
     const countRows = countResults + countErrors;
 
-    console.log(registeredStudentsData.results);
     if (countErrors > 0 && countResults > 0) {
       toast(
         `${countResults} из ${countRows} записей успешно созданы, но в ${countErrors} есть ошибки`,
@@ -380,10 +384,13 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       );
 
       setUploadXlsxErrors(registeredStudentsData.errors);
+      /*
       setData((prevData) => [
         ...prevData,
         ...(registeredStudentsData.results as any),
       ]);
+      */
+      loadData();
     } else if (countErrors > 0 && countResults === 0) {
       toast(`Ошибка всех записей`, {
         type: 'error',
@@ -393,10 +400,13 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       toast(`Все записи успешно созданы!`, {
         type: 'success',
       });
+      /*
       setData((prevData) => [
         ...prevData,
         ...(registeredStudentsData.results as any),
       ]);
+      */
+      loadData();
     }
   };
 
@@ -421,7 +431,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           onClose={() => setUploadXlsxErrors([])}
         />
       )}
-      <title>{config.title}</title>
+      {uploadXlsxHelp && (
+        <AdminUploadXlsxHelpModal onClose={() => setUploadXlsxHelp(false)} />
+      )}
+
       <div className="flex flex-col items-start">
         <p className="text-3xl font-medium">{config.title}</p>
 
@@ -456,7 +469,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           </button>
 
           {config.type === 'students' && (
-            <>
+            <div className="flex space-x-1">
               <button
                 onClick={() =>
                   fileInputRef.current && fileInputRef.current.click()
@@ -464,6 +477,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
                 className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400 whitespace-nowrap"
               >
                 📤 Загрузить .xlsx
+              </button>
+              <button
+                className='className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400 whitespace-nowrap'
+                onClick={() => setUploadXlsxHelp(true)}
+              >
+                ℹ️
               </button>
               <input
                 id="xslx-file"
@@ -473,7 +492,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
                 ref={fileInputRef}
                 onChange={handleFileXlsxChange}
               ></input>
-            </>
+            </div>
           )}
           <SearchBar
             searchText={searchText}

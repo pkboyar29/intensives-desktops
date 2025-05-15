@@ -125,12 +125,18 @@ const ManageEventForm: FC = () => {
   );
   // TODO: начать получать аудитории университета интенсива
   const { data: audiencesToChoose } = useGetAudiencesQuery({});
-  const { data: markStrategies } = useGetMarkStrategiesQuery(undefined, {
-    skip: !currentUser,
-  });
-  const { data: criterias } = useGetCriteriasQuery(undefined, {
-    skip: !currentUser,
-  });
+  const { data: markStrategies } = useGetMarkStrategiesQuery(
+    {},
+    {
+      skip: !currentUser,
+    }
+  );
+  const { data: criterias } = useGetCriteriasQuery(
+    {},
+    {
+      skip: !currentUser,
+    }
+  );
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [successfulSaveModal, setSuccessfulSaveModal] = useState<{
@@ -169,7 +175,7 @@ const ManageEventForm: FC = () => {
           scoreType: scoreType,
           markStrategy: event.markStrategy
             ? event.markStrategy.id.toString()
-            : markStrategies[0].id.toString(),
+            : markStrategies.results[0].id.toString(),
           deadlineDate: event.deadlineDate
             ? getISODateTimeInUTC3(event.deadlineDate)
             : undefined,
@@ -189,7 +195,7 @@ const ManageEventForm: FC = () => {
       } else {
         reset({
           scoreType: 'withoutMarkStrategy',
-          markStrategy: markStrategies[0].id.toString(),
+          markStrategy: markStrategies.results[0].id.toString(),
         });
       }
     }
@@ -770,7 +776,7 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале"
               >
-                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderMarkStrategies(markStrategies?.results, markStrategy)}
                 {renderDeadlineDateInput()}
               </InputRadio>
               <InputRadio
@@ -780,7 +786,7 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале с критериями"
               >
-                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderMarkStrategies(markStrategies?.results, markStrategy)}
                 {renderDeadlineDateInput()}
 
                 {criterias && (
@@ -791,7 +797,7 @@ const ManageEventForm: FC = () => {
                       render={({ field }) => (
                         <MultipleSelectInput
                           description="Список критериев"
-                          items={criterias}
+                          items={criterias.results}
                           selectedItems={field.value || []}
                           setSelectedItems={field.onChange}
                           errorMessage={

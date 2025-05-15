@@ -70,7 +70,7 @@ const ManageIntensiveForm: FC = () => {
   const { data: flows } = useGetFlowsQuery({});
   // TODO: получать от конкретного университета
   const { data: teachers } = useGetTeachersInUniversityQuery();
-  const { data: studentRoles } = useGetStudentRolesQuery();
+  const { data: studentRoles } = useGetStudentRolesQuery({});
 
   const {
     attachedFilesList,
@@ -499,7 +499,7 @@ const ManageIntensiveForm: FC = () => {
                           ? errors.roles.message
                           : ''
                       }
-                      items={studentRoles}
+                      items={studentRoles.results}
                       selectedItems={field.value || []}
                       setSelectedItems={field.onChange}
                     />
