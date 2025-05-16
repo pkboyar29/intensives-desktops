@@ -21,6 +21,7 @@ import SearchBar from '../components/common/SearchBar';
 import PagionationButtonPages from '../components/PaginationButtonPages';
 import { removeEqualFields } from '../helpers/tableHelpers';
 import AdminUploadXlsxHelpModal from '../components/common/modals/AdminUploadXlsxHelpModal';
+import { Helmet } from 'react-helmet-async';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -68,11 +69,11 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const offset = useRef<number>(0); // Текущее смещение
   const count = queryData?.count; // Общее количество записей
 
-  const paramsFromUrl: Record<string, string> = {};
+  const paramsDependencies: Record<string, string> = {};
   for (const dep of config.queryParamsDependencies ?? []) {
     const value = urlParams[dep.from];
     if (value) {
-      paramsFromUrl[dep.as] = value;
+      paramsDependencies[dep.as] = value;
     }
   }
 
@@ -106,7 +107,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (queryData) {
-      //console.log(queryData);
+      console.log(queryData);
       setData(queryData.results);
     }
   }, [queryData]);
@@ -142,7 +143,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const loadData = async () => {
     if (fetchData) {
       await fetchData({
-        ...paramsFromUrl,
+        ...paramsDependencies,
         ...paramsFromConfig,
         limit: limit,
         offset: offset.current,
@@ -298,6 +299,16 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     }
   };
 
+  const setFilters = (column: string, filter: string) => {
+    for (const dep of config.queryParamsDependencies ?? []) {
+      if (column === dep.from) {
+        paramsDependencies[dep.as] = filter;
+      }
+    }
+    console.log(paramsDependencies); // есть баг с этой галочкой
+    loadData();
+  };
+
   const createBreadcrumbs = () => {
     const pathParts = window.location.pathname.split('/');
     pathParts.forEach((pathPart, index) => {
@@ -412,6 +423,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   return (
     <>
+      <Helmet>
+        <title>Админ-панель | {config.title}</title>
+      </Helmet>
       <ToastContainer position="top-center" />
       {isEntryModal && (
         <AdminCreateEntityModal
@@ -516,6 +530,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         }}
         onUpdate={(entity) => updateEntity(entity)}
         onDelete={(entity) => deleteEntity(entity)}
+        onColumnFilter={(column, filter) => setFilters(column, filter)}
         isLoadingData={
           queryData
             ? data.length === 0 && queryData.results.length > 0

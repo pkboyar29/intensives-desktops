@@ -54,7 +54,10 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   flows: {
     type: 'flows',
     title: 'Потоки',
-    queryParamsDependencies: [{ from: 'universityId', as: 'university' }],
+    queryParamsDependencies: [
+      { from: 'universityId', as: 'university' },
+      { from: 'isArchived', as: 'archived' },
+    ],
     defaultQueryParams: { withChildrenMeta: true, ordering: 'name' },
     hooks: queryHooksMap['flows'],
   },

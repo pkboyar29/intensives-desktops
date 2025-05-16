@@ -27,12 +27,20 @@ type DotNotationKeys<T, Prefix extends string = ''> = {
 }[keyof T];
 */
 
+export type ColumnType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'relation'
+  | 'action';
+
 // Тип для метаданных интерфейсов для таблицы
 export type ColumnConfig<T> = {
   key: keyof T;
   adaptedKeyName?: string;
   label: string;
-  type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
+  type: ColumnType;
   renderKey?: string; // не string и не keyof T а keyof T и от типов поля с внешним ключом
   parentField?: keyof T;
   readOnly?: boolean;
@@ -142,7 +150,7 @@ export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
   { key: 'firstName', label: 'Имя', type: 'string' },
   { key: 'patronymic', label: 'Отчество', type: 'string', isNull: true },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
+  { key: 'resetPassword', label: 'Пароль', type: 'action', isNull: true },
   { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
 ];
 
@@ -152,7 +160,7 @@ export const teachersColumns: ColumnConfig<ITeacherAdmin>[] = [
   { key: 'firstName', label: 'Имя', type: 'string' },
   { key: 'patronymic', label: 'Отчество', type: 'string', isNull: true },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
+  { key: 'resetPassword', label: 'Пароль', type: 'action', isNull: true },
   {
     key: 'university',
     label: 'Университет',

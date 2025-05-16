@@ -15,16 +15,18 @@ import RelatedKeysList from './RelatedKeysList';
 import { IGroup } from '../ts/interfaces/IGroup';
 import { ISpecialization } from '../ts/interfaces/IEducation';
 import { validateTableFields } from '../helpers/tableHelpers';
+import TableColumnHeader from './common/TableColumnFilter';
 
 interface CrudTableProps<T> {
   data: T[];
   type: TableType;
   getId: (row: T) => string | number;
   childEntities?: childEntitiesMeta[];
-  onUpdate?: (item: T) => void;
-  onDelete?: (item: T) => void;
+  onUpdate: (item: T) => void;
+  onDelete: (item: T) => void;
   onChildNavigate?: (item: T, childEntities: childEntitiesMeta) => void;
   onChildNavigatePath?: (childNavigatePath: string) => void;
+  onColumnFilter: (column: string, valueFilter: string) => void;
   isLoadingData?: boolean;
 }
 
@@ -38,6 +40,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
     onDelete,
     onChildNavigate,
     onChildNavigatePath,
+    onColumnFilter,
     isLoadingData,
   } = props;
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -77,7 +80,19 @@ function CrudTable<T>(props: CrudTableProps<T>) {
         },
         {
           id: String(column.key),
-          header: column.label,
+          header: () => (
+            <TableColumnHeader
+              columnId={String(column.key)}
+              headerText={column.label}
+              type={column.type}
+              onChangeFilter={(newValueFilter: string) =>
+                onColumnFilter(String(column.key), newValueFilter)
+              }
+            />
+          ),
+          //meta: {
+          //  type: column.type,
+          //},
           cell: (info) => {
             // Кастомный рендер ячейки
             const value = info.getValue();
@@ -94,7 +109,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                 return (
                   <input
                     type="checkbox"
-                    defaultChecked={value ? value : false}
+                    checked={value ? value : false}
                     className="border border-black"
                     disabled
                   ></input>
@@ -113,9 +128,6 @@ function CrudTable<T>(props: CrudTableProps<T>) {
             // Иначе отображаем вместо значения редактируемое что-то
             switch (column.type) {
               case 'string':
-                //if(column.key === "password") {
-                //  return (<) //можно и как string а там при отправке запроса обработать как boolean или еще что то
-                //}
                 return (
                   <input
                     defaultValue={value}
@@ -142,6 +154,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                   ></input>
                 );
               case 'boolean':
+              case 'action':
                 return (
                   <div className="flex space-x-2">
                     {column.key === 'resetPassword' && (
@@ -288,7 +301,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
       editingRow.current &&
       validateTableFields<T>(columns, editingRow.current)
     ) {
-      onUpdate && onUpdate(editingRow.current);
+      onUpdate(editingRow.current);
       setEditingRowId(null);
       editingRow.current = null;
     }
@@ -303,7 +316,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   };
 
   const handleDelete = (row: T) => {
-    onDelete && onDelete(row);
+    onDelete(row);
   };
 
   const handleChildNavigate = (row: T, child: childEntitiesMeta) => {
