@@ -33,11 +33,11 @@ const Table: FC<TableProps> = ({
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       pagination,
-      //columnVisibility, //с этим получается задержка
+      // columnVisibility, //с этим получается задержка
     },
     initialState: {
       columnVisibility: {
-        //id: false,
+        id: false,
       },
     },
   });
