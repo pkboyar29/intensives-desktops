@@ -195,12 +195,13 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                         column.parentField &&
                         (editingRow.current[column.parentField] as any).id // any плохо но id есть у всех сущностей (надо это где то прописать ведь это всегда так)
                       }
-                      parent={
+                      parentKey={
                         column.adaptedKeyName
                           ? column.adaptedKeyName
                           : column.key.toString()
                       }
                       defaultValue={value}
+                      advanced={true}
                       onChange={(parentEntity) => {
                         console.log(parentEntity?.id, parentEntity?.name);
                         if (editingRow.current) {

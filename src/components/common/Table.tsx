@@ -40,7 +40,7 @@ const Table: FC<TableProps> = ({
     },
     initialState: {
       columnVisibility: {
-        id: false,
+        id: true,
       },
     },
   });

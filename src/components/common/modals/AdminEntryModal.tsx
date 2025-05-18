@@ -130,7 +130,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
                         defaultParentFields &&
                         defaultParentFields[column.key as string]?.grandparentId
                       }
-                      parent={
+                      parentKey={
                         column.adaptedKeyName
                           ? column.adaptedKeyName
                           : column.key.toString()
