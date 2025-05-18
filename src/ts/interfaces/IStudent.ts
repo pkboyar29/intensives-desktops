@@ -6,7 +6,13 @@ export interface IStudent {
   id: number;
   group: {
     id: number;
+    name: string;
     flowId: number;
+  };
+  user: {
+    firstName: string;
+    lastName: string;
+    patronymic: string;
   };
   nameWithGroup: string;
 }

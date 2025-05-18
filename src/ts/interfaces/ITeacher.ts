@@ -4,6 +4,11 @@ import { IUserAdmin, IUserPatch, IUserRegister } from './IUser';
 export interface ITeacher {
   id: number;
   name: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    patronymic: string;
+  };
 }
 
 export interface ITeacherAdmin extends IUserAdmin {

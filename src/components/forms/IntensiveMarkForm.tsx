@@ -134,7 +134,10 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
   return (
     <div className="flex flex-col gap-6 max-w-[600px] w-full">
       <div className="flex flex-col gap-3">
-        <div className="text-xl">{student.nameWithGroup}</div>
+        <div className="text-xl">
+          {student.group.name} {student.user.lastName} {student.user.firstName}{' '}
+          {student.user.patronymic}
+        </div>
         {studentRoles.length === 0 && !isStudentTeamlead && (
           <div className="ml-3 font-bold">Нет ролей</div>
         )}

@@ -17,6 +17,11 @@ export const mapTeacher = (teacher: any): ITeacher => {
       teacher.user.last_name,
       teacher.user.patronymic
     ),
+    user: {
+      firstName: teacher.user.first_name,
+      lastName: teacher.user.last_name,
+      patronymic: teacher.user.patronymic,
+    },
   };
 };
 
