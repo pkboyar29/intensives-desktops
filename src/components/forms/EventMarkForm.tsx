@@ -203,7 +203,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
           </div>
 
           <textarea
-            className="w-full p-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+            className="w-full p-3 text-base border-2 border-solid rounded-md shadow-md border-gray_3 focus:outline-none focus:border-blue"
             value={eventMarks[0]?.comment}
             onChange={(e) => updateComment(0, e.target.value)}
             rows={4}
@@ -246,7 +246,7 @@ const EventMarkForm: FC<EventMarkFormProps> = ({
               </div>
 
               <textarea
-                className="w-full p-3 mt-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+                className="w-full p-3 mt-3 text-base border-2 border-solid rounded-md shadow-md border-gray_3 focus:outline-none focus:border-blue"
                 value={
                   eventMarks.find((m) => m.criteriaId === criteria.id)?.comment
                 }

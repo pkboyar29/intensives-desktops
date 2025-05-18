@@ -31,6 +31,8 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
 }) => {
   const currentTeam = useAppSelector((state) => state.team.data);
 
+  const isStudentTeamlead = currentTeam?.teamlead?.id === student.id;
+
   const [submitMark] = useCreateIntensiveMarkMutation();
   const [updateMark] = useUpdateIntensiveMarkMutation();
   const [deleteMark] = useDeleteIntensiveMarkMutation();
@@ -130,12 +132,14 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-[500px] w-full">
+    <div className="flex flex-col gap-6 max-w-[600px] w-full">
       <div className="flex flex-col gap-3">
         <div className="text-xl">{student.nameWithGroup}</div>
-        {/* TODO: отображать надпись "Нет ролей", как-то проверять чтобы студент и не был тимлидом и у него не было ролей */}
-        <div className="flex gap-2 ml-3">
-          {currentTeam?.teamlead?.id === student.id && (
+        {studentRoles.length === 0 && !isStudentTeamlead && (
+          <div className="ml-3 font-bold">Нет ролей</div>
+        )}
+        <div className="flex flex-wrap gap-2 ml-3">
+          {isStudentTeamlead && (
             <div>
               <Tag
                 content={<div className="font-bold">Тимлид</div>}
@@ -144,6 +148,7 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
               />
             </div>
           )}
+
           {studentRoles.map((role) => (
             <div key={role.id}>
               <Tag
@@ -156,7 +161,7 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-20 mt-4">
+      <div className="flex items-center gap-4 mt-4 md:gap-8 xl:gap-20">
         <div className="w-32 text-base text-gray_3">Ответ</div>
 
         {intensiveAnswer ? (
@@ -166,7 +171,7 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
         )}
       </div>
 
-      <div className="flex items-center gap-20">
+      <div className="flex items-center gap-4 md:gap-8 xl:gap-20">
         <div className="w-32 text-base text-gray_3">Статус оценивания</div>
 
         {intensiveMark ? (
@@ -182,7 +187,7 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
         )}
       </div>
 
-      <div className="flex items-center gap-20">
+      <div className="flex items-center gap-4 md:gap-8 xl:gap-20">
         <div className="w-32 text-base text-gray_3">Оценка</div>
 
         <div className="flex items-center gap-4">
@@ -197,11 +202,11 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
         </div>
       </div>
 
-      <div className="flex gap-20">
+      <div className="flex gap-4 md:gap-8 xl:gap-20">
         <div className="w-32 text-base shrink-0 text-gray_3">Комментарий</div>
 
         <textarea
-          className="w-full p-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+          className="w-full p-3 text-base border-2 border-solid rounded-md shadow-md border-gray_3 focus:outline-none focus:border-blue"
           value={comment}
           onChange={(e) => {
             onChangeComment(e.target.value);
