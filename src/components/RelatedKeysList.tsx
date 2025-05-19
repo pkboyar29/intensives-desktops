@@ -6,6 +6,7 @@ import { IEventMark } from '../ts/interfaces/IEventMark';
 import { IMarkStrategy } from '../ts/interfaces/IMarkStrategy';
 import { TableType } from '../tableConfigs';
 import {
+  useGetRelatedListAdvancedQuery,
   useLazyGetRelatedListAdvancedQuery,
   useLazyGetRelatedListQuery,
 } from '../redux/api/relatedListApi';
@@ -59,11 +60,10 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
   const [relatedListAdvanced, setRelatedListAdvanced] =
     useState<IRelatedListAdvanced>();
   const [resultsList, setResultsList] = useState<IRelatedListResult[]>([]);
-  const [currentEntity, setCurrentEntity] = useState<TableType>(entity);
   const [currentLabel, setCurrentLabel] = useState<string>(defaultValue ?? '—');
-  const [currentParentKey, setCurrentParentKey] = useState<string>(parentKey);
-  const [parentInfo, setParentInfo] = useState<IParentInfo | null>();
-  const [childrenInfo, setChildrenInfo] = useState<String[] | null>();
+  const [currentParentKey, setCurrentParentKey] = useState<string | undefined>(
+    parentKey
+  );
 
   useEffect(() => {
     if (listData) {
@@ -73,13 +73,14 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
   }, [listData]);
 
   useEffect(() => {
-    if (listDataAdvanced) {
-      //setCurrentEntity(listDataAdvanced.keyInfo.urlPath as TableType);
+    if (
+      listDataAdvanced &&
+      listDataAdvanced.relatedListAdvanced.results.length > 0
+    ) {
+      setCurrentParentKey(listDataAdvanced.relatedListAdvanced.keyInfo.name);
+
       setResultsList(listDataAdvanced.relatedListAdvanced.results);
       setRelatedListAdvanced(listDataAdvanced.relatedListAdvanced);
-      //setKeyInfo(listDataAdvanced.keyInfo);
-      //setParentInfo(listDataAdvanced.parentInfo);
-      //setChildrenInfo(listDataAdvanced.childrenInfo);
     }
   }, [listDataAdvanced]);
 
@@ -134,14 +135,14 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
   const loadData = () => {
     if (entityId && entityParentId === undefined && advanced) {
       getListAdvanced({
-        entity: currentEntity,
+        entity: entity,
         entityId,
         key: parentKey,
         type: 'parent',
       });
     } else if (entityId === undefined || entityParentId) {
       getList({
-        entity: currentEntity,
+        entity: entity,
         key: parentKey,
         key_parent_id: entityParentId,
       });
@@ -150,7 +151,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
 
   const loadRelatedListAdvanced = async () => {
     if (relatedListAdvanced && relatedListAdvanced.parentInfo) {
-      setCurrentParentKey(relatedListAdvanced.parentInfo.key);
+      //setCurrentParentKey(relatedListAdvanced.parentInfo.key);
       getListAdvanced({
         entity: relatedListAdvanced?.keyInfo.urlPath,
         entityId: resultsList[0].id, // можно просто брать любой элемент
@@ -162,10 +163,10 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
 
   const loadRelatedListChildren = async (relatedId: number | string) => {
     if (relatedListAdvanced && relatedListAdvanced.childInfo) {
-      setCurrentParentKey(relatedListAdvanced.childInfo.key);
+      //setCurrentParentKey(relatedListAdvanced.childInfo.key);
       getListAdvanced({
         entity: relatedListAdvanced?.keyInfo.urlPath,
-        entityId: relatedId, // можно просто брать любой элемент
+        entityId: relatedId,
         key: relatedListAdvanced.childInfo.key,
         type: 'children',
       });

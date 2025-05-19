@@ -27,7 +27,9 @@ export const mapParentInfo = (unmappedParentInfo: any): IParentInfo => {
 };
 
 export const mapKeyInfo = (unmappedKeyInfo: any): IKeyInfo => {
+  console.log(unmappedKeyInfo);
   return {
+    name: unmappedKeyInfo.name,
     urlPath: unmappedKeyInfo.url_path,
   };
 };

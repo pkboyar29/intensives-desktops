@@ -188,6 +188,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         await createEntityAPI({ ...entity }).unwrap();
       }
 
+      setIsEntryModal(false);
       toast(`Объект ${entity.name ? `"${entity.name}"` : ''} успешно создан`, {
         type: 'success',
       });
@@ -206,18 +207,18 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const updateEntity = async (entity: any) => {
     const prevItems = [...data]; // сохраняем стейт
-    const prevItem = [data.find((item) => item.id === entity.id)];
+    const prevItem = [data.find((item) => item.id === entity.id)][0];
     //console.log(prevItem);
 
     // заменяем строку измененной
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === entity.id ? { ...item, ...entity } : item
-      )
-    );
+    //setData((prevData) =>
+    //  prevData.map((item) =>
+    //    item.id === entity.id ? { ...item, ...entity } : item
+    //  )
+    //);
 
     // Получаем объект только с измененными строками
-    var entityPatch = removeEqualFields(entity, prevItem[0]);
+    var entityPatch = removeEqualFields(entity, prevItem);
 
     // Если ничего не изменили не отправляем
     if (Object.keys(entityPatch).length === 0) {
@@ -249,10 +250,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         `Error on updating entity ${entityType} id=${entity.id}`,
         error
       );
-      setData(prevItems); // в случае ошибки откатываем состояние
+      //setData(prevItems); // в случае ошибки откатываем состояние
       toast(
         `Ошибка при обновлении объекта ${
-          entity.name ? `"${entity.name}"` : ''
+          prevItem?.name ? `"${prevItem.name}"` : ''
         } ${error?.data?.detail ? ` - ${error.data.detail}` : ''}`,
         {
           type: 'error',
@@ -305,7 +306,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         paramsDependencies[dep.as] = filter;
       }
     }
-    console.log(paramsDependencies); // есть баг с этой галочкой
+    console.log(paramsDependencies);
     loadData();
   };
 
@@ -434,7 +435,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           entityParentId={undefined}
           onCreate={(entity) => {
             createEntity(entity);
-            setIsEntryModal(false);
           }}
           onClose={() => setIsEntryModal(false)}
         />
@@ -539,7 +539,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             : true
         }
       />
-      {count && (
+      {count ? (
         <div className="mt-2 ml-1">
           <PagionationButtonPages
             countPages={Math.ceil(count / limit)}
@@ -548,6 +548,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             onClick={(newPage: number) => loadPage(newPage)}
           />
         </div>
+      ) : (
+        ''
       )}
     </>
   );

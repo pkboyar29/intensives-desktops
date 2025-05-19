@@ -151,6 +151,14 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     className="border border-black"
+                    onChange={(e) => {
+                      if (editingRow.current) {
+                        editingRow.current = {
+                          ...editingRow.current,
+                          [key as keyof T]: e.target.value,
+                        };
+                      }
+                    }}
                   ></input>
                 );
               case 'boolean':
@@ -175,12 +183,20 @@ function CrudTable<T>(props: CrudTableProps<T>) {
                     ></input>
                   </div>
                 );
-              case 'date': // тоже проверить (и доделать)
+              case 'date':
                 return (
                   <input
                     type="date"
                     defaultValue={value}
                     className="border border-black"
+                    onChange={(e) => {
+                      if (editingRow.current) {
+                        editingRow.current = {
+                          ...editingRow.current,
+                          [key as keyof T]: e.target.value,
+                        };
+                      }
+                    }}
                   ></input>
                 );
               case 'relation':

@@ -17,6 +17,7 @@ export interface IParentInfo {
 }
 
 export interface IKeyInfo {
+  name: string;
   urlPath: string;
 }
 
