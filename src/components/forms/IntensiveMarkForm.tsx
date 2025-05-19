@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import Tag from '../common/Tag';
 import RangeSlider from '../common/RangeSlider';
 import PrimaryButton from '../common/PrimaryButton';
+import AttachedFileList from '../AttachedFileList';
 
 import { IIntensiveMark } from '../../ts/interfaces/IIntensiveMark';
 import { IIntensiveAnswerMark } from '../../ts/interfaces/IIntensiveAnswer';
@@ -164,11 +165,30 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-4 mt-4 md:gap-8 xl:gap-20">
-        <div className="w-32 text-base text-gray_3">Ответ</div>
+      <div className="flex gap-4 mt-4 md:gap-8 xl:gap-20">
+        <div className="w-32 text-base shrink-0 text-gray_3">Ответ</div>
 
         {intensiveAnswer ? (
-          <div className="text-lg text-green-500">Ответ отправлен</div>
+          <div className="flex flex-col w-full gap-6">
+            <div>
+              <div className="text-lg text-green-500">Овет прикреплен</div>
+              <div className="text-gray_3">
+                {intensiveAnswer.updatedDate.toLocaleDateString()},{' '}
+                {getTimeFromDate(intensiveAnswer.updatedDate)}
+              </div>
+            </div>
+
+            <div className="text-base">{intensiveAnswer.text}</div>
+
+            <div className="w-full">
+              <AttachedFileList
+                context={'intensive_answers'}
+                contextId={intensiveAnswer.id}
+                nameFileList="ответа"
+                files={[]}
+              />
+            </div>
+          </div>
         ) : (
           <div className="text-lg text-red">Ответ не прикреплен</div>
         )}

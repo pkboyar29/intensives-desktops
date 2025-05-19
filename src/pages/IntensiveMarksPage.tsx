@@ -110,7 +110,7 @@ const IntensiveMarksPage: FC = () => {
                 <div className="hidden p-2 xl:block rounded-xl bg-another_white">
                   <div className="text-base text-gray_3">Участники команды</div>
 
-                  <div className="flex flex-col gap-4 mt-4">
+                  <div className="flex flex-col h-[600px] gap-4 mt-4">
                     {currentTeam?.studentsInTeam.map((studentInTeam) => (
                       <div
                         key={studentInTeam.student.id}
