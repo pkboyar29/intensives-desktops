@@ -73,11 +73,10 @@ export const eventApi = createApi({
     }),
     createEvent: builder.mutation<IEvent, IEventCreate>({
       query: (data) => ({
-        url: '/events/',
+        url: `/events/?intensive_id=${data.intensiveId}`,
         method: 'POST',
         body: {
           ...data,
-          intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
           is_online: data.isOnline,
@@ -97,7 +96,6 @@ export const eventApi = createApi({
         method: 'PUT',
         body: {
           ...data,
-          intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
           is_online: data.isOnline,

@@ -33,6 +33,8 @@ import { relatedListApi } from './api/relatedListApi';
 import { breadcrumbApi } from './api/breadcrumbApi';
 import { educationRequestApi } from './api/educationRequestApi';
 import { educationRequestAnswerApi } from './api/educationRequestAnswerApi';
+import { intensiveMarkApi } from './api/intensiveMarkApi';
+import { intensiveAnswerApi } from './api/intensiveAnswerApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -69,6 +71,8 @@ export const store = configureStore({
     [breadcrumbApi.reducerPath]: breadcrumbApi.reducer,
     [educationRequestApi.reducerPath]: educationRequestApi.reducer,
     [educationRequestAnswerApi.reducerPath]: educationRequestAnswerApi.reducer,
+    [intensiveMarkApi.reducerPath]: intensiveMarkApi.reducer,
+    [intensiveAnswerApi.reducerPath]: intensiveAnswerApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -99,7 +103,9 @@ export const store = configureStore({
       relatedListApi.middleware,
       breadcrumbApi.middleware,
       educationRequestApi.middleware,
-      educationRequestAnswerApi.middleware
+      educationRequestAnswerApi.middleware,
+      intensiveMarkApi.middleware,
+      intensiveAnswerApi.middleware
     ),
 });
 

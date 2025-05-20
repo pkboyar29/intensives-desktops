@@ -18,7 +18,13 @@ export const mapStudent = (unmappedStudent: any): IStudent => {
     id: unmappedStudent.id,
     group: {
       id: unmappedStudent.group.id,
+      name: unmappedStudent.group.name,
       flowId: unmappedStudent.group.flow.id,
+    },
+    user: {
+      firstName: unmappedStudent.user.first_name,
+      lastName: unmappedStudent.user.last_name,
+      patronymic: unmappedStudent.user.patronymic,
     },
     nameWithGroup: getNameWithGroup(
       unmappedStudent.group.name,

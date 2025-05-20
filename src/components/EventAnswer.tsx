@@ -256,7 +256,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
 
             <textarea
-              className="w-full p-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+              className="w-full p-3 text-base border-2 border-solid rounded-md shadow-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
               onChange={handleTextChange}
               rows={4}
@@ -358,7 +358,6 @@ const EventAnswer: FC<EventAnswerProps> = ({
                               </div>
                             );
                           }
-                          // TODO: что за return null?
                           return null;
                         })}{' '}
                       </>

@@ -8,15 +8,18 @@ import { setIsSidebarOpen } from '../redux/slices/windowSlice';
 
 import PrimaryButton from './common/PrimaryButton';
 import Modal from './common/modals/Modal';
+import ManagerHelpModal from './common/modals/ManagerHelpModal';
 import UserIcon from './icons/UserIcon';
 import SettingsIcon from './icons/SettingsIcon';
 import LogoutIcon from './icons/LogoutIcon';
 import ChevronRightIcon from './icons/ChevronRightIcon';
 import ChevronLeftIcon from './icons/ChevronLeftIcon';
+import HelpIcon from './icons/HelpIcon';
 
 import Cookies from 'js-cookie';
 import { UserRole } from '../ts/interfaces/IUser';
 import { redirectByRole } from '../helpers/urlHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 const Header: FC = () => {
   const navigate = useNavigate();
@@ -29,6 +32,8 @@ const Header: FC = () => {
     status: boolean;
     role: UserRole | null;
   }>({ status: false, role: null });
+
+  const [helpModal, setHelpModal] = useState<boolean>(false);
 
   const currentUser = useAppSelector((state) => state.user.data);
   const isSidebarOpen = useAppSelector((state) => state.window.isSidebarOpen);
@@ -141,6 +146,8 @@ const Header: FC = () => {
         </Modal>
       )}
 
+      {helpModal && <ManagerHelpModal onClose={() => setHelpModal(false)} />}
+
       <header
         className={`fixed w-full top-0 z-[100] px-5 py-4 border-b border-solid bg-white border-gray`}
       >
@@ -165,11 +172,12 @@ const Header: FC = () => {
                 </div>
               </div>
             </div>
+
             {currentUser && (
               <div>
                 <button
                   onClick={() => setIsOpen((isOpen) => !isOpen)}
-                  className="p-4 transition duration-300 ease-in-out rounded-xl bg-another_white hover:bg-black_gray"
+                  className="w-[45px] h-[45px] p-4 transition duration-300 ease-in-out rounded-xl bg-another_white hover:bg-black_gray"
                 >
                   <UserIcon />
                 </button>
@@ -222,6 +230,22 @@ const Header: FC = () => {
                         Настройки
                       </span>
                     </button>
+
+                    {isUserManager(currentUser) && (
+                      <button
+                        className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
+                        onClick={() => {
+                          setIsOpen(false);
+                          setHelpModal(true);
+                        }}
+                      >
+                        <HelpIcon className="w-5 h-5" />
+                        <span className="inline-flex items-center">
+                          Справка
+                        </span>
+                      </button>
+                    )}
+
                     <button
                       className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
                       onClick={() => {

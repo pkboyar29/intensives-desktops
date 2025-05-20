@@ -36,7 +36,7 @@ const Table: FC<TableProps> = ({
     getSortedRowModel: getSortedRowModel(),
     state: {
       pagination,
-      //columnVisibility, //с этим получается задержка
+      // columnVisibility, //с этим получается задержка
     },
     initialState: {
       columnVisibility: {

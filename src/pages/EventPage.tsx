@@ -361,7 +361,8 @@ const EventPage: FC = () => {
 
                     {/* отображение ответов текущей команды для студентов/наставника/тьютора команды */}
                     {(isUserStudent(currentUser) ||
-                      isUserTutor(currentUser, currentTeam) ||
+                      (isUserTutor(currentUser, currentTeam) &&
+                        !isUserJury(currentUser, event)) ||
                       isUserMentor(currentUser)) && (
                       <div className="flex flex-col gap-3 mt-5 md:mt-10">
                         <p className="text-lg font-bold md:text-xl text-black_2">

@@ -20,15 +20,14 @@ export const stageApi = createApi({
     getStagesForIntensive: builder.query<IStage[], number>({
       query: (intensiveId) => `/stages/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): IStage[] =>
-        response.results.map((unmappedStage: any) => mapStage(unmappedStage)),
+        response.map((unmappedStage: any) => mapStage(unmappedStage)),
     }),
     createStage: builder.mutation<IStage, IStageCreate>({
       query: (data) => ({
-        url: `/stages/`,
+        url: `/stages/?intensive_id=${data.intensiveId}`,
         method: 'POST',
         body: {
           ...data,
-          intensive: data.intensiveId,
           start_dt: data.startDate,
           finish_dt: data.finishDate,
         },
@@ -41,6 +40,7 @@ export const stageApi = createApi({
         method: 'PUT',
         body: {
           ...data,
+          // TODO: запретить передавать тут intensiveId?
           intensive: data.intensiveId,
           start_dt: data.startDate,
           finish_dt: data.finishDate,

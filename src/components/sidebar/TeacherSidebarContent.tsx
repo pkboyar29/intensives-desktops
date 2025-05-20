@@ -125,6 +125,7 @@ const TeacherSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
                         to="educationRequests"
                         text="Образовательные запросы"
                       />
+                      <SidebarLink to="marks" text="Оценки за интенсив" />
                     </div>
                   </>
                 )}
