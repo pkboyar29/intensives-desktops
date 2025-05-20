@@ -57,7 +57,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
       >
         <div className="px-2 py-2 space-y-4">
           {columns.map((column) => {
-            if (column.readOnly) return;
+            if (column.readOnly || column.type === 'action') return;
 
             let inputElement;
             switch (column.type) {
@@ -108,6 +108,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
                 inputElement = (
                   <input
                     type="date"
+                    className="border border-black"
                     onChange={(e) => {
                       setCreatingRow((prev) => ({
                         ...prev,
@@ -130,7 +131,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
                         defaultParentFields &&
                         defaultParentFields[column.key as string]?.grandparentId
                       }
-                      parent={
+                      parentKey={
                         column.adaptedKeyName
                           ? column.adaptedKeyName
                           : column.key.toString()

@@ -21,6 +21,7 @@ export const mapFlow = (unmappedFlow: any): IFlow => {
       unmappedFlow.stage_education &&
       mapStageEducation(unmappedFlow.stage_education),
     graduationDate: unmappedFlow.graduation_date,
+    isArchived: unmappedFlow.archived,
   };
 };
 
@@ -38,6 +39,7 @@ export const flowApi = createApi({
       },
       {
         university?: number | null;
+        archived?: boolean;
         withChildrenMeta?: boolean;
         limit?: number;
         offset?: number;
@@ -63,6 +65,7 @@ export const flowApi = createApi({
           university: data.university,
           stage_education: data.stageEducation,
           graduation_date: data.graduationDate,
+          archived: data.isArchived,
         },
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),
@@ -75,6 +78,7 @@ export const flowApi = createApi({
           name: data.name,
           university: data.university?.id,
           stage_education: data.stageEducation?.id,
+          archived: data.isArchived,
         },
       }),
       transformResponse: (response: any): IFlow => mapFlow(response),

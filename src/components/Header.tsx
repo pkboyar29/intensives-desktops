@@ -181,7 +181,11 @@ const Header: FC = () => {
                   }`}
                 >
                   <div className="flex flex-col items-start gap-2">
-                    <div className="text-base font-bold md:text-lg">{`${currentUser.firstName} ${currentUser.lastName} ${currentUser.patronymic}`}</div>
+                    <div className="text-base font-bold md:text-lg">{`${
+                      currentUser.firstName
+                    } ${currentUser.lastName} ${
+                      currentUser.patronymic || ''
+                    }`}</div>
 
                     <div className="w-full border-b border-solid border-black_gray"></div>
 

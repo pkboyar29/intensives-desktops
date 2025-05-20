@@ -27,12 +27,20 @@ type DotNotationKeys<T, Prefix extends string = ''> = {
 }[keyof T];
 */
 
+export type ColumnType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'relation'
+  | 'action';
+
 // Тип для метаданных интерфейсов для таблицы
 export type ColumnConfig<T> = {
   key: keyof T;
   adaptedKeyName?: string;
   label: string;
-  type: 'string' | 'number' | 'boolean' | 'date' | 'relation';
+  type: ColumnType;
   renderKey?: string; // не string и не keyof T а keyof T и от типов поля с внешним ключом
   parentField?: keyof T;
   readOnly?: boolean;
@@ -85,7 +93,8 @@ export const flowsColumns: ColumnConfig<IFlow>[] = [
     type: 'relation',
     renderKey: 'name',
   },
-  { key: 'graduationDate', label: 'Дата выпуска', type: 'date', isNull: true },
+  { key: 'graduationDate', label: 'Дата выпуска', type: 'date' },
+  { key: 'isArchived', label: 'Архивный', type: 'boolean', isNull: true },
 ];
 
 export const groupsColumns: ColumnConfig<IGroup>[] = [
@@ -137,21 +146,21 @@ export const specializationsColumns: ColumnConfig<ISpecialization>[] = [
 
 export const studentsColumns: ColumnConfig<IStudentAdmin>[] = [
   { key: 'id', label: 'ID', type: 'number', readOnly: true },
-  { key: 'firstName', label: 'Имя', type: 'string' },
   { key: 'lastName', label: 'Фамилия', type: 'string' },
-  { key: 'patronymic', label: 'Отчество', type: 'string' },
+  { key: 'firstName', label: 'Имя', type: 'string' },
+  { key: 'patronymic', label: 'Отчество', type: 'string', isNull: true },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
+  { key: 'resetPassword', label: 'Пароль', type: 'action', isNull: true },
   { key: 'group', label: 'Группа', type: 'relation', renderKey: 'name' },
 ];
 
 export const teachersColumns: ColumnConfig<ITeacherAdmin>[] = [
   { key: 'id', label: 'ID', type: 'number', readOnly: true },
-  { key: 'firstName', label: 'Имя', type: 'string' },
   { key: 'lastName', label: 'Фамилия', type: 'string' },
-  { key: 'patronymic', label: 'Отчество', type: 'string' },
+  { key: 'firstName', label: 'Имя', type: 'string' },
+  { key: 'patronymic', label: 'Отчество', type: 'string', isNull: true },
   { key: 'email', label: 'Почта', type: 'string' },
-  { key: 'resetPassword', label: 'Пароль', type: 'boolean', isNull: true },
+  { key: 'resetPassword', label: 'Пароль', type: 'action', isNull: true },
   {
     key: 'university',
     label: 'Университет',

@@ -20,6 +20,10 @@ import { IUploadXlsxError } from '../ts/interfaces/IUser';
 import SearchBar from '../components/common/SearchBar';
 import PagionationButtonPages from '../components/PaginationButtonPages';
 import { removeEqualFields } from '../helpers/tableHelpers';
+import AdminUploadXlsxHelpModal from '../components/common/modals/AdminUploadXlsxHelpModal';
+import { Helmet } from 'react-helmet-async';
+import PrimaryButton from '../components/common/PrimaryButton';
+import { ColumnConfig } from '../tableConfigs/nameConfig';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -58,6 +62,11 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const [uploadXlsxErrors, setUploadXlsxErrors] = useState<IUploadXlsxError[]>(
     []
   );
+  const [uploadXlsxHelp, setUploadXlsxHelp] = useState<boolean>(false);
+  const [deletingEntity, setDeletingEntity] = useState<any | undefined>(
+    undefined
+  );
+
   const [searchText, setSearchText] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,11 +75,11 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const offset = useRef<number>(0); // Текущее смещение
   const count = queryData?.count; // Общее количество записей
 
-  const paramsFromUrl: Record<string, string> = {};
+  const paramsDependencies: Record<string, string> = {};
   for (const dep of config.queryParamsDependencies ?? []) {
     const value = urlParams[dep.from];
     if (value) {
-      paramsFromUrl[dep.as] = value;
+      paramsDependencies[dep.as] = value;
     }
   }
 
@@ -104,16 +113,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (queryData) {
-      //console.log(queryData);
       setData(queryData.results);
     }
   }, [queryData]);
-
-  useEffect(() => {
-    //console.log(data);
-    //console.log(queryData?.results);
-    //console.log((queryData as any)?.childEntitiesMeta);
-  }, [data]);
 
   useEffect(() => {
     //const newEntity = createEntityData || updateEntityData;
@@ -140,7 +142,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   const loadData = async () => {
     if (fetchData) {
       await fetchData({
-        ...paramsFromUrl,
+        ...paramsDependencies,
         ...paramsFromConfig,
         limit: limit,
         offset: offset.current,
@@ -185,15 +187,16 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         await createEntityAPI({ ...entity }).unwrap();
       }
 
+      setIsEntryModal(false);
       toast(`Объект ${entity.name ? `"${entity.name}"` : ''} успешно создан`, {
         type: 'success',
       });
     } catch (error: any) {
       //setData(prevItems); // в случае ошибки откатываем состояние
       toast(
-        `Ошибка при создании объекта ${
-          entity.name ? `"${entity.name}"` : ''
-        } - ${error?.data?.detail}`,
+        `Ошибка при создании объекта ${entity.name ? `"${entity.name}"` : ''} ${
+          error?.data?.detail ? ` - ${error.data.detail}` : ''
+        }`,
         {
           type: 'error',
         }
@@ -203,18 +206,18 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   const updateEntity = async (entity: any) => {
     const prevItems = [...data]; // сохраняем стейт
-    const prevItem = [data.find((item) => item.id === entity.id)];
+    const prevItem = [data.find((item) => item.id === entity.id)][0];
     //console.log(prevItem);
 
     // заменяем строку измененной
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === entity.id ? { ...item, ...entity } : item
-      )
-    );
+    //setData((prevData) =>
+    //  prevData.map((item) =>
+    //    item.id === entity.id ? { ...item, ...entity } : item
+    //  )
+    //);
 
     // Получаем объект только с измененными строками
-    var entityPatch = removeEqualFields(entity, prevItem[0]);
+    var entityPatch = removeEqualFields(entity, prevItem);
 
     // Если ничего не изменили не отправляем
     if (Object.keys(entityPatch).length === 0) {
@@ -246,10 +249,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         `Error on updating entity ${entityType} id=${entity.id}`,
         error
       );
-      setData(prevItems); // в случае ошибки откатываем состояние
+      //setData(prevItems); // в случае ошибки откатываем состояние
       toast(
         `Ошибка при обновлении объекта ${
-          entity.name ? `"${entity.name}"` : ''
+          prevItem?.name ? `"${prevItem.name}"` : ''
         } ${error?.data?.detail ? ` - ${error.data.detail}` : ''}`,
         {
           type: 'error',
@@ -259,6 +262,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   };
 
   const deleteEntity = async (entity: any) => {
+    setDeletingEntity(undefined);
     try {
       //cringe
       if (paramsFromConfig.type) {
@@ -269,7 +273,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       } else {
         await deleteEntityAPI(entity.id).unwrap();
       }
-
       setData((prevData) =>
         prevData.filter((entities) => entities.id !== entity.id)
       );
@@ -294,6 +297,16 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
         );
       }
     }
+  };
+
+  const setFilters = (column: string, filter: string) => {
+    for (const dep of config.queryParamsDependencies ?? []) {
+      if (column === dep.from) {
+        paramsDependencies[dep.as] = filter;
+      }
+    }
+    console.log(paramsDependencies);
+    loadData();
   };
 
   const createBreadcrumbs = () => {
@@ -349,6 +362,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   };
 
   const uploadFileXlsx = async (file: File) => {
+    const toastId = toast.loading('Создание записей...');
     const { data: registeredStudentsData, error: registeredStudentError } =
       await registerStudentsXlsx({
         group:
@@ -357,6 +371,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             : undefined,
         file: file,
       });
+
+    toast.dismiss(toastId);
 
     if (registeredStudentError && !registeredStudentsData) {
       console.warn(registeredStudentError);
@@ -370,7 +386,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     const countErrors = registeredStudentsData.errors.length;
     const countRows = countResults + countErrors;
 
-    console.log(registeredStudentsData.results);
     if (countErrors > 0 && countResults > 0) {
       toast(
         `${countResults} из ${countRows} записей успешно созданы, но в ${countErrors} есть ошибки`,
@@ -380,10 +395,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       );
 
       setUploadXlsxErrors(registeredStudentsData.errors);
-      setData((prevData) => [
-        ...prevData,
-        ...(registeredStudentsData.results as any),
-      ]);
+      loadData();
     } else if (countErrors > 0 && countResults === 0) {
       toast(`Ошибка всех записей`, {
         type: 'error',
@@ -393,16 +405,52 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       toast(`Все записи успешно созданы!`, {
         type: 'success',
       });
+      /*
       setData((prevData) => [
         ...prevData,
         ...(registeredStudentsData.results as any),
       ]);
+      */
+      loadData();
     }
   };
 
   return (
     <>
+      <Helmet>
+        <title>Админ-панель | {config.title}</title>
+      </Helmet>
+
       <ToastContainer position="top-center" />
+
+      {deletingEntity && (
+        <Modal
+          title="Удаление записи"
+          onCloseModal={() => setDeletingEntity(undefined)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Вы уверены, что хотите удалить запись ${
+              deletingEntity.name ? `"${deletingEntity.name}"` : ''
+            }?`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setDeletingEntity(undefined)}
+                children="Отмена"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => deleteEntity(deletingEntity)}
+                children="Удалить"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {isEntryModal && (
         <AdminCreateEntityModal
           type={config.type}
@@ -410,7 +458,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           entityParentId={undefined}
           onCreate={(entity) => {
             createEntity(entity);
-            setIsEntryModal(false);
           }}
           onClose={() => setIsEntryModal(false)}
         />
@@ -421,7 +468,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           onClose={() => setUploadXlsxErrors([])}
         />
       )}
-      <title>{config.title}</title>
+      {uploadXlsxHelp && (
+        <AdminUploadXlsxHelpModal onClose={() => setUploadXlsxHelp(false)} />
+      )}
+
       <div className="flex flex-col items-start">
         <p className="text-3xl font-medium">{config.title}</p>
 
@@ -456,7 +506,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           </button>
 
           {config.type === 'students' && (
-            <>
+            <div className="flex space-x-1">
               <button
                 onClick={() =>
                   fileInputRef.current && fileInputRef.current.click()
@@ -464,6 +514,12 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
                 className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400 whitespace-nowrap"
               >
                 📤 Загрузить .xlsx
+              </button>
+              <button
+                className='className="px-2 py-2 mt-5 duration-100 bg-green-300 rounded-md hover:bg-green-400 whitespace-nowrap'
+                onClick={() => setUploadXlsxHelp(true)}
+              >
+                ℹ️
               </button>
               <input
                 id="xslx-file"
@@ -473,7 +529,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
                 ref={fileInputRef}
                 onChange={handleFileXlsxChange}
               ></input>
-            </>
+            </div>
           )}
           <SearchBar
             searchText={searchText}
@@ -496,7 +552,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           navigate(window.location.pathname + path);
         }}
         onUpdate={(entity) => updateEntity(entity)}
-        onDelete={(entity) => deleteEntity(entity)}
+        onDelete={(entity) => setDeletingEntity(entity)}
+        onColumnFilter={(column, filter) => setFilters(column, filter)}
         isLoadingData={
           queryData
             ? data.length === 0 && queryData.results.length > 0
@@ -505,7 +562,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             : true
         }
       />
-      {count && (
+      {count ? (
         <div className="mt-2 ml-1">
           <PagionationButtonPages
             countPages={Math.ceil(count / limit)}
@@ -514,6 +571,8 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
             onClick={(newPage: number) => loadPage(newPage)}
           />
         </div>
+      ) : (
+        ''
       )}
     </>
   );

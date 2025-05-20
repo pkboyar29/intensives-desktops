@@ -14,7 +14,6 @@ import { IUploadXlsxError } from '../../ts/interfaces/IUser';
 
 // TODO: учесть, что patronymic (отчество) может быть необязательным
 export const mapStudent = (unmappedStudent: any): IStudent => {
-  console.log(unmappedStudent);
   return {
     id: unmappedStudent.id,
     group: {

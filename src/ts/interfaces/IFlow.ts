@@ -7,6 +7,7 @@ export interface IFlow {
   university: IUniversity;
   stageEducation: IStageEducation;
   graduationDate: Date;
+  isArchived: boolean;
 }
 
 export interface IFlowCreate {
@@ -14,6 +15,7 @@ export interface IFlowCreate {
   university: number;
   stageEducation: number;
   graduationDate: Date;
+  isArchived: boolean;
 }
 
 export interface IFlowUpdate extends IFlowCreate {
@@ -25,4 +27,5 @@ export interface IFlowPatch {
   name?: string;
   university?: IUniversity;
   stageEducation?: IStageEducation;
+  isArchived?: boolean;
 }

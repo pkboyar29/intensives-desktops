@@ -62,7 +62,7 @@ const PagionationButtonPages: FC<PaginationButtonPagesProps> = ({
       <button
         key={page}
         className={`${buttonStyle} ${
-          page === currentPage ? `!bg-blue !hover:bg-dark_blue text-white` : ''
+          page === currentPage ? `!bg-blue hover:!bg-dark_blue text-white` : ''
         }`}
         onClick={() => onClick(page)}
       >
