@@ -22,6 +22,8 @@ import PagionationButtonPages from '../components/PaginationButtonPages';
 import { removeEqualFields } from '../helpers/tableHelpers';
 import AdminUploadXlsxHelpModal from '../components/common/modals/AdminUploadXlsxHelpModal';
 import { Helmet } from 'react-helmet-async';
+import PrimaryButton from '../components/common/PrimaryButton';
+import { ColumnConfig } from '../tableConfigs/nameConfig';
 
 interface AdminEntityPageProps {
   entityType: TableType;
@@ -61,6 +63,10 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     []
   );
   const [uploadXlsxHelp, setUploadXlsxHelp] = useState<boolean>(false);
+  const [deletingEntity, setDeletingEntity] = useState<any | undefined>(
+    undefined
+  );
+
   const [searchText, setSearchText] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,16 +113,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
 
   useEffect(() => {
     if (queryData) {
-      console.log(queryData);
       setData(queryData.results);
     }
   }, [queryData]);
-
-  useEffect(() => {
-    //console.log(data);
-    //console.log(queryData?.results);
-    //console.log((queryData as any)?.childEntitiesMeta);
-  }, [data]);
 
   useEffect(() => {
     //const newEntity = createEntityData || updateEntityData;
@@ -195,9 +194,9 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
     } catch (error: any) {
       //setData(prevItems); // в случае ошибки откатываем состояние
       toast(
-        `Ошибка при создании объекта ${
-          entity.name ? `"${entity.name}"` : ''
-        } - ${error?.data?.detail}`,
+        `Ошибка при создании объекта ${entity.name ? `"${entity.name}"` : ''} ${
+          error?.data?.detail ? ` - ${error.data.detail}` : ''
+        }`,
         {
           type: 'error',
         }
@@ -263,6 +262,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
   };
 
   const deleteEntity = async (entity: any) => {
+    setDeletingEntity(undefined);
     try {
       //cringe
       if (paramsFromConfig.type) {
@@ -273,7 +273,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       } else {
         await deleteEntityAPI(entity.id).unwrap();
       }
-
       setData((prevData) =>
         prevData.filter((entities) => entities.id !== entity.id)
       );
@@ -396,12 +395,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       );
 
       setUploadXlsxErrors(registeredStudentsData.errors);
-      /*
-      setData((prevData) => [
-        ...prevData,
-        ...(registeredStudentsData.results as any),
-      ]);
-      */
       loadData();
     } else if (countErrors > 0 && countResults === 0) {
       toast(`Ошибка всех записей`, {
@@ -427,7 +420,37 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       <Helmet>
         <title>Админ-панель | {config.title}</title>
       </Helmet>
+
       <ToastContainer position="top-center" />
+
+      {deletingEntity && (
+        <Modal
+          title="Удаление записи"
+          onCloseModal={() => setDeletingEntity(undefined)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Вы уверены, что хотите удалить запись ${
+              deletingEntity.name ? `"${deletingEntity.name}"` : ''
+            }?`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setDeletingEntity(undefined)}
+                children="Отмена"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => deleteEntity(deletingEntity)}
+                children="Удалить"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {isEntryModal && (
         <AdminCreateEntityModal
           type={config.type}
@@ -529,7 +552,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
           navigate(window.location.pathname + path);
         }}
         onUpdate={(entity) => updateEntity(entity)}
-        onDelete={(entity) => deleteEntity(entity)}
+        onDelete={(entity) => setDeletingEntity(entity)}
         onColumnFilter={(column, filter) => setFilters(column, filter)}
         isLoadingData={
           queryData

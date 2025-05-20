@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import SearchIcon from '../icons/SearchIcon';
 import CrossIcon from '../icons/CrossIcon';
 import { TableType } from '../../tableConfigs';
@@ -17,6 +17,8 @@ const TableColumnHeader: FC<TableColumnHeaderProps> = ({
   type,
   onChangeFilter,
 }) => {
+  const [currentValue, setCurrentValue] = useState<string | undefined>();
+
   return (
     <div className="flex items-center">
       <div>{headerText}</div>
@@ -24,9 +26,10 @@ const TableColumnHeader: FC<TableColumnHeaderProps> = ({
         <select
           defaultValue={''}
           onChange={(e) => {
+            setCurrentValue(e.target.value);
             onChangeFilter && onChangeFilter(e.target.value);
           }}
-          className="w-5 border"
+          className="w-6 border"
         >
           <option value=""></option>
           <option value="all">Все</option>
@@ -34,7 +37,8 @@ const TableColumnHeader: FC<TableColumnHeaderProps> = ({
           <option value="false">Нет</option>
         </select>
       )}
-      {/* Под другие типы — тоже можно рендерить разные фильтры */}
+
+      {/* Под другие типы тоже можно рендерить разные фильтры */}
     </div>
   );
 };
