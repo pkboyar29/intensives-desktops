@@ -61,6 +61,7 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
       <div className="flex flex-col gap-4 my-3">
         <SidebarLink to="overview" text="Просмотр интенсива" />
         <SidebarLink to="teams" text="Команды" />
+        <SidebarLink to="results" text="Результат интенсива" />
       </div>
       <div className="my-3">
         {isTeamLoading ? (
