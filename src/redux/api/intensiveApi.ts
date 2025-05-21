@@ -50,14 +50,50 @@ export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getIntensives: builder.query<IIntensiveShort[], boolean>({
-      query: (isMentor) => `/intensives/?is_mentor=${isMentor}`,
-      transformResponse: (response: any): IIntensiveShort[] => {
-        const mappedIntensives: IIntensiveShort[] = response.map(
+    getIntensives: builder.query<
+      {
+        results: IIntensiveShort[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        isMentor: boolean;
+        page: number;
+        search: string;
+        openness?: 'all' | 'opened' | 'closed';
+        relevance: 'all' | 'relevant' | 'past';
+        sortOption: 'fromOldToNew' | 'fromNewToOld';
+      }
+    >({
+      query: ({ isMentor, page, search, openness, relevance, sortOption }) => {
+        const params = new URLSearchParams();
+        params.append('is_mentor', isMentor.toString());
+        params.append('page', page.toString());
+        params.append('search', search);
+        params.append('relevance', relevance);
+        params.append(
+          'ordering',
+          sortOption === 'fromOldToNew' ? 'open_dt' : '-open_dt'
+        );
+
+        if (openness) {
+          params.append('openness', openness);
+        }
+
+        return `/intensives/?${params.toString()}`;
+      },
+      transformResponse: (response: any) => {
+        const mappedIntensives: IIntensiveShort[] = response.results.map(
           (unmappedIntensive: any) => mapIntensiveShort(unmappedIntensive)
         );
 
-        return mappedIntensives;
+        return {
+          results: mappedIntensives,
+          count: response.count,
+          next: response.next,
+          previous: response.previous,
+        };
       },
     }),
     getIntensive: builder.query<IIntensive, number>({
@@ -137,8 +173,7 @@ export const intensiveApi = createApi({
 });
 
 export const {
-  useGetIntensivesQuery,
-  useLazyGetIntensiveQuery,
+  useLazyGetIntensivesQuery,
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
