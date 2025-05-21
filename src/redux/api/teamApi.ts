@@ -70,7 +70,7 @@ export const teamApi = createApi({
         return teams;
       },
     }),
-    getTeam: builder.query<ITeam, number>({
+    getTeam: builder.query<ITeam | null, number>({
       query: (teamId) => `teams/${teamId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
     }),
@@ -118,9 +118,10 @@ export const teamApi = createApi({
         })),
       }),
     }),
-    getMyTeam: builder.query<ITeam, number>({
+    getMyTeam: builder.query<ITeam | null, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeam => mapTeam(response),
+      transformResponse: (response: any): ITeam | null =>
+        response ? mapTeam(response) : null,
     }),
   }),
 });

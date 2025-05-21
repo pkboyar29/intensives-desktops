@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useRef, useEffect, FC } from 'react';
 import { motion } from 'framer-motion';
 import { useLazyGetStudentsQuery } from '../../../redux/api/studentApi';
 
@@ -31,15 +31,15 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
-  const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const [startTyping, setStartTyping] = useState<boolean>(false);
 
   const [students, setStudents] = useState<Item[]>([]);
 
   useEffect(() => {
     if (startTyping) {
-      if (timer) {
-        clearTimeout(timer);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
       }
 
       const timeoutId = setTimeout(async () => {
@@ -58,7 +58,7 @@ const SpecificStudentsInput: FC<SpecificStudentsInputProps> = ({
         }
       }, 1000);
 
-      setTimer(timeoutId);
+      timerRef.current = timeoutId;
     }
   }, [searchText]);
 

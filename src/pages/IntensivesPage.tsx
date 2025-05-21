@@ -1,11 +1,11 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
-import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
+import { useLazyGetIntensivesQuery } from '../redux/api/intensiveApi';
 
-import { IIntensive, IIntensiveShort } from '../ts/interfaces/IIntensive';
+import { IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
 import { Helmet } from 'react-helmet-async';
@@ -16,107 +16,79 @@ import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Filter from '../components/common/Filter';
 import Skeleton from 'react-loading-skeleton';
+import PagionationButtonPages from '../components/PaginationButtonPages';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
 
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const {
-    data: intensives,
-    isLoading,
-    isUninitialized,
-  } = useGetIntensivesQuery(currentUser?.currentRole?.name === 'Mentor', {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser?.currentRole,
-  });
-  const [filteredIntensives, setFilteredIntensives] = useState<
-    IIntensiveShort[]
-  >([]);
-  const [sortedIntensives, setSortedIntensives] = useState<IIntensiveShort[]>(
-    []
-  );
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const [getIntensives, { data, isLoading, isUninitialized }] =
+    useLazyGetIntensivesQuery();
+  const intensives = data?.results ?? [];
+  const pagesCount = data ? Math.ceil(data.count / 10) : 0; // TODO: мы тут на 0 разделить можем?
+
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const [searchText, setSearchText] = useState<string>('');
+  const startTypingRef = useRef<boolean>(false);
+
   const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
     'fromOldToNew'
   );
-
   const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
   const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
     'relevant'
   );
 
   useEffect(() => {
-    updateFilteredIntensives();
-  }, [searchText, openness, relevance, intensives]);
+    if (currentUser?.currentRole) {
+      loadPage(currentPage);
+    }
+  }, [currentPage, currentUser?.currentRole]);
 
   useEffect(() => {
-    updateSortedIntensives();
-  }, [sortOption, filteredIntensives]);
+    if (startTypingRef.current) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
 
-  const updateFilteredIntensives = () => {
-    if (intensives) {
-      let filteredIntensives: IIntensiveShort[] = [];
-
-      filteredIntensives = intensives.filter(
-        (intensive) =>
-          intensive.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          intensive.description
-            ?.toLowerCase()
-            .includes(searchText.toLowerCase())
-      );
-
-      if (isUserManager(currentUser)) {
-        if (openness === 'opened') {
-          filteredIntensives = filteredIntensives.filter(
-            (intensive) => intensive.isOpen
-          );
+      const timeoutId = setTimeout(() => {
+        if (currentPage != 1) {
+          setCurrentPage(1);
+        } else {
+          loadPage(1);
         }
-        if (openness === 'closed') {
-          filteredIntensives = filteredIntensives.filter(
-            (intensive) => !intensive.isOpen
-          );
-        }
-      }
-
-      if (relevance === 'relevant') {
-        filteredIntensives = filteredIntensives.filter(
-          (intensive) => intensive.closeDate.getTime() > Date.now()
-        );
-      }
-
-      if (relevance === 'past') {
-        filteredIntensives = filteredIntensives.filter(
-          (intensive) => intensive.closeDate.getTime() < Date.now()
-        );
-      }
-
-      setFilteredIntensives(filteredIntensives);
+      }, 500);
+      timerRef.current = timeoutId;
     }
-  };
+  }, [searchText]);
 
-  const updateSortedIntensives = () => {
-    if (filteredIntensives) {
-      if (sortOption === 'fromOldToNew') {
-        // сортировка по возрастанию
-        setSortedIntensives(
-          [...filteredIntensives].sort(
-            (a, b) => a.openDate.getTime() - b.openDate.getTime()
-          )
-        );
-      } else if (sortOption === 'fromNewToOld') {
-        // сортировка по убыванию
-        setSortedIntensives(
-          [...filteredIntensives].sort(
-            (a, b) => b.openDate.getTime() - a.openDate.getTime()
-          )
-        );
+  useEffect(() => {
+    // TODO: убрать это условие или заменить его на что-то нормальное?
+    if (currentUser?.currentRole) {
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadPage(1);
       }
     }
+  }, [openness, relevance, sortOption]);
+
+  const loadPage = (page: number) => {
+    getIntensives({
+      isMentor: currentUser?.currentRole?.name === 'Mentor',
+      page,
+      search: searchText,
+      openness,
+      relevance,
+      sortOption,
+    });
   };
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    startTypingRef.current = true;
     setSearchText(e.target.value);
   };
 
@@ -124,7 +96,7 @@ const IntensivesPage: FC = () => {
     setSortOption(e.target.value as 'fromOldToNew' | 'fromNewToOld');
   };
 
-  const columnHelper = createColumnHelper<IIntensive>();
+  const columnHelper = createColumnHelper<IIntensiveShort>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',
@@ -235,32 +207,33 @@ const IntensivesPage: FC = () => {
             <Skeleton />
           ) : intensives.length > 0 ? (
             <>
-              {sortedIntensives.length !== 0 ? (
-                isUserManager(currentUser) ? (
-                  <Table
-                    onClick={intensiveClickHandler}
-                    columns={columns}
-                    data={sortedIntensives}
-                  />
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {sortedIntensives.map((intensive) => (
-                      <IntensiveCard
-                        key={intensive.id}
-                        intensive={intensive}
-                        onClick={intensiveClickHandler}
-                      />
-                    ))}
-                  </div>
-                )
+              <PagionationButtonPages
+                countPages={pagesCount}
+                countElements={data!.count}
+                currentPage={currentPage}
+                onClick={(newPage) => setCurrentPage(newPage)}
+              />
+
+              {isUserManager(currentUser) ? (
+                <Table
+                  onClick={intensiveClickHandler}
+                  columns={columns}
+                  data={intensives}
+                />
               ) : (
-                <div className="text-xl font-bold">Ничего не найдено</div>
+                <div className="flex flex-col gap-4 mt-6">
+                  {intensives.map((intensive) => (
+                    <IntensiveCard
+                      key={intensive.id}
+                      intensive={intensive}
+                      onClick={intensiveClickHandler}
+                    />
+                  ))}
+                </div>
               )}
             </>
           ) : (
-            <div className="text-xl font-bold">
-              Для вас нету открытых интенсивов
-            </div>
+            <div className="text-xl font-bold">Ничего не найдено</div>
           )}
         </div>
       </div>

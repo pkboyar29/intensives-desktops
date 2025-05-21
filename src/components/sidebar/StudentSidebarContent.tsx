@@ -22,7 +22,8 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const currentTeam = useAppSelector((state) => state.team.data);
 
-  const [getMyTeam, { isLoading: isTeamLoading }] = useLazyGetMyTeamQuery();
+  const [getMyTeam, { data, isLoading: isTeamLoading }] =
+    useLazyGetMyTeamQuery();
 
   useEffect(() => {
     if (currentIntensive) {
@@ -66,21 +67,23 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         {isTeamLoading ? (
           <Skeleton />
         ) : (
-          <>
-            <div className="text-xl font-bold text-black_2">
-              {currentTeam?.name}
-            </div>
+          currentTeam && (
+            <>
+              <div className="text-xl font-bold text-black_2">
+                {currentTeam.name}
+              </div>
 
-            <div className="flex flex-col gap-4 my-3">
-              <SidebarLink to="team-overview" text="Просмотр команды" />
-              <SidebarLink to="schedule" text="Мероприятия команды" />
-              <SidebarLink to="kanban" text="Ведение задач" />
-              <SidebarLink
-                to="educationRequests"
-                text="Образовательные запросы"
-              />
-            </div>
-          </>
+              <div className="flex flex-col gap-4 my-3">
+                <SidebarLink to="team-overview" text="Просмотр команды" />
+                <SidebarLink to="schedule" text="Мероприятия команды" />
+                <SidebarLink to="kanban" text="Ведение задач" />
+                <SidebarLink
+                  to="educationRequests"
+                  text="Образовательные запросы"
+                />
+              </div>
+            </>
+          )
         )}
       </div>
       <PrimaryButton
