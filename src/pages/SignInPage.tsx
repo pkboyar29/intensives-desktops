@@ -20,7 +20,7 @@ const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const [signIn] = useSignInMutation();
+  const [signIn, { isLoading }] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
 
   const [tempUser, setTempUser] = useState<IUser | null>(null);
@@ -183,7 +183,11 @@ const SignInPage: FC = () => {
                   }
                 />
 
-                <PrimaryButton children="Войти в систему" type="submit" />
+                <PrimaryButton
+                  disabled={isLoading}
+                  children="Войти в систему"
+                  type="submit"
+                />
               </form>
             </div>
           )}

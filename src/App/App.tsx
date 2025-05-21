@@ -40,6 +40,18 @@ const App: FC = () => {
     }
   }, []);
 
+  const setCurrentRoleAndRedirect = (user: IUser, role: UserRole) => {
+    dispatch(
+      setCurrentUser({
+        ...user,
+        currentRole: role,
+      })
+    );
+    setIsLoading(false);
+    localStorage.setItem('currentRole', role.name);
+    redirectByRole(role);
+  };
+
   const fetchCurrentUserInfo = async () => {
     setIsLoading(true);
     const { data: userData, error } = await getUser();
@@ -72,6 +84,11 @@ const App: FC = () => {
         );
         setIsLoading(false);
       } else {
+        if (userRoles.length == 1) {
+          setCurrentRoleAndRedirect(userData, userRoles[0]);
+          return;
+        }
+
         setChooseRoleModal({
           status: true,
           tempUser: {
@@ -89,39 +106,43 @@ const App: FC = () => {
 
   const onContinueButtonClick = (newRole: UserRole) => {
     if (chooseRoleModal.tempUser) {
-      dispatch(
-        setCurrentUser({
-          ...chooseRoleModal.tempUser,
-          currentRole: newRole,
-        })
-      );
-      setIsLoading(false);
-      localStorage.setItem('currentRole', newRole.name);
-      redirectByRole(newRole);
+      setCurrentRoleAndRedirect(chooseRoleModal.tempUser, newRole);
 
       disableChooseRoleModal();
     }
   };
 
+  const ChoosingRoleModal: FC = () => {
+    return (
+      <>
+        {chooseRoleModal.status && chooseRoleModal.tempUser && (
+          <Modal
+            title="Выбор роли пользователя"
+            onCloseModal={() => {}}
+            shouldHaveCrossIcon={false}
+          >
+            <ChoosingRoleComponent
+              rolesToChoose={chooseRoleModal.tempUser.roles}
+              onContinueButtonClick={onContinueButtonClick}
+            />
+          </Modal>
+        )}
+      </>
+    );
+  };
+
   // показываем пустоту, если еще идет загрузка текущего пользователя в SignInPage
   if (isLoading && !requiredAuth) {
-    return <div></div>;
+    return (
+      <>
+        <ChoosingRoleModal />
+      </>
+    );
   }
 
   return (
     <>
-      {chooseRoleModal.status && chooseRoleModal.tempUser && (
-        <Modal
-          title="Выбор роли пользователя"
-          onCloseModal={() => {}}
-          shouldHaveCrossIcon={false}
-        >
-          <ChoosingRoleComponent
-            rolesToChoose={chooseRoleModal.tempUser.roles}
-            onContinueButtonClick={onContinueButtonClick}
-          />
-        </Modal>
-      )}
+      <ChoosingRoleModal />
 
       <div className="App">
         {currentUser && currentUser.currentRole && <Header />}
