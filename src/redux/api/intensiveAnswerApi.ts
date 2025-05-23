@@ -1,12 +1,14 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth, buildUrl } from './baseQuery';
 import { mapIntensiveMark } from './intensiveMarkApi';
 import { mapStudent } from './studentApi';
 
 import {
   IIntensiveAnswer,
+  IIntensiveAnswerCreate,
   IIntensiveAnswerMark,
 } from '../../ts/interfaces/IIntensiveAnswer';
+import { mapFile } from './fileApi';
 
 const mapIntensiveAnswer = (unmappedAnswer: any): IIntensiveAnswer => {
   return {
@@ -15,6 +17,7 @@ const mapIntensiveAnswer = (unmappedAnswer: any): IIntensiveAnswer => {
     student: unmappedAnswer.student,
     createdDate: new Date(unmappedAnswer.created_at),
     updatedDate: new Date(unmappedAnswer.updated_at),
+    files: unmappedAnswer.files.map((file: any) => mapFile(file)),
   };
 };
 
@@ -38,21 +41,33 @@ export const intensiveAnswerApi = createApi({
   endpoints: (builder) => ({
     getIntensiveAnswers: builder.query<
       IIntensiveAnswerMark[],
-      { teamId?: number }
+      { team_id?: number; intensive_id?: number }
     >({
-      query: ({ teamId }) => {
-        const searchParams = new URLSearchParams();
-        if (teamId) {
-          searchParams.append('team_id', teamId.toString());
-        }
-        return `/intensive_answers/?${searchParams.toString()}`;
-      },
+      query: (args) => buildUrl('/intensive_answers', args),
       transformResponse: (response: any) =>
         response.map((unmappedAnswerMark: any) =>
           mapIntensiveAnswerMark(unmappedAnswerMark)
         ),
     }),
+    createIntensiveAnswer: builder.mutation<
+      IIntensiveAnswer,
+      IIntensiveAnswerCreate
+    >({
+      query: (data) => ({
+        url: `/intensive_answers/`,
+        method: 'POST',
+        body: {
+          text: data.text,
+          intensive: data.intensiveId,
+        },
+      }),
+      transformResponse: (response: any): IIntensiveAnswer =>
+        mapIntensiveAnswer(response),
+    }),
   }),
 });
 
-export const { useLazyGetIntensiveAnswersQuery } = intensiveAnswerApi;
+export const {
+  useLazyGetIntensiveAnswersQuery,
+  useCreateIntensiveAnswerMutation,
+} = intensiveAnswerApi;

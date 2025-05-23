@@ -46,9 +46,7 @@ const EditableFileList: FC<EditableFileListProps> = ({
             ))}
           </ul>
         ) : (
-          <p className="py-4 text-sm text-center text-gray-500">
-            Нет доступных файлов
-          </p>
+          <p className="py-4 text-sm text-center text-gray-500">Нет файлов</p>
         )}
       </div>
     </div>

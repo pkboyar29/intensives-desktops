@@ -55,9 +55,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
               </li>
             ))
           ) : (
-            <p className="py-4 text-sm text-center text-gray-500">
-              Нет доступных файлов
-            </p>
+            <p className="py-4 text-sm text-center text-gray-500">Нет файлов</p>
           )}
         </ul>
       </div>
