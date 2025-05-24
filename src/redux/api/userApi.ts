@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
 
 import {
+  IChangePassword,
   ISignIn,
   ISignInResponse,
   IUser,
@@ -57,6 +58,16 @@ export const userApi = createApi({
         body: credentials,
       }),
     }),
+    changePassword: builder.mutation<string, IChangePassword>({
+      query: (data) => ({
+        url: '/users/change_password/',
+        method: 'POST',
+        body: {
+          old_password: data.oldPassword,
+          password: data.password,
+        },
+      }),
+    }),
     getUser: builder.query<IUser, void>({
       query: () => '/users/me',
       transformResponse: (response: any): IUser => mapUser(response),
@@ -64,4 +75,8 @@ export const userApi = createApi({
   }),
 });
 
-export const { useLazyGetUserQuery, useSignInMutation } = userApi;
+export const {
+  useLazyGetUserQuery,
+  useSignInMutation,
+  useChangePasswordMutation,
+} = userApi;

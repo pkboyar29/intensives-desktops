@@ -298,7 +298,7 @@ const ManageEventForm: FC = () => {
   );
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       time?: string[];
       start_dt?: string[];
       finish_dt?: string[];
@@ -331,7 +331,6 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одну команду',
       });
-      console.log('trigger teams');
       return;
     }
 
@@ -340,7 +339,6 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одного преподавателя',
       });
-      console.log('trigger teachers');
       return;
     }
 

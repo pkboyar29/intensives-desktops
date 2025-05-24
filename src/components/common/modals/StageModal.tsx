@@ -91,7 +91,7 @@ const StageModal: FC<StageModalProps> = ({
   };
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       start_dt?: string[];
       finish_dt?: string[];
     };

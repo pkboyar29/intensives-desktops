@@ -31,6 +31,11 @@ export interface ISignInResponse {
   refresh: string;
 }
 
+export interface IChangePassword {
+  oldPassword: string;
+  password: string;
+}
+
 export interface IUserAdmin {
   id: number;
   firstName: string;

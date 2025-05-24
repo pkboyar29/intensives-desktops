@@ -128,7 +128,7 @@ const ManageIntensiveForm: FC = () => {
   }, [openDate, closeDate]);
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       open_dt?: string[];
       close_dt?: string[];
       specific_student_ids?: string[];
