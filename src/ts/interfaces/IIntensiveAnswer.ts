@@ -17,8 +17,9 @@ export interface IIntensiveAnswerCreate {
 }
 
 export interface IIntensiveAnswerUpdate {
+  id: number;
   text?: string;
-  intensiveIds?: number[];
+  fileIds?: number[];
 }
 
 export interface IIntensiveAnswerMark {

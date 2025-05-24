@@ -7,6 +7,7 @@ import {
   IIntensiveAnswer,
   IIntensiveAnswerCreate,
   IIntensiveAnswerMark,
+  IIntensiveAnswerUpdate,
 } from '../../ts/interfaces/IIntensiveAnswer';
 import { mapFile } from './fileApi';
 
@@ -64,10 +65,26 @@ export const intensiveAnswerApi = createApi({
       transformResponse: (response: any): IIntensiveAnswer =>
         mapIntensiveAnswer(response),
     }),
+    updateInstensiveAnswer: builder.mutation<
+      IIntensiveAnswer,
+      IIntensiveAnswerUpdate
+    >({
+      query: (data) => ({
+        url: `/intensive_answers/${data.id}/`,
+        method: 'PATCH',
+        body: {
+          text: data.text,
+          file_ids: data.fileIds,
+        },
+      }),
+      transformResponse: (response: any): IIntensiveAnswer =>
+        mapIntensiveAnswer(response),
+    }),
   }),
 });
 
 export const {
   useLazyGetIntensiveAnswersQuery,
   useCreateIntensiveAnswerMutation,
+  useUpdateInstensiveAnswerMutation,
 } = intensiveAnswerApi;

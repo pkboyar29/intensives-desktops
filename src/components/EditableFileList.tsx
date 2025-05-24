@@ -15,7 +15,7 @@ const EditableFileList: FC<EditableFileListProps> = ({
   onFileDelete,
 }) => {
   return (
-    <div className="py-2 pt-4 mx-auto bg-white rounded-lg max-w">
+    <div className="p-4 pt-2 mx-auto bg-white rounded-lg max-w">
       <h2 className="mb-3 text-lg font-semibold">{`📄 Список файлов ${
         nameFileList ? nameFileList : ''
       }`}</h2>
