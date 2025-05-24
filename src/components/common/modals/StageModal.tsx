@@ -120,7 +120,7 @@ const StageModal: FC<StageModalProps> = ({
         title={stage ? 'Редактирование этапа' : 'Создание этапа'}
         onCloseModal={onClose}
       >
-        <div>
+        <div className="w-full">
           <InputDescription
             register={register}
             fieldName="name"
@@ -163,7 +163,7 @@ const StageModal: FC<StageModalProps> = ({
             />
           </div>
 
-          <div className="flex gap-5 mt-7">
+          <div className="flex flex-col w-full gap-5 mt-3 md:flex-row md:mt-7">
             <InputDescription
               register={register}
               fieldName="startDate"
@@ -179,6 +179,7 @@ const StageModal: FC<StageModalProps> = ({
                   : ''
               }
             />
+
             <InputDescription
               register={register}
               fieldName="finishDate"

@@ -35,16 +35,23 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
 
   return (
     <section>
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between gap-3 overflow-hidden md:flex-row">
         <div className="flex flex-col gap-3">
-          <div className="text-2xl font-bold text-black_2">{stage.name}</div>
+          <div className="text-xl font-bold whitespace-break-spaces md:text-2xl text-black_2">
+            {stage.name}
+          </div>
+          {stage.description && stage.description.length > 0 && (
+            <div className="mt-1 text-lg max-w-[800px]">
+              {stage.description}
+            </div>
+          )}
           <div className="text-bright_gray">
             {stage.startDate.toLocaleDateString()} -{' '}
             {stage.finishDate.toLocaleDateString()}
           </div>
         </div>
         {isUserManager(currentUser) && (
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             <button
               className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
               onClick={() => {
