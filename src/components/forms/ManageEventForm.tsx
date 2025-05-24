@@ -87,7 +87,7 @@ const ManageEventForm: FC = () => {
     reset,
     watch,
     control,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
@@ -841,13 +841,13 @@ const ManageEventForm: FC = () => {
             </div>
           </div>
 
-          {!isValid && (
+          {Object.keys(errors).length > 0 && (
             <div className="text-base text-center text-red sm:text-left">
               Форма содержит ошибки
             </div>
           )}
 
-          {!isValid && errors.teams && teamsToChoose?.length === 0 && (
+          {errors.teams && teamsToChoose?.length === 0 && (
             <div className="text-base text-center text-red sm:text-left">
               В интенсиве нету команд
             </div>

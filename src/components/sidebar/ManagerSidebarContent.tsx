@@ -82,16 +82,18 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           </div>
         </>
       )}
-      <div className="mt-3">
-        <SwitchButton
-          leftSideText="Открыт"
-          rightSideText="Закрыт"
-          currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
-          onSideClick={(side) =>
-            updateIntensiveOpenness(side === 'left' ? true : false)
-          }
-        />
-      </div>
+      {!pathname.includes('editIntensive') && (
+        <div className="mt-3">
+          <SwitchButton
+            leftSideText="Видим"
+            rightSideText="Невидим"
+            currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
+            onSideClick={(side) =>
+              updateIntensiveOpenness(side === 'left' ? true : false)
+            }
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-4 mt-5 mb-3">
         <SidebarLink
           to="overview"

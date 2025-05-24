@@ -168,8 +168,8 @@ const IntensivesPage: FC = () => {
                 }
                 activeFilterOption={openness}
                 filterList={[
-                  { label: 'Открытые', value: 'opened' },
-                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Видимые', value: 'opened' },
+                  { label: 'Невидимые', value: 'closed' },
                   { label: 'Все', value: 'all' },
                 ]}
               />

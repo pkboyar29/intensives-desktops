@@ -43,6 +43,7 @@ interface ManageIntensiveFields {
   teachers: Item[];
   roles: Item[];
   files?: IFile[];
+  isOpen: boolean;
 }
 
 const ManageIntensiveForm: FC = () => {
@@ -87,7 +88,7 @@ const ManageIntensiveForm: FC = () => {
     setError,
     clearErrors,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
@@ -106,6 +107,7 @@ const ManageIntensiveForm: FC = () => {
         })),
         teachers: currentIntensive.teachers,
         roles: currentIntensive.roles,
+        isOpen: currentIntensive.isOpen,
       });
 
       // Записываем в отображаемый список файлов реальный текущий список
@@ -156,6 +158,8 @@ const ManageIntensiveForm: FC = () => {
   };
 
   const onSubmit = async (data: ManageIntensiveFields) => {
+    console.log(data);
+
     if (!data.flows || data.flows.length === 0) {
       setError('flows', {
         type: 'custom',
@@ -196,7 +200,6 @@ const ManageIntensiveForm: FC = () => {
         specificStudentsIds,
         teacherIds,
         roleIds,
-        isOpen: true,
         fileIds: fileIds,
       }));
 
@@ -530,7 +533,7 @@ const ManageIntensiveForm: FC = () => {
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
-          {!isValid && (
+          {Object.keys(errors).length > 0 && (
             <div className="text-base text-center text-red sm:text-left">
               Форма содержит ошибки
             </div>
