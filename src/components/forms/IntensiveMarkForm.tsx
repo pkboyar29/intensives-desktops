@@ -185,7 +185,7 @@ const IntensiveMarkForm: FC<IntensiveMarkFormProps> = ({
                 context={'intensive_answers'}
                 contextId={intensiveAnswer.id}
                 nameFileList="ответа"
-                files={[]}
+                files={intensiveAnswer.files}
               />
             </div>
           </div>

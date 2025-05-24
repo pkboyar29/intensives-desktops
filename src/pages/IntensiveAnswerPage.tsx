@@ -57,6 +57,7 @@ const IntensiveAnswerPage: FC = () => {
 
     if (data) {
       setIntensiveAnswerMark(data[0]);
+      console.log(data[0].intensiveMark);
       if (data[0].intensiveAnswer) {
         setEditedTextAnswer(data[0].intensiveAnswer.text);
         setAttachedFilesList(data[0].intensiveAnswer.files);
@@ -207,10 +208,10 @@ const IntensiveAnswerPage: FC = () => {
                     </div>
                   )}
                   {intensiveAnswerMark?.intensiveAnswer?.updatedDate && (
-                    <div className="mt-2">
-                      <p className="py-2">
+                    <div className="mt-1">
+                      <p className="py-2 text-lg">
                         {' '}
-                        Ответ отправлен/обновлен{' - '}
+                        Ответ отправлен(обновлен){' - '}
                         {getDateTimeDisplay(
                           intensiveAnswerMark?.intensiveAnswer.updatedDate
                         )}
@@ -253,10 +254,29 @@ const IntensiveAnswerPage: FC = () => {
         </div>
         <div className="w-1/2 mt-8">
           <h1 className="mb-3 text-2xl font-semibold">Оценка за интенсив</h1>
-          {intensiveAnswerMark?.intensiveMark ? (
-            <></>
-          ) : (
+          {!intensiveAnswerMark?.intensiveMark && (
             <p className="text-xl">Оценки пока нет</p>
+          )}
+
+          {intensiveAnswerMark?.intensiveMark && (
+            <div className="p-1 space-y-1 text-lg">
+              <p className="">
+                Преподаватель — {intensiveAnswerMark.intensiveMark.teacher.name}
+              </p>
+              <p className="font-medium">
+                Оценка —{' '}
+                <span className="text-green-600">
+                  {intensiveAnswerMark.intensiveMark.mark}
+                </span>
+              </p>
+              <p>
+                Выставлена(обновлена){' — '}
+                {getDateTimeDisplay(
+                  intensiveAnswerMark.intensiveMark.updatedDate
+                )}
+              </p>
+              <p>Комментарий — "{intensiveAnswerMark.intensiveMark.comment}"</p>
+            </div>
           )}
         </div>
       </div>
