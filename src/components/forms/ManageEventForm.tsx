@@ -51,14 +51,9 @@ interface ManageEventFormFields {
   scoreType: 'withoutMarkStrategy' | 'withMarkStrategy' | 'withCriterias';
   markStrategy: string;
   deadlineDate: string;
-  criterias: Item[];
-  teams: Item[];
-  teachers: Item[];
-}
-
-interface Item {
-  id: number;
-  name: string;
+  criterias: number[];
+  teams: number[];
+  teachers: number[];
 }
 
 const ManageEventForm: FC = () => {
@@ -180,18 +175,9 @@ const ManageEventForm: FC = () => {
           deadlineDate: event.deadlineDate
             ? getISODateTimeInUTC3(event.deadlineDate)
             : undefined,
-          criterias: event.criterias.map((criteria) => ({
-            id: criteria.id,
-            name: criteria.name,
-          })),
-          teams: event.teams.map((team) => ({
-            id: team.id,
-            name: team.name,
-          })),
-          teachers: event.teachers.map((teacher) => ({
-            id: teacher.id,
-            name: teacher.name,
-          })),
+          criterias: event.criterias.map((criteria) => criteria.id),
+          teams: event.teams.map((team) => team.id),
+          teachers: event.teachers.map((teacher) => teacher.id),
         });
       } else {
         reset({
@@ -378,7 +364,7 @@ const ManageEventForm: FC = () => {
         scoreRequestBody = {
           markStrategyId: Number(data.markStrategy),
           deadlineDate: data.deadlineDate,
-          criteriaIds: data.criterias.map((criteria) => criteria.id),
+          criteriaIds: data.criterias,
         };
         break;
     }
@@ -405,10 +391,8 @@ const ManageEventForm: FC = () => {
           audienceId: data.audience != -1 ? data.audience : null,
           isOnline: data.audience == -1,
           visibility: event.visibility,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -439,10 +423,8 @@ const ManageEventForm: FC = () => {
           audienceId: data.audience != -1 ? data.audience : null,
           isOnline: data.audience == -1,
           visibility: true,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -748,8 +730,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teams.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -768,8 +750,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teachers.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -814,8 +796,8 @@ const ManageEventForm: FC = () => {
                         <MultipleSelectInput
                           description="Список критериев"
                           items={criterias.results}
-                          selectedItems={field.value || []}
-                          setSelectedItems={field.onChange}
+                          selectedItemIds={field.value || []}
+                          setSelectedItemIds={field.onChange}
                           errorMessage={
                             typeof errors.criterias?.message === 'string'
                               ? errors.criterias.message

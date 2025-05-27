@@ -5,15 +5,14 @@ import Checkbox from './Checkbox';
 import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
-// TODO: selectedItems тоже по-хорошему должен быть массивом чисел, чтобы не было конфликтов с именами
 interface MultipleSelectInputProps<T> {
   description: string;
   errorMessage?: string;
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
-  selectedItems: T[];
+  selectedItemIds: number[];
   disabledItemIds?: number[];
-  setSelectedItems: (items: T[]) => void;
+  setSelectedItemIds: (itemIds: number[]) => void;
   chipSize?: 'small' | 'big';
 }
 
@@ -22,8 +21,8 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   errorMessage,
   setErrorMessage,
   items,
-  selectedItems,
-  setSelectedItems,
+  selectedItemIds,
+  setSelectedItemIds,
   disabledItemIds = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
@@ -39,11 +38,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const addSelectedItem = (id: number) => {
-    const selectedItem = items.find((item) => item.id === id);
-
-    if (selectedItem) {
-      setSelectedItems([...selectedItems, selectedItem]);
-    }
+    setSelectedItemIds([...selectedItemIds, id]);
 
     if (setErrorMessage) {
       setErrorMessage('');
@@ -51,8 +46,11 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const deleteSelectedItem = (id: number) => {
-    const newSelectedItems = selectedItems.filter((item) => item.id !== id);
-    setSelectedItems(newSelectedItems);
+    const newSelectedItemIds = selectedItemIds.filter(
+      (selectedId) => selectedId != id
+    );
+
+    setSelectedItemIds(newSelectedItemIds);
   };
 
   return (
@@ -84,14 +82,16 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
           <Checkbox
             item={{ id: 0, name: 'Выбрать все' }}
             addSelectedItem={() => {
-              setSelectedItems(items);
+              setSelectedItemIds(items.map((item) => item.id));
             }}
             deleteSelectedItem={() => {
-              setSelectedItems(
-                items.filter((item) => disabledItemIds.includes(item.id))
+              setSelectedItemIds(
+                items
+                  .filter((item) => disabledItemIds.includes(item.id))
+                  .map((item) => item.id)
               );
             }}
-            isChecked={selectedItems.length === items.length}
+            isChecked={selectedItemIds.length === items.length}
           />
         </div>
 
@@ -110,16 +110,17 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
 
                 deleteSelectedItem(item.id);
               }}
-              isChecked={selectedItems.some(
-                (selectedItem) => selectedItem.id === item.id
-              )}
+              isChecked={selectedItemIds.some((id) => id == item.id)}
             />
           ))}
         </ul>
       </motion.div>
 
       <div className="mt-2.5">
-        <ChipList items={selectedItems} chipSize={chipSize} />
+        <ChipList
+          items={items.filter((item) => selectedItemIds.includes(item.id))}
+          chipSize={chipSize}
+        />
       </div>
 
       <div className="text-base text-red">{errorMessage}</div>
