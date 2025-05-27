@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef, useMemo } from 'react';
 import KanbanTaskMenu from './KanbanTaskMenu';
 import {
   useLazyGetSubtasksQuery,
@@ -9,11 +9,12 @@ import {
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import {
-  selectSubtaskData,
   moveTaskTemporary,
   savePreviousState,
+  makeSelectSubtaskData,
 } from '../redux/slices/kanbanSlice';
 import { useDrag, useDrop } from 'react-dnd';
+import React from 'react';
 
 interface KanbanTaskProps {
   id: number;
@@ -62,7 +63,8 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   }, [creatingSubtask]);
 
   // Получаем данные подзадач
-  const subtasksData = useAppSelector((state) => selectSubtaskData(state, id));
+  const selectSubtasksData = useMemo(() => makeSelectSubtaskData(id), [id]);
+  const subtasksData = useAppSelector(selectSubtasksData);
 
   // Получаем количество подзадач
   const subtaskCount = useAppSelector(
@@ -156,13 +158,15 @@ const KanbanTask: FC<KanbanTaskProps> = ({
       columnId: number | null;
       parentTaskId: number | null;
     }) => {
-      dispatch(savePreviousState());
+      //console.log('dg');
+      //dispatch(savePreviousState());
 
       if (
         item.index !== index ||
         item.columnId !== columnId ||
         item.parentTaskId !== parentTaskId
       ) {
+        dispatch(savePreviousState());
         dispatch(
           moveTaskTemporary({
             taskId: item.id,

@@ -220,7 +220,7 @@ const IntensiveAnswerPage: FC = () => {
                   )}
                 </>
               )}
-              <div className="flex mt-3 space-x-5">
+              <div className="flex mt-2 space-x-5">
                 {isEditing && (
                   <PrimaryButton
                     type="button"
@@ -254,29 +254,38 @@ const IntensiveAnswerPage: FC = () => {
         </div>
         <div className="w-1/2 mt-8">
           <h1 className="mb-3 text-2xl font-semibold">Оценка за интенсив</h1>
-          {!intensiveAnswerMark?.intensiveMark && (
-            <p className="text-xl">Оценки пока нет</p>
-          )}
+          {!intensiveAnswerMark ? (
+            <Skeleton />
+          ) : (
+            <>
+              {!intensiveAnswerMark?.intensiveMark && (
+                <p className="text-xl">Оценки пока нет</p>
+              )}
 
-          {intensiveAnswerMark?.intensiveMark && (
-            <div className="p-1 space-y-1 text-lg">
-              <p className="">
-                Преподаватель — {intensiveAnswerMark.intensiveMark.teacher.name}
-              </p>
-              <p className="font-medium">
-                Оценка —{' '}
-                <span className="text-green-600">
-                  {intensiveAnswerMark.intensiveMark.mark}
-                </span>
-              </p>
-              <p>
-                Выставлена(обновлена){' — '}
-                {getDateTimeDisplay(
-                  intensiveAnswerMark.intensiveMark.updatedDate
-                )}
-              </p>
-              <p>Комментарий — "{intensiveAnswerMark.intensiveMark.comment}"</p>
-            </div>
+              {intensiveAnswerMark?.intensiveMark && (
+                <div className="p-1 space-y-1 text-lg">
+                  <p className="">
+                    Преподаватель —{' '}
+                    {intensiveAnswerMark.intensiveMark.teacher.name}
+                  </p>
+                  <p className="font-medium">
+                    Оценка —{' '}
+                    <span className="text-green-600">
+                      {intensiveAnswerMark.intensiveMark.mark}
+                    </span>
+                  </p>
+                  <p>
+                    Выставлена(обновлена){' — '}
+                    {getDateTimeDisplay(
+                      intensiveAnswerMark.intensiveMark.updatedDate
+                    )}
+                  </p>
+                  <p>
+                    Комментарий — "{intensiveAnswerMark.intensiveMark.comment}"
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

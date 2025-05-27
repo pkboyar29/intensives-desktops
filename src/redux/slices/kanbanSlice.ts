@@ -22,22 +22,27 @@ const initialState: KanbanState = {
   previousState: null,
 };
 
+const EMPTY_ARRAY: number[] = []; //dsl
+
 const kanbanSlice = createSlice({
   name: 'kanban',
   initialState,
   reducers: {
     setColumns(state, action: PayloadAction<IColumn[]>) {
+      //можно сделать безопасным — сохранять старые taskIds, если уже есть
       state.columns = action.payload
         .map((column) => ({
           ...column,
-          taskIds: [], // Инициализируем изначально пустой массив задач колонки
+          taskIds: EMPTY_ARRAY, // Инициализируем изначально пустой массив задач колонки
         }))
         .sort((a, b) => a.position - b.position); // Сортируем колонки по позиции
+
+      //state.columns = newColumns;
     },
     addColumn(state, action: PayloadAction<IColumn>) {
       const newColumn = {
         ...action.payload,
-        taskIds: [], // Инициализируем пустой массив для задач
+        taskIds: EMPTY_ARRAY, // Инициализируем пустой массив для задач
       };
 
       if (state.columns) {
@@ -555,13 +560,36 @@ export const {
 
 export default kanbanSlice.reducer;
 
+export const selectColumnById = (id: number) =>
+  createSelector(
+    (state: RootState) => state.kanban.columns,
+    (columns) => columns?.find((col) => col.id === id)
+  );
+
+export const selectTasksByColumnId = (id: number) =>
+  createSelector(
+    [(state: RootState) => state.kanban.tasks, selectColumnById(id)],
+    (tasks, column) => column?.taskIds.map((taskId) => tasks?.[taskId])
+  );
+
 // Селектор для получения ID подзадач
 export const selectSubtaskIds = (state: RootState, id: number) =>
-  state.kanban.subtasks?.[id] || [];
+  state.kanban.subtasks?.[id] ?? EMPTY_ARRAY;
 
 // Мемоизированный селектор для получения данных подзадач
+/*
 export const selectSubtaskData = createSelector(
   [selectSubtaskIds, (state: RootState) => state.kanban.tasks],
   (subtaskIds, tasks) =>
     subtaskIds.map((subtaskId) => tasks?.[subtaskId]).filter(Boolean)
 );
+*/
+
+export const makeSelectSubtaskData = (taskId: number) =>
+  createSelector(
+    [
+      (state: RootState) => state.kanban.subtasks?.[taskId] ?? EMPTY_ARRAY,
+      (state: RootState) => state.kanban.tasks ?? {},
+    ],
+    (subtasksIds, tasks) => subtasksIds.map((id) => tasks[id]).filter(Boolean)
+  );

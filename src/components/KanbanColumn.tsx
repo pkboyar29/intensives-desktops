@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   useLazyGetTasksColumnQuery,
   useCreateTaskMutation,
@@ -10,10 +10,12 @@ import KanbanTask from './KanbanTask';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import {
-  selectSubtaskData,
   moveTaskTemporary,
   savePreviousState,
+  selectTasksByColumnId,
 } from '../redux/slices/kanbanSlice';
+import Skeleton from 'react-loading-skeleton';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface KanbanColumnProps {
   id: number;
@@ -41,7 +43,8 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   onDeleteColumn,
 }) => {
   const dispatch = useAppDispatch();
-  const [getTasks, { isLoading, isError }] = useLazyGetTasksColumnQuery();
+  const [getTasks, { isLoading, isError, isSuccess }] =
+    useLazyGetTasksColumnQuery();
   const [createTaskAPI] = useCreateTaskMutation();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -51,7 +54,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const [page, setPage] = useState(1); // Текущая страница
   const pageSize = 100; // Размер страницы
-  const hasMore = useRef(true); // Есть ли ещё страницы для загрузки
+  const hasMore = useRef(false); // Есть ли ещё страницы для загрузки
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -60,6 +63,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       if (data?.next === null) {
         hasMore.current = false; // Если `next` равно null, страниц больше нет
       } else {
+        hasMore.current = true;
         setPage(page + 1);
       }
     };
@@ -73,12 +77,14 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   );
 
   // Получаем задачи для этой колонки
+  const selectTasks = useMemo(() => selectTasksByColumnId(id), [id]); // проверить если убрать
   const tasks = useAppSelector((state) =>
-    column?.taskIds.map((taskId) => state.kanban.tasks?.[taskId])
+    isSuccess ? selectTasksByColumnId(id)(state) : null
   );
 
   useEffect(() => {
-    //console.log(tasks)
+    //console.log('rerender column id -', id);
+    console.log('задачи колонки id', id, '-', tasks);
   }, [tasks]);
 
   // Функция для автоматического изменения высоты textarea
@@ -191,6 +197,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     },
   });
 
+  /*
   const [, dropTaskRef] = useDrop({
     accept: 'TASK',
     hover: (item: {
@@ -231,17 +238,19 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       //updateTaskPosition(item)
     },
   });
-
+  */
   // Соединяем previewRef и dropRef
   const previewRefDropRef = (node: HTMLDivElement | null) => {
     previewRef(node); // Отвечает за то как визуально выглядит перетаскиваемый объект
     dropRef(node);
   };
 
+  /*
   const dragRefDropTaskRef = (node: HTMLDivElement | null) => {
     dragRef(node);
     dropTaskRef(node);
   };
+  */
 
   return (
     <div
@@ -314,36 +323,50 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
         )}
       </div>
 
-      <div className="space-y-2 max-h-[calc(100vh-200px)] ml-4 mr-4 md-4 mt-2 overflow-y-auto overflow-x-hidden">
-        {tasks &&
-          tasks.map(
-            (task, index) =>
-              task && (
-                <div key={task.id}>
-                  {' '}
-                  {/* Добавляем key сюда так хочет реакт*/}
-                  <KanbanTask
-                    id={task.id}
-                    index={index}
-                    columnId={id}
-                    parentTaskId={null}
-                    name={task.name}
-                    isCompleted={task.isCompleted}
-                    initialSubtaskCount={task.initialSubtaskCount}
-                  />
-                </div>
-              )
-          )}
+      {!tasks && isLoading ? (
+        <Skeleton />
+      ) : (
+        <div className="space-y-2 max-h-[calc(100vh-200px)] ml-4 mr-4 md-4 mt-2 overflow-y-auto overflow-x-hidden">
+          {tasks !== undefined &&
+            tasks !== null &&
+            tasks.map(
+              (task, index) =>
+                task && (
+                  <motion.div
+                    key={task.id}
+                    layout
+                    transition={{
+                      //type: 'spring',
+                      //stiffness: 500,
+                      //damping: 30,
+                      //mass: 0.5,
+                      duration: 0.17,
+                    }}
+                    className="task"
+                  >
+                    <KanbanTask
+                      id={task.id}
+                      index={index}
+                      columnId={id}
+                      parentTaskId={null}
+                      name={task.name}
+                      isCompleted={task.isCompleted}
+                      initialSubtaskCount={task.initialSubtaskCount}
+                    />
+                  </motion.div>
+                )
+            )}
 
-        {hasMore.current && (
-          <button
-            className="w-full p-3 bg-blue text-white rounded-[10px] duration-300"
-            onClick={loadMoreTasks}
-          >
-            Загрузить еще
-          </button>
-        )}
-      </div>
+          {hasMore.current && (
+            <button
+              className="w-full p-3 bg-blue text-white rounded-[10px] duration-300"
+              onClick={loadMoreTasks}
+            >
+              Загрузить еще
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

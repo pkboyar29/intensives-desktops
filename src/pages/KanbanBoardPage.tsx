@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
   useUpdateColumnPositionMutation,
   useUpdateColumnNameMutation,
@@ -41,22 +41,17 @@ const KanbanBoardPage: FC = () => {
 
   const [deleteModal, setDeleteModal] = useState<number | null>(null);
 
-  // Локальное состояние для управления временным порядком колонок при dnd
-  const [localColumns, setLocalColumns] = useState(columns);
-
   useEffect(() => {
-    if (currentTeam) {
+    if (currentTeam && (!columns || columns?.length === 0)) {
       getColumns(currentTeam.id);
       console.log(currentTeam);
       console.log(currentUser);
     }
   }, [currentTeam]);
 
-  useEffect(() => {});
-
   useEffect(() => {
-    //console.log(columns)
-    setLocalColumns(columns);
+    console.log('columns updated', columns);
+    //console.log('render kanbanboard');
   }, [columns]);
 
   // Функция для обновления позиций после перемещения
