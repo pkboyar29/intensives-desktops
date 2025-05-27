@@ -67,7 +67,6 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   return (
     <>
-      {' '}
       {isIntensiveLoading ? (
         <Skeleton />
       ) : (
@@ -97,7 +96,7 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
       <div className="flex flex-col gap-4 mt-5 mb-3">
         <SidebarLink
           to="overview"
-          text="Настройки интенсива"
+          text="Просмотр интенсива"
           className={`${pathname.includes('/editIntensive') && 'active'}`}
         />
         <SidebarLink

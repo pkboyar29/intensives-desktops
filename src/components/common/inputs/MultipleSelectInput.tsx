@@ -5,14 +5,14 @@ import Checkbox from './Checkbox';
 import ChipList from '../ChipList';
 import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
+// TODO: selectedItems тоже по-хорошему должен быть массивом чисел, чтобы не было конфликтов с именами
 interface MultipleSelectInputProps<T> {
   description: string;
   errorMessage?: string;
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
   selectedItems: T[];
-  // TODO: спросить у чат гпт как лучше назвать эту переменную
-  disabledItems?: T[];
+  disabledItemIds?: number[];
   setSelectedItems: (items: T[]) => void;
   chipSize?: 'small' | 'big';
 }
@@ -24,7 +24,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   items,
   selectedItems,
   setSelectedItems,
-  disabledItems = [],
+  disabledItemIds = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -76,9 +76,9 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
 
       <motion.div
         className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
+        variants={dropdownVariants}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
-        variants={dropdownVariants}
       >
         <div className="pb-8">
           <Checkbox
@@ -87,7 +87,9 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               setSelectedItems(items);
             }}
             deleteSelectedItem={() => {
-              setSelectedItems(disabledItems);
+              setSelectedItems(
+                items.filter((item) => disabledItemIds.includes(item.id))
+              );
             }}
             isChecked={selectedItems.length === items.length}
           />
@@ -102,7 +104,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               item={item}
               addSelectedItem={addSelectedItem}
               deleteSelectedItem={() => {
-                if (disabledItems.map((item) => item.id).includes(item.id)) {
+                if (disabledItemIds.includes(item.id)) {
                   return;
                 }
 

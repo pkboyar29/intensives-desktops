@@ -28,6 +28,10 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
+    managers: unmappedIntensive.managers.map((manager: any) =>
+      mapTeacher(manager)
+    ),
+    creatorId: unmappedIntensive.creator,
     roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
     files: unmappedIntensive.files.map((file: any) => mapFile(file)),
   };
@@ -111,6 +115,7 @@ export const intensiveApi = createApi({
           open_dt: data.openDate,
           close_dt: data.closeDate,
           teachers: data.teacherIds,
+          managers: data.managerIds,
           flows: data.flowIds,
           specific_student_ids: data.specificStudentsIds,
           roles: data.roleIds,
@@ -132,6 +137,7 @@ export const intensiveApi = createApi({
             open_dt: data.openDate,
             close_dt: data.closeDate,
             teachers: data.teacherIds,
+            managers: data.managerIds,
             flows: data.flowIds,
             specific_student_ids: data.specificStudentsIds,
             roles: data.roleIds,

@@ -14,6 +14,8 @@ export interface IIntensive {
   flows: IFlow[];
   specificStudents: IStudent[];
   teachers: ITeacher[];
+  managers: ITeacher[];
+  creatorId: number;
   roles: IStudentRole[];
   files: IFile[];
 }
@@ -35,6 +37,7 @@ export interface IIntensiveCreate {
   openDate: string;
   closeDate: string;
   teacherIds: number[];
+  managerIds: number[];
   flowIds: number[];
   specificStudentsIds: number[];
   roleIds: number[];
