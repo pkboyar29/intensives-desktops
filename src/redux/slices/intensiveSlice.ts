@@ -41,10 +41,10 @@ const intensiveSlice = createSlice({
         }
       )
       .addMatcher(
-        intensiveApi.endpoints.updateIntensiveOpenness.matchFulfilled,
+        intensiveApi.endpoints.updateIntensiveVisibility.matchFulfilled,
         (state) => {
           if (state.data) {
-            state.data = { ...state.data, isOpen: !state.data.isOpen };
+            state.data = { ...state.data, isVisible: !state.data.isVisible };
           }
         }
       )

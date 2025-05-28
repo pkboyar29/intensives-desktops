@@ -31,6 +31,7 @@ const mapUser = (unmappedUser: any): IUser => {
     lastName: unmappedUser.last_name,
     patronymic: unmappedUser.patronymic,
     email: unmappedUser.email,
+    notificationDisabled: unmappedUser.notification_disabled,
     roles: unmappedUser.roles.map((role: any) => mapRoleName(role.name)),
     currentRole: null,
   };
@@ -61,10 +62,19 @@ export const userApi = createApi({
     changePassword: builder.mutation<string, IChangePassword>({
       query: (data) => ({
         url: '/users/change_password/',
-        method: 'POST',
+        method: 'PATCH',
         body: {
           old_password: data.oldPassword,
           password: data.password,
+        },
+      }),
+    }),
+    toggleNotifications: builder.mutation<string, boolean>({
+      query: (notificationDisabled) => ({
+        url: '/users/toggle_notifications/',
+        method: 'PATCH',
+        body: {
+          notification_disabled: notificationDisabled,
         },
       }),
     }),
@@ -79,4 +89,5 @@ export const {
   useLazyGetUserQuery,
   useSignInMutation,
   useChangePasswordMutation,
+  useToggleNotificationsMutation,
 } = userApi;

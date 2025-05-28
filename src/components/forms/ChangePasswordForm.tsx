@@ -64,7 +64,7 @@ const ChangePasswordForm: FC<ChangePasswordFormProps> = ({
       <div className="text-base">
         Пароль должен содержать хотя бы одну цифру, одну заглавную и строчную
         букву, а также один спецсимвол (!@#$%^&*). Пароль должен содержать от 5
-        до 20 символов
+        до 32 символов
       </div>
 
       <InputDescription
@@ -92,8 +92,8 @@ const ChangePasswordForm: FC<ChangePasswordFormProps> = ({
             message: 'Минимальное количество символов - 5',
           },
           maxLength: {
-            value: 20,
-            message: 'Максимальное количество символов - 20',
+            value: 32,
+            message: 'Максимальное количество символов - 32',
           },
           pattern: {
             value: passwordRegex,

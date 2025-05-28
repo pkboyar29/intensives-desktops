@@ -42,7 +42,7 @@ interface ManageIntensiveFields {
   managers: number[];
   roles: number[];
   files?: IFile[];
-  isOpen: boolean;
+  isVisible: boolean;
 }
 
 const ManageIntensiveForm: FC = () => {
@@ -113,7 +113,7 @@ const ManageIntensiveForm: FC = () => {
         teachers: currentIntensive.teachers.map((teacher) => teacher.id),
         managers: currentIntensive.managers.map((manager) => manager.id),
         roles: currentIntensive.roles.map((role) => role.id),
-        isOpen: currentIntensive.isOpen,
+        isVisible: currentIntensive.isVisible,
       });
 
       // Записываем в отображаемый список файлов реальный текущий список
@@ -223,7 +223,7 @@ const ManageIntensiveForm: FC = () => {
         teacherIds: data.teachers,
         managerIds: data.managers,
         roleIds: data.roles,
-        isOpen: true,
+        isVisible: true,
       }));
 
       if (responseError) {

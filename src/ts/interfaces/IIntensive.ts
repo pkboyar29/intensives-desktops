@@ -8,7 +8,7 @@ export interface IIntensive {
   id: number;
   name: string;
   description?: string;
-  isOpen: boolean;
+  isVisible: boolean;
   openDate: Date;
   closeDate: Date;
   flows: IFlow[];
@@ -24,7 +24,7 @@ export interface IIntensiveShort {
   id: number;
   name: string;
   description?: string;
-  isOpen: boolean;
+  isVisible: boolean;
   openDate: Date;
   closeDate: Date;
   flows: IFlow[];
@@ -41,7 +41,7 @@ export interface IIntensiveCreate {
   flowIds: number[];
   specificStudentsIds: number[];
   roleIds: number[];
-  isOpen: boolean;
+  isVisible: boolean;
   fileIds?: number[]; // можно перенести в IIntensiveUpdate
 }
 

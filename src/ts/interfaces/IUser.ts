@@ -4,6 +4,7 @@ export interface IUser {
   lastName: string;
   patronymic: string;
   email: string;
+  notificationDisabled: boolean;
   roles: UserRole[];
   currentRole: UserRole | null;
 }

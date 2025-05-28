@@ -1,15 +1,22 @@
 import { FC, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { useAppSelector } from '../../../redux/store';
+import { useToggleNotificationsMutation } from '../../../redux/api/userApi';
 
 import Modal from './Modal';
 import ChangePasswordForm from '../../forms/ChangePasswordForm';
 import PrimaryButton from '../PrimaryButton';
+import ToggleButton from '../ToggleButton';
 
 interface SettingsModalProps {
   onClose: () => void;
 }
 
 const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
+  const currentUser = useAppSelector((state) => state.user.data);
+
+  const [toggleNotifications] = useToggleNotificationsMutation();
+
   const [changePasswordMode, setChangePasswordMode] = useState<boolean>(false);
 
   return (
@@ -19,7 +26,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
       <Modal title="Настройки" onCloseModal={onClose}>
         <div className="text-lg text-bright_gray h-[60vh] overflow-y-auto flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <p>Изменение пароля</p>
+            <p className="text-base sm:text-lg">Изменение пароля</p>
 
             {!changePasswordMode && (
               <div>
@@ -49,9 +56,27 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
           )}
           <div className="mt-3 border-b border-solid opacity-40 border-bright_gray"></div>
           <div className="flex items-center justify-between">
-            <p>Отключение уведомлений на почту</p>
+            <p className="text-base sm:text-lg">Не показывать уведомления</p>
 
-            <input type="checkbox" />
+            {currentUser && (
+              <ToggleButton
+                isChecked={currentUser.notificationDisabled}
+                setIsChecked={async (isChecked) => {
+                  const { error: responseError } = await toggleNotifications(
+                    isChecked
+                  );
+
+                  if (responseError) {
+                    toast(
+                      'Произошла серверная ошибка при изменении показа уведомлений',
+                      {
+                        type: 'error',
+                      }
+                    );
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </Modal>
