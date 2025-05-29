@@ -18,7 +18,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     id: unmappedIntensive.id,
     name: unmappedIntensive.name,
     description: unmappedIntensive.description,
-    isOpen: unmappedIntensive.is_open,
+    isVisible: unmappedIntensive.is_visible,
     openDate: new Date(unmappedIntensive.open_dt),
     closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
@@ -28,6 +28,10 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
+    managers: unmappedIntensive.managers.map((manager: any) =>
+      mapTeacher(manager)
+    ),
+    creatorId: unmappedIntensive.creator,
     roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
     files: unmappedIntensive.files.map((file: any) => mapFile(file)),
   };
@@ -38,7 +42,7 @@ const mapIntensiveShort = (unmappedIntensive: any): IIntensiveShort => {
     id: unmappedIntensive.id,
     name: unmappedIntensive.name,
     description: unmappedIntensive.description,
-    isOpen: unmappedIntensive.is_open,
+    isVisible: unmappedIntensive.is_visible,
     openDate: new Date(unmappedIntensive.open_dt),
     closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
@@ -61,12 +65,19 @@ export const intensiveApi = createApi({
         isMentor: boolean;
         page: number;
         search: string;
-        openness?: 'all' | 'opened' | 'closed';
+        visibility?: 'all' | 'visible' | 'invisible';
         relevance: 'all' | 'relevant' | 'past';
         sortOption: 'fromOldToNew' | 'fromNewToOld';
       }
     >({
-      query: ({ isMentor, page, search, openness, relevance, sortOption }) => {
+      query: ({
+        isMentor,
+        page,
+        search,
+        visibility,
+        relevance,
+        sortOption,
+      }) => {
         const params = new URLSearchParams();
         params.append('is_mentor', isMentor.toString());
         params.append('page', page.toString());
@@ -77,8 +88,8 @@ export const intensiveApi = createApi({
           sortOption === 'fromOldToNew' ? 'open_dt' : '-open_dt'
         );
 
-        if (openness) {
-          params.append('openness', openness);
+        if (visibility) {
+          params.append('visibility', visibility);
         }
 
         return `/intensives/?${params.toString()}`;
@@ -107,10 +118,11 @@ export const intensiveApi = createApi({
         body: {
           name: data.name,
           description: data.description,
-          is_open: data.isOpen,
+          is_visible: data.isVisible,
           open_dt: data.openDate,
           close_dt: data.closeDate,
           teachers: data.teacherIds,
+          managers: data.managerIds,
           flows: data.flowIds,
           specific_student_ids: data.specificStudentsIds,
           roles: data.roleIds,
@@ -128,10 +140,11 @@ export const intensiveApi = createApi({
           body: {
             name: data.name,
             description: data.description,
-            is_open: data.isOpen,
+            is_visible: data.isVisible,
             open_dt: data.openDate,
             close_dt: data.closeDate,
             teachers: data.teacherIds,
+            managers: data.managerIds,
             flows: data.flowIds,
             specific_student_ids: data.specificStudentsIds,
             roles: data.roleIds,
@@ -141,15 +154,15 @@ export const intensiveApi = createApi({
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
-    updateIntensiveOpenness: builder.mutation<
+    updateIntensiveVisibility: builder.mutation<
       string,
-      { openness: boolean; intensiveId: number }
+      { visibility: boolean; intensiveId: number }
     >({
       query: (data) => ({
-        url: `/intensives/${data.intensiveId}/openness/`,
+        url: `/intensives/${data.intensiveId}/visibility/`,
         method: 'PATCH',
         body: {
-          openness: data.openness,
+          visibility: data.visibility,
         },
       }),
     }),
@@ -177,7 +190,7 @@ export const {
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
-  useUpdateIntensiveOpennessMutation,
+  useUpdateIntensiveVisibilityMutation,
   useDeleteIntensiveMutation,
   useLazyGetFreeStudentsQuery,
   useLazyGetSpecificFreeStudentsQuery,

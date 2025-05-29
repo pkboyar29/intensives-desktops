@@ -37,7 +37,9 @@ const IntensivesPage: FC = () => {
   const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
     'fromOldToNew'
   );
-  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
+  const [visibility, setVisibility] = useState<'invisible' | 'visible' | 'all'>(
+    'all'
+  );
   const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
     'relevant'
   );
@@ -74,14 +76,14 @@ const IntensivesPage: FC = () => {
         loadPage(1);
       }
     }
-  }, [openness, relevance, sortOption]);
+  }, [visibility, relevance, sortOption]);
 
   const loadPage = (page: number) => {
     getIntensives({
       isMentor: currentUser?.currentRole?.name === 'Mentor',
       page,
       search: searchText,
-      openness,
+      visibility,
       relevance,
       sortOption,
     });
@@ -164,12 +166,12 @@ const IntensivesPage: FC = () => {
             {isUserManager(currentUser) && (
               <Filter
                 onFilterOptionClick={(filterOption) =>
-                  setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                  setVisibility(filterOption as 'all' | 'visible' | 'invisible')
                 }
-                activeFilterOption={openness}
+                activeFilterOption={visibility}
                 filterList={[
-                  { label: 'Открытые', value: 'opened' },
-                  { label: 'Закрытые', value: 'closed' },
+                  { label: 'Видимые', value: 'visible' },
+                  { label: 'Невидимые', value: 'invisible' },
                   { label: 'Все', value: 'all' },
                 ]}
               />

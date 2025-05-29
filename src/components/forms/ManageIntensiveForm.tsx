@@ -13,7 +13,7 @@ import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
 import { useFileHandler } from '../../helpers/useFileHandler';
 import { getISODateInUTC3 } from '../../helpers/dateHelpers';
-import { getUniqueFiles, uploadAllFiles } from '../../helpers/fileHelpers';
+import { uploadAllFiles } from '../../helpers/fileHelpers';
 
 import { Helmet } from 'react-helmet-async';
 import Title from '../common/Title';
@@ -26,28 +26,29 @@ import Modal from '../common/modals/Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import EditableFileList from '../EditableFileList';
 
-import { IFile, INewFileObject } from '../../ts/interfaces/IFile';
-
-interface Item {
-  id: number;
-  name: string;
-}
+import { IFile } from '../../ts/interfaces/IFile';
 
 interface ManageIntensiveFields {
   name: string;
   description: string;
   openDate: string;
   closeDate: string;
-  flows: Item[];
-  specificStudents: Item[];
-  teachers: Item[];
-  roles: Item[];
+  flows: number[];
+  specificStudents: {
+    id: number;
+    name: string;
+  }[];
+  teachers: number[];
+  managers: number[];
+  roles: number[];
   files?: IFile[];
+  isVisible: boolean;
 }
 
 const ManageIntensiveForm: FC = () => {
   const { intensiveId } = useParams();
   const currentIntensive = useAppSelector((state) => state.intensive.data);
+  const currentUser = useAppSelector((state) => state.user.data);
 
   const navigate = useNavigate();
 
@@ -66,16 +67,21 @@ const ManageIntensiveForm: FC = () => {
 
   // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery({});
-  // TODO: получать от конкретного университета
-  const { data: teachers } = useGetTeachersInUniversityQuery();
+  const { data: teachers } = useGetTeachersInUniversityQuery({});
+  const { data: managers } = useGetTeachersInUniversityQuery({
+    isManager: true,
+  });
   const { data: studentRoles } = useGetStudentRolesQuery({});
+
+  const displayManagersInput =
+    !intensiveId ||
+    (intensiveId && currentIntensive?.creatorId == currentUser?.id);
 
   const {
     attachedFilesList,
     newFiles,
     handleFilesChange,
     setAttachedFilesList,
-    setNewFiles,
     handleFileDelete,
   } = useFileHandler();
 
@@ -87,7 +93,7 @@ const ManageIntensiveForm: FC = () => {
     setError,
     clearErrors,
     watch,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ManageIntensiveFields>({
     mode: 'onBlur',
   });
@@ -99,13 +105,15 @@ const ManageIntensiveForm: FC = () => {
         description: currentIntensive.description,
         openDate: getISODateInUTC3(currentIntensive.openDate),
         closeDate: getISODateInUTC3(currentIntensive.closeDate),
-        flows: currentIntensive.flows,
+        flows: currentIntensive.flows.map((flow) => flow.id),
         specificStudents: currentIntensive.specificStudents.map((student) => ({
           id: student.id,
           name: student.nameWithGroup,
         })),
-        teachers: currentIntensive.teachers,
-        roles: currentIntensive.roles,
+        teachers: currentIntensive.teachers.map((teacher) => teacher.id),
+        managers: currentIntensive.managers.map((manager) => manager.id),
+        roles: currentIntensive.roles.map((role) => role.id),
+        isVisible: currentIntensive.isVisible,
       });
 
       // Записываем в отображаемый список файлов реальный текущий список
@@ -118,6 +126,14 @@ const ManageIntensiveForm: FC = () => {
     }
   }, [intensiveId, currentIntensive]);
 
+  useEffect(() => {
+    if (!intensiveId && currentUser) {
+      reset({
+        managers: [currentUser.id],
+      });
+    }
+  }, [intensiveId, currentUser]);
+
   const openDate = watch('openDate');
   const closeDate = watch('closeDate');
   useEffect(() => {
@@ -128,7 +144,7 @@ const ManageIntensiveForm: FC = () => {
   }, [openDate, closeDate]);
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       open_dt?: string[];
       close_dt?: string[];
       specific_student_ids?: string[];
@@ -171,13 +187,8 @@ const ManageIntensiveForm: FC = () => {
       return;
     }
 
-    const flowIds: number[] = data.flows.map((flow) => flow.id);
     const specificStudentsIds: number[] = data.specificStudents
       ? data.specificStudents.map((student) => student.id)
-      : [];
-    const teacherIds: number[] = data.teachers.map((teacher) => teacher.id);
-    const roleIds: number[] = data.roles
-      ? data.roles.map((role) => role.id)
       : [];
     const fileIds: number[] = attachedFilesList
       ? attachedFilesList
@@ -192,11 +203,11 @@ const ManageIntensiveForm: FC = () => {
       ({ data: responseData, error: responseError } = await updateIntensive({
         id: Number(intensiveId),
         ...data,
-        flowIds,
+        flowIds: data.flows,
         specificStudentsIds,
-        teacherIds,
-        roleIds,
-        isOpen: true,
+        teacherIds: data.teachers,
+        managerIds: data.managers,
+        roleIds: data.roles,
         fileIds: fileIds,
       }));
 
@@ -207,11 +218,12 @@ const ManageIntensiveForm: FC = () => {
     } else {
       ({ data: responseData, error: responseError } = await createIntensive({
         ...data,
-        flowIds,
+        flowIds: data.flows,
         specificStudentsIds,
-        teacherIds,
-        roleIds,
-        isOpen: true,
+        teacherIds: data.teachers,
+        managerIds: data.managers,
+        roleIds: data.roles,
+        isVisible: true,
       }));
 
       if (responseError) {
@@ -438,12 +450,9 @@ const ManageIntensiveForm: FC = () => {
                           : ''
                       }
                       items={flows.results}
-                      selectedItems={field.value || []}
-                      disabledItems={currentIntensive?.flows.map((f) => ({
-                        id: f.id,
-                        name: f.name,
-                      }))}
-                      setSelectedItems={field.onChange}
+                      selectedItemIds={field.value || []}
+                      disabledItemIds={currentIntensive?.flows.map((f) => f.id)}
+                      setSelectedItemIds={field.onChange}
                       chipSize="big"
                     />
                   </div>
@@ -459,11 +468,7 @@ const ManageIntensiveForm: FC = () => {
                   <SpecificStudentsInput
                     selectedItems={field.value || []}
                     setSelectedItems={field.onChange}
-                    flowsToExclude={
-                      watch('flows')
-                        ? watch('flows').map((flow) => flow.id)
-                        : []
-                    }
+                    flowsToExclude={watch('flows') ? watch('flows') : []}
                     errorMessage={
                       typeof errors.specificStudents?.message === 'string'
                         ? errors.specificStudents.message
@@ -488,8 +493,40 @@ const ManageIntensiveForm: FC = () => {
                           : ''
                       }
                       items={teachers}
-                      selectedItems={field.value || []}
-                      setSelectedItems={field.onChange}
+                      selectedItemIds={field.value || []}
+                      setSelectedItemIds={field.onChange}
+                    />
+                  </div>
+                )}
+              />
+            )}
+
+            {managers && currentUser && displayManagersInput && (
+              <Controller
+                name="managers"
+                control={control}
+                render={({ field }) => (
+                  <div className="mt-3">
+                    <MultipleSelectInput
+                      description="Список организаторов"
+                      errorMessage={
+                        typeof errors.managers?.message === 'string'
+                          ? errors.managers.message
+                          : ''
+                      }
+                      items={managers.map((manager) => {
+                        if (manager.id == currentUser.id) {
+                          return {
+                            id: manager.id,
+                            name: `${manager.name} (Вы)`,
+                          };
+                        } else {
+                          return manager;
+                        }
+                      })}
+                      selectedItemIds={field.value || []}
+                      setSelectedItemIds={field.onChange}
+                      disabledItemIds={[currentUser.id]}
                     />
                   </div>
                 )}
@@ -510,8 +547,8 @@ const ManageIntensiveForm: FC = () => {
                           : ''
                       }
                       items={studentRoles.results}
-                      selectedItems={field.value || []}
-                      setSelectedItems={field.onChange}
+                      selectedItemIds={field.value || []}
+                      setSelectedItemIds={field.onChange}
                     />
                   </div>
                 )}
@@ -530,7 +567,7 @@ const ManageIntensiveForm: FC = () => {
             <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
-          {!isValid && (
+          {Object.keys(errors).length > 0 && (
             <div className="text-base text-center text-red sm:text-left">
               Форма содержит ошибки
             </div>

@@ -2,7 +2,7 @@ import { FC, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
 import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
-import { useUpdateIntensiveOpennessMutation } from '../../redux/api/intensiveApi';
+import { useUpdateIntensiveVisibilityMutation } from '../../redux/api/intensiveApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
 import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
 import { setIsSidebarOpen } from '../../redux/slices/windowSlice';
@@ -23,7 +23,7 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   const { width: windowWidth } = useWindowSize();
 
   const [getTeam] = useLazyGetTeamQuery();
-  const [updateOpenness] = useUpdateIntensiveOpennessMutation();
+  const [updateVisibility] = useUpdateIntensiveVisibilityMutation();
 
   const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
@@ -48,11 +48,11 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
     }
   }, [pathname]);
 
-  const updateIntensiveOpenness = (isOpen: boolean) => {
+  const updateIntensiveVisibility = (isVisible: boolean) => {
     if (currentIntensive) {
-      if (isOpen !== currentIntensive.isOpen) {
-        updateOpenness({
-          openness: isOpen,
+      if (isVisible !== currentIntensive.isVisible) {
+        updateVisibility({
+          visibility: isVisible,
           intensiveId: currentIntensive.id,
         });
       }
@@ -67,7 +67,6 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   return (
     <>
-      {' '}
       {isIntensiveLoading ? (
         <Skeleton />
       ) : (
@@ -82,20 +81,22 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           </div>
         </>
       )}
-      <div className="mt-3">
-        <SwitchButton
-          leftSideText="Открыт"
-          rightSideText="Закрыт"
-          currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
-          onSideClick={(side) =>
-            updateIntensiveOpenness(side === 'left' ? true : false)
-          }
-        />
-      </div>
+      {!pathname.includes('editIntensive') && (
+        <div className="mt-3">
+          <SwitchButton
+            leftSideText="Видим"
+            rightSideText="Невидим"
+            currentSide={currentIntensive?.isVisible ? 'left' : 'right'}
+            onSideClick={(side) =>
+              updateIntensiveVisibility(side === 'left' ? true : false)
+            }
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-4 mt-5 mb-3">
         <SidebarLink
           to="overview"
-          text="Настройки интенсива"
+          text="Просмотр интенсива"
           className={`${pathname.includes('/editIntensive') && 'active'}`}
         />
         <SidebarLink

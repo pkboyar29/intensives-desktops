@@ -10,10 +10,9 @@ interface MultipleSelectInputProps<T> {
   errorMessage?: string;
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
-  selectedItems: T[];
-  // TODO: спросить у чат гпт как лучше назвать эту переменную
-  disabledItems?: T[];
-  setSelectedItems: (items: T[]) => void;
+  selectedItemIds: number[];
+  disabledItemIds?: number[];
+  setSelectedItemIds: (itemIds: number[]) => void;
   chipSize?: 'small' | 'big';
 }
 
@@ -22,9 +21,9 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   errorMessage,
   setErrorMessage,
   items,
-  selectedItems,
-  setSelectedItems,
-  disabledItems = [],
+  selectedItemIds,
+  setSelectedItemIds,
+  disabledItemIds = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -39,11 +38,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const addSelectedItem = (id: number) => {
-    const selectedItem = items.find((item) => item.id === id);
-
-    if (selectedItem) {
-      setSelectedItems([...selectedItems, selectedItem]);
-    }
+    setSelectedItemIds([...selectedItemIds, id]);
 
     if (setErrorMessage) {
       setErrorMessage('');
@@ -51,8 +46,11 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const deleteSelectedItem = (id: number) => {
-    const newSelectedItems = selectedItems.filter((item) => item.id !== id);
-    setSelectedItems(newSelectedItems);
+    const newSelectedItemIds = selectedItemIds.filter(
+      (selectedId) => selectedId != id
+    );
+
+    setSelectedItemIds(newSelectedItemIds);
   };
 
   return (
@@ -76,20 +74,24 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
 
       <motion.div
         className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
+        variants={dropdownVariants}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
-        variants={dropdownVariants}
       >
         <div className="pb-8">
           <Checkbox
             item={{ id: 0, name: 'Выбрать все' }}
             addSelectedItem={() => {
-              setSelectedItems(items);
+              setSelectedItemIds(items.map((item) => item.id));
             }}
             deleteSelectedItem={() => {
-              setSelectedItems(disabledItems);
+              setSelectedItemIds(
+                items
+                  .filter((item) => disabledItemIds.includes(item.id))
+                  .map((item) => item.id)
+              );
             }}
-            isChecked={selectedItems.length === items.length}
+            isChecked={selectedItemIds.length === items.length}
           />
         </div>
 
@@ -102,22 +104,23 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               item={item}
               addSelectedItem={addSelectedItem}
               deleteSelectedItem={() => {
-                if (disabledItems.map((item) => item.id).includes(item.id)) {
+                if (disabledItemIds.includes(item.id)) {
                   return;
                 }
 
                 deleteSelectedItem(item.id);
               }}
-              isChecked={selectedItems.some(
-                (selectedItem) => selectedItem.id === item.id
-              )}
+              isChecked={selectedItemIds.some((id) => id == item.id)}
             />
           ))}
         </ul>
       </motion.div>
 
       <div className="mt-2.5">
-        <ChipList items={selectedItems} chipSize={chipSize} />
+        <ChipList
+          items={items.filter((item) => selectedItemIds.includes(item.id))}
+          chipSize={chipSize}
+        />
       </div>
 
       <div className="text-base text-red">{errorMessage}</div>

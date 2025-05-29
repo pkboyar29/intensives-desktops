@@ -148,6 +148,27 @@ const IntensiveOverviewPage: FC = () => {
               )}
 
               {currentIntensive ? (
+                isUserManager(currentUser) && (
+                  <ChipList
+                    title="Список организаторов"
+                    items={currentIntensive.managers.map((manager) => {
+                      if (manager.id == currentIntensive.creatorId) {
+                        return {
+                          id: manager.id,
+                          name: `${manager.name} (Создатель)`,
+                        };
+                      } else {
+                        return manager;
+                      }
+                    })}
+                    chipSize="small"
+                  />
+                )
+              ) : (
+                <Skeleton />
+              )}
+
+              {currentIntensive ? (
                 currentIntensive.roles.length > 0 && (
                   <ChipList
                     title="Список ролей для студентов"
@@ -183,15 +204,17 @@ const IntensiveOverviewPage: FC = () => {
                     }}
                   />
 
-                  <div>
-                    <PrimaryButton
-                      buttonColor="gray"
-                      children={<TrashIcon />}
-                      onClick={() => {
-                        setDeleteModal(true);
-                      }}
-                    />
-                  </div>
+                  {currentIntensive?.creatorId == currentUser?.id && (
+                    <div>
+                      <PrimaryButton
+                        buttonColor="gray"
+                        children={<TrashIcon />}
+                        onClick={() => {
+                          setDeleteModal(true);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

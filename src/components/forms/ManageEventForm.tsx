@@ -51,14 +51,9 @@ interface ManageEventFormFields {
   scoreType: 'withoutMarkStrategy' | 'withMarkStrategy' | 'withCriterias';
   markStrategy: string;
   deadlineDate: string;
-  criterias: Item[];
-  teams: Item[];
-  teachers: Item[];
-}
-
-interface Item {
-  id: number;
-  name: string;
+  criterias: number[];
+  teams: number[];
+  teachers: number[];
 }
 
 const ManageEventForm: FC = () => {
@@ -87,7 +82,7 @@ const ManageEventForm: FC = () => {
     reset,
     watch,
     control,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
@@ -180,18 +175,9 @@ const ManageEventForm: FC = () => {
           deadlineDate: event.deadlineDate
             ? getISODateTimeInUTC3(event.deadlineDate)
             : undefined,
-          criterias: event.criterias.map((criteria) => ({
-            id: criteria.id,
-            name: criteria.name,
-          })),
-          teams: event.teams.map((team) => ({
-            id: team.id,
-            name: team.name,
-          })),
-          teachers: event.teachers.map((teacher) => ({
-            id: teacher.id,
-            name: teacher.name,
-          })),
+          criterias: event.criterias.map((criteria) => criteria.id),
+          teams: event.teams.map((team) => team.id),
+          teachers: event.teachers.map((teacher) => teacher.id),
         });
       } else {
         reset({
@@ -298,7 +284,7 @@ const ManageEventForm: FC = () => {
   );
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       time?: string[];
       start_dt?: string[];
       finish_dt?: string[];
@@ -331,7 +317,6 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одну команду',
       });
-      console.log('trigger teams');
       return;
     }
 
@@ -340,7 +325,6 @@ const ManageEventForm: FC = () => {
         type: 'custom',
         message: 'Необходимо выбрать как минимум одного преподавателя',
       });
-      console.log('trigger teachers');
       return;
     }
 
@@ -380,7 +364,7 @@ const ManageEventForm: FC = () => {
         scoreRequestBody = {
           markStrategyId: Number(data.markStrategy),
           deadlineDate: data.deadlineDate,
-          criteriaIds: data.criterias.map((criteria) => criteria.id),
+          criteriaIds: data.criterias,
         };
         break;
     }
@@ -407,10 +391,8 @@ const ManageEventForm: FC = () => {
           audienceId: data.audience != -1 ? data.audience : null,
           isOnline: data.audience == -1,
           visibility: event.visibility,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -441,10 +423,8 @@ const ManageEventForm: FC = () => {
           audienceId: data.audience != -1 ? data.audience : null,
           isOnline: data.audience == -1,
           visibility: true,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -588,8 +568,8 @@ const ManageEventForm: FC = () => {
                   message: 'Минимальное количество символов - 4',
                 },
                 maxLength: {
-                  value: 100,
-                  message: 'Максимальное количество символов - 100',
+                  value: 50,
+                  message: 'Максимальное количество символов - 50',
                 },
               }}
               description="Название мероприятия"
@@ -750,8 +730,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teams.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -770,8 +750,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teachers.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -816,8 +796,8 @@ const ManageEventForm: FC = () => {
                         <MultipleSelectInput
                           description="Список критериев"
                           items={criterias.results}
-                          selectedItems={field.value || []}
-                          setSelectedItems={field.onChange}
+                          selectedItemIds={field.value || []}
+                          setSelectedItemIds={field.onChange}
                           errorMessage={
                             typeof errors.criterias?.message === 'string'
                               ? errors.criterias.message
@@ -843,13 +823,13 @@ const ManageEventForm: FC = () => {
             </div>
           </div>
 
-          {!isValid && (
+          {Object.keys(errors).length > 0 && (
             <div className="text-base text-center text-red sm:text-left">
               Форма содержит ошибки
             </div>
           )}
 
-          {!isValid && errors.teams && teamsToChoose?.length === 0 && (
+          {errors.teams && teamsToChoose?.length === 0 && (
             <div className="text-base text-center text-red sm:text-left">
               В интенсиве нету команд
             </div>

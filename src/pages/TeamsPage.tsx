@@ -68,7 +68,7 @@ const TeamsPage: FC = () => {
       {isLoading ? (
         <Skeleton className="mt-5 md:mt-10" />
       ) : teams && teams.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-3 mt-5 md:justify-start md:gap-6 md:mt-10">
+        <div className="flex flex-wrap justify-center gap-3 mt-5 overflow-x-hidden md:justify-start md:gap-6 md:mt-10">
           {teams.map((team) => (
             <TeamCard key={team.id} team={team as ITeam} />
           ))}

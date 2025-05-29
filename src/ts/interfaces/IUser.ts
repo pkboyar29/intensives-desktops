@@ -4,6 +4,7 @@ export interface IUser {
   lastName: string;
   patronymic: string;
   email: string;
+  notificationDisabled: boolean;
   roles: UserRole[];
   currentRole: UserRole | null;
 }
@@ -29,6 +30,11 @@ export interface ISignIn {
 export interface ISignInResponse {
   access: string;
   refresh: string;
+}
+
+export interface IChangePassword {
+  oldPassword: string;
+  password: string;
 }
 
 export interface IUserAdmin {
