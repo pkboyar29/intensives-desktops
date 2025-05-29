@@ -158,10 +158,18 @@ const IntensivesPage: FC = () => {
       <div className="mt-8">
         {isUserManager(currentUser) && (
           <div className="flex justify-end">
-            <div className="ml-auto">
+            <div className="flex gap-4 ml-auto">
               <PrimaryButton
                 children="Создать интенсив"
                 clickHandler={() => navigate(`/createIntensive`)}
+              />
+              <PrimaryButton
+                children="Банк вопросов"
+                clickHandler={() => navigate(`/questions`)}
+              />
+              <PrimaryButton
+                children="Список тестов"
+                clickHandler={() => navigate(`/tests`)}
               />
             </div>
           </div>

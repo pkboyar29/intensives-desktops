@@ -1,3 +1,6 @@
+//  FC — тип для функционального компонента (Functional Component).
+/* ButtonHTMLAttributes<HTMLButtonElement> — набор стандартных атрибутов для кнопки (type, disabled, onClick и т.п.).
+ReactNode — любой React-контент внутри кнопки (текст, иконка, <span> и т.д.). */
 import { FC, ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,10 +11,10 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const PrimaryButton: FC<PrimaryButtonProps> = ({
   children,
-  buttonColor = 'blue',
+  buttonColor = 'blue', // по умолчанию: "blue"
   clickHandler,
   type,
-  ...props
+  ...props // остальные атрибуты кнопки (например, disabled)
 }) => {
   return (
     <button

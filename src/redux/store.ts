@@ -24,7 +24,8 @@ import { taskApi } from './api/taskApi';
 import { fileApi } from './api/fileApi';
 import { eventAnswerApi } from './api/eventAnswerApi';
 import { eventMarkApi } from './api/eventMarkApi';
-
+import { questionApi } from './api/questionApi';
+import { testApi } from './api/testApi';
 // export const resetAllStates = createAction('resetAllStates');
 
 export const store = configureStore({
@@ -51,6 +52,8 @@ export const store = configureStore({
     [fileApi.reducerPath]: fileApi.reducer,
     [eventAnswerApi.reducerPath]: eventAnswerApi.reducer,
     [eventMarkApi.reducerPath]: eventMarkApi.reducer,
+    [questionApi.reducerPath]: questionApi.reducer,
+    [testApi.reducerPath]: testApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -73,7 +76,9 @@ export const store = configureStore({
       criteriaApi.middleware,
       fileApi.middleware,
       eventAnswerApi.middleware,
-      eventMarkApi.middleware
+      eventMarkApi.middleware,
+      questionApi.middleware,
+      testApi.middleware,
     ),
 });
 
