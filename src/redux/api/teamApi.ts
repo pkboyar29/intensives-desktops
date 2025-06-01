@@ -11,6 +11,7 @@ import {
   ITeamsSupportMembersUpdate,
   ITeamleadChange,
   IStudentsRolesChange,
+  IProjectInfoChange,
   ITeamShort,
 } from '../../ts/interfaces/ITeam';
 
@@ -32,6 +33,8 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     ),
     teamlead:
       unmappedTeam.teamlead === null ? null : mapStudent(unmappedTeam.teamlead),
+    projectName: unmappedTeam.project_name,
+    projectDescription: unmappedTeam.project_description,
   };
 };
 
@@ -118,6 +121,16 @@ export const teamApi = createApi({
         })),
       }),
     }),
+    changeProjectInfo: builder.mutation<string, IProjectInfoChange>({
+      query: (data) => ({
+        url: `/teams/${data.teamId}/change_project_info/`,
+        method: 'PUT',
+        body: {
+          project_name: data.projectName,
+          project_description: data.projectDescription,
+        },
+      }),
+    }),
     getMyTeam: builder.query<ITeam | null, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
       transformResponse: (response: any): ITeam | null =>
@@ -133,6 +146,7 @@ export const {
   useUpdateSupportMembersMutation,
   useChangeTeamleadMutation,
   useChangeStudentRolesMutation,
+  useChangeProjectInfoMutation,
   useLazyGetMyTeamQuery,
   useLazyGetTeamQuery,
 } = teamApi;
