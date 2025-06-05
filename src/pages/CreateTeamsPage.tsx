@@ -101,6 +101,7 @@ const CreateTeamsPage: FC = () => {
                 tutor: null,
                 mentor: null,
                 teamlead: null,
+                projectName: '',
               },
               {
                 id: null,
@@ -111,6 +112,7 @@ const CreateTeamsPage: FC = () => {
                 tutor: null,
                 mentor: null,
                 teamlead: null,
+                projectName: '',
               },
             ];
 
@@ -221,6 +223,7 @@ const CreateTeamsPage: FC = () => {
             tutor: null,
             mentor: null,
             teamlead: null,
+            projectName: '',
           });
         }
         setTeams((prevState) => [...prevState, ...newTeams]);

@@ -24,7 +24,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
       <ToastContainer position="top-center" />
 
       <Modal title="Настройки" onCloseModal={onClose}>
-        <div className="text-lg text-bright_gray h-[60vh] overflow-y-auto flex flex-col gap-3">
+        <div className="text-lg text-bright_gray h-[60vh] overflow-y-auto flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <p className="text-base sm:text-lg">Изменение пароля</p>
 
@@ -54,7 +54,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
               />
             </div>
           )}
-          <div className="mt-3 border-b border-solid opacity-40 border-bright_gray"></div>
+          <div className="border-b border-solid opacity-40 border-bright_gray"></div>
           <div className="flex items-center justify-between">
             <p className="text-base sm:text-lg">Не показывать уведомления</p>
 
@@ -77,6 +77,24 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
                 }}
               />
             )}
+          </div>
+          <div className="border-b border-solid opacity-40 border-bright_gray"></div>
+          <div className="flex items-center justify-between">
+            <p className="text-base sm:text-lg">Обратная связь</p>
+
+            <div>
+              <PrimaryButton
+                clickHandler={() => console.log('ссылка на форму')}
+                children={
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfp6VEuFBmzkhFUnEJmgdHjct8KujQP07U69emdyzPW7gdBeQ/viewform?usp=header"
+                    target="_blank"
+                  >
+                    Сообщить об ошибке
+                  </a>
+                }
+              />
+            </div>
           </div>
         </div>
       </Modal>

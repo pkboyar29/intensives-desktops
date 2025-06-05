@@ -116,7 +116,7 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
           registerOptions={{
             required: 'Поле обязательно к заполнению',
             maxLength: {
-              value: 50,
+              value: 500,
               message: 'Максимальное количество символов - 500',
             },
           }}

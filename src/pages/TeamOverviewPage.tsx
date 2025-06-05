@@ -2,10 +2,12 @@ import { FC, useState, useEffect } from 'react';
 import { useAppSelector } from '../redux/store';
 import { useAppDispatch } from '../redux/store';
 import { isUserTeacher, isUserTeamlead } from '../helpers/userHelpers';
+import { useForm } from 'react-hook-form';
 
 import {
   useChangeTeamleadMutation,
   useChangeStudentRolesMutation,
+  useChangeProjectInfoMutation,
 } from '../redux/api/teamApi';
 import { setTeam } from '../redux/slices/teamSlice';
 
@@ -19,6 +21,11 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Tag from '../components/common/Tag';
 import { ToastContainer, toast } from 'react-toastify';
 
+interface ProjectInfoFields {
+  projectName: string;
+  projectDescription?: string;
+}
+
 const TeamOverviewPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
@@ -28,6 +35,7 @@ const TeamOverviewPage: FC = () => {
 
   const [changeTeamlead] = useChangeTeamleadMutation();
   const [changeStudentRoles] = useChangeStudentRolesMutation();
+  const [changeProjectInfo] = useChangeProjectInfoMutation();
 
   const [changeMode, setChangeMode] = useState<boolean>(false);
 
@@ -40,6 +48,15 @@ const TeamOverviewPage: FC = () => {
     IStudentInTeam[]
   >([]);
 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProjectInfoFields>({
+    mode: 'onBlur',
+  });
+
   useEffect(() => {
     if (currentTeam) {
       setCurrentTeamleadId(
@@ -51,6 +68,13 @@ const TeamOverviewPage: FC = () => {
   useEffect(() => {
     if (currentTeam) {
       setCurrentStudentsInTeam(currentTeam.studentsInTeam);
+    }
+  }, [currentTeam]);
+
+  useEffect(() => {
+    if (currentTeam) {
+      setValue('projectName', currentTeam.projectName);
+      setValue('projectDescription', currentTeam.projectDescription);
     }
   }, [currentTeam]);
 
@@ -88,7 +112,7 @@ const TeamOverviewPage: FC = () => {
     setIsRolesEditing(true);
   };
 
-  const onSubmit = async () => {
+  const onChangeRolesAndTeamleadSubmit = async () => {
     if (currentTeam) {
       try {
         // если тимлид изменился, то отправляем запрос на его изменение
@@ -191,6 +215,32 @@ const TeamOverviewPage: FC = () => {
     }
   };
 
+  const onChangeProjectInfoSubmit = async (data: ProjectInfoFields) => {
+    if (currentTeam) {
+      const { error: responseError } = await changeProjectInfo({
+        teamId: currentTeam.id,
+        ...data,
+      });
+
+      if (responseError) {
+        toast('Произошла серверная ошибка при изменении информации о проекте', {
+          type: 'error',
+        });
+
+        setValue('projectName', currentTeam.projectName);
+        setValue('projectDescription', currentTeam.projectDescription);
+      } else {
+        dispatch(
+          setTeam({
+            ...currentTeam,
+            projectName: data.projectName,
+            projectDescription: data.projectDescription,
+          })
+        );
+      }
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -232,7 +282,9 @@ const TeamOverviewPage: FC = () => {
                         </div>
                       ) : (
                         <div>
-                          <PrimaryButton onClick={onSubmit}>
+                          <PrimaryButton
+                            onClick={onChangeRolesAndTeamleadSubmit}
+                          >
                             Сохранить изменения
                           </PrimaryButton>
                         </div>
@@ -246,118 +298,179 @@ const TeamOverviewPage: FC = () => {
                 </div>
               )}
 
-              <div className="flex flex-col gap-4">
-                {currentStudentsInTeam?.map((studentInTeam) => (
-                  <div key={studentInTeam.student.id}>
-                    <div className="font-sans text-base text-bright_gray">
-                      {studentInTeam.student.group.name}
-                      {'  '}
-                      {studentInTeam.student.user.lastName}{' '}
-                      {studentInTeam.student.user.firstName}{' '}
-                      {studentInTeam.student.user.patronymic}
-                    </div>
+              <div className="flex flex-col justify-between gap-4 lg:flex-row">
+                <div className="flex flex-col gap-4 max-w-[700px]">
+                  {currentStudentsInTeam?.map((studentInTeam) => (
+                    <div key={studentInTeam.student.id}>
+                      <div className="font-sans text-base text-bright_gray">
+                        {studentInTeam.student.group.name}
+                        {'  '}
+                        {studentInTeam.student.user.lastName}{' '}
+                        {studentInTeam.student.user.firstName}{' '}
+                        {studentInTeam.student.user.patronymic}
+                      </div>
 
-                    <div className="flex flex-wrap items-center gap-3 mt-3 ml-3">
-                      {studentInTeam.roles.length === 0 &&
-                        studentInTeam.student.id != currentTeamleadId && (
-                          <div className="font-bold">Нет ролей</div>
-                        )}
-
-                      {studentInTeam.student.id == currentTeamleadId && (
-                        <div>
-                          <Tag
-                            content={<div className="font-bold">Тимлид</div>}
-                            shouldHaveCrossIcon={
-                              changeMode && isUserTeacher(currentUser)
-                            }
-                            deleteHandler={() => setCurrentTeamleadId(null)}
-                          />
-                        </div>
-                      )}
-
-                      {studentInTeam.roles.map((role) => (
-                        <div key={role.id}>
-                          <Tag
-                            content={role.name}
-                            shouldHaveCrossIcon={changeMode}
-                            deleteHandler={() =>
-                              handleRoleCrossClick(
-                                studentInTeam.student.id,
-                                role.id
-                              )
-                            }
-                          />
-                        </div>
-                      ))}
-
-                      {changeMode && (
-                        <select
-                          onChange={(e) => {
-                            if (e.target.value === 'teamlead') {
-                              setCurrentTeamleadId(studentInTeam.student.id);
-                              return;
-                            }
-
-                            handleRoleSelectChange(
-                              studentInTeam.student.id,
-                              currentIntensive?.roles.find(
-                                (role) => role.id === Number(e.target.value)
-                              )!
-                            );
-                          }}
-                          value=""
-                          className="px-3 py-1 text-base bg-gray_5 rounded-xl"
-                        >
-                          <option value="">Добавить роль</option>
-
-                          {!currentTeamleadId && (
-                            <option value="teamlead" className="font-bold">
-                              Тимлид
-                            </option>
+                      <div className="flex flex-wrap items-center gap-3 mt-3 ml-3">
+                        {studentInTeam.roles.length === 0 &&
+                          studentInTeam.student.id != currentTeamleadId && (
+                            <div className="font-bold">Нет ролей</div>
                           )}
 
-                          {currentIntensive?.roles
-                            .filter(
-                              (role) =>
-                                !studentInTeam.roles
-                                  .map((role) => role.id)
-                                  .includes(role.id)
-                            )
-                            .map((role) => (
-                              <option key={role.id} value={role.id}>
-                                {role.name}
+                        {studentInTeam.student.id == currentTeamleadId && (
+                          <div>
+                            <Tag
+                              content={<div className="font-bold">Тимлид</div>}
+                              shouldHaveCrossIcon={
+                                changeMode && isUserTeacher(currentUser)
+                              }
+                              deleteHandler={() => setCurrentTeamleadId(null)}
+                            />
+                          </div>
+                        )}
+
+                        {studentInTeam.roles.map((role) => (
+                          <div key={role.id}>
+                            <Tag
+                              content={role.name}
+                              shouldHaveCrossIcon={changeMode}
+                              deleteHandler={() =>
+                                handleRoleCrossClick(
+                                  studentInTeam.student.id,
+                                  role.id
+                                )
+                              }
+                            />
+                          </div>
+                        ))}
+
+                        {changeMode && (
+                          <select
+                            onChange={(e) => {
+                              if (e.target.value === 'teamlead') {
+                                setCurrentTeamleadId(studentInTeam.student.id);
+                                return;
+                              }
+
+                              handleRoleSelectChange(
+                                studentInTeam.student.id,
+                                currentIntensive?.roles.find(
+                                  (role) => role.id === Number(e.target.value)
+                                )!
+                              );
+                            }}
+                            value=""
+                            className="px-3 py-1 text-base bg-gray_5 rounded-xl"
+                          >
+                            <option value="">Добавить роль</option>
+
+                            {!currentTeamleadId && (
+                              <option value="teamlead" className="font-bold">
+                                Тимлид
                               </option>
-                            ))}
-                        </select>
-                      )}
+                            )}
+
+                            {currentIntensive?.roles
+                              .filter(
+                                (role) =>
+                                  !studentInTeam.roles
+                                    .map((role) => role.id)
+                                    .includes(role.id)
+                              )
+                              .map((role) => (
+                                <option key={role.id} value={role.id}>
+                                  {role.name}
+                                </option>
+                              ))}
+                          </select>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <div className="h-[200px] flex flex-col gap-3 p-4 rounded-xl bg-gray_5 w-full lg:w-[320px]">
+                    <h2 className="font-sans text-xl font-bold text-black whitespace-nowrap">
+                      Проект
+                    </h2>
+
+                    <input
+                      disabled={!isUserTeamlead(currentUser, currentTeam)}
+                      {...register('projectName', {
+                        maxLength: {
+                          value: 50,
+                          message: 'Максимальное количество символов - 50',
+                        },
+                      })}
+                      placeholder="Название проекта"
+                      onBlur={(e) => {
+                        if (e.target.value !== currentTeam.projectName) {
+                          handleSubmit(onChangeProjectInfoSubmit)();
+                        }
+                      }}
+                      type="text"
+                      className={
+                        'p-1 text-base rounded-lg bg-transparent hover:bg-gray_6 transition duration-300 ease-in-out focus:bg-gray_6'
+                      }
+                    />
+                    {errors.projectName && (
+                      <div className="text-sm text-red">
+                        {errors.projectName.message}
+                      </div>
+                    )}
+
+                    <textarea
+                      disabled={!isUserTeamlead(currentUser, currentTeam)}
+                      {...register('projectDescription', {
+                        maxLength: {
+                          value: 500,
+                          message: 'Максимальное количество символов - 500',
+                        },
+                      })}
+                      placeholder="Описание проекта"
+                      onBlur={(e) => {
+                        if (e.target.value !== currentTeam.projectDescription) {
+                          handleSubmit(onChangeProjectInfoSubmit)();
+                        }
+                      }}
+                      className={
+                        'p-1 text-base rounded-lg h-28 bg-transparent hover:bg-gray_6 transition duration-300 ease-in-out focus:bg-gray_6'
+                      }
+                    />
+                    {errors.projectDescription && (
+                      <div className="text-base text-red">
+                        {errors.projectDescription.message}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="h-[200px] p-4 rounded-xl bg-gray_5 w-full lg:w-[320px]">
+                    <h2 className="font-sans text-xl font-bold text-black whitespace-nowrap">
+                      Команда сопровождения
+                    </h2>
+
+                    <div className="mt-3">
+                      <h2 className="font-sans text-xl font-bold text-black">
+                        Тьютор
+                      </h2>
+                      <div className="mt-2 font-sans text-base text-bright_gray">
+                        {currentTeam.tutor
+                          ? `${currentTeam.tutor.user.lastName} ${currentTeam.tutor.user.firstName} ${currentTeam.tutor.user.patronymic}`
+                          : 'Нету'}
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <h2 className="font-sans text-xl font-bold text-black">
+                        Наставник
+                      </h2>
+                      <div className="mt-2 font-sans text-base text-bright_gray">
+                        {currentTeam.mentor
+                          ? `${currentTeam.mentor.group.name} ${currentTeam.mentor.user.lastName} ${currentTeam.mentor.user.firstName} ${currentTeam.mentor.user.patronymic}`
+                          : 'Нету'}
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <h2 className="font-sans text-xl font-bold text-black">
-                Команда сопровождения
-              </h2>
-
-              <div>
-                <h2 className="font-sans text-xl font-bold text-black">
-                  Наставник
-                </h2>
-                <div className="mt-2 font-sans text-base text-bright_gray">
-                  {currentTeam.mentor
-                    ? `${currentTeam.mentor.group.name} ${currentTeam.mentor.user.lastName} ${currentTeam.mentor.user.firstName} ${currentTeam.mentor.user.patronymic}`
-                    : 'Нету'}
-                </div>
-              </div>
-
-              <div>
-                <h2 className="font-sans text-xl font-bold text-black">
-                  Тьютор
-                </h2>
-                <div className="mt-2 font-sans text-base text-bright_gray">
-                  {currentTeam.tutor
-                    ? `${currentTeam.tutor.user.lastName} ${currentTeam.tutor.user.firstName} ${currentTeam.tutor.user.patronymic}`
-                    : 'Нету'}
                 </div>
               </div>
             </div>

@@ -10,6 +10,8 @@ export interface ITeam {
   tutor: ITeacher | null;
   mentor: IStudent | null;
   teamlead: IStudent | null;
+  projectName: string;
+  projectDescription?: string;
 }
 
 export interface ITeamShort {
@@ -77,4 +79,10 @@ export interface IStudentRolesChange {
 export interface IStudentsRolesChange {
   studentsInTeam: IStudentRolesChange[];
   teamId: number;
+}
+
+export interface IProjectInfoChange {
+  teamId: number;
+  projectName: string;
+  projectDescription?: string;
 }

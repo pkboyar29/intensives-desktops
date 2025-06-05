@@ -203,11 +203,6 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-.modal-open {
-  overflow: hidden;
-  padding-right: 16px;
-}
-
 /* input[type='radio'] {
   appearance: none;
   width: 4px;
