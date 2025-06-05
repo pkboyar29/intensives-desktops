@@ -5,6 +5,7 @@ import {
   ITask,
   ITaskCreate,
   ITaskPositionUpdate,
+  ITaskUpdate,
 } from '../../ts/interfaces/ITask';
 import {
   addSubtask,
@@ -13,6 +14,7 @@ import {
   setColumnTasks,
   setSubtasks,
   restoreKanbanState,
+  updateTask,
 } from '../slices/kanbanSlice';
 
 const mapTask = (unmappedEvent: any): ITask => {
@@ -126,7 +128,8 @@ export const taskApi = createApi({
         method: 'PATCH',
         body: {
           position: data.position,
-          ...(data.column !== undefined && { column: data.column }), // Добавляем только если колонка изменилась
+          ...(data.column !== undefined &&
+            data.parentTask === undefined && { column: data.column }), // Добавляем только если колонка изменилась
           ...(data.parentTask !== undefined && {
             parent_task: data.parentTask,
           }), // Добавляем только если родитель изменился
@@ -143,6 +146,33 @@ export const taskApi = createApi({
           console.error('Ошибка синхронизации позиции:', err);
           // Откат к предыдущему состоянию при ошибке
           dispatch(restoreKanbanState());
+        }
+      },
+    }),
+    updateTask: builder.mutation<ITask, ITaskUpdate>({
+      query: (data) => ({
+        url: `/tasks/${data.id}/`,
+        method: 'PATCH',
+        body: {
+          name: data?.name,
+          description: data?.description,
+          assignees: data?.assignees,
+          deadline_start_dt: data?.deadlineStartDt,
+          deadline_end_dt: data.deadlineEndDt,
+          is_completed: data.isCompleted,
+        },
+      }),
+      transformResponse: (response: any): ITask => mapTask(response),
+      async onQueryStarted(
+        updatedTask,
+        { dispatch, queryFulfilled, getState }
+      ) {
+        try {
+          await queryFulfilled;
+
+          dispatch(updateTask(updatedTask));
+        } catch (err) {
+          console.error('Ошибка обновления задачи:', err);
         }
       },
     }),
@@ -173,6 +203,7 @@ export const {
   useLazyGetTasksColumnQuery,
   useLazyGetSubtasksQuery,
   useCreateTaskMutation,
+  useUpdateTaskMutation,
   useUpdateTaskPositionMutation,
   useDeleteTaskMutation,
 } = taskApi;

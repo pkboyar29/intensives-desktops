@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../redux/store';
 import {
   useCreateIntensiveAnswerMutation,
+  useDeleteIntensiveAnswerMutation,
   useLazyGetIntensiveAnswersQuery,
   useUpdateInstensiveAnswerMutation,
 } from '../redux/api/intensiveAnswerApi';
@@ -22,6 +23,8 @@ import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import { IFile } from '../ts/interfaces/IFile';
 import { uploadAllFiles } from '../helpers/fileHelpers';
 import { useUploadFilesMutation } from '../redux/api/fileApi';
+import Modal from '../components/common/modals/Modal';
+import TrashIcon from '../components/icons/TrashIcon';
 
 const IntensiveAnswerPage: FC = () => {
   const currentTeam = useAppSelector((state) => state.team.data);
@@ -30,12 +33,14 @@ const IntensiveAnswerPage: FC = () => {
   const [getIntensiveAnswers] = useLazyGetIntensiveAnswersQuery();
   const [createIntensiveAnswer] = useCreateIntensiveAnswerMutation();
   const [updateIntensiveAnswer] = useUpdateInstensiveAnswerMutation();
+  const [deleteIntensiveAnswer] = useDeleteIntensiveAnswerMutation();
   const [uploadFiles] = useUploadFilesMutation();
 
   const [intensiveAnswerMark, setIntensiveAnswerMark] =
-    useState<IIntensiveAnswerMark>();
+    useState<IIntensiveAnswerMark | null>();
   const [editedTextAnswer, setEditedTextAnswer] = useState('');
   const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const {
     attachedFilesList,
@@ -160,6 +165,31 @@ const IntensiveAnswerPage: FC = () => {
     }
   };
 
+  const deleteAnswer = async () => {
+    if (
+      !intensiveAnswerMark?.intensiveAnswer ||
+      intensiveAnswerMark?.intensiveMark
+    ) {
+      return;
+    }
+
+    const { error: responseError } = await deleteIntensiveAnswer(
+      intensiveAnswerMark?.intensiveAnswer.id
+    );
+
+    setDeleteModal(false);
+
+    if (responseError) {
+      toast('Произошла серверная ошибка', { type: 'error' });
+      return;
+    }
+
+    toast('Ответ успешно удален', {
+      type: 'success',
+    });
+    setIntensiveAnswerMark(null); //мсправить
+  };
+
   return (
     <>
       <Helmet>
@@ -167,6 +197,31 @@ const IntensiveAnswerPage: FC = () => {
       </Helmet>
 
       <ToastContainer position="top-center" />
+      {deleteModal && (
+        <Modal
+          title="Удаление ответа на мероприятие"
+          onCloseModal={() => setDeleteModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Вы уверены, что хотите удалить ответ на интенсив?`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setDeleteModal(false)}
+                children="Отмена"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => deleteAnswer()}
+                children="Удалить"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
       <Title text="Мой результат интенсива" />
       <div className="mt-8 max-w">
         <div className="mt-3 lg:w-1/2">
@@ -229,6 +284,19 @@ const IntensiveAnswerPage: FC = () => {
                     clickHandler={() => setIsEditing(false)}
                   />
                 )}
+                {!isEditing &&
+                  !intensiveAnswerMark.intensiveMark &&
+                  intensiveAnswerMark.intensiveAnswer && (
+                    <div>
+                      <PrimaryButton
+                        buttonColor="gray"
+                        children={<TrashIcon />}
+                        onClick={() => {
+                          setDeleteModal(true);
+                        }}
+                      />
+                    </div>
+                  )}
                 <PrimaryButton
                   type="button"
                   //buttonColor={isEditing ? 'red' : 'blue'}
@@ -239,7 +307,7 @@ const IntensiveAnswerPage: FC = () => {
                         : 'Сохранить и отправить'
                       : intensiveAnswerMark?.intensiveAnswer
                       ? 'Редактировать ответ'
-                      : 'Отправить ответ'
+                      : 'Отправить новый ответ'
                   }
                   clickHandler={() => {
                     if (isEditing) {

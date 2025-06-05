@@ -1,37 +1,24 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useAppSelector } from '../redux/store';
 
-interface KanbanTaskMenuProps {
-  onRename: () => void;
+interface KanbanAssigneeMenuProps {
+  onAddAssignee: (studentIds: number[]) => void;
+  addedAssignee?: number[];
   onCreateSubtask?: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }
 
-const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
-  onRename,
-  onCreateSubtask,
+const KanbanAssigneeMenu: FC<KanbanAssigneeMenuProps> = ({
+  onAddAssignee,
+  addedAssignee,
   onDelete,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null); // Ссылка на компонент меню
   const buttonRef = useRef<HTMLButtonElement>(null); // Ссылка на кнопку меню
-
-  const toggleMenu = () => {
-    //setIsOpen((prev) => !prev);
-
-    // Рассчет позицию меню (можно ли проверять !isOpen тут?)
-    if (!isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setMenuPosition({
-        top: rect.bottom + window.scrollY - 20, // Верхняя координата
-        left: rect.left + window.scrollX, // Левая координата
-      });
-    }
-
-    setIsOpen((prev) => !prev);
-  };
-  const closeMenu = () => setIsOpen(false);
+  const currentTeam = useAppSelector((state) => state.team.data);
 
   // Закрытие меню при клике вне области
   useEffect(() => {
@@ -77,6 +64,19 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
     };
   }, [isOpen]);
 
+  const toggleMenu = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY - 20, // Верхняя координата
+        left: rect.left + window.scrollX, // Левая координата
+      });
+    }
+
+    setIsOpen((prev) => !prev);
+  };
+  const closeMenu = () => setIsOpen(false);
+
   const menuContent = (
     <div
       ref={menuRef}
@@ -86,55 +86,25 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         left: menuPosition.left,
         zIndex: 1000,
       }}
-      className="absolute left-0 w-40 mt-2 bg-white border rounded shadow-lg"
+      className="absolute left-0 mt-2 bg-white border rounded shadow-lg w-50" // сделать w вычислимым
       onBlur={closeMenu}
     >
       <ul className="py-1">
-        <li>
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Останавливаем всплытие ??
-              onRename();
-              closeMenu();
-            }}
-            className="block w-full px-4 py-2 text-left text-black duration-100 hover:text-blue"
-          >
-            Переименовать
-          </button>
-        </li>
-
-        <div className="my-2 border-t border-gray-300"></div>
-
-        {onCreateSubtask && (
-          <>
-            <li>
+        {currentTeam &&
+          currentTeam.studentsInTeam.map((student, index) => (
+            <li key={index} className="border-t">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onCreateSubtask();
+                  onAddAssignee([student.id!]);
                   closeMenu();
                 }}
-                className="block w-full px-4 py-2 text-left text-black duration-100 hover:text-blue"
+                className="block w-full px-4 py-2 my-2 text-left text-black duration-100 cursor-pointer hover:text-blue"
               >
-                Создать подзадачу
+                {student.student.user.lastName} {student.student.user.firstName}
               </button>
             </li>
-            <div className="my-2 border-t border-gray-300"></div>
-          </>
-        )}
-
-        <li>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-              closeMenu();
-            }}
-            className="block w-full px-4 py-2 text-left duration-100 text-red hover:text-dark_red"
-          >
-            Удалить задачу
-          </button>
-        </li>
+          ))}
       </ul>
     </div>
   );
@@ -146,8 +116,9 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         ref={buttonRef}
         onClick={toggleMenu}
         className="rounded-full hover:text-blue"
+        title="Добавить исполнителей"
       >
-        &#x22EE; {/* Юникод для трех вертикальных точек */}
+        &#x002B;
       </button>
 
       {/* Рендерим меню через портал */}
@@ -156,4 +127,4 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
   );
 };
 
-export default KanbanTaskMenu;
+export default KanbanAssigneeMenu;

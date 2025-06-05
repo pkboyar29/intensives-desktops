@@ -65,6 +65,7 @@ export interface ITeamleadChange {
 }
 
 export interface IStudentInTeam {
+  id?: number;
   student: IStudent;
   roles: IStudentRole[];
 }

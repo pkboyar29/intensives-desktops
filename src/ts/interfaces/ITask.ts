@@ -1,6 +1,5 @@
-
 export interface ITask {
-  id: number,
+  id: number;
   idTask: number;
   name: string;
   description: string | null;
@@ -10,7 +9,7 @@ export interface ITask {
   parentTask: number | null;
   createdDt: Date;
   deadlineStartDt: Date | null;
-  deadlineEndDt: Date  | null;
+  deadlineEndDt: Date | null;
   position: number;
   isCompleted: boolean;
   initialSubtaskCount: number | null;
@@ -27,4 +26,14 @@ export interface ITaskPositionUpdate {
   position: number;
   column?: number;
   parentTask?: number;
+}
+
+export interface ITaskUpdate {
+  id: number;
+  name?: string;
+  description?: string;
+  assignees?: number[];
+  deadlineStartDt?: Date;
+  deadlineEndDt?: Date;
+  isCompleted?: boolean;
 }

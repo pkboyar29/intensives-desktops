@@ -24,6 +24,7 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
       unmappedTeam.mentor === null ? null : mapStudent(unmappedTeam.mentor),
     studentsInTeam: unmappedTeam.students_in_team.map(
       (unmappedStudent: any) => ({
+        id: unmappedStudent.id && unmappedStudent.id,
         student: mapStudent(unmappedStudent.student),
         roles: unmappedStudent.roles.map((unmappedRole: any) =>
           mapStudentRole(unmappedRole)

@@ -12,6 +12,7 @@ import { ParentFields } from '../../../ts/types/types';
 
 interface AdminEntityModalProps<T> {
   type: TableType;
+  entityName: string;
   defaultParentFields?: ParentFields;
   entityParentId?: Record<string, string | number>;
   onClose: () => void;
@@ -19,8 +20,14 @@ interface AdminEntityModalProps<T> {
 }
 
 function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
-  const { type, defaultParentFields, entityParentId, onClose, onCreate } =
-    props;
+  const {
+    type,
+    entityName,
+    defaultParentFields,
+    entityParentId,
+    onClose,
+    onCreate,
+  } = props;
 
   const columns = tableConfigs[type] as ColumnConfig<T>[];
   const [creatingRow, setCreatingRow] = useState<T>({} as T);
@@ -51,7 +58,7 @@ function AdminCreateEntityModal<T>(props: AdminEntityModalProps<T>) {
   return (
     <>
       <Modal
-        title={'Создание записи'}
+        title={`Создание записи (${entityName})`}
         onCloseModal={() => onClose()}
         closeByClickOutside={false}
       >

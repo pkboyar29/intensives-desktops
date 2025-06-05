@@ -80,6 +80,12 @@ export const intensiveAnswerApi = createApi({
       transformResponse: (response: any): IIntensiveAnswer =>
         mapIntensiveAnswer(response),
     }),
+    deleteIntensiveAnswer: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/intensive_answers/${id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -87,4 +93,5 @@ export const {
   useLazyGetIntensiveAnswersQuery,
   useCreateIntensiveAnswerMutation,
   useUpdateInstensiveAnswerMutation,
+  useDeleteIntensiveAnswerMutation,
 } = intensiveAnswerApi;
