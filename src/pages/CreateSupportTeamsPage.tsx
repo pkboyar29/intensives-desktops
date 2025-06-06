@@ -16,9 +16,9 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
 import SearchBar from '../components/common/SearchBar';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
-import { ISupportTeamForManager, ITeam } from '../ts/interfaces/ITeam';
+import { ISupportTeamManager, ITeam } from '../ts/interfaces/ITeam';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -30,9 +30,7 @@ const CreateSupportTeamsPage: FC = () => {
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
   const [getSpecificFreeStudents] = useLazyGetSpecificFreeStudentsQuery();
 
-  const [supportTeams, setSupportTeams] = useState<ISupportTeamForManager[]>(
-    []
-  );
+  const [supportTeams, setSupportTeams] = useState<ISupportTeamManager[]>([]);
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
     () => supportTeams.find((team) => team.id === currentTeamId),
@@ -253,8 +251,6 @@ const CreateSupportTeamsPage: FC = () => {
             `Изменение команд сопровождения | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {cancelModal && (
         <Modal

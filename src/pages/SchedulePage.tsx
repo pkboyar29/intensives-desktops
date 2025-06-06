@@ -12,7 +12,7 @@ import Modal from '../components/common/modals/Modal';
 import Title from '../components/common/Title';
 import DisplaySelect from '../components/common/DisplaySelect';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import StageInSchedule from '../components/schedule/StageInSchedule';
 import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/common/modals/StageModal';
@@ -137,8 +137,6 @@ const SchedulePage: FC = () => {
           {currentIntensive && `Расписание | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {stageModal.status && (
         <StageModal

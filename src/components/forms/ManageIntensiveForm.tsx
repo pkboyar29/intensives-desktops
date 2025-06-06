@@ -23,7 +23,7 @@ import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import SpecificStudentsInput from '../common/inputs/SpecificStudentsInput';
 import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import EditableFileList from '../EditableFileList';
 
 import { IFile } from '../../ts/interfaces/IFile';
@@ -266,8 +266,6 @@ const ManageIntensiveForm: FC = () => {
             : 'Создание интенсива'}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {cancelModal && (
         <Modal

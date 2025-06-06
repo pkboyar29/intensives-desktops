@@ -15,14 +15,14 @@ import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Tooltip from '../components/common/Tooltip';
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
 import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeam, ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam, ITeamCreate, ITeamManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const CreateTeamsPage: FC = () => {
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
   const [teamsCountError, setTeamsCountError] = useState<string | null>(null);
-  const [teams, setTeams] = useState<ITeamForManager[]>([]);
+  const [teams, setTeams] = useState<ITeamManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
@@ -91,7 +91,7 @@ const CreateTeamsPage: FC = () => {
               }))
             );
           } else {
-            const initialTeamData: ITeamForManager[] = [
+            const initialTeamData: ITeamManager[] = [
               {
                 id: null,
                 index: 1,
@@ -212,7 +212,7 @@ const CreateTeamsPage: FC = () => {
       if (prevTeamsCount < teamsCount) {
         // teams count will increase
 
-        const newTeams: ITeamForManager[] = [];
+        const newTeams: ITeamManager[] = [];
         for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
           newTeams.push({
             id: null,
@@ -232,7 +232,7 @@ const CreateTeamsPage: FC = () => {
 
         setTeams((prevTeams) => {
           const reducedStudentsInTeam: IStudent[] = [];
-          const remainingTeams: ITeamForManager[] = [];
+          const remainingTeams: ITeamManager[] = [];
 
           for (let i = 0; i < prevTeamsCount; i++) {
             if (i <= teamsCount - 1) {
@@ -253,11 +253,8 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
-  const handleStudentMove = (
-    team: ITeamForManager,
-    droppedStudent: IStudent
-  ) => {
-    const sourceTeam: ITeamForManager | undefined = teams.find((team) =>
+  const handleStudentMove = (team: ITeamManager, droppedStudent: IStudent) => {
+    const sourceTeam: ITeamManager | undefined = teams.find((team) =>
       team.studentsInTeam.some((student) => student.id === droppedStudent.id)
     );
     if (sourceTeam) {
@@ -283,7 +280,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentDelete = (
-    team: ITeamForManager,
+    team: ITeamManager,
     studentToDelete: IStudent
   ) => {
     const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
@@ -369,8 +366,6 @@ const CreateTeamsPage: FC = () => {
             `Изменение состава команд | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {teamsCountModal && (
         <Modal

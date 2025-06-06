@@ -30,7 +30,7 @@ import BackArrowIcon from '../components/icons/BackArrowIcon';
 import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import ChipList from '../components/common/ChipList';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
 import Accordion from '../components/common/Accordion';
@@ -190,8 +190,6 @@ const EventPage: FC = () => {
             `${event.name} | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {deleteModal && (
         <Modal

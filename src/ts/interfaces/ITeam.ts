@@ -20,14 +20,13 @@ export interface ITeamShort {
   position: number;
 }
 
-export interface ITeamForManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
+export interface ITeamManager extends Omit<ITeam, 'studentsInTeam' | 'id'> {
   studentsInTeam: IStudent[];
   index: number;
   id: number | null;
 }
 
-export interface ISupportTeamForManager
-  extends Omit<ITeam, 'tutor' | 'mentor'> {
+export interface ISupportTeamManager extends Omit<ITeam, 'tutor' | 'mentor'> {
   tutor: {
     id: number;
     name: string;

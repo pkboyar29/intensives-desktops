@@ -13,7 +13,7 @@ import Modal from './Modal';
 import InputDescription from '../inputs/InputDescription';
 import TrashIcon from '../../icons/TrashIcon';
 import PrimaryButton from '../PrimaryButton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import {
   IEducationRequest,
@@ -156,8 +156,6 @@ const EducationRequestAnswerModal: FC<EducationRequestAnswerModalProps> = ({
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
       <Modal
         title={
           <>

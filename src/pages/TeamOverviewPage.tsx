@@ -19,7 +19,7 @@ import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Tag from '../components/common/Tag';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 interface ProjectInfoFields {
   projectName: string;
@@ -250,8 +250,6 @@ const TeamOverviewPage: FC = () => {
             `${currentTeam.name} | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {!currentTeam ? (
         <Skeleton />

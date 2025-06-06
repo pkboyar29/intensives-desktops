@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import Modal from '../modals/Modal';
 import InputDescription from '../inputs/InputDescription';
 import PrimaryButton from '../PrimaryButton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import {
   useCreateStageMutation,
@@ -114,8 +114,6 @@ const StageModal: FC<StageModalProps> = ({
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
       <Modal
         title={stage ? 'Редактирование этапа' : 'Создание этапа'}
         onCloseModal={onClose}

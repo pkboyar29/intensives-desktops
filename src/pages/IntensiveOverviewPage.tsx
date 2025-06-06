@@ -11,7 +11,7 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Skeleton from 'react-loading-skeleton';
 import TrashIcon from '../components/icons/TrashIcon';
 import Modal from '../components/common/modals/Modal';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import AttachedFileList from '../components/AttachedFileList';
 
 const IntensiveOverviewPage: FC = () => {
@@ -31,8 +31,6 @@ const IntensiveOverviewPage: FC = () => {
           {currentIntensive && `Просмотр | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {deleteModal && currentIntensive && (
         <Modal

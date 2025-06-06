@@ -21,7 +21,7 @@ import EducationRequestModal from '../components/common/modals/EducationRequestM
 import EducationRequestAnswerModal from '../components/common/modals/EducationRequestAnswerModal';
 import EducationRequestCard from '../components/EducationRequestCard';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import {
   IEducationRequest,
@@ -171,8 +171,6 @@ const EducationRequestsPage: FC = () => {
             `Образовательные запросы | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {requestModal.status && (
         <EducationRequestModal
