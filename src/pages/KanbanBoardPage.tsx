@@ -18,6 +18,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { moveColumnTemporary } from '../redux/slices/kanbanSlice';
+import { isUserTeamlead } from '../helpers/userHelpers';
 
 const KanbanBoardPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -188,24 +189,28 @@ const KanbanBoardPage: FC = () => {
                 </div>
               ))}
 
-            {isColumnCreating ? (
-              <input
-                type="text"
-                defaultValue={''}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                onChange={handleInputChange}
-                maxLength={50}
-                autoFocus
-                className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
-              />
-            ) : (
-              <button
-                className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
-                onClick={() => setColumnCreating(true)}
-              >
-                Создать колонку
-              </button>
+            {isUserTeamlead(currentUser, currentTeam) && (
+              <>
+                {isColumnCreating ? (
+                  <input
+                    type="text"
+                    defaultValue={''}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onChange={handleInputChange}
+                    maxLength={50}
+                    autoFocus
+                    className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
+                  />
+                ) : (
+                  <button
+                    className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
+                    onClick={() => setColumnCreating(true)}
+                  >
+                    Создать колонку
+                  </button>
+                )}
+              </>
             )}
           </div>
         </DndProvider>

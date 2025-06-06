@@ -5,14 +5,14 @@ import { useAppSelector } from '../redux/store';
 interface KanbanAssigneeMenuProps {
   onAddAssignee: (studentIds: number[]) => void;
   addedAssignee?: number[];
-  onCreateSubtask?: () => void;
+  isVisibleButton?: boolean;
   onDelete?: () => void;
 }
 
 const KanbanAssigneeMenu: FC<KanbanAssigneeMenuProps> = ({
   onAddAssignee,
   addedAssignee,
-  onDelete,
+  isVisibleButton = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -115,10 +115,10 @@ const KanbanAssigneeMenu: FC<KanbanAssigneeMenuProps> = ({
       <button
         ref={buttonRef}
         onClick={toggleMenu}
-        className="rounded-full hover:text-blue"
+        className="text-xl duration-100 rounded-full hover:bg-white hover:text-dark_blue"
         title="Добавить исполнителей"
       >
-        &#x002B;
+        {isVisibleButton && '+'}
       </button>
 
       {/* Рендерим меню через портал */}

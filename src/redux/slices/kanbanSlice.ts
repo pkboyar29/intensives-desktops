@@ -179,13 +179,13 @@ const kanbanSlice = createSlice({
       // Обновляем список taskIds для данной колонки
       const column = state.columns.find((col) => col.id === columnId);
       if (column) {
-        // Просто добавляем новые задачи в конец списка taskIds
-        column.taskIds = [
-          ...column.taskIds,
-          ...tasks
-            .filter((task) => !task.parentTask) // Только задачи без parent_task
-            .map((task) => task.id),
-        ] // Сохраняем только ID задач
+        const existingTaskIds = new Set(column.taskIds);
+        const newUniqueTaskIds = tasks
+          .filter((task) => !task.parentTask)
+          .filter((task) => !existingTaskIds.has(task.id))
+          .map((task) => task.id);
+
+        column.taskIds = [...column.taskIds, ...newUniqueTaskIds] // Сохраняем только ID задач
           .sort(
             (a, b) =>
               state.tasks.byId[a].position - state.tasks.byId[b].position

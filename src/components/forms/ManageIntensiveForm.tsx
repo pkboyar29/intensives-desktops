@@ -524,10 +524,10 @@ const ManageIntensiveForm: FC = () => {
             {attachedFilesList && (
               <EditableFileList
                 files={attachedFilesList}
+                onFilesChange={handleFilesChange}
                 onFileDelete={handleFileDelete}
               />
             )}
-            <FileUpload onFilesChange={handleFilesChange} />
           </div>
 
           {!isValid && (

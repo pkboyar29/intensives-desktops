@@ -19,6 +19,11 @@ import {
 import Skeleton from 'react-loading-skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ITaskPositionUpdate } from '../ts/interfaces/ITask';
+import {
+  isUserMentor,
+  isUserStudent,
+  isUserTeamlead,
+} from '../helpers/userHelpers';
 
 interface KanbanColumnProps {
   id: number;
@@ -88,6 +93,9 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   const dndPlaceholder = useAppSelector(
     (state) => state.kanban.dndTaskPlaceholderIndex
   );
+
+  const currentUser = useAppSelector((state) => state.user.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
 
   useEffect(() => {
     //console.log('rerender column id -', id);
@@ -428,7 +436,11 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       }`}
       style={{ borderTopColor: colorHEX }}
     >
-      <div ref={dragRef} onMouseDown={preventDrag} className="p-4">
+      <div
+        ref={isUserTeamlead(currentUser, currentTeam) ? dragRef : null}
+        onMouseDown={preventDrag}
+        className="p-4"
+      >
         <div className="flex flex-row items-start justify-between">
           <div className="flex items-center justify-between mb-2 group">
             {isEditing ? (
@@ -462,32 +474,37 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
             )}
           </div>
 
-          <KanbanColumnMenu
-            onRename={renameColumn}
-            onChangeColor={(color: string) => onUpdateColor(id, color)}
-            onDelete={deleteColumn}
-          />
+          {isUserStudent(currentUser) && !isUserMentor(currentUser) && (
+            <KanbanColumnMenu
+              onRename={renameColumn}
+              onChangeColor={(color: string) => onUpdateColor(id, color)}
+              onDelete={deleteColumn}
+            />
+          )}
         </div>
-
-        {creatingTask != null ? (
-          <textarea
-            ref={textareaRef}
-            value={creatingTask}
-            onBlur={handleBlurTask}
-            onKeyDown={handleKeyDownTask}
-            onChange={(e) => setCreatingTask(e.target.value)}
-            maxLength={500}
-            placeholder="Введите название задачи..."
-            autoFocus
-            className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
-          />
-        ) : (
-          <button
-            className="text-left text-blue hover:text-dark_blue"
-            onClick={() => setCreatingTask('')}
-          >
-            + Создать задачу
-          </button>
+        {isUserStudent(currentUser) && !isUserMentor(currentUser) && (
+          <>
+            {creatingTask != null ? (
+              <textarea
+                ref={textareaRef}
+                value={creatingTask}
+                onBlur={handleBlurTask}
+                onKeyDown={handleKeyDownTask}
+                onChange={(e) => setCreatingTask(e.target.value)}
+                maxLength={500}
+                placeholder="Введите название задачи..."
+                autoFocus
+                className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
+              />
+            ) : (
+              <button
+                className="text-left text-blue hover:text-dark_blue"
+                onClick={() => setCreatingTask('')}
+              >
+                + Создать задачу
+              </button>
+            )}
+          </>
         )}
       </div>
 

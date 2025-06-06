@@ -256,10 +256,9 @@ const IntensiveAnswerPage: FC = () => {
                       <EditableFileList
                         files={attachedFilesList}
                         nameFileList="ответа"
+                        onFilesChange={handleFilesChange}
                         onFileDelete={handleFileDelete}
                       />
-
-                      <FileInput onFilesChange={handleFilesChange} />
                     </div>
                   )}
                   {intensiveAnswerMark?.intensiveAnswer?.updatedDate && (

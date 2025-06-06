@@ -9,7 +9,10 @@ import {
   isUserTutor,
   isUserJury,
 } from '../helpers/userHelpers';
-import { getEventDateDisplayString } from '../helpers/dateHelpers';
+import {
+  getDateTimeDisplay,
+  getEventDateDisplayString,
+} from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
@@ -321,6 +324,21 @@ const EventPage: FC = () => {
                       </div>
                     )}
 
+                  {event.deadlineDate && (
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">
+                        Дедлайн ответа
+                      </div>
+                      <div
+                        className={`${
+                          new Date() > event.deadlineDate && 'text-dark_red'
+                        }`}
+                      >
+                        {getDateTimeDisplay(event.deadlineDate)}
+                      </div>
+                    </div>
+                  )}
+
                   {event?.files && (
                     <div>
                       <AttachedFileList
@@ -398,6 +416,11 @@ const EventPage: FC = () => {
                               }}
                             />
                           )}
+                        {!isUserTeamlead(currentUser, currentTeam) && (
+                          <p className="text-lg md:text-xl text-black_2">
+                            Отправка ответа доступна тимлиду команды
+                          </p>
+                        )}
                       </div>
                     )}
                   </>

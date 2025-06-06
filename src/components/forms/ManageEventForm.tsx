@@ -836,10 +836,10 @@ const ManageEventForm: FC = () => {
               {attachedFilesList && (
                 <EditableFileList
                   files={attachedFilesList}
+                  onFilesChange={handleFilesChange}
                   onFileDelete={handleFileDelete}
                 />
               )}
-              <FileUpload onFilesChange={handleFilesChange} />
             </div>
           </div>
 

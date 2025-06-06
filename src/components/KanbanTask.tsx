@@ -23,6 +23,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import React from 'react';
 import { ITaskPositionUpdate } from '../ts/interfaces/ITask';
 import KanbanAssigneeMenu from './KanbanAssigneeMenu';
+import { motion } from 'framer-motion';
+import { isUserMentor, isUserStudent } from '../helpers/userHelpers';
 
 interface KanbanTaskProps {
   id: number;
@@ -67,6 +69,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [taskSize, setTaskSize] = useState({ width: 0, height: 0 });
   const [isEditingName, setIsEditingName] = useState(false);
   const [currentName, setCurrentName] = useState<string>(name);
+  const [isHovered, setIsHovered] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea создание подзадачи
   const textareaNameRef = useRef<HTMLTextAreaElement>(null); // Ссылка на textarea редактирования названия задачи
   const taskRef = useRef<HTMLDivElement>(null);
@@ -79,9 +82,11 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const subtaskCount = useAppSelector(
     (state) => state.kanban.subtasks?.[id]?.length || 0
   );
+
   const dndPlaceholder = useAppSelector(
     (state) => state.kanban.dndTaskPlaceholderIndex
   );
+  const currentUser = useAppSelector((state) => state.user.data);
 
   useEffect(() => {
     if (taskRef.current) {
@@ -450,15 +455,21 @@ const KanbanTask: FC<KanbanTaskProps> = ({
               id === dndPlaceholder?.hoverId &&
               'border border-blue duration-100'
             }`}
-            ref={dragTaskRef}
+            ref={
+              isUserStudent(currentUser) && !isUserMentor(currentUser)
+                ? dragTaskRef
+                : null
+            }
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
             <div className="flex justify-between space-x-2 ml">
               <div className="flex space-x-3">
-                {index}
+                {/*
                 <input
                   type="checkbox"
                   className="w-4 h-4 text-blue-500 cursor-pointer"
-                />
+                />*/}
                 <div className="w-[180px] break-words text-l text-gray-700 font-normal ">
                   {isEditingName ? (
                     <textarea
@@ -482,34 +493,39 @@ const KanbanTask: FC<KanbanTaskProps> = ({
                   )}
                 </div>
               </div>
-              {!parentTaskId ? (
+
+              {isUserStudent(currentUser) && !isUserMentor(currentUser) && (
                 <KanbanTaskMenu
                   onRename={renameTask}
-                  onCreateSubtask={() => {
-                    loadSubtasksData();
-                    setIsExpandedSubtasks(true);
-                    setCreatingSubtask('');
-                  }}
+                  onCreateSubtask={
+                    !parentTaskId
+                      ? () => {
+                          loadSubtasksData();
+                          setIsExpandedSubtasks(true);
+                          setCreatingSubtask('');
+                        }
+                      : undefined
+                  }
                   onDelete={deleteTask}
                 />
-              ) : (
-                <KanbanTaskMenu onRename={renameTask} onDelete={deleteTask} />
               )}
             </div>
 
             <div className="flex items-center justify-between mt-2">
-              <span className="inline-block px-2 py-1 mt-2 text-xs text-gray-600 rounded bg-gray">
+              {/*<span className="inline-block px-2 py-1 mt-2 text-xs text-gray-600 rounded bg-gray">
                 {id}
               </span>
               {assignees && assignees.length > 0 ? (
-                <div className="flex items-center justify-center text-xs font-semibold text-white bg-blue-500 rounded-full w-7 h-7">
+                <div className="flex items-center justify-center text-xs font-semibold text-black bg-blue-500 rounded-full w-7 h-7">
                   исполнители
                 </div>
               ) : (
                 <KanbanAssigneeMenu
                   onAddAssignee={(ids: number[]) => updateTaskAssignees(ids)}
+                  isVisibleButton={false} //isHoveres
                 />
               )}
+              */}
             </div>
           </div>
           {id === dndPlaceholder?.hoverId &&
@@ -565,7 +581,11 @@ const KanbanTask: FC<KanbanTaskProps> = ({
                 if (!subtask) return null;
 
                 return (
-                  <div key={subtask.id} className="ml-3 mr-1">
+                  <motion.div
+                    key={subtask.id}
+                    layout
+                    transition={{ duration: 0.14 }}
+                  >
                     <KanbanTask
                       id={subtask.id}
                       columnId={subtask.column}
@@ -575,7 +595,7 @@ const KanbanTask: FC<KanbanTaskProps> = ({
                       isCompleted={subtask.isCompleted}
                       initialSubtaskCount={subtask.initialSubtaskCount}
                     />
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
