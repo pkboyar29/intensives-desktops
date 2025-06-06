@@ -15,12 +15,12 @@ export const mapTeacher = (teacher: any): ITeacher => {
     name: getFullName(
       teacher.user.first_name,
       teacher.user.last_name,
-      teacher.user.patronymic
+      teacher.user.patronymic ? teacher.user.patronymic : null
     ),
     user: {
       firstName: teacher.user.first_name,
       lastName: teacher.user.last_name,
-      patronymic: teacher.user.patronymic,
+      patronymic: teacher.user.patronymic ? teacher.user.patronymic : null,
     },
   };
 };
@@ -43,17 +43,24 @@ export const mapTeacherAdmin = (unmappedTeacher: any): ITeacherAdmin => {
 const getFullName = (
   firstName: string,
   lastName: string,
-  patronymic: string
+  patronymic?: string
 ) => {
-  return `${lastName} ${firstName[0]}.${patronymic[0]}.`;
+  return `${lastName} ${firstName[0]}.${patronymic && patronymic[0]}.`;
 };
 
 export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeachersInUniversity: builder.query<ITeacher[], void>({
-      query: () => `teachers/`,
+    getTeachersInUniversity: builder.query<
+      ITeacher[],
+      {
+        isManager?: boolean;
+      }
+    >({
+      query: ({ isManager = false }) => {
+        return `teachers/?is_manager=${isManager}`;
+      },
       transformResponse: (response: any): ITeacher[] =>
         response.results.map((teacher: any) => mapTeacher(teacher)),
     }),

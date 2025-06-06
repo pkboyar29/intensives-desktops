@@ -18,7 +18,7 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     id: unmappedIntensive.id,
     name: unmappedIntensive.name,
     description: unmappedIntensive.description,
-    isOpen: unmappedIntensive.is_open,
+    isVisible: unmappedIntensive.is_visible,
     openDate: new Date(unmappedIntensive.open_dt),
     closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
@@ -28,6 +28,10 @@ const mapIntensive = (unmappedIntensive: any): IIntensive => {
     teachers: unmappedIntensive.teachers.map((teacher: any) =>
       mapTeacher(teacher)
     ),
+    managers: unmappedIntensive.managers.map((manager: any) =>
+      mapTeacher(manager)
+    ),
+    creatorId: unmappedIntensive.creator,
     roles: unmappedIntensive.roles.map((role: any) => mapStudentRole(role)),
     files: unmappedIntensive.files.map((file: any) => mapFile(file)),
   };
@@ -38,7 +42,7 @@ const mapIntensiveShort = (unmappedIntensive: any): IIntensiveShort => {
     id: unmappedIntensive.id,
     name: unmappedIntensive.name,
     description: unmappedIntensive.description,
-    isOpen: unmappedIntensive.is_open,
+    isVisible: unmappedIntensive.is_visible,
     openDate: new Date(unmappedIntensive.open_dt),
     closeDate: new Date(unmappedIntensive.close_dt),
     flows: unmappedIntensive.flows,
@@ -50,14 +54,57 @@ export const intensiveApi = createApi({
   reducerPath: 'intensiveApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getIntensives: builder.query<IIntensiveShort[], boolean>({
-      query: (isMentor) => `/intensives/?is_mentor=${isMentor}`,
-      transformResponse: (response: any): IIntensiveShort[] => {
-        const mappedIntensives: IIntensiveShort[] = response.map(
+    getIntensives: builder.query<
+      {
+        results: IIntensiveShort[];
+        count: number;
+        next: string | null;
+        previous: string | null;
+      },
+      {
+        isMentor: boolean;
+        page: number;
+        search: string;
+        visibility?: 'all' | 'visible' | 'invisible';
+        relevance: 'all' | 'relevant' | 'past';
+        sortOption: 'fromOldToNew' | 'fromNewToOld';
+      }
+    >({
+      query: ({
+        isMentor,
+        page,
+        search,
+        visibility,
+        relevance,
+        sortOption,
+      }) => {
+        const params = new URLSearchParams();
+        params.append('is_mentor', isMentor.toString());
+        params.append('page', page.toString());
+        params.append('search', search);
+        params.append('relevance', relevance);
+        params.append(
+          'ordering',
+          sortOption === 'fromOldToNew' ? 'open_dt' : '-open_dt'
+        );
+
+        if (visibility) {
+          params.append('visibility', visibility);
+        }
+
+        return `/intensives/?${params.toString()}`;
+      },
+      transformResponse: (response: any) => {
+        const mappedIntensives: IIntensiveShort[] = response.results.map(
           (unmappedIntensive: any) => mapIntensiveShort(unmappedIntensive)
         );
 
-        return mappedIntensives;
+        return {
+          results: mappedIntensives,
+          count: response.count,
+          next: response.next,
+          previous: response.previous,
+        };
       },
     }),
     getIntensive: builder.query<IIntensive, number>({
@@ -71,10 +118,11 @@ export const intensiveApi = createApi({
         body: {
           name: data.name,
           description: data.description,
-          is_open: data.isOpen,
+          is_visible: data.isVisible,
           open_dt: data.openDate,
           close_dt: data.closeDate,
           teachers: data.teacherIds,
+          managers: data.managerIds,
           flows: data.flowIds,
           specific_student_ids: data.specificStudentsIds,
           roles: data.roleIds,
@@ -92,10 +140,11 @@ export const intensiveApi = createApi({
           body: {
             name: data.name,
             description: data.description,
-            is_open: data.isOpen,
+            is_visible: data.isVisible,
             open_dt: data.openDate,
             close_dt: data.closeDate,
             teachers: data.teacherIds,
+            managers: data.managerIds,
             flows: data.flowIds,
             specific_student_ids: data.specificStudentsIds,
             roles: data.roleIds,
@@ -105,15 +154,15 @@ export const intensiveApi = createApi({
       },
       transformResponse: (response: any): IIntensive => mapIntensive(response),
     }),
-    updateIntensiveOpenness: builder.mutation<
+    updateIntensiveVisibility: builder.mutation<
       string,
-      { openness: boolean; intensiveId: number }
+      { visibility: boolean; intensiveId: number }
     >({
       query: (data) => ({
-        url: `/intensives/${data.intensiveId}/openness/`,
+        url: `/intensives/${data.intensiveId}/visibility/`,
         method: 'PATCH',
         body: {
-          openness: data.openness,
+          visibility: data.visibility,
         },
       }),
     }),
@@ -137,12 +186,11 @@ export const intensiveApi = createApi({
 });
 
 export const {
-  useGetIntensivesQuery,
-  useLazyGetIntensiveQuery,
+  useLazyGetIntensivesQuery,
   useGetIntensiveQuery,
   useCreateIntensiveMutation,
   useUpdateIntensiveMutation,
-  useUpdateIntensiveOpennessMutation,
+  useUpdateIntensiveVisibilityMutation,
   useDeleteIntensiveMutation,
   useLazyGetFreeStudentsQuery,
   useLazyGetSpecificFreeStudentsQuery,

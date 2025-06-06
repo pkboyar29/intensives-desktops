@@ -9,6 +9,7 @@ import { setIsSidebarOpen } from '../redux/slices/windowSlice';
 import PrimaryButton from './common/PrimaryButton';
 import Modal from './common/modals/Modal';
 import ManagerHelpModal from './common/modals/ManagerHelpModal';
+import SettingsModal from './common/modals/SettingsModal';
 import UserIcon from './icons/UserIcon';
 import SettingsIcon from './icons/SettingsIcon';
 import LogoutIcon from './icons/LogoutIcon';
@@ -34,6 +35,7 @@ const Header: FC = () => {
   }>({ status: false, role: null });
 
   const [helpModal, setHelpModal] = useState<boolean>(false);
+  const [settingsModal, setSettingsModal] = useState<boolean>(false);
 
   const currentUser = useAppSelector((state) => state.user.data);
   const isSidebarOpen = useAppSelector((state) => state.window.isSidebarOpen);
@@ -148,6 +150,10 @@ const Header: FC = () => {
 
       {helpModal && <ManagerHelpModal onClose={() => setHelpModal(false)} />}
 
+      {settingsModal && (
+        <SettingsModal onClose={() => setSettingsModal(false)} />
+      )}
+
       <header
         className={`fixed w-full top-0 z-[100] px-5 py-4 border-b border-solid bg-white border-gray`}
       >
@@ -223,7 +229,10 @@ const Header: FC = () => {
 
                     <button
                       className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
-                      onClick={() => console.log('переход в настройки')}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setSettingsModal(true);
+                      }}
                     >
                       <SettingsIcon className="w-5 h-5" />
                       <span className="inline-flex items-center">

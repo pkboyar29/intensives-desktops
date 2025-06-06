@@ -25,6 +25,7 @@ const SearchBar: FC<SearchBarProps> = ({
         onChange={searchInputChangeHandler}
         className="w-full pl-4 bg-another_white focus:outline-none"
         placeholder="Поиск"
+        maxLength={100}
       />
       {crossIconClickHandler && (
         <button onClick={crossIconClickHandler} type="button">

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
@@ -20,7 +20,7 @@ const SignInPage: FC = () => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const [signIn] = useSignInMutation();
+  const [signIn, { isLoading }] = useSignInMutation();
   const [getUserInfo] = useLazyGetUserQuery();
 
   const [tempUser, setTempUser] = useState<IUser | null>(null);
@@ -40,9 +40,9 @@ const SignInPage: FC = () => {
   }
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       email?: string;
-      password?: string;
+      detail?: string;
     };
 
     if (errorData && errorData.email) {
@@ -50,10 +50,10 @@ const SignInPage: FC = () => {
         type: 'custom',
         message: errorData.email,
       });
-    } else if (errorData && errorData.password) {
+    } else if (errorData && errorData.detail) {
       setError('password', {
         type: 'custom',
-        message: errorData.password,
+        message: 'Неверный пароль',
       });
     }
   };
@@ -183,7 +183,11 @@ const SignInPage: FC = () => {
                   }
                 />
 
-                <PrimaryButton children="Войти в систему" type="submit" />
+                <PrimaryButton
+                  disabled={isLoading}
+                  children="Войти в систему"
+                  type="submit"
+                />
               </form>
             </div>
           )}

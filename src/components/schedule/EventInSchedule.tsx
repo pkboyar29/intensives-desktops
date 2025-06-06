@@ -23,7 +23,7 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
   const currentUser = useAppSelector((state) => state.user.data);
 
   return (
-    <section className="flex items-center gap-7">
+    <section className="flex items-center gap-4 md:gap-7">
       {isUserManager(currentUser) && (
         <button>
           <EyeIcon
@@ -36,13 +36,16 @@ const EventInSchedule: FC<EventInScheduleProps> = ({
       <div className="flex flex-col">
         <p
           onClick={() => onEventClick(event.id)}
-          className="text-xl transition duration-300 ease-in-out cursor-pointer text-black_2 hover:text-blue"
+          className="text-lg transition duration-300 ease-in-out cursor-pointer sm:text-xl text-black_2 hover:text-blue"
         >
           {event.name}
         </p>
-        <time className="text-base text-bright_gray">
-          {getEventDateDisplayString(event.startDate, event.finishDate)}
-        </time>
+        <div className="text-base text-bright_gray">
+          <time>
+            {getEventDateDisplayString(event.startDate, event.finishDate)}
+          </time>
+          {/* <div>{event.isOnline ? 'Онлайн' : event.audience?.name}</div> */}
+        </div>
       </div>
       {currentUser &&
         isUserTeacher(currentUser) &&

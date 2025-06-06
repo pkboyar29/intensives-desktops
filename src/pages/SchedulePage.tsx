@@ -208,7 +208,7 @@ const SchedulePage: FC = () => {
       )}
 
       <div className="max-w-[1280px]">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
           <Title text="Расписание интенсива" />
           {isUserManager(currentUser) && (
             <DisplaySelect
@@ -241,10 +241,10 @@ const SchedulePage: FC = () => {
         </div>
 
         {isScheduleLoading ? (
-          <Skeleton className="mt-10" />
+          <Skeleton className="mt-5 md:mt-10" />
         ) : (
           <>
-            <div className="flex flex-col gap-5 mt-10">
+            <div className="flex flex-col gap-5 mt-5 md:mt-10">
               {schedule?.stages.length === 0 ? (
                 <p className="text-xl text-black">
                   Этапы еще не определены для этого интенсива
@@ -281,8 +281,8 @@ const SchedulePage: FC = () => {
             {schedule &&
               schedule.events.filter((event) => event.stageId === null).length >
                 0 && (
-                <div className="mt-10">
-                  <div className="text-2xl font-bold text-black_2">
+                <div className="mt-5 md:mt-10">
+                  <div className="text-xl font-bold md:text-2xl text-black_2">
                     Мероприятия без этапа
                   </div>
 

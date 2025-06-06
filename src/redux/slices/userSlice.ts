@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { userApi } from '../api/userApi';
 
 import { IUser, UserRole } from '../../ts/interfaces/IUser';
 
@@ -28,6 +29,19 @@ const userSlice = createSlice({
     setCurrentUser: (state, action: PayloadAction<IUser>) => {
       state.data = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      userApi.endpoints.toggleNotifications.matchFulfilled,
+      (state) => {
+        if (state.data) {
+          state.data = {
+            ...state.data,
+            notificationDisabled: !state.data.notificationDisabled,
+          };
+        }
+      }
+    );
   },
 });
 

@@ -11,6 +11,7 @@ import {
   ITeamsSupportMembersUpdate,
   ITeamleadChange,
   IStudentsRolesChange,
+  IProjectInfoChange,
   ITeamShort,
 } from '../../ts/interfaces/ITeam';
 
@@ -33,6 +34,8 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     ),
     teamlead:
       unmappedTeam.teamlead === null ? null : mapStudent(unmappedTeam.teamlead),
+    projectName: unmappedTeam.project_name,
+    projectDescription: unmappedTeam.project_description,
   };
 };
 
@@ -71,7 +74,7 @@ export const teamApi = createApi({
         return teams;
       },
     }),
-    getTeam: builder.query<ITeam, number>({
+    getTeam: builder.query<ITeam | null, number>({
       query: (teamId) => `teams/${teamId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
     }),
@@ -119,9 +122,20 @@ export const teamApi = createApi({
         })),
       }),
     }),
-    getMyTeam: builder.query<ITeam, number>({
+    changeProjectInfo: builder.mutation<string, IProjectInfoChange>({
+      query: (data) => ({
+        url: `/teams/${data.teamId}/change_project_info/`,
+        method: 'PUT',
+        body: {
+          project_name: data.projectName,
+          project_description: data.projectDescription,
+        },
+      }),
+    }),
+    getMyTeam: builder.query<ITeam | null, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeam => mapTeam(response),
+      transformResponse: (response: any): ITeam | null =>
+        response ? mapTeam(response) : null,
     }),
   }),
 });
@@ -133,6 +147,7 @@ export const {
   useUpdateSupportMembersMutation,
   useChangeTeamleadMutation,
   useChangeStudentRolesMutation,
+  useChangeProjectInfoMutation,
   useLazyGetMyTeamQuery,
   useLazyGetTeamQuery,
 } = teamApi;

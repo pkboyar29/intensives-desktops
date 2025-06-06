@@ -50,12 +50,18 @@ export const mapEvent = (unmappedEvent: any): IEvent => {
 };
 
 export const mapEventShort = (unmappedEvent: any): IEventShort => {
+  console.log(unmappedEvent);
+
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
     startDate: new Date(unmappedEvent.start_dt),
     finishDate: new Date(unmappedEvent.finish_dt),
+    audience: unmappedEvent.audience
+      ? mapAudience(unmappedEvent.audience)
+      : null,
+    isOnline: unmappedEvent.is_online,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage,
     visibility: unmappedEvent.visibility,
     teamIds: unmappedEvent.teams,

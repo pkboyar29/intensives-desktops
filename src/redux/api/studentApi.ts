@@ -24,7 +24,9 @@ export const mapStudent = (unmappedStudent: any): IStudent => {
     user: {
       firstName: unmappedStudent.user.first_name,
       lastName: unmappedStudent.user.last_name,
-      patronymic: unmappedStudent.user.patronymic,
+      patronymic: unmappedStudent.user.patronymic
+        ? unmappedStudent.user.patronymic
+        : null,
     },
     nameWithGroup: getNameWithGroup(
       unmappedStudent.group.name,
@@ -59,9 +61,11 @@ const getNameWithGroup = (
   groupName: string,
   firstName: string,
   lastName: string,
-  patronymic: string
+  patronymic?: string
 ): string => {
-  return `${groupName} ${lastName} ${firstName[0]}. ${[patronymic[0]]}.`;
+  return `${groupName} ${lastName} ${firstName[0]}. ${
+    patronymic && [patronymic[0]]
+  }.`;
 };
 
 interface IStudentListQuery {

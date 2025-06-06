@@ -29,6 +29,8 @@ export interface IEventShort {
   description: string;
   startDate: Date;
   finishDate: Date;
+  audience: IAudience | null;
+  isOnline: boolean;
   stageId: number | null;
   visibility: boolean;
   teamIds: number[];
