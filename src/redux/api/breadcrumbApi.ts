@@ -1,7 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth, buildUrl } from './baseQuery';
 import { TableType } from '../../tableConfigs';
-import { IParent, IRelatedList } from '../../ts/interfaces/IRelatedList';
 import { IBreadcrumb } from '../../ts/interfaces/IBreadcrumb';
 
 export const mapBreadcrumb = (unmappedBreadcrumb: any): IBreadcrumb => {

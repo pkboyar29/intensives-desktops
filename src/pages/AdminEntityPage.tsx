@@ -454,6 +454,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       {isEntryModal && (
         <AdminCreateEntityModal
           type={config.type}
+          entityName={config.title}
           defaultParentFields={getDefaultParentFields()}
           entityParentId={undefined}
           onCreate={(entity) => {

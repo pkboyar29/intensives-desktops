@@ -10,9 +10,9 @@ export const useFileHandler = (initialFiles: IFile[] = []) => {
   const [newFiles, setNewFiles] = useState<INewFileObject[]>([]);
 
   // Обработка новых файлов
-  const handleFilesChange = (fileList: FileList | null) => {
-    if (fileList) {
-      const selectedFiles: File[] = Array.from(fileList);
+  const handleFilesChange = (selectedFiles: File[] | null) => {
+    if (selectedFiles) {
+      //const selectedFiles: File[] = Array.from(fileList);
       console.log(
         'Выбранные файлы:',
         selectedFiles.map((file) => file.name)

@@ -22,6 +22,7 @@ import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
 import AdminEntityPage from '../pages/AdminEntityPage';
 import { TableType } from '../tableConfigs';
+import IntensiveAnswerPage from '../pages/IntensiveAnswerPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -157,6 +158,10 @@ const routeConfig: RouteType[] = [
       {
         path: 'marks',
         element: <IntensiveMarksPage />,
+      },
+      {
+        path: 'results',
+        element: <IntensiveAnswerPage />,
       },
       {
         path: 'statistics',

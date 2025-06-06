@@ -113,7 +113,7 @@ const RelatedKeysList: FC<RelatedKeysListProps> = ({
         !dropdownRef.current?.contains(event.target as Node) &&
         !dropdownButtonRef.current?.contains(event.target as Node)
       ) {
-        console.log('tuta');
+        //console.log('tuta');
       }
       //closeDropdown();
     };

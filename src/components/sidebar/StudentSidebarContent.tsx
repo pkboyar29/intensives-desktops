@@ -63,6 +63,7 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         <SidebarLink to="overview" text="Просмотр интенсива" />
         <SidebarLink to="teams" text="Команды" />
         {currentTeam && <SidebarLink to="schedule" text="Мероприятия" />}
+        <SidebarLink to="results" text="Результат интенсива" />
       </div>
       <div className="my-3">
         {isTeamLoading ? (

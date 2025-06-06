@@ -57,13 +57,13 @@ export const universityColumns: ColumnConfig<IUniversity>[] = [
 export const buildingColumns: ColumnConfig<IBuilding>[] = [
   { key: 'id', label: 'ID', type: 'number', readOnly: true },
   { key: 'name', label: 'Название', type: 'string' },
+  { key: 'address', label: 'Адрес', type: 'string' },
   {
     key: 'university',
     label: 'Университет',
     type: 'relation',
     renderKey: 'name',
   },
-  { key: 'address', label: 'Адрес', type: 'string' },
 ];
 
 export const audienceColumns: ColumnConfig<IAudience>[] = [

@@ -1,3 +1,5 @@
+import { ITaskPositionUpdate } from '../ts/interfaces/ITask';
+
 export const KANBAN_COLORS = [
   '#1a5ce5', // синий
   '#2ac7d8', // бирюзовый
@@ -24,4 +26,32 @@ export const validateKanban = (name: string): boolean => {
     return false;
   }
   return true;
+};
+
+export function useCombinedRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
+  return (node: T) => {
+    for (const ref of refs) {
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref && typeof ref === 'object') {
+        (ref as React.MutableRefObject<T | null>).current = node;
+      }
+    }
+  };
+}
+
+export const getPayloadForUpdatingTaskPosition = (
+  info: ITaskPositionUpdate
+) => {
+  const payload = {
+    id: info.id,
+    position: info.position, // Новая позиция
+    column: info.column !== null ? undefined : info.column, // Если есть подзадача не отправляем колонку (нет смысла)
+    parentTask: info.parentTask !== null ? info.parentTask : undefined,
+  };
+  console.log(payload);
+
+  return payload;
 };

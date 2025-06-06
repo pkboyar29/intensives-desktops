@@ -40,10 +40,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
   return (
     <div className="relative" ref={menuRef}>
       {/* Кнопка для открытия меню */}
-      <button
-        onClick={toggleMenu}
-        className="p-2 rounded-full hover:bg-gray-200"
-      >
+      <button onClick={toggleMenu} className="rounded-full hover:bg-gray-200">
         &#x22EE; {/* Юникод для трех вертикальных точек */}
       </button>
 
@@ -60,7 +57,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
                   onRename();
                   closeMenu();
                 }}
-                className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left text-black hover:text-blue duration-100"
               >
                 Переименовать
               </button>
@@ -69,7 +66,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
             <div className="my-2 border-t border-gray-300"></div>
 
             <li>
-              <h3 className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100">
+              <h3 className="block w-full px-4 py-2 text-left text-black hover:text-blue duration-100">
                 Цвет колонки
               </h3>
               <div className="grid grid-cols-8 gap-1 px-4">
@@ -95,7 +92,7 @@ const KanbanColumnMenu: FC<KanbanColumnMenuProps> = ({
                   onDelete();
                   closeMenu();
                 }}
-                className="block w-full px-4 py-2 text-left text-red hover:text-dark_red"
+                className="block w-full px-4 py-2 text-left duration-100 text-red hover:text-dark_red"
               >
                 Удалить колонку
               </button>

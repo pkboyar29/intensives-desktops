@@ -39,7 +39,7 @@ const IntensiveMarksPage: FC = () => {
 
   useEffect(() => {
     const fetchIntensiveAnswers = async (teamId: number) => {
-      const { data } = await getIntensiveAnswers({ teamId });
+      const { data } = await getIntensiveAnswers({ team_id: teamId });
 
       if (data) {
         setIntensiveAnswers(data);

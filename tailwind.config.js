@@ -27,6 +27,7 @@ export default {
         gray_9: '#e5e7eb',
         black_gray: '#bdbebf',
         modal_eclipse: '#00000047',
+        bg_gray: '#f5f7fa',
       },
       fontFamily: {
         sans: ['Open Sans', 'sans-serif'],
