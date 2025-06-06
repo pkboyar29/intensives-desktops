@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useAppSelector } from '../../../redux/store';
 import { useToggleNotificationsMutation } from '../../../redux/api/userApi';
 
@@ -21,8 +21,6 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
       <Modal title="Настройки" onCloseModal={onClose}>
         <div className="text-lg text-bright_gray h-[60vh] overflow-y-auto flex flex-col gap-4">
           <div className="flex items-center justify-between">

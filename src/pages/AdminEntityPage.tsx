@@ -8,7 +8,7 @@ import {
   useEntityQueryHooks,
 } from '../tableConfigs/entitiesConfig';
 import { TableType } from '../tableConfigs';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { AdminBreadcrumb, ParentFields } from '../ts/types/types';
 import { useLazyGetBreadcrumbQuery } from '../redux/api/breadcrumbApi';
 import Modal from '../components/common/modals/Modal';
@@ -420,8 +420,6 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       <Helmet>
         <title>Админ-панель | {config.title}</title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {deletingEntity && (
         <Modal

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { ToastContainer } from 'react-toastify';
 
 import { IUser, UserRole } from '../ts/interfaces/IUser';
 import { useLazyGetUserQuery } from '../redux/api/userApi';
@@ -145,6 +146,8 @@ const App: FC = () => {
       <ChoosingRoleModal />
 
       <div className="App">
+        <ToastContainer position="top-center" />
+
         {currentUser && currentUser.currentRole && <Header />}
 
         <Routes>

@@ -16,7 +16,7 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
 import SearchBar from '../components/common/SearchBar';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { ISupportTeamManager, ITeam } from '../ts/interfaces/ITeam';
 
@@ -251,8 +251,6 @@ const CreateSupportTeamsPage: FC = () => {
             `Изменение команд сопровождения | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {cancelModal && (
         <Modal

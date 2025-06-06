@@ -9,7 +9,7 @@ import {
 import Modal from '../modals/Modal';
 import InputDescription from '../inputs/InputDescription';
 import PrimaryButton from '../PrimaryButton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { IEducationRequest } from '../../../ts/interfaces/IEducationRequest';
 
@@ -88,8 +88,6 @@ const EducationRequestModal: FC<EducationRequestModalProps> = ({
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
       <Modal
         title={
           request

@@ -7,7 +7,7 @@ import {
 } from '../redux/api/intensiveMarkApi';
 import { useParams } from 'react-router-dom';
 import { useLazyGetGroupsQuery } from '../redux/api/groupApi';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import Skeleton from 'react-loading-skeleton';
 import { Helmet } from 'react-helmet-async';
@@ -139,8 +139,6 @@ const ManagerIntensiveMarksPage: FC = () => {
           {currentIntensive && `Оценки за интенсив | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       <Title text="Оценки за интенсив" />
 

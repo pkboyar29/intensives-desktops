@@ -15,7 +15,7 @@ import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Tooltip from '../components/common/Tooltip';
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
@@ -366,8 +366,6 @@ const CreateTeamsPage: FC = () => {
             `Изменение состава команд | ${currentIntensive.name}`}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {teamsCountModal && (
         <Modal

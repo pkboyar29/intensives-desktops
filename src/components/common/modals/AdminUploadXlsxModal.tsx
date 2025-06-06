@@ -1,14 +1,6 @@
-import { FC, ReactNode, useEffect, useRef, useState } from 'react';
+import { FC } from 'react';
 
-import CrossIcon from '../../icons/CrossIcon';
-import { tableConfigs, TableType } from '../../../tableConfigs';
 import Modal from './Modal';
-import { ColumnConfig } from '../../../tableConfigs/nameConfig';
-import RelatedKeysList from '../../RelatedKeysList';
-import PrimaryButton from '../PrimaryButton';
-import { toast, ToastContainer } from 'react-toastify';
-import { validateTableFields } from '../../../helpers/tableHelpers';
-import { ParentFields } from '../../../ts/types/types';
 import { IUploadXlsxError } from '../../../ts/interfaces/IUser';
 
 interface AdminUploadXlsxModalProps {

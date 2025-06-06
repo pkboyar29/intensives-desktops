@@ -31,7 +31,7 @@ import PrimaryButton from '../common/PrimaryButton';
 import Modal from '../common/modals/Modal';
 import FileUpload from '../common/inputs/FileInput';
 import InputRadio from '../common/inputs/InputRadio';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 import { useFileHandler } from '../../helpers/useFileHandler';
@@ -470,8 +470,6 @@ const ManageEventForm: FC = () => {
               : `Создание мероприятия | ${currentIntensive.name}`)}
         </title>
       </Helmet>
-
-      <ToastContainer position="top-center" />
 
       {cancelModal && (
         <Modal
