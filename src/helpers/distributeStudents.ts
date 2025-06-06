@@ -1,10 +1,10 @@
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeamManager } from '../ts/interfaces/ITeam';
 
 const distributeStudents = (
   allStudents: IStudent[],
-  teams: ITeamForManager[]
-): ITeamForManager[] => {
+  teams: ITeamManager[]
+): ITeamManager[] => {
   // минимальное количество студентов в команде
   // const minStudentsCountPerTeam = Math.floor(allStudents.length / teamsCount);
   // console.log(allStudents.length);
@@ -21,7 +21,7 @@ const distributeStudents = (
     studentsByGroup[student.group.id].push(student);
   });
 
-  let newTeams: ITeamForManager[] = teams.map((team) => ({
+  let newTeams: ITeamManager[] = teams.map((team) => ({
     ...team,
     studentsInTeam: [],
   }));

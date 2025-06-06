@@ -7,7 +7,8 @@ import NotFoundPage from '../pages/NotFoundPage';
 
 import EventPage from '../pages/EventPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
-import IntensiveMarksPage from '../pages/IntensiveMarksPage';
+import TeacherIntensiveMarksPage from '../pages/TeacherIntensiveMarksPage';
+import ManagerIntensiveMarksPage from '../pages/ManagerIntensiveMarksPage';
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
@@ -155,8 +156,12 @@ const routeConfig: RouteType[] = [
         element: <EducationRequestsPage />,
       },
       {
-        path: 'marks',
-        element: <IntensiveMarksPage />,
+        path: 'teacher-marks',
+        element: <TeacherIntensiveMarksPage />,
+      },
+      {
+        path: 'manager-marks',
+        element: <ManagerIntensiveMarksPage />,
       },
       {
         path: 'statistics',

@@ -4,14 +4,14 @@ import Tag from '../common/Tag';
 import TeamIcon from '../icons/TeamIcon';
 
 import { ItemTypes } from './ItemTypes';
-import { ISupportTeamForManager } from '../../ts/interfaces/ITeam';
+import { ISupportTeamManager } from '../../ts/interfaces/ITeam';
 
 // TODO: можно тут также отображать тимлида
 
 interface SupportTeamDragContainerProps<
   DroppedElementType extends { id: number; content: string; isTutor: boolean }
 > {
-  team: ISupportTeamForManager;
+  team: ISupportTeamManager;
   allStudents: { id: number; name: string }[];
   allTeachers: { id: number; name: string }[];
   onDrop: (droppedElement: DroppedElementType) => void;

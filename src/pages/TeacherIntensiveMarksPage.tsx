@@ -5,7 +5,7 @@ import { useLazyGetIntensiveAnswersQuery } from '../redux/api/intensiveAnswerApi
 import Skeleton from 'react-loading-skeleton';
 import { Helmet } from 'react-helmet-async';
 import Title from '../components/common/Title';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 import { IIntensiveAnswerMark } from '../ts/interfaces/IIntensiveAnswer';
 import IntensiveMarkForm from '../components/forms/IntensiveMarkForm';
