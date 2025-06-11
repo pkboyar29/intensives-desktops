@@ -24,11 +24,11 @@ const AdminSidebarContent: FC = () => {
       <div className="flex flex-col gap-4 my-3">
         <SidebarLink to="universities" text="Университеты" />
         <SidebarLink to="stagesEducation" text="Ступени образования" />
-        <SidebarLink to="profiles" text="Профили" />
-        <SidebarLink to="specializations" text="Направления" />
-        <SidebarLink to="markStrategies" text="Шкалы" />
-        <SidebarLink to="studentRoles" text="Роли студента" />
-        <SidebarLink to="criterias" text="Критерии" />
+        <SidebarLink to="specializations" text="Направления подготовки" />
+        <SidebarLink to="profiles" text="Профили подготовки" />
+        <SidebarLink to="markStrategies" text="Шкалы оценивания" />
+        <SidebarLink to="criterias" text="Критерии оценивания" />
+        <SidebarLink to="studentRoles" text="Роли студентов" />
       </div>
     </>
   );

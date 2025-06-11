@@ -1,20 +1,4 @@
-import { useLazyGetAudiencesQuery } from '../redux/api/audienceApi';
-import {
-  useCreateBuildingMutation,
-  useDeleteBuildingMutation,
-  useLazyGetBuildingsQuery,
-  useUpdateBuildingMutation,
-} from '../redux/api/buildingApi';
-import {
-  useCreateUniversityMutation,
-  useDeleteUniversityMutation,
-  useLazyGetUniversitiesQuery,
-  useUpdateUniversityMutation,
-} from '../redux/api/universityApi';
-import { TableType, tableConfigs } from '.';
-import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
-import { useLazyGetGroupsQuery } from '../redux/api/groupApi';
-import { useLazyGetEducationQuery } from '../redux/api/educationApi';
+import { TableType } from '.';
 import { EntitiesQueryHooks, queryHooksMap } from './queryHooksConfig';
 
 // Тип описания query параметров родительской сущности у дочерней сущности
@@ -76,14 +60,14 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   },
   profiles: {
     type: 'profiles',
-    title: 'Профили',
+    title: 'Профили подготовки',
     //queryParamsDependencies: [{ from: 'specializationId', as: 'specialization' }],
     defaultQueryParams: { type: 'profiles', ordering: 'name' },
     hooks: queryHooksMap['education'],
   },
   specializations: {
     type: 'specializations',
-    title: 'Направления образования',
+    title: 'Направления подготовки',
     defaultQueryParams: { type: 'specializations', ordering: 'name' },
     hooks: queryHooksMap['education'],
   },
@@ -106,13 +90,13 @@ export const entitiesConfig: Record<string, EntitiesConfig> = {
   },
   markStrategies: {
     type: 'markStrategies',
-    title: 'Шкалы оценки',
+    title: 'Шкалы оценивания',
     defaultQueryParams: { ordering: 'name' },
     hooks: queryHooksMap['markStrategy'],
   },
   studentRoles: {
     type: 'studentRoles',
-    title: 'Роли студента',
+    title: 'Роли студентов',
     defaultQueryParams: { ordering: 'name' },
     hooks: queryHooksMap['studentRoles'],
   },

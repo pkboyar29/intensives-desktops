@@ -2,18 +2,9 @@ import { FC, useState, useEffect, useMemo, useRef } from 'react';
 import { childEntitiesMeta } from '../ts/types/types';
 import { ColumnConfig } from '../tableConfigs/nameConfig';
 import Table from './common/Table';
-import {
-  createColumnHelper,
-  useReactTable,
-  flexRender,
-  getCoreRowModel,
-  ColumnDef,
-  Row,
-} from '@tanstack/react-table';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { tableConfigs, TableType } from '../tableConfigs';
 import RelatedKeysList from './RelatedKeysList';
-import { IGroup } from '../ts/interfaces/IGroup';
-import { ISpecialization } from '../ts/interfaces/IEducation';
 import { validateTableFields } from '../helpers/tableHelpers';
 import TableColumnHeader from './common/TableColumnFilter';
 
@@ -46,9 +37,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const editingRow = useRef<T | null>(null);
   const columns = tableConfigs[type] as ColumnConfig<T>[];
-  const [columnVisibility, setColumnVisibility] = useState<
-    Record<string, boolean>
-  >({});
+
   const dropdownRef = useRef<HTMLDivElement>(null); // Ссылка на кнопку меню
 
   const columnHelper = createColumnHelper<T>();
@@ -346,11 +335,7 @@ function CrudTable<T>(props: CrudTableProps<T>) {
   return (
     <>
       <div>
-        <Table
-          data={data}
-          columns={columnsTable}
-          columnVisibility={columnVisibility}
-        />
+        <Table data={data} columns={columnsTable} />
         {data.length === 0 && (
           <p className="mt-3 text-2xl text-center">
             {isLoadingData ? 'Загрузка...' : 'Нет записей'}

@@ -21,7 +21,6 @@ import PrimaryButton from '../common/PrimaryButton';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
 import SpecificStudentsInput from '../common/inputs/SpecificStudentsInput';
-import FileUpload from '../common/inputs/FileInput';
 import Modal from '../common/modals/Modal';
 import { toast } from 'react-toastify';
 import EditableFileList from '../EditableFileList';

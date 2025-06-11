@@ -1,4 +1,3 @@
-import { ColumnOrderColumn } from '@tanstack/react-table';
 import { IAudience } from '../ts/interfaces/IAudience';
 import { IBuilding } from '../ts/interfaces/IBuilding';
 import {

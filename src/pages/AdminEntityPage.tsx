@@ -1,8 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import CrudTable from '../components/CrudTable';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLazyGetFlowsQuery } from '../redux/api/flowApi';
-import { IFlow } from '../ts/interfaces/IFlow';
 import {
   entitiesConfig,
   useEntityQueryHooks,
@@ -12,7 +10,6 @@ import { toast } from 'react-toastify';
 import { AdminBreadcrumb, ParentFields } from '../ts/types/types';
 import { useLazyGetBreadcrumbQuery } from '../redux/api/breadcrumbApi';
 import Modal from '../components/common/modals/Modal';
-import AdminEntryModal from '../components/common/modals/AdminEntryModal';
 import AdminCreateEntityModal from '../components/common/modals/AdminEntryModal';
 import { useRegisterStudentsFileXlsxMutation } from '../redux/api/studentApi';
 import AdminUploadXlsxModal from '../components/common/modals/AdminUploadXlsxModal';
@@ -23,7 +20,6 @@ import { removeEqualFields } from '../helpers/tableHelpers';
 import AdminUploadXlsxHelpModal from '../components/common/modals/AdminUploadXlsxHelpModal';
 import { Helmet } from 'react-helmet-async';
 import PrimaryButton from '../components/common/PrimaryButton';
-import { ColumnConfig } from '../tableConfigs/nameConfig';
 
 interface AdminEntityPageProps {
   entityType: TableType;
