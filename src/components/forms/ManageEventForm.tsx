@@ -119,7 +119,6 @@ const ManageEventForm: FC = () => {
       skip: !currentUser,
     }
   );
-  // TODO: начать получать аудитории университета интенсива
   const { data: audiencesToChoose } = useGetAudiencesQuery({});
   const { data: markStrategies } = useGetMarkStrategiesQuery(
     {},

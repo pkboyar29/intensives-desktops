@@ -52,7 +52,7 @@ export const teacherApi = createApi({
   reducerPath: 'teacherApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeachersInUniversity: builder.query<
+    getTeachersManager: builder.query<
       ITeacher[],
       {
         isManager?: boolean;
@@ -131,7 +131,7 @@ export const teacherApi = createApi({
 });
 
 export const {
-  useGetTeachersInUniversityQuery,
+  useGetTeachersManagerQuery,
   useLazyGetTeachersAdminQuery,
   useRegisterTeacherMutation,
   useUpdateTeacherMutation,

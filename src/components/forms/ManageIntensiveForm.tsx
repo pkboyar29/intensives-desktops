@@ -8,7 +8,7 @@ import {
   useUpdateIntensiveMutation,
 } from '../../redux/api/intensiveApi';
 import { useGetFlowsQuery } from '../../redux/api/flowApi';
-import { useGetTeachersInUniversityQuery } from '../../redux/api/teacherApi';
+import { useGetTeachersManagerQuery } from '../../redux/api/teacherApi';
 import { useGetStudentRolesQuery } from '../../redux/api/studentRoleApi';
 import { useUploadFilesMutation } from '../../redux/api/fileApi';
 import { useFileHandler } from '../../helpers/useFileHandler';
@@ -64,10 +64,9 @@ const ManageIntensiveForm: FC = () => {
   const [updateIntensive] = useUpdateIntensiveMutation();
   const [uploadFiles] = useUploadFilesMutation();
 
-  // TODO: получать от конкретного университета
   const { data: flows } = useGetFlowsQuery({});
-  const { data: teachers } = useGetTeachersInUniversityQuery({});
-  const { data: managers } = useGetTeachersInUniversityQuery({
+  const { data: teachers } = useGetTeachersManagerQuery({});
+  const { data: managers } = useGetTeachersManagerQuery({
     isManager: true,
   });
   const { data: studentRoles } = useGetStudentRolesQuery({});
