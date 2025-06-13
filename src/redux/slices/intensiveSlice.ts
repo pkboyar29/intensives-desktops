@@ -40,6 +40,14 @@ const intensiveSlice = createSlice({
           state.data = payload;
         }
       )
+      .addMatcher(
+        intensiveApi.endpoints.updateIntensiveVisibility.matchFulfilled,
+        (state) => {
+          if (state.data) {
+            state.data = { ...state.data, isVisible: !state.data.isVisible };
+          }
+        }
+      )
       /*
       .addMatcher(
         intensiveApi.endpoints.uploadFiles.matchFulfilled,

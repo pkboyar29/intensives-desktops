@@ -1,113 +1,96 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '../redux/store';
-import { useGetIntensivesQuery } from '../redux/api/intensiveApi';
+import { useLazyGetIntensivesQuery } from '../redux/api/intensiveApi';
 
-import { IIntensive } from '../ts/interfaces/IIntensive';
+import { IIntensiveShort } from '../ts/interfaces/IIntensive';
 import { isUserManager, isUserTeacher } from '../helpers/userHelpers';
 
-import SearchIcon from '../components/icons/SearchIcon';
+import { Helmet } from 'react-helmet-async';
+import SearchBar from '../components/common/SearchBar';
 import IntensiveCard from '../components/IntensiveCard';
 import Table from '../components/common/Table';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Filter from '../components/common/Filter';
 import Skeleton from 'react-loading-skeleton';
+import PagionationButtonPages from '../components/PaginationButtonPages';
 
 const IntensivesPage: FC = () => {
   const navigate = useNavigate();
 
   const currentUser = useAppSelector((state) => state.user.data);
 
-  const { data: intensives, isLoading } = useGetIntensivesQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser,
-  });
-  const [filteredIntensives, setFilteredIntensives] = useState<IIntensive[]>(
-    []
-  );
-  const [sortedIntensives, setSortedIntensives] = useState<IIntensive[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const [getIntensives, { data, isLoading, isUninitialized }] =
+    useLazyGetIntensivesQuery();
+  const intensives = data?.results ?? [];
+  const pagesCount = data ? Math.ceil(data.count / 10) : 0; // TODO: мы тут на 0 разделить можем?
+
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const [searchText, setSearchText] = useState<string>('');
+  const startTypingRef = useRef<boolean>(false);
+
   const [sortOption, setSortOption] = useState<'fromOldToNew' | 'fromNewToOld'>(
     'fromOldToNew'
   );
-
-  const [openness, setOpenness] = useState<'closed' | 'opened' | 'all'>('all');
-  const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
+  const [visibility, setVisibility] = useState<'invisible' | 'visible' | 'all'>(
     'all'
   );
-
-  // обрабатывать зависимость relevance
-  useEffect(() => {
-    updateFilteredIntensives();
-  }, [searchText, openness, relevance, intensives]);
+  const [relevance, setRelevance] = useState<'relevant' | 'past' | 'all'>(
+    'relevant'
+  );
 
   useEffect(() => {
-    updateSortedIntensives();
-  }, [sortOption, filteredIntensives]);
-
-  // TODO: обрабатывать relevance
-  const updateFilteredIntensives = () => {
-    if (intensives) {
-      let filteredIntensives: IIntensive[] = [];
-
-      filteredIntensives = intensives.filter((intensive) =>
-        intensive.name.toLowerCase().includes(searchText)
-      );
-
-      if (isUserManager(currentUser)) {
-        if (openness === 'opened') {
-          filteredIntensives = filteredIntensives.filter(
-            (intensive) => intensive.isOpen
-          );
-        }
-        if (openness === 'closed') {
-          filteredIntensives = filteredIntensives.filter(
-            (intensive) => !intensive.isOpen
-          );
-        }
-      }
-
-      if (relevance === 'relevant') {
-        filteredIntensives = filteredIntensives.filter(
-          (intensive) => intensive.closeDate.getTime() > Date.now()
-        );
-      }
-
-      if (relevance === 'past') {
-        filteredIntensives = filteredIntensives.filter(
-          (intensive) => intensive.closeDate.getTime() < Date.now()
-        );
-      }
-
-      setFilteredIntensives(filteredIntensives);
+    if (currentUser?.currentRole) {
+      loadPage(currentPage);
     }
-  };
+  }, [currentPage, currentUser?.currentRole]);
 
-  const updateSortedIntensives = () => {
-    if (filteredIntensives) {
-      if (sortOption === 'fromOldToNew') {
-        // сортировка по возрастанию
-        setSortedIntensives(
-          [...filteredIntensives].sort(
-            (a, b) => a.openDate.getTime() - b.openDate.getTime()
-          )
-        );
-      } else if (sortOption === 'fromNewToOld') {
-        // сортировка по убыванию
-        setSortedIntensives(
-          [...filteredIntensives].sort(
-            (a, b) => b.openDate.getTime() - a.openDate.getTime()
-          )
-        );
+  useEffect(() => {
+    if (startTypingRef.current) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+
+      const timeoutId = setTimeout(() => {
+        if (currentPage != 1) {
+          setCurrentPage(1);
+        } else {
+          loadPage(1);
+        }
+      }, 500);
+      timerRef.current = timeoutId;
+    }
+  }, [searchText]);
+
+  useEffect(() => {
+    // TODO: убрать это условие или заменить его на что-то нормальное?
+    if (currentUser?.currentRole) {
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadPage(1);
       }
     }
+  }, [visibility, relevance, sortOption]);
+
+  const loadPage = (page: number) => {
+    getIntensives({
+      isMentor: currentUser?.currentRole?.name === 'Mentor',
+      page,
+      search: searchText,
+      visibility,
+      relevance,
+      sortOption,
+    });
   };
 
   const searchInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    startTypingRef.current = true;
     setSearchText(e.target.value);
   };
 
@@ -115,7 +98,7 @@ const IntensivesPage: FC = () => {
     setSortOption(e.target.value as 'fromOldToNew' | 'fromNewToOld');
   };
 
-  const columnHelper = createColumnHelper<IIntensive>();
+  const columnHelper = createColumnHelper<IIntensiveShort>();
   const columns = [
     columnHelper.accessor('id', {
       header: () => 'ID',
@@ -144,17 +127,20 @@ const IntensivesPage: FC = () => {
   ];
 
   const intensiveClickHandler = (id: number) => {
-    if (isUserTeacher(currentUser)) {
-      localStorage.removeItem('tutorTeamId');
+    if (isUserTeacher(currentUser) || isUserManager(currentUser)) {
+      sessionStorage.removeItem('currentTeam');
     }
 
     navigate(`/intensives/${id}/overview`);
   };
 
   return (
-    <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
-      <Title text="Интенсивы" />
+    <>
+      <Helmet>
+        <title>Интенсивы | {import.meta.env.VITE_SITE_NAME}</title>
+      </Helmet>
 
+<<<<<<< HEAD
       <div className="mt-8">
         {isUserManager(currentUser) && (
           <div className="flex justify-end">
@@ -175,79 +161,93 @@ const IntensivesPage: FC = () => {
           </div>
         )}
       </div>
+=======
+      <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
+        <Title text="Интенсивы" />
+>>>>>>> main
 
-      <div className="flex items-center w-full px-4 py-3 mt-3 bg-another_white rounded-xl">
-        <SearchIcon className="text-gray-500" />
-        <input
-          value={searchText}
-          onChange={searchInputChangeHandler}
-          className="w-full pl-4 bg-another_white focus:outline-none"
-          placeholder="Поиск"
-        />
-      </div>
-
-      <div className="flex items-center justify-between gap-8 mt-5">
-        <div className="flex gap-8">
+        <div className="mt-4 sm:mt-8">
           {isUserManager(currentUser) && (
+            <div className="flex justify-end">
+              <div className="ml-auto">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <SearchBar
+          searchText={searchText}
+          searchInputChangeHandler={searchInputChangeHandler}
+        />
+
+        <div className="flex flex-wrap justify-center gap-4 mt-5 sm:justify-between sm:gap-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
+            {isUserManager(currentUser) && (
+              <Filter
+                onFilterOptionClick={(filterOption) =>
+                  setVisibility(filterOption as 'all' | 'visible' | 'invisible')
+                }
+                activeFilterOption={visibility}
+                filterList={[
+                  { label: 'Видимые', value: 'visible' },
+                  { label: 'Невидимые', value: 'invisible' },
+                  { label: 'Все', value: 'all' },
+                ]}
+              />
+            )}
+
             <Filter
               onFilterOptionClick={(filterOption) =>
-                setOpenness(filterOption as 'all' | 'opened' | 'closed')
+                setRelevance(filterOption as 'all' | 'past' | 'relevant')
               }
-              activeFilterOption={openness}
+              activeFilterOption={relevance}
               filterList={[
-                { label: 'Открытые', value: 'opened' },
-                { label: 'Закрытые', value: 'closed' },
+                { label: 'Актуальные', value: 'relevant' },
+                { label: 'Прошедшие', value: 'past' },
                 { label: 'Все', value: 'all' },
               ]}
             />
-          )}
+          </div>
 
-          <Filter
-            onFilterOptionClick={(filterOption) =>
-              setRelevance(filterOption as 'all' | 'past' | 'relevant')
-            }
-            activeFilterOption={relevance}
-            filterList={[
-              { label: 'Актуальные', value: 'relevant' },
-              { label: 'Прошедшие', value: 'past' },
-              { label: 'Все', value: 'all' },
-            ]}
-          />
+          <select
+            onChange={selectChangeHandler}
+            value={sortOption}
+            className="bg-another_white rounded-xl p-1.5"
+          >
+            <option value="fromOldToNew">
+              Сортировка по дате (сначала старые)
+            </option>
+            <option value="fromNewToOld">
+              Сортировка по дате (сначала новые)
+            </option>
+          </select>
         </div>
 
-        <select
-          onChange={selectChangeHandler}
-          value={sortOption}
-          className="bg-another_white rounded-xl p-1.5"
-        >
-          <option value="fromOldToNew">
-            Сортировка по дате (сначала старые)
-          </option>
-          <option value="fromNewToOld">
-            Сортировка по дате (сначала новые)
-          </option>
-        </select>
-      </div>
+        <div className="mt-3 sm:mt-10">
+          {isLoading || isUninitialized || !intensives ? (
+            <Skeleton />
+          ) : intensives.length > 0 ? (
+            <>
+              <PagionationButtonPages
+                countPages={pagesCount}
+                countElements={data!.count}
+                currentPage={currentPage}
+                onClick={(newPage) => setCurrentPage(newPage)}
+              />
 
-      <div className="mt-10">
-        {isLoading ? (
-          <Skeleton />
-        ) : intensives?.length === 0 ? (
-          <div className="text-xl font-bold">
-            Для вас нету открытых интенсивов
-          </div>
-        ) : (
-          <>
-            {sortedIntensives.length !== 0 ? (
-              isUserManager(currentUser) ? (
+              {isUserManager(currentUser) ? (
                 <Table
                   onClick={intensiveClickHandler}
                   columns={columns}
-                  data={sortedIntensives}
+                  data={intensives}
                 />
               ) : (
-                <div className="flex flex-col gap-4">
-                  {sortedIntensives.map((intensive) => (
+                <div className="flex flex-col gap-4 mt-6">
+                  {intensives.map((intensive) => (
                     <IntensiveCard
                       key={intensive.id}
                       intensive={intensive}
@@ -255,14 +255,14 @@ const IntensivesPage: FC = () => {
                     />
                   ))}
                 </div>
-              )
-            ) : (
-              <div className="text-xl font-bold">Ничего не найдено</div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          ) : (
+            <div className="text-xl font-bold">Ничего не найдено</div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

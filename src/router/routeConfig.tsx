@@ -1,4 +1,4 @@
-import { RouteObject, Navigate } from 'react-router-dom'; // Импортируются компоненты-страницы и формы, которые будут использоваться как содержимое маршрутов
+import { RouteObject, Navigate, Outlet } from 'react-router-dom';
 
 import SignInPage from '../pages/SignInPage';
 import IntensivesPage from '../pages/IntensivesPage';
@@ -7,7 +7,8 @@ import NotFoundPage from '../pages/NotFoundPage';
 
 import EventPage from '../pages/EventPage';
 import TeamOverviewPage from '../pages/TeamOverviewPage';
-import EvaluationIntensivePage from '../pages/EvaluationIntensivePage';
+import TeacherIntensiveMarksPage from '../pages/TeacherIntensiveMarksPage';
+import ManagerIntensiveMarksPage from '../pages/ManagerIntensiveMarksPage';
 import IntensiveStatisticsPage from '../pages/IntensiveStatisticsPage';
 import IntensiveOverviewPage from '../pages/IntensiveOverviewPage';
 import TeamsPage from '../pages/TeamsPage';
@@ -18,22 +19,94 @@ import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
 import QuestionsPage from '../pages/QuestionsPage';
-import AdminPage from '../pages/AdminPage';
 import TestsPage from '../pages/TestsPage';
 import CreateTestPage from '../pages/CreateTestPage';
 import EditTestPage from '../pages/EditTestPage'; // Импортируются страницы и компоненты, которые будут использоваться в маршрутах
 import InteniveTests from '../pages/IntensiveTests'; // Импортируется страница с тестами для интенсива
+import EducationRequestsPage from '../pages/EducationRequestsPage';
+import AdminPage from '../pages/AdminPage';
+import AdminEntityPage from '../pages/AdminEntityPage';
+import { TableType } from '../tableConfigs';
+import IntensiveAnswerPage from '../pages/IntensiveAnswerPage';
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
 }; // Создаётся расширенный тип маршрута, включающий поле requiredAuth, чтобы дополнительно контролировать доступ (например, через middleware или обёртку роутера)
 
+const AdminEntityPageWrapper = ({ entityType }: { entityType: TableType }) => {
+  return <AdminEntityPage key={entityType} entityType={entityType} />;
+};
+
 const routeConfig: RouteType[] = [
   {
     path: '/admin',
     element: <AdminPage />,
+    children: [
+      //можно все сделать одной функцией по последнему слову в url ?
+      {
+        path: 'universities',
+        element: <AdminEntityPageWrapper entityType="universities" />,
+      },
+      {
+        path: 'users',
+        element: <AdminEntityPageWrapper entityType="buildings" />,
+      },
+      {
+        path: 'universities/:universityId/buildings',
+        element: <AdminEntityPageWrapper entityType="buildings" />,
+      },
+      {
+        path: 'universities/:universityId/buildings/:buildingId/audiences',
+        element: <AdminEntityPageWrapper entityType="audiences" />,
+      },
+      {
+        path: 'universities/:universityId/flows',
+        element: <AdminEntityPageWrapper entityType="flows" />,
+      },
+      {
+        path: 'universities/:universityId/flows/:flowId/groups',
+        element: <AdminEntityPageWrapper entityType="groups" />,
+      },
+      {
+        path: 'universities/:universityId/flows/:flowId/groups/:groupId/students',
+        element: <AdminEntityPageWrapper entityType="students" />,
+      },
+      {
+        path: 'universities/:universityId/teachers',
+        element: <AdminEntityPageWrapper entityType="teachers" />,
+      },
+      {
+        path: 'stagesEducation',
+        element: <AdminEntityPageWrapper entityType="stagesEducation" />,
+      },
+      {
+        path: 'profiles',
+        element: <AdminEntityPageWrapper entityType="profiles" />,
+      },
+      {
+        path: 'specializations',
+        element: <AdminEntityPageWrapper entityType="specializations" />,
+      },
+      {
+        path: 'markStrategies',
+        element: <AdminEntityPageWrapper entityType="markStrategies" />,
+      },
+      {
+        path: 'studentRoles',
+        element: <AdminEntityPageWrapper entityType="studentRoles" />,
+      },
+      {
+        path: 'criterias',
+        element: <AdminEntityPageWrapper entityType="criterias" />,
+      },
+      {
+        path: 'buildings',
+        element: <AdminEntityPageWrapper key={'upd'} entityType="buildings" />,
+      },
+    ],
     requiredAuth: false,
   },
+
   {
     path: '/intensives',
     element: <IntensivesPage />,
@@ -89,6 +162,22 @@ const routeConfig: RouteType[] = [
         element: <ManageEventForm />,
       },
       {
+        path: 'educationRequests',
+        element: <EducationRequestsPage />,
+      },
+      {
+        path: 'teacher-marks',
+        element: <TeacherIntensiveMarksPage />,
+      },
+      {
+        path: 'manager-marks',
+        element: <ManagerIntensiveMarksPage />,
+      },
+      {
+        path: 'results',
+        element: <IntensiveAnswerPage />,
+      },
+      {
         path: 'statistics',
         element: <IntensiveStatisticsPage />,
       },
@@ -102,11 +191,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/createIntensive',
     element: <ManageIntensiveForm />,
-    requiredAuth: false,
-  },
-  {
-    path: '/evaluation',
-    element: <EvaluationIntensivePage />,
     requiredAuth: false,
   },
   {

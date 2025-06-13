@@ -3,7 +3,7 @@ import { ICriteria } from './ICriteria';
 import { IFile } from './IFile';
 import { IMarkStrategy } from './IMarkStrategy';
 import { ITeacher } from './ITeacher';
-import { ITeam } from './ITeam';
+import { ITeamShort } from './ITeam';
 
 export interface IEvent {
   id: number;
@@ -11,9 +11,10 @@ export interface IEvent {
   description: string;
   startDate: Date;
   finishDate: Date;
-  audience: IAudience;
+  audience: IAudience | null;
+  isOnline: boolean;
   stageId: number | null;
-  teams: ITeam[];
+  teams: ITeamShort[];
   teachers: ITeacher[];
   markStrategy: IMarkStrategy | null;
   deadlineDate: Date | null;
@@ -28,6 +29,8 @@ export interface IEventShort {
   description: string;
   startDate: Date;
   finishDate: Date;
+  audience: IAudience | null;
+  isOnline: boolean;
   stageId: number | null;
   visibility: boolean;
   teamIds: number[];
@@ -40,7 +43,8 @@ export interface IEventCreate {
   startDate: string;
   finishDate: string;
   stageId: number | null;
-  audienceId: number;
+  audienceId: number | null;
+  isOnline: boolean;
   visibility: boolean;
   intensiveId: number;
   teamIds: number[];

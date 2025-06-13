@@ -1,22 +1,31 @@
 import { FC, useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { resetUserState, setCurrentRole } from '../redux/slices/userSlice';
 import { resetIntensiveState } from '../redux/slices/intensiveSlice';
 import { resetTeamState } from '../redux/slices/teamSlice';
+import { setIsSidebarOpen } from '../redux/slices/windowSlice';
 
 import PrimaryButton from './common/PrimaryButton';
 import Modal from './common/modals/Modal';
+import ManagerHelpModal from './common/modals/ManagerHelpModal';
+import SettingsModal from './common/modals/SettingsModal';
 import UserIcon from './icons/UserIcon';
 import SettingsIcon from './icons/SettingsIcon';
 import LogoutIcon from './icons/LogoutIcon';
+import ChevronRightIcon from './icons/ChevronRightIcon';
+import ChevronLeftIcon from './icons/ChevronLeftIcon';
+import HelpIcon from './icons/HelpIcon';
 
 import Cookies from 'js-cookie';
 import { UserRole } from '../ts/interfaces/IUser';
 import { redirectByRole } from '../helpers/urlHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 const Header: FC = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   const [logOutModal, setLogOutModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -25,7 +34,11 @@ const Header: FC = () => {
     role: UserRole | null;
   }>({ status: false, role: null });
 
+  const [helpModal, setHelpModal] = useState<boolean>(false);
+  const [settingsModal, setSettingsModal] = useState<boolean>(false);
+
   const currentUser = useAppSelector((state) => state.user.data);
+  const isSidebarOpen = useAppSelector((state) => state.window.isSidebarOpen);
   const dispatch = useAppDispatch();
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -135,34 +148,58 @@ const Header: FC = () => {
         </Modal>
       )}
 
+      {helpModal && <ManagerHelpModal onClose={() => setHelpModal(false)} />}
+
+      {settingsModal && (
+        <SettingsModal onClose={() => setSettingsModal(false)} />
+      )}
+
       <header
-        className={`fixed w-full top-0 z-[100] px-10 py-4 border-b border-solid bg-white border-gray`}
+        className={`fixed w-full top-0 z-[100] px-5 py-4 border-b border-solid bg-white border-gray`}
       >
-        <div className="container md:relative">
+        <div className="md:container">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="font-sans text-2xl font-bold">LOGO</div>
-              <div className="hidden font-sans text-base md:block">
-                Костромской государственный университет
+            <div className="flex items-center gap-4">
+              {!['/intensives', '/sign-in', '/createIntensive'].includes(
+                pathname
+              ) && (
+                <button
+                  className="md:hidden w-12 h-12 flex items-center justify-center rounded-[10px] bg-gray_5 transition duration-300 hover:bg-gray_6"
+                  onClick={() => dispatch(setIsSidebarOpen(!isSidebarOpen))}
+                >
+                  {isSidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </button>
+              )}
+
+              <div className="flex items-center gap-2">
+                <div className="font-sans text-2xl font-bold">LOGO</div>
+                <div className="hidden font-sans text-base md:block">
+                  Костромской государственный университет
+                </div>
               </div>
             </div>
+
             {currentUser && (
               <div>
                 <button
                   onClick={() => setIsOpen((isOpen) => !isOpen)}
-                  className="p-4 transition duration-300 ease-in-out rounded-xl bg-another_white hover:bg-black_gray"
+                  className="w-[45px] h-[45px] p-4 transition duration-300 ease-in-out rounded-xl bg-another_white hover:bg-black_gray"
                 >
                   <UserIcon />
                 </button>
 
                 <div
                   ref={menuRef}
-                  className={`absolute z-50 w-full md:w-80 top-15 md:top-11 right-0 mt-2 bg-another_white rounded-xl shadow-lg p-4 ${
+                  className={`absolute z-50 w-full sm:w-80 top-15 md:top-11 right-0 mt-0 md:mt-6 bg-another_white rounded-xl shadow-lg p-4 ${
                     isOpen ? 'block' : 'hidden'
                   }`}
                 >
                   <div className="flex flex-col items-start gap-2">
-                    <div className="text-base font-bold md:text-lg">{`${currentUser.firstName} ${currentUser.lastName} ${currentUser.patronymic}`}</div>
+                    <div className="text-base font-bold md:text-lg">{`${
+                      currentUser.firstName
+                    } ${currentUser.lastName} ${
+                      currentUser.patronymic || ''
+                    }`}</div>
 
                     <div className="w-full border-b border-solid border-black_gray"></div>
 
@@ -192,13 +229,32 @@ const Header: FC = () => {
 
                     <button
                       className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
-                      onClick={() => console.log('переход в настройки')}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setSettingsModal(true);
+                      }}
                     >
                       <SettingsIcon className="w-5 h-5" />
                       <span className="inline-flex items-center">
                         Настройки
                       </span>
                     </button>
+
+                    {isUserManager(currentUser) && (
+                      <button
+                        className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
+                        onClick={() => {
+                          setIsOpen(false);
+                          setHelpModal(true);
+                        }}
+                      >
+                        <HelpIcon className="w-5 h-5" />
+                        <span className="inline-flex items-center">
+                          Справка
+                        </span>
+                      </button>
+                    )}
+
                     <button
                       className="flex items-center w-full gap-3 p-2 text-base text-left transition duration-300 ease-in-out rounded-lg hover:bg-black_gray"
                       onClick={() => {

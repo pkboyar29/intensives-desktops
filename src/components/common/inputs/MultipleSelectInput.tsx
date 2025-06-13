@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import Checkbox from './Checkbox';
-import Chip from '../Chip';
+import ChipList from '../ChipList';
+import ChevronDownIcon from '../../icons/ChevronDownIcon';
 
 interface MultipleSelectInputProps<T> {
   description: string;
   errorMessage?: string;
   setErrorMessage?: (errorMessage: string) => void;
   items: T[];
-  selectedItems: T[];
-  setSelectedItems: (items: T[]) => void;
+  selectedItemIds: number[];
+  disabledItemIds?: number[];
+  setSelectedItemIds: (itemIds: number[]) => void;
   chipSize?: 'small' | 'big';
 }
 
@@ -19,12 +21,12 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   errorMessage,
   setErrorMessage,
   items,
-  selectedItems,
-  setSelectedItems,
+  selectedItemIds,
+  setSelectedItemIds,
+  disabledItemIds = [],
   chipSize = 'small',
 }: MultipleSelectInputProps<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectAllState, setSelectAllState] = useState<boolean>(false);
 
   const dropdownVariants = {
     open: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
@@ -36,11 +38,7 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const addSelectedItem = (id: number) => {
-    const selectedItem = items.find((item) => item.id === id);
-
-    if (selectedItem) {
-      setSelectedItems([...selectedItems, selectedItem]);
-    }
+    setSelectedItemIds([...selectedItemIds, id]);
 
     if (setErrorMessage) {
       setErrorMessage('');
@@ -48,8 +46,11 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
   };
 
   const deleteSelectedItem = (id: number) => {
-    const newSelectedItems = selectedItems.filter((item) => item.id !== id);
-    setSelectedItems(newSelectedItems);
+    const newSelectedItemIds = selectedItemIds.filter(
+      (selectedId) => selectedId != id
+    );
+
+    setSelectedItemIds(newSelectedItemIds);
   };
 
   return (
@@ -64,45 +65,33 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
         }`}
       >
         <div>Выбрать</div>
-        <svg
+        <ChevronDownIcon
           className={`transition-transform duration-300 ${
             isOpen && `rotate-180`
           }`}
-          width="15"
-          height="9"
-          viewBox="0 0 15 9"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1.5 1.5L7.5 7.5L13.5 1.5"
-            stroke="#667080"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        />
       </button>
 
       <motion.div
         className={`bg-another_white rounded-b-xl text-bright_gray px-7 pb-4 select-none overflow-hidden max-h-[450px] overflow-y-auto`}
+        variants={dropdownVariants}
         initial="closed"
         animate={isOpen ? 'open' : 'closed'}
-        variants={dropdownVariants}
       >
         <div className="pb-8">
           <Checkbox
             item={{ id: 0, name: 'Выбрать все' }}
             addSelectedItem={() => {
-              if (selectedItems.length !== items.length) {
-                setSelectedItems(items);
-              }
-              setSelectAllState(true);
+              setSelectedItemIds(items.map((item) => item.id));
             }}
             deleteSelectedItem={() => {
-              setSelectAllState(false);
+              setSelectedItemIds(
+                items
+                  .filter((item) => disabledItemIds.includes(item.id))
+                  .map((item) => item.id)
+              );
             }}
-            isChecked={selectAllState}
+            isChecked={selectedItemIds.length === items.length}
           />
         </div>
 
@@ -114,23 +103,24 @@ const MultipleSelectInput = <T extends { id: number; name: string }>({
               key={item.id}
               item={item}
               addSelectedItem={addSelectedItem}
-              deleteSelectedItem={deleteSelectedItem}
-              isChecked={selectedItems.some(
-                (selectedItem) => selectedItem.id === item.id
-              )}
+              deleteSelectedItem={() => {
+                if (disabledItemIds.includes(item.id)) {
+                  return;
+                }
+
+                deleteSelectedItem(item.id);
+              }}
+              isChecked={selectedItemIds.some((id) => id == item.id)}
             />
           ))}
         </ul>
       </motion.div>
 
-      <div className="flex flex-wrap gap-2 mx-3 mt-3">
-        {selectedItems.map((selectedItem) => (
-          <Chip
-            key={selectedItem.id}
-            label={selectedItem.name}
-            size={chipSize}
-          />
-        ))}
+      <div className="mt-2.5">
+        <ChipList
+          items={items.filter((item) => selectedItemIds.includes(item.id))}
+          chipSize={chipSize}
+        />
       </div>
 
       <div className="text-base text-red">{errorMessage}</div>

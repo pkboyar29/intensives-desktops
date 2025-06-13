@@ -8,7 +8,7 @@ import {
   IEventUpdateVisibility,
   IEventShort,
 } from '../../ts/interfaces/IEvent';
-import { mapTeam } from './teamApi';
+import { mapTeamShort } from './teamApi';
 import { mapAudience } from './audienceApi';
 import { mapTeacher } from './teacherApi';
 import { mapMarkStrategy } from './markStrategyApi';
@@ -16,17 +16,22 @@ import { mapCriteria } from './criteriaApi';
 import { mapFile } from './fileApi';
 
 export const mapEvent = (unmappedEvent: any): IEvent => {
+  unmappedEvent.teams.sort((a: any, b: any) => a.position - b.position);
+
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
     startDate: new Date(unmappedEvent.start_dt),
     finishDate: new Date(unmappedEvent.finish_dt),
-    audience: mapAudience(unmappedEvent.audience),
+    audience: unmappedEvent.audience
+      ? mapAudience(unmappedEvent.audience)
+      : null,
+    isOnline: unmappedEvent.is_online,
     visibility: unmappedEvent.visibility,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage.id,
     teams: unmappedEvent.teams.map((unmappedTeam: any) =>
-      mapTeam(unmappedTeam)
+      mapTeamShort(unmappedTeam)
     ),
     teachers: unmappedEvent.teachers.map((unmappedTeacher: any) =>
       mapTeacher(unmappedTeacher)
@@ -45,12 +50,18 @@ export const mapEvent = (unmappedEvent: any): IEvent => {
 };
 
 export const mapEventShort = (unmappedEvent: any): IEventShort => {
+  console.log(unmappedEvent);
+
   return {
     id: unmappedEvent.id,
     name: unmappedEvent.name,
     description: unmappedEvent.description,
     startDate: new Date(unmappedEvent.start_dt),
     finishDate: new Date(unmappedEvent.finish_dt),
+    audience: unmappedEvent.audience
+      ? mapAudience(unmappedEvent.audience)
+      : null,
+    isOnline: unmappedEvent.is_online,
     stageId: unmappedEvent.stage === null ? null : unmappedEvent.stage,
     visibility: unmappedEvent.visibility,
     teamIds: unmappedEvent.teams,
@@ -68,13 +79,13 @@ export const eventApi = createApi({
     }),
     createEvent: builder.mutation<IEvent, IEventCreate>({
       query: (data) => ({
-        url: '/events/',
+        url: `/events/?intensive_id=${data.intensiveId}`,
         method: 'POST',
         body: {
           ...data,
-          intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
+          is_online: data.isOnline,
           teams: data.teamIds,
           teachers: data.teacherIds,
           start_dt: data.startDate,
@@ -82,7 +93,6 @@ export const eventApi = createApi({
           mark_strategy: data.markStrategyId,
           criterias: data.criteriaIds,
           deadline_dt: data.deadlineDate,
-          files: [],
         },
       }),
     }),
@@ -92,9 +102,9 @@ export const eventApi = createApi({
         method: 'PUT',
         body: {
           ...data,
-          intensive: data.intensiveId,
           stage: data.stageId,
           audience: data.audienceId,
+          is_online: data.isOnline,
           teams: data.teamIds,
           teachers: data.teacherIds,
           start_dt: data.startDate,
@@ -117,7 +127,7 @@ export const eventApi = createApi({
     }),
     deleteEvent: builder.mutation<void, number>({
       query: (eventId) => ({
-        url: `/events/${eventId}`,
+        url: `/events/${eventId}/`,
         method: 'DELETE',
       }),
     }),

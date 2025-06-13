@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 interface KanbanTaskMenuProps {
   onRename: () => void;
-  onCreateSubtask: () => void;
+  onCreateSubtask?: () => void;
   onDelete: () => void;
 }
 
@@ -18,9 +18,9 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null); // Ссылка на кнопку меню
 
   const toggleMenu = () => {
-    setIsOpen((prev) => !prev);
+    //setIsOpen((prev) => !prev);
 
-    // Рассчет позицию меню
+    // Рассчет позицию меню (можно ли проверять !isOpen тут?)
     if (!isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
@@ -28,6 +28,8 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
         left: rect.left + window.scrollX, // Левая координата
       });
     }
+
+    setIsOpen((prev) => !prev);
   };
   const closeMenu = () => setIsOpen(false);
 
@@ -95,7 +97,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
               onRename();
               closeMenu();
             }}
-            className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+            className="block w-full px-4 py-2 text-left text-black duration-100 hover:text-blue"
           >
             Переименовать
           </button>
@@ -103,20 +105,23 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
 
         <div className="my-2 border-t border-gray-300"></div>
 
-        <li>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onCreateSubtask();
-              closeMenu();
-            }}
-            className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100"
-          >
-            Создать подзадачу
-          </button>
-        </li>
-
-        <div className="my-2 border-t border-gray-300"></div>
+        {onCreateSubtask && (
+          <>
+            <li>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCreateSubtask();
+                  closeMenu();
+                }}
+                className="block w-full px-4 py-2 text-left text-black duration-100 hover:text-blue"
+              >
+                Создать подзадачу
+              </button>
+            </li>
+            <div className="my-2 border-t border-gray-300"></div>
+          </>
+        )}
 
         <li>
           <button
@@ -125,7 +130,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
               onDelete();
               closeMenu();
             }}
-            className="block w-full px-4 py-2 text-left text-red hover:text-dark_red"
+            className="block w-full px-4 py-2 text-left duration-100 text-red hover:text-dark_red"
           >
             Удалить задачу
           </button>
@@ -140,7 +145,7 @@ const KanbanTaskMenu: FC<KanbanTaskMenuProps> = ({
       <button
         ref={buttonRef}
         onClick={toggleMenu}
-        className="p-2 rounded-full hover:text-blue"
+        className="rounded-full hover:text-blue"
       >
         &#x22EE; {/* Юникод для трех вертикальных точек */}
       </button>

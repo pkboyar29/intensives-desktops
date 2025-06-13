@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import userReducer from './slices/userSlice';
 import intensiveReducer from './slices/intensiveSlice';
 import teamReducer from './slices/teamSlice';
-import kanbanSlice from './slices/kanbanSlice';
+import kanbanReducer from './slices/kanbanSlice';
+import windowReducer from './slices/windowSlice';
 
 import { userApi } from './api/userApi';
 import { intensiveApi } from './api/intensiveApi';
@@ -27,6 +28,16 @@ import { eventMarkApi } from './api/eventMarkApi';
 import { questionApi } from './api/questionApi';
 import { testApi } from './api/testApi';
 import { testIntensiveApi } from './api/testIntensiveApi';
+import { universityApi } from './api/universityApi';
+import { buildingApi } from './api/buildingApi';
+import { groupApi } from './api/groupApi';
+import { educationApi } from './api/educationApi';
+import { relatedListApi } from './api/relatedListApi';
+import { breadcrumbApi } from './api/breadcrumbApi';
+import { educationRequestApi } from './api/educationRequestApi';
+import { educationRequestAnswerApi } from './api/educationRequestAnswerApi';
+import { intensiveMarkApi } from './api/intensiveMarkApi';
+import { intensiveAnswerApi } from './api/intensiveAnswerApi';
 
 // export const resetAllStates = createAction('resetAllStates');
 
@@ -35,7 +46,8 @@ export const store = configureStore({
     user: userReducer,
     intensive: intensiveReducer,
     team: teamReducer,
-    kanban: kanbanSlice,
+    kanban: kanbanReducer,
+    window: windowReducer,
     [userApi.reducerPath]: userApi.reducer,
     [intensiveApi.reducerPath]: intensiveApi.reducer,
     [eventApi.reducerPath]: eventApi.reducer,
@@ -57,6 +69,16 @@ export const store = configureStore({
     [questionApi.reducerPath]: questionApi.reducer,
     [testApi.reducerPath]: testApi.reducer,
     [testIntensiveApi.reducerPath]: testIntensiveApi.reducer,
+    [universityApi.reducerPath]: universityApi.reducer,
+    [buildingApi.reducerPath]: buildingApi.reducer,
+    [groupApi.reducerPath]: groupApi.reducer,
+    [educationApi.reducerPath]: educationApi.reducer,
+    [relatedListApi.reducerPath]: relatedListApi.reducer,
+    [breadcrumbApi.reducerPath]: breadcrumbApi.reducer,
+    [educationRequestApi.reducerPath]: educationRequestApi.reducer,
+    [educationRequestAnswerApi.reducerPath]: educationRequestAnswerApi.reducer,
+    [intensiveMarkApi.reducerPath]: intensiveMarkApi.reducer,
+    [intensiveAnswerApi.reducerPath]: intensiveAnswerApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -83,6 +105,16 @@ export const store = configureStore({
       questionApi.middleware,
       testApi.middleware,
       testIntensiveApi.middleware,
+      universityApi.middleware,
+      buildingApi.middleware,
+      groupApi.middleware,
+      educationApi.middleware,
+      relatedListApi.middleware,
+      breadcrumbApi.middleware,
+      educationRequestApi.middleware,
+      educationRequestAnswerApi.middleware,
+      intensiveMarkApi.middleware,
+      intensiveAnswerApi.middleware
     ),
 });
 

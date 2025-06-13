@@ -1,10 +1,13 @@
 import { FC } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../../redux/store';
 import { isUserManager } from '../../helpers/userHelpers';
 
 import EventInSchedule from './EventInSchedule';
 import TrashIcon from '../icons/TrashIcon';
 import EditIcon from '../icons/EditIcon';
+import PlusIcon from '../icons/PlusIcon';
+import Tooltip from '../common/Tooltip';
 
 import { IStage } from '../../ts/interfaces/IStage';
 import { IEventShort } from '../../ts/interfaces/IEvent';
@@ -26,20 +29,29 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
   onEventClick,
   onEventEyeIconClick,
 }) => {
+  const navigate = useNavigate();
+  const { intensiveId } = useParams();
   const currentUser = useAppSelector((state) => state.user.data);
 
   return (
     <section>
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between gap-3 overflow-hidden md:flex-row">
         <div className="flex flex-col gap-3">
-          <div className="text-2xl font-bold text-black_2">{stage.name}</div>
+          <div className="text-xl font-bold whitespace-break-spaces md:text-2xl text-black_2">
+            {stage.name}
+          </div>
+          {stage.description && stage.description.length > 0 && (
+            <div className="mt-1 text-lg max-w-[800px]">
+              {stage.description}
+            </div>
+          )}
           <div className="text-bright_gray">
             {stage.startDate.toLocaleDateString()} -{' '}
             {stage.finishDate.toLocaleDateString()}
           </div>
         </div>
         {isUserManager(currentUser) && (
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             <button
               className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
               onClick={() => {
@@ -48,6 +60,24 @@ const StageInSchedule: FC<StageInScheduleProps> = ({
             >
               <EditIcon />
             </button>
+
+            <div>
+              <Tooltip
+                tooltipText="Создать мероприятие в этом этапе"
+                tooltipClasses="bg-gray_5 p-1 rounded"
+              >
+                <button
+                  className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"
+                  onClick={() => {
+                    navigate(
+                      `/intensives/${intensiveId}/schedule/editEvent?stageId=${stage.id}`
+                    );
+                  }}
+                >
+                  <PlusIcon />
+                </button>
+              </Tooltip>
+            </div>
 
             <button
               className="w-9 h-9 rounded-[10px] bg-another_white hover:bg-black_gray transition duration-300 ease-in-out flex justify-center items-center"

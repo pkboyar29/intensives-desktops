@@ -15,9 +15,9 @@ const Accordion = <T extends { id: number; name: string }>({
   expandedContent,
 }: AccordionProps<T>) => {
   return (
-    <div className="flex flex-col gap-2 p-4 bg-white rounded-lg shadow-md max-w">
+    <div className="flex flex-col gap-2 p-2 bg-white rounded-lg shadow-md sm:p-3 md:p-4 max-w">
       {items.map((item) => (
-        <div className={`p-4 rounded-lg shadow-sm`} key={item.id}>
+        <div className={`p-1 sm:p-4 rounded-lg shadow-sm`} key={item.id}>
           <button
             className={`w-full cursor-pointer select-none text-left text-lg font-medium transition duration-300 ease-in-out hover:text-blue py-1.5 ${
               expandedItemId && item.id === expandedItemId && 'text-blue'

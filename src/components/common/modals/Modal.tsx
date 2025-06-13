@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect, useRef } from 'react';
-
+import ReactDOM from 'react-dom';
 import CrossIcon from '../../icons/CrossIcon';
 
 interface ModalProps {
@@ -7,6 +7,7 @@ interface ModalProps {
   title: ReactNode;
   onCloseModal: () => void;
   shouldHaveCrossIcon?: boolean;
+  closeByClickOutside?: boolean;
 }
 
 const Modal: FC<ModalProps> = ({
@@ -14,6 +15,7 @@ const Modal: FC<ModalProps> = ({
   title,
   onCloseModal,
   shouldHaveCrossIcon = true,
+  closeByClickOutside = true,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const isMouseDownInside = useRef<boolean>(false);
@@ -38,18 +40,17 @@ const Modal: FC<ModalProps> = ({
       onCloseModal();
     }
   };
-
-  return (
+  const modalContent = (
     <div
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      onMouseDown={closeByClickOutside ? handleMouseDown : () => {}}
+      onMouseUp={closeByClickOutside ? handleMouseUp : () => {}}
       className="fixed top-0 left-0 z-[200] flex items-center justify-center w-full h-full bg-modal_eclipse"
     >
       <div
         ref={modalRef}
-        className="px-5 py-6 mx-3 overflow-hidden bg-white border-2 border-solid rounded-xl lg:basis-1/3 border-another_white"
+        className="w-full px-5 py-6 mx-3 overflow-hidden bg-white border-2 border-solid rounded-xl lg:basis-2/3 xl:basis-1/3 border-another_white"
       >
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-start justify-between gap-4 mb-5">
           <div className="text-xl font-bold">{title}</div>
           {shouldHaveCrossIcon && (
             <button onClick={onCloseModal}>
@@ -60,6 +61,29 @@ const Modal: FC<ModalProps> = ({
         {children}
       </div>
     </div>
+  );
+  return (
+    <div
+      onMouseDown={closeByClickOutside ? handleMouseDown : () => {}}
+      onMouseUp={closeByClickOutside ? handleMouseUp : () => {}}
+      className="fixed top-0 left-0 z-[200] flex items-center justify-center w-full h-full bg-modal_eclipse"
+    >
+      <div
+        ref={modalRef}
+        className="w-full px-5 py-6 mx-3 overflow-hidden bg-white border-2 border-solid rounded-xl lg:basis-2/3 xl:basis-1/3 border-another_white"
+      >
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div className="text-xl font-bold">{title}</div>
+          {shouldHaveCrossIcon && (
+            <button onClick={onCloseModal}>
+              <CrossIcon />
+            </button>
+          )}
+        </div>
+        {children}
+      </div>
+    </div>
+    //ReactDOM.createPortal(modalContent, document.body)
   );
 };
 

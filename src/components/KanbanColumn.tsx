@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   useLazyGetTasksColumnQuery,
   useCreateTaskMutation,
+  useUpdateTaskPositionMutation,
 } from '../redux/api/taskApi';
 import { FC } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
@@ -10,10 +11,19 @@ import KanbanTask from './KanbanTask';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import {
-  selectSubtaskData,
   moveTaskTemporary,
   savePreviousState,
+  selectTasksByColumnId,
+  setMovingPlaceholder,
 } from '../redux/slices/kanbanSlice';
+import Skeleton from 'react-loading-skeleton';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ITaskPositionUpdate } from '../ts/interfaces/ITask';
+import {
+  isUserMentor,
+  isUserStudent,
+  isUserTeamlead,
+} from '../helpers/userHelpers';
 
 interface KanbanColumnProps {
   id: number;
@@ -41,8 +51,10 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   onDeleteColumn,
 }) => {
   const dispatch = useAppDispatch();
-  const [getTasks, { isLoading, isError }] = useLazyGetTasksColumnQuery();
+  const [getTasks, { isLoading, isError, isSuccess }] =
+    useLazyGetTasksColumnQuery();
   const [createTaskAPI] = useCreateTaskMutation();
+  const [updateTaskPositionAPI] = useUpdateTaskPositionMutation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(title);
@@ -51,7 +63,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
 
   const [page, setPage] = useState(1); // Текущая страница
   const pageSize = 100; // Размер страницы
-  const hasMore = useRef(true); // Есть ли ещё страницы для загрузки
+  const hasMore = useRef(false); // Есть ли ещё страницы для загрузки
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -60,6 +72,7 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       if (data?.next === null) {
         hasMore.current = false; // Если `next` равно null, страниц больше нет
       } else {
+        hasMore.current = true;
         setPage(page + 1);
       }
     };
@@ -68,17 +81,25 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
   }, [id, getTasks]);
 
   // Получаем колонку по её ID
-  const column = useAppSelector((state) =>
-    state.kanban.columns?.find((col) => col.id === id)
-  );
+  //const column = useAppSelector((state) =>
+  // state.kanban.columns?.find((col) => col.id === id)
+  //);
 
   // Получаем задачи для этой колонки
+  //const selectTasks = useMemo(() => selectTasksByColumnId(id), [id]); // проверить если убрать
   const tasks = useAppSelector((state) =>
-    column?.taskIds.map((taskId) => state.kanban.tasks?.[taskId])
+    isSuccess ? selectTasksByColumnId(id)(state) : null
+  );
+  const dndPlaceholder = useAppSelector(
+    (state) => state.kanban.dndTaskPlaceholderIndex
   );
 
+  const currentUser = useAppSelector((state) => state.user.data);
+  const currentTeam = useAppSelector((state) => state.team.data);
+
   useEffect(() => {
-    //console.log(tasks)
+    //console.log('rerender column id -', id);
+    //console.log('задачи колонки id', id, '-', tasks);
   }, [tasks]);
 
   // Функция для автоматического изменения высоты textarea
@@ -169,6 +190,15 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     onDeleteColumn(id);
   };
 
+  const updateTaskPosition = async (payload: ITaskPositionUpdate) => {
+    console.log(payload);
+    try {
+      await updateTaskPositionAPI(payload);
+    } catch (err) {
+      console.error('Error on updating position subtask:', err);
+    }
+  };
+
   // Используем DnD hook для перемещения колонки
   const [{ isDragging }, dragRef, previewRef] = useDrag({
     type: 'COLUMN',
@@ -198,24 +228,22 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       index: number;
       columnId: number | null;
       parentTaskId: number | null;
-    }) => {
-      dispatch(savePreviousState());
-
-      if (item.index !== 0 || item.columnId !== id) {
+    }) => {},
+    collect: (monitor) => {
+      if (
+        !monitor.isOver() &&
+        dndPlaceholder &&
+        dndPlaceholder?.hoverId !== null
+      ) {
+        //console.log('Вышли из зоны hover в column');
+        /*
         dispatch(
-          moveTaskTemporary({
-            taskId: item.id,
-            dragIndex: item.index,
-            hoverIndex: 0,
-            fromColumnId: item.columnId,
-            toColumnId: id,
-            fromParentTaskId: item.parentTaskId,
-            toParentTaskId: null,
+          setMovingPlaceholder({
+            draggableId: monitor.getItem().id,
+            hoverId: null,
           })
         );
-
-        item.index = 0;
-        item.columnId = id;
+        */
       }
     },
     drop: (
@@ -227,8 +255,39 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       },
       monitor
     ) => {
-      console.log('item.columnId:' + item.columnId + 'columnId: ' + id);
-      //updateTaskPosition(item)
+      if (!dndPlaceholder) return;
+
+      const hoverIndex = dndPlaceholder.hoverIndex;
+      if (hoverIndex === null) return;
+      //const toColumnId = dndPlaceholder.hoverColumnId;
+
+      dispatch(
+        setMovingPlaceholder({
+          draggableId: null,
+        })
+      );
+      // Если не сдвинули
+      if (item.columnId === id && item.index === dndPlaceholder.hoverIndex)
+        return;
+
+      dispatch(savePreviousState());
+      dispatch(
+        moveTaskTemporary({
+          taskId: item.id,
+          dragIndex: item.index,
+          hoverIndex: hoverIndex,
+          fromColumnId: item.columnId,
+          toColumnId: id,
+          fromParentTaskId: item.parentTaskId,
+          toParentTaskId: null,
+        })
+      );
+
+      updateTaskPosition({
+        id: item.id,
+        position: hoverIndex,
+        column: id,
+      });
     },
   });
 
@@ -238,10 +297,136 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
     dropRef(node);
   };
 
+  /*
   const dragRefDropTaskRef = (node: HTMLDivElement | null) => {
     dragRef(node);
     dropTaskRef(node);
   };
+  */
+  const renderedTasks: JSX.Element[] = [];
+  if (tasks) {
+    var addIndex = false;
+    //console.log(dndPlaceholder?.hoverIndex);
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
+
+      /*
+      if (
+        dndPlaceholder &&
+        task.id === dndPlaceholder?.hoverId &&
+        (i < dndPlaceholder?.draggableIndex! ||
+          id !== dndPlaceholder?.draggableColumnId)
+      ) {
+        renderedTasks.push(
+          <motion.div
+            key={'placeholder-motion'}
+            transition={{ duration: 0.14 }}
+          >
+            <div
+              key={'placeholder'}
+              ref={dropTaskRef}
+              className={`border border-blue border-separate rounded-lg`}
+              style={{
+                width: dndPlaceholder.draggableWidth,
+                height: dndPlaceholder.draggableHeight,
+              }}
+            />
+          </motion.div>
+        );
+        addIndex = true;
+      }
+      */
+
+      //if (task.id !== dndPlaceholder?.draggableId) {
+      renderedTasks.push(
+        <motion.div key={task.id} layout transition={{ duration: 0.14 }}>
+          <KanbanTask
+            id={task.id}
+            index={addIndex ? i + 1 : i}
+            columnId={id}
+            parentTaskId={null}
+            name={task.name}
+            assignees={task.assignees ? task.assignees : undefined}
+            isCompleted={task.isCompleted}
+            initialSubtaskCount={task.initialSubtaskCount}
+          />
+        </motion.div>
+      );
+      //}
+
+      /*
+      if (
+        dndPlaceholder &&
+        task.id === dndPlaceholder?.hoverId &&
+        i >= dndPlaceholder?.draggableIndex! &&
+        id === dndPlaceholder.draggableColumnId
+      ) {
+        renderedTasks.push(
+          <motion.div
+            key={'placeholder-motion'}
+            transition={{ duration: 0.14 }}
+          >
+            <div
+              key={'placeholder'}
+              ref={dropTaskRef}
+              className={`border border-blue border-separate rounded-lg`}
+              style={{
+                width: dndPlaceholder.draggableWidth,
+                height: dndPlaceholder.draggableHeight,
+              }}
+            />
+          </motion.div>
+        );
+        addIndex = true;
+      }
+        */
+    }
+  }
+
+  /*
+  const renderedTasksReduce = tasks?.reduce<{
+    elements: JSX.Element[];
+    placeholderRendered: boolean;
+  }>(
+    (acc, task, i) => {
+      if (
+        task.id === dndPlaceholder?.hoverIndex &&
+        id === dndPlaceholder?.hoverColumnId &&
+        !acc.placeholderRendered
+      ) {
+        console.log(task);
+        acc.elements.push(
+          <div
+            key={'placeholder'}
+            ref={dropTaskRef}
+            className={`border border-blue border-separate rounded-lg`}
+            style={{
+              width: dndPlaceholder.draggableWidth,
+              height: dndPlaceholder.draggableHeight,
+            }}
+          />
+        );
+        acc.placeholderRendered = true;
+      }
+
+      if (task.id !== dndPlaceholder?.draggableId) {
+        acc.elements.push(
+          <KanbanTask
+            id={task.id}
+            index={i}
+            columnId={id}
+            parentTaskId={null}
+            name={task.name}
+            isCompleted={task.isCompleted}
+            initialSubtaskCount={task.initialSubtaskCount}
+          />
+        );
+      }
+      return acc;
+    },
+    { elements: [], placeholderRendered: false }
+  ).elements;
+  */
 
   return (
     <div
@@ -251,7 +436,11 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
       }`}
       style={{ borderTopColor: colorHEX }}
     >
-      <div ref={dragRef} onMouseDown={preventDrag} className="p-4">
+      <div
+        ref={isUserTeamlead(currentUser, currentTeam) ? dragRef : null}
+        onMouseDown={preventDrag}
+        className="p-4"
+      >
         <div className="flex flex-row items-start justify-between">
           <div className="flex items-center justify-between mb-2 group">
             {isEditing ? (
@@ -285,65 +474,99 @@ const KanbanColumn: FC<KanbanColumnProps> = ({
             )}
           </div>
 
-          <KanbanColumnMenu
-            onRename={renameColumn}
-            onChangeColor={(color: string) => onUpdateColor(id, color)}
-            onDelete={deleteColumn}
-          />
+          {isUserStudent(currentUser) && !isUserMentor(currentUser) && (
+            <KanbanColumnMenu
+              onRename={renameColumn}
+              onChangeColor={(color: string) => onUpdateColor(id, color)}
+              onDelete={deleteColumn}
+            />
+          )}
         </div>
-
-        {creatingTask != null ? (
-          <textarea
-            ref={textareaRef}
-            value={creatingTask}
-            onBlur={handleBlurTask}
-            onKeyDown={handleKeyDownTask}
-            onChange={(e) => setCreatingTask(e.target.value)}
-            maxLength={500}
-            placeholder="Введите название задачи..."
-            autoFocus
-            className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
-          />
-        ) : (
-          <button
-            className="text-left text-blue hover:text-dark_blue"
-            onClick={() => setCreatingTask('')}
-          >
-            + Создать задачу
-          </button>
+        {isUserStudent(currentUser) && !isUserMentor(currentUser) && (
+          <>
+            {creatingTask != null ? (
+              <textarea
+                ref={textareaRef}
+                value={creatingTask}
+                onBlur={handleBlurTask}
+                onKeyDown={handleKeyDownTask}
+                onChange={(e) => setCreatingTask(e.target.value)}
+                maxLength={500}
+                placeholder="Введите название задачи..."
+                autoFocus
+                className="flex items-center overflow-hidden text-left align-top resize-none justify-between p-3 mb-3 transition border border-gray-200 rounded-lg shadow-sm cursor-pointer bg-gray-50 hover:shadow-md w-[100%]"
+              />
+            ) : (
+              <button
+                className="text-left text-blue hover:text-dark_blue"
+                onClick={() => setCreatingTask('')}
+              >
+                + Создать задачу
+              </button>
+            )}
+          </>
         )}
       </div>
 
-      <div className="space-y-2 max-h-[calc(100vh-200px)] ml-4 mr-4 md-4 mt-2 overflow-y-auto overflow-x-hidden">
-        {tasks &&
-          tasks.map(
-            (task, index) =>
-              task && (
-                <div key={task.id}>
-                  {' '}
-                  {/* Добавляем key сюда так хочет реакт*/}
-                  <KanbanTask
-                    id={task.id}
-                    index={index}
-                    columnId={id}
-                    parentTaskId={null}
-                    name={task.name}
-                    isCompleted={task.isCompleted}
-                    initialSubtaskCount={task.initialSubtaskCount}
-                  />
-                </div>
-              )
+      {!tasks && isLoading ? (
+        <Skeleton />
+      ) : (
+        <div className="space-y-2 max-h-[calc(100vh-200px)] md-4 mt-2 overflow-y-scroll overflow-x-hidden">
+          {tasks !== undefined && tasks !== null && (
+            <AnimatePresence>{renderedTasks}</AnimatePresence>
           )}
 
-        {hasMore.current && (
-          <button
-            className="w-full p-3 bg-blue text-white rounded-[10px] duration-300"
-            onClick={loadMoreTasks}
-          >
-            Загрузить еще
-          </button>
-        )}
-      </div>
+          {/*tasks.map(
+              (task, index) =>
+                task &&
+                task.id !== dndPlaceholder?.draggableId && (
+                  <motion.div
+                    key={task.id}
+                    layout
+                    transition={{
+                      //type: 'spring',
+                      //stiffness: 500,
+                      //damping: 30,
+                      //mass: 0.5,
+                      duration: 0.14,
+                    }}
+                    className="task"
+                  >
+                    {index === dndPlaceholder?.hoverIndex &&
+                    id === dndPlaceholder?.hoverColumnId ? (
+                      <div
+                        //ref={dropTaskRef}
+                        className={`border border-blue border-separate rounded-lg`}
+                        style={{
+                          width: dndPlaceholder.draggableWidth,
+                          height: dndPlaceholder.draggableHeight,
+                        }}
+                      ></div>
+                    ) : (
+                      <KanbanTask
+                        id={task.id}
+                        index={index}
+                        columnId={id}
+                        parentTaskId={null}
+                        name={task.name}
+                        isCompleted={task.isCompleted}
+                        initialSubtaskCount={task.initialSubtaskCount}
+                      />
+                    )}
+                  </motion.div>
+                )
+            )}
+           */}
+          {hasMore.current && (
+            <button
+              className="w-full p-3 bg-blue text-white rounded-[10px] duration-300"
+              onClick={loadMoreTasks}
+            >
+              Загрузить еще
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

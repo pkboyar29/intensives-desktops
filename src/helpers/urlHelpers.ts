@@ -9,7 +9,13 @@ const replaceLastURLSegment = (segment: string): string => {
 };
 
 const redirectByRole = (role: UserRole) => {
-  window.location.assign(role.name === 'Admin' ? '/admin' : '/intensives');
+  window.location.assign(
+    role.name === 'Admin' ? '/admin/universities' : '/intensives'
+  );
 };
 
-export { replaceLastURLSegment, redirectByRole };
+const getRedirectedPathByRole = (role: UserRole) => {
+  return role.name === 'Admin' ? '/admin/universities' : '/intensives';
+};
+
+export { replaceLastURLSegment, redirectByRole, getRedirectedPathByRole };

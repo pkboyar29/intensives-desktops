@@ -1,8 +1,57 @@
+import { ITeamShort } from './ITeam';
+
 export interface IEducationRequest {
   id: number;
   subject: string;
-  descr: string;
-  teamName: string;
-  ownerName: string;
+  description?: string;
+  team: ITeamShort;
+  status: 'Открыт' | 'Решен';
   createdDate: Date;
+  updatedDate: Date;
+  answer: IEducationRequestAnswer | null;
+}
+
+export const defaultEducationRequest: IEducationRequest = {
+  id: 0,
+  subject: '',
+  description: '',
+  team: { id: 0, position: 0, name: '' },
+  status: 'Открыт',
+  createdDate: new Date(),
+  updatedDate: new Date(),
+  answer: null,
+};
+
+export interface IEducationRequestSend {
+  subject: string;
+  description?: string;
+  intensiveId: number;
+}
+
+export interface IEducationRequestUpdate {
+  subject: string;
+  description?: string;
+  requestId: number;
+}
+
+export interface IEducationRequestChangeStatus {
+  status: 'OPENED' | 'CLOSED';
+  requestId: number;
+}
+
+export interface IEducationRequestAnswer {
+  id: number;
+  comment: string;
+  managerId: number;
+  createdDate: Date;
+}
+
+export interface IEducationRequestAnswerSubmit {
+  comment: string;
+  requestId: number;
+}
+
+export interface IEducationRequestAnswerUpdate {
+  comment: string;
+  answerId: number;
 }

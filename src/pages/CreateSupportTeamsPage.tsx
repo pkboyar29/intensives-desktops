@@ -1,24 +1,24 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
 
 import {
   useLazyGetTeamsQuery,
   useUpdateSupportMembersMutation,
 } from '../redux/api/teamApi';
-import { useGetNotAssignedStudentsQuery } from '../redux/api/studentApi';
+import { useLazyGetSpecificFreeStudentsQuery } from '../redux/api/intensiveApi';
 
-import { useAppSelector } from '../redux/store';
-
+import { Helmet } from 'react-helmet-async';
 import Modal from '../components/common/modals/Modal';
 import SupportTeamDragContainer from '../components/DragComponents/SupportTeamDragContainer';
 import SupportTeamDragElement from '../components/DragComponents/SupportTeamDragElement';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
-import SearchIcon from '../components/icons/SearchIcon';
+import SearchBar from '../components/common/SearchBar';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
-import { ITeam } from '../ts/interfaces/ITeam';
+import { ISupportTeamManager, ITeam } from '../ts/interfaces/ITeam';
 
 const CreateSupportTeamsPage: FC = () => {
   const navigate = useNavigate();
@@ -26,22 +26,24 @@ const CreateSupportTeamsPage: FC = () => {
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  // TODO: все-таки вместо lazy хуков использовать нормальные?
   const [getTeams, { isLoading }] = useLazyGetTeamsQuery();
   const [updateSupportMembers] = useUpdateSupportMembersMutation();
+  const [getSpecificFreeStudents] = useLazyGetSpecificFreeStudentsQuery();
 
-  const [teams, setTeams] = useState<ITeam[]>([]);
-  // TODO: предположить, что тут может быть рандомная цифра?
+  const [supportTeams, setSupportTeams] = useState<ISupportTeamManager[]>([]);
   const [currentTeamId, setCurrentTeamId] = useState<number>();
   const currentTeam = useMemo(
-    () => teams.find((team) => team.id === currentTeamId),
-    [teams, currentTeamId]
+    () => supportTeams.find((team) => team.id === currentTeamId),
+    [supportTeams, currentTeamId]
   );
 
-  const allTeachers = currentIntensive?.teachers;
-  const { data: allStudents } = useGetNotAssignedStudentsQuery(
-    Number(intensiveId)
-  );
+  interface ElementType {
+    id: number;
+    name: string;
+  }
+
+  const [allStudents, setAllStudents] = useState<ElementType[]>([]);
+  const [allTeachers, setAllTeachers] = useState<ElementType[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
 
@@ -56,22 +58,78 @@ const CreateSupportTeamsPage: FC = () => {
 
   useEffect(() => {
     const fetchTeams = async () => {
-      try {
-        if (intensiveId) {
-          const { data } = await getTeams(parseInt(intensiveId));
+      if (intensiveId) {
+        const { data, error } = await getTeams({
+          intensiveId: parseInt(intensiveId),
+          short: false,
+        });
 
-          if (data) {
-            setTeams(data);
-            setCurrentTeamId(data[0].id || undefined);
-          }
+        if (data) {
+          setSupportTeams(
+            (data as ITeam[]).map((team) => ({
+              ...team,
+              mentor: team.mentor
+                ? { id: team.mentor.id, name: team.mentor.nameWithGroup }
+                : null,
+              tutor: team.tutor
+                ? { id: team.tutor.id, name: team.tutor.name }
+                : null,
+            }))
+          );
+          setCurrentTeamId(data[0].id || undefined);
         }
-      } catch (e) {
-        console.log(e);
+
+        if (error) {
+          console.log(error);
+        }
       }
     };
 
     fetchTeams();
   }, []);
+
+  useEffect(() => {
+    const fetchSpecificFreeStudents = async () => {
+      if (intensiveId) {
+        const { data, error } = await getSpecificFreeStudents(
+          parseInt(intensiveId)
+        );
+
+        if (data) {
+          setAllStudents(
+            data.map((s) => ({
+              id: s.id,
+              name: s.nameWithGroup,
+            }))
+          );
+        }
+
+        if (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    fetchSpecificFreeStudents();
+  }, []);
+
+  useEffect(() => {
+    if (currentIntensive) {
+      setAllTeachers(
+        currentIntensive.teachers.map((t) => ({ id: t.id, name: t.name }))
+      );
+    }
+  }, [currentIntensive]);
+
+  const onTutorSlugClick = () => {
+    setSearchString('');
+    setSlug('tutors');
+  };
+
+  const onMentorSlugClick = () => {
+    setSearchString('');
+    setSlug('mentors');
+  };
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentTeamId(Number(event.target.value));
@@ -85,7 +143,7 @@ const CreateSupportTeamsPage: FC = () => {
       isTutor: boolean;
     }
   ) => {
-    setTeams((teams) =>
+    setSupportTeams((teams) =>
       teams.map((team) => {
         if (currentTeamId !== team.id) {
           return team;
@@ -99,9 +157,15 @@ const CreateSupportTeamsPage: FC = () => {
             name: newDroppedElement.content,
           };
         } else {
+          let students: ElementType[] = allStudents;
+          if (team.mentor) {
+            students = [...students, team.mentor];
+          }
+          setAllStudents(students.filter((s) => s.id !== newDroppedElement.id));
+
           updatedTeam.mentor = {
             id: newDroppedElement.id,
-            nameWithGroup: newDroppedElement.content,
+            name: newDroppedElement.content,
           };
         }
 
@@ -112,9 +176,13 @@ const CreateSupportTeamsPage: FC = () => {
 
   const deleteTeamSupportMember = (
     currentTeamId: number,
-    deleteTutorOrMentor: boolean
+    deletedElement: {
+      id: number;
+      content: string;
+      isTutor: boolean;
+    }
   ) => {
-    setTeams((teams) =>
+    setSupportTeams((teams) =>
       teams.map((team) => {
         if (currentTeamId !== team.id) {
           return team;
@@ -122,9 +190,14 @@ const CreateSupportTeamsPage: FC = () => {
 
         const updatedTeam = { ...team };
 
-        if (deleteTutorOrMentor) {
+        if (deletedElement.isTutor) {
           updatedTeam.tutor = null;
         } else {
+          setAllStudents((students) => [
+            ...students,
+            { id: deletedElement.id, name: deletedElement.content },
+          ]);
+
           updatedTeam.mentor = null;
         }
 
@@ -134,32 +207,50 @@ const CreateSupportTeamsPage: FC = () => {
   };
 
   const onSubmit = async () => {
-    try {
-      const { data: responseData, error: responseError } =
-        await updateSupportMembers({
-          teams: teams.map((team) => ({
-            id: team.id,
-            tutorId: team.tutor?.id || null,
-            mentorId: team.mentor?.id || null,
-          })),
-          intensiveId: Number(intensiveId),
-        });
+    const { data: responseData, error: responseError } =
+      await updateSupportMembers({
+        teams: supportTeams.map((team) => ({
+          id: team.id,
+          tutorId: team.tutor?.id || null,
+          mentorId: team.mentor?.id || null,
+        })),
+        intensiveId: Number(intensiveId),
+      });
 
-      if (responseData) {
-        setSaveModal(true);
-      }
+    if (responseData) {
+      setSaveModal(true);
+    }
 
-      if (responseError) {
-        toast('Произошла серверная ошибка', { type: 'error' });
-      }
-    } catch (e) {
-      console.log(e);
+    if (responseError) {
+      toast('Произошла серверная ошибка', { type: 'error' });
     }
   };
 
+  const SubmitButtons: FC = () => (
+    <div className="flex justify-end w-full gap-3 mt-3">
+      <div>
+        <PrimaryButton
+          children="Отменить"
+          buttonColor="gray"
+          clickHandler={() => {
+            setCancelModal(true);
+          }}
+        />
+      </div>
+      <div>
+        <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <ToastContainer position="top-center" />
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `Изменение команд сопровождения | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
 
       {cancelModal && (
         <Modal
@@ -170,7 +261,7 @@ const CreateSupportTeamsPage: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -199,7 +290,7 @@ const CreateSupportTeamsPage: FC = () => {
           onCloseModal={() => {
             setSaveModal(false);
             if (intensiveId) {
-              navigate(`/manager/${intensiveId}/teams`);
+              navigate(`/intensives/${intensiveId}/teams`);
             }
           }}
         >
@@ -232,7 +323,7 @@ const CreateSupportTeamsPage: FC = () => {
         <div className="mt-7">
           <Skeleton />
         </div>
-      ) : teams.length <= 0 ? (
+      ) : supportTeams.length <= 0 ? (
         <div className="text-xl font-bold text-black mt-7">
           Команды еще не определены для этого интенсива
         </div>
@@ -244,9 +335,9 @@ const CreateSupportTeamsPage: FC = () => {
             <select
               onChange={handleSelectChange}
               value={currentTeamId}
-              className="mt-3 bg-another_white rounded-xl p-2.5"
+              className="mt-3 bg-another_white rounded-xl p-2.5 min-w-[130px]"
             >
-              {teams.map((team) => (
+              {supportTeams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
                   {team.name}
                 </option>
@@ -254,9 +345,9 @@ const CreateSupportTeamsPage: FC = () => {
             </select>
           </div>
 
-          <div className="flex gap-20 mt-8">
+          <div className="block mt-4 md:mt-8 xl:flex lg:gap-5 xl:gap-10">
             {currentTeam && (
-              <div className="flex flex-col gap-2 basis-1/3">
+              <div className="flex flex-col gap-2 xl:basis-1/3">
                 <div className="text-lg font-bold text-black">
                   {currentTeam.name}
                 </div>
@@ -268,6 +359,8 @@ const CreateSupportTeamsPage: FC = () => {
 
                 <SupportTeamDragContainer
                   team={currentTeam}
+                  allStudents={allStudents}
+                  allTeachers={allTeachers}
                   onDrop={(newDroppedElement) => {
                     if (currentTeamId) {
                       updateTeamSupportMembers(
@@ -276,29 +369,23 @@ const CreateSupportTeamsPage: FC = () => {
                       );
                     }
                   }}
-                  onDelete={(deleteTutorOrMentor) => {
+                  onDelete={(deletedElement) => {
                     if (currentTeamId) {
-                      deleteTeamSupportMember(
-                        currentTeamId,
-                        deleteTutorOrMentor
-                      );
+                      deleteTeamSupportMember(currentTeamId, deletedElement);
                     }
                   }}
                 />
               </div>
             )}
 
-            <div className="flex flex-col items-center grow basis-2/3">
+            <div className="flex-col items-center hidden md:flex grow xl:basis-2/3">
               <div className="text-lg font-bold text-black">
                 Тьюторы и наставники
               </div>
 
               <div className="relative flex justify-between mt-6 min-w-[266px] border-solid border-b border-b-black pb-2 text-lg">
                 <button
-                  onClick={() => {
-                    setSearchString('');
-                    setSlug('tutors');
-                  }}
+                  onClick={onTutorSlugClick}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'tutors' ? 'text-blue' : 'hover:text-blue'
                   }`}
@@ -306,10 +393,7 @@ const CreateSupportTeamsPage: FC = () => {
                   Тьюторы
                 </button>
                 <button
-                  onClick={() => {
-                    setSearchString('');
-                    setSlug('mentors');
-                  }}
+                  onClick={onMentorSlugClick}
                   className={`transition-colors duration-300 cursor-pointer ${
                     slug === 'mentors' ? 'text-blue' : 'hover:text-blue'
                   }`}
@@ -325,18 +409,12 @@ const CreateSupportTeamsPage: FC = () => {
                 ></div>
               </div>
 
-              <div className="relative flex items-center w-full mt-8">
-                <SearchIcon />
-                <input
-                  type="text"
-                  placeholder="Поиск"
-                  className="w-full py-3 pl-12 pr-2 rounded-xl bg-another_white"
-                  value={searchString}
-                  onChange={searchInputChangeHandler}
-                />
-              </div>
+              <SearchBar
+                searchText={searchString}
+                searchInputChangeHandler={searchInputChangeHandler}
+              />
 
-              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center min-w-[550px] mt-3">
+              <div className="rounded-[10px] border border-dashed border-bright_gray py-3 px-6 flex flex-wrap gap-2 justify-center mt-3">
                 {slug === 'tutors' ? (
                   <>
                     {allTeachers
@@ -361,7 +439,7 @@ const CreateSupportTeamsPage: FC = () => {
                     {' '}
                     {allStudents
                       ?.filter((student) =>
-                        student.nameWithGroup
+                        student.name
                           .toLowerCase()
                           .includes(searchString.toLowerCase())
                       )
@@ -370,7 +448,7 @@ const CreateSupportTeamsPage: FC = () => {
                           key={student.id}
                           data={{
                             id: student.id,
-                            content: student.nameWithGroup,
+                            content: student.name,
                             isTutor: false,
                           }}
                         />
@@ -379,20 +457,11 @@ const CreateSupportTeamsPage: FC = () => {
                 )}
               </div>
 
-              <div className="flex justify-end w-full gap-3 mt-3">
-                <div>
-                  <PrimaryButton
-                    children="Отменить"
-                    buttonColor="gray"
-                    clickHandler={() => {
-                      setCancelModal(true);
-                    }}
-                  />
-                </div>
-                <div>
-                  <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
-                </div>
-              </div>
+              <SubmitButtons />
+            </div>
+
+            <div className="block md:hidden">
+              <SubmitButtons />
             </div>
           </div>
         </>

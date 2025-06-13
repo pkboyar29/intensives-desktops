@@ -23,20 +23,24 @@ const TeacherMarkCard: FC<TeacherMarkCardProps> = ({
 
   return (
     <div className="w-full p-4 mx-auto bg-white border rounded-lg shadow-md max-w">
-      <div className="flex items-center justify-between pb-2 text-lg border-b">
-        <h2 className="text-lg font-semibold">Преподаватель: {teacher.name}</h2>
+      <div className="flex flex-col items-center justify-between gap-3 pb-2 text-lg border-b sm:flex-row">
+        <h2 className="text-base font-semibold sm:text-lg">
+          Преподаватель: {teacher.name}
+        </h2>
         <span className="text-base">{createdDate}</span>
       </div>
 
       {teacherMarks.length === 1 ? (
-        <div className="mt-2 text-lg">
+        <div className="mt-2 text-base sm:text-lg">
           <div className="flex gap-2">
             <span className="font-semibold">Общая оценка:</span>{' '}
             <span className="font-bold text-blue">{teacherMarks[0].mark}</span>
           </div>
           {teacherMarks[0].comment.length > 0 && (
             <div className="flex gap-2">
-              <span className="font-semibold">Комментарий:</span>
+              <span className="hidden font-semibold sm:block">
+                Комментарий:
+              </span>
               <span className="font-bold">{teacherMarks[0].comment}</span>
             </div>
           )}
@@ -64,9 +68,7 @@ const TeacherMarkCard: FC<TeacherMarkCardProps> = ({
                   key={mark.id}
                   className="py-2 space-y-2 border-b last:border-none"
                 >
-                  <p className="font-semibold">
-                    Критерий: {mark.criteria?.name}
-                  </p>
+                  <p className="font-semibold">{mark.criteria?.name}</p>
                   <p>
                     Оценка:{' '}
                     <span className="font-bold text-green-600">

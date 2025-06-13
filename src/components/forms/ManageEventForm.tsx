@@ -22,6 +22,7 @@ import {
 } from '../../redux/api/eventApi';
 import { useAppSelector } from '../../redux/store';
 
+import { Helmet } from 'react-helmet-async';
 import Select from '../common/inputs/Select';
 import InputDescription from '../common/inputs/InputDescription';
 import MultipleSelectInput from '../common/inputs/MultipleSelectInput';
@@ -30,7 +31,7 @@ import PrimaryButton from '../common/PrimaryButton';
 import Modal from '../common/modals/Modal';
 import FileUpload from '../common/inputs/FileInput';
 import InputRadio from '../common/inputs/InputRadio';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { IMarkStrategy } from '../../ts/interfaces/IMarkStrategy';
 import { useFileHandler } from '../../helpers/useFileHandler';
@@ -50,14 +51,9 @@ interface ManageEventFormFields {
   scoreType: 'withoutMarkStrategy' | 'withMarkStrategy' | 'withCriterias';
   markStrategy: string;
   deadlineDate: string;
-  criterias: Item[];
-  teams: Item[];
-  teachers: Item[];
-}
-
-interface Item {
-  id: number;
-  name: string;
+  criterias: number[];
+  teams: number[];
+  teachers: number[];
 }
 
 const ManageEventForm: FC = () => {
@@ -82,6 +78,7 @@ const ManageEventForm: FC = () => {
     handleSubmit,
     setValue,
     setError,
+    clearErrors,
     reset,
     watch,
     control,
@@ -89,7 +86,14 @@ const ManageEventForm: FC = () => {
   } = useForm<ManageEventFormFields>({
     mode: 'onBlur',
   });
-  const { startDate, startTime, scoreType, markStrategy } = watch();
+  const {
+    startDate,
+    startTime,
+    finishDate,
+    finishTime,
+    scoreType,
+    markStrategy,
+  } = watch();
 
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -100,10 +104,13 @@ const ManageEventForm: FC = () => {
     { refetchOnMountOrArgChange: true, skip: !currentUser }
   );
 
-  const { data: teamsToChoose } = useGetTeamsQuery(Number(intensiveId), {
-    refetchOnMountOrArgChange: true,
-    skip: !currentUser,
-  });
+  const { data: teamsToChoose } = useGetTeamsQuery(
+    { intensiveId: Number(intensiveId), short: true },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !currentUser,
+    }
+  );
   const teachersToChoose = currentIntensive?.teachers;
   const { data: stagesToChoose } = useGetStagesForIntensiveQuery(
     Number(intensiveId),
@@ -112,16 +119,19 @@ const ManageEventForm: FC = () => {
       skip: !currentUser,
     }
   );
-  // TODO: начать получать аудитории университета интенсива
-  const { data: audiencesToChoose } = useGetAudiencesQuery(undefined, {
-    skip: !currentUser,
-  });
-  const { data: markStrategies } = useGetMarkStrategiesQuery(undefined, {
-    skip: !currentUser,
-  });
-  const { data: criterias } = useGetCriteriasQuery(undefined, {
-    skip: !currentUser,
-  });
+  const { data: audiencesToChoose } = useGetAudiencesQuery({});
+  const { data: markStrategies } = useGetMarkStrategiesQuery(
+    {},
+    {
+      skip: !currentUser,
+    }
+  );
+  const { data: criterias } = useGetCriteriasQuery(
+    {},
+    {
+      skip: !currentUser,
+    }
+  );
 
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [successfulSaveModal, setSuccessfulSaveModal] = useState<{
@@ -155,32 +165,26 @@ const ManageEventForm: FC = () => {
           finishDate: getISODateInUTC3(event.finishDate),
           startTime: getTimeFromDate(event.startDate),
           finishTime: getTimeFromDate(event.finishDate),
-          audience: event.audience.id,
+          audience: event.isOnline ? -1 : event.audience!.id,
           stage: event.stageId ? event.stageId : 0,
           scoreType: scoreType,
           markStrategy: event.markStrategy
             ? event.markStrategy.id.toString()
-            : markStrategies[0].id.toString(),
+            : markStrategies.results[0].id.toString(),
           deadlineDate: event.deadlineDate
             ? getISODateTimeInUTC3(event.deadlineDate)
             : undefined,
-          criterias: event.criterias.map((criteria) => ({
-            id: criteria.id,
-            name: criteria.name,
-          })),
-          teams: event.teams.map((team) => ({
-            id: team.id,
-            name: team.name,
-          })),
-          teachers: event.teachers.map((teacher) => ({
-            id: teacher.id,
-            name: teacher.name,
-          })),
+          criterias: event.criterias.map((criteria) => criteria.id),
+          teams: event.teams.map((team) => team.id),
+          teachers: event.teachers.map((teacher) => teacher.id),
         });
       } else {
         reset({
           scoreType: 'withoutMarkStrategy',
-          markStrategy: markStrategies[0].id.toString(),
+          markStrategy: markStrategies.results[0].id.toString(),
+          stage: searchParams.get('stageId')
+            ? Number(searchParams.get('stageId'))
+            : 0,
         });
       }
     }
@@ -198,6 +202,15 @@ const ManageEventForm: FC = () => {
       setValue('finishDate', startDate);
     }
   }, [startDate]);
+
+  useEffect(() => {
+    if (!startDate || !startTime || !finishDate || !finishTime) {
+      return;
+    }
+    clearErrors('startDate');
+    clearErrors('finishDate');
+    clearErrors('startTime');
+  }, [startDate, startTime, finishDate, finishTime]);
 
   const renderMarkStrategies = (
     markStrategies: IMarkStrategy[] | undefined,
@@ -270,7 +283,8 @@ const ManageEventForm: FC = () => {
   );
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
+      time?: string[];
       start_dt?: string[];
       finish_dt?: string[];
     };
@@ -283,6 +297,11 @@ const ManageEventForm: FC = () => {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
+      });
+    } else if (errorData && errorData.time) {
+      setError('startTime', {
+        type: 'custom',
+        message: errorData.time[0],
       });
     } else {
       toast('Произошла серверная ошибка', {
@@ -344,7 +363,7 @@ const ManageEventForm: FC = () => {
         scoreRequestBody = {
           markStrategyId: Number(data.markStrategy),
           deadlineDate: data.deadlineDate,
-          criteriaIds: data.criterias.map((criteria) => criteria.id),
+          criteriaIds: data.criterias,
         };
         break;
     }
@@ -368,12 +387,11 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: event.visibility,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -401,12 +419,11 @@ const ManageEventForm: FC = () => {
             data.finishTime
           ),
           stageId: data.stage == 0 ? null : data.stage,
-          audienceId: data.audience,
+          audienceId: data.audience != -1 ? data.audience : null,
+          isOnline: data.audience == -1,
           visibility: true,
-          teacherIds: data.teachers
-            ? data.teachers.map((teacher) => teacher.id)
-            : [],
-          teamIds: data.teams ? data.teams.map((team) => team.id) : [],
+          teacherIds: data.teachers ? data.teachers : [],
+          teamIds: data.teams ? data.teams : [],
           ...scoreRequestBody,
         }));
 
@@ -444,7 +461,14 @@ const ManageEventForm: FC = () => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            (event
+              ? `${event.name} | Редактирование мероприятия`
+              : `Создание мероприятия | ${currentIntensive.name}`)}
+        </title>
+      </Helmet>
 
       {cancelModal && (
         <Modal
@@ -455,7 +479,7 @@ const ManageEventForm: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -541,8 +565,8 @@ const ManageEventForm: FC = () => {
                   message: 'Минимальное количество символов - 4',
                 },
                 maxLength: {
-                  value: 100,
-                  message: 'Максимальное количество символов - 100',
+                  value: 50,
+                  message: 'Максимальное количество символов - 50',
                 },
               }}
               description="Название мероприятия"
@@ -593,7 +617,7 @@ const ManageEventForm: FC = () => {
 
             <div className="text-xl font-bold">Время проведения</div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startDate"
                 register={register}
@@ -626,7 +650,7 @@ const ManageEventForm: FC = () => {
               />
             </div>
 
-            <div className="flex justify-between gap-2.5">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-2.5">
               <InputDescription
                 fieldName="startTime"
                 register={register}
@@ -664,7 +688,10 @@ const ManageEventForm: FC = () => {
                 <div className="text-xl font-bold">Место проведения</div>
                 <Select
                   initialText="Выберите место проведения"
-                  options={audiencesToChoose}
+                  options={[
+                    { id: -1, name: 'Онлайн' },
+                    ...audiencesToChoose.results,
+                  ]}
                   register={register}
                   registerOptions={{
                     validate: {
@@ -700,8 +727,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teams.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -720,8 +747,8 @@ const ManageEventForm: FC = () => {
                         ? errors.teachers.message
                         : ''
                     }
-                    selectedItems={field.value || []}
-                    setSelectedItems={field.onChange}
+                    selectedItemIds={field.value || []}
+                    setSelectedItemIds={field.onChange}
                   />
                 )}
               />
@@ -744,7 +771,7 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале"
               >
-                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderMarkStrategies(markStrategies?.results, markStrategy)}
                 {renderDeadlineDateInput()}
               </InputRadio>
               <InputRadio
@@ -754,7 +781,7 @@ const ManageEventForm: FC = () => {
                 currentValue={scoreType}
                 description="Оценивание по шкале с критериями"
               >
-                {renderMarkStrategies(markStrategies, markStrategy)}
+                {renderMarkStrategies(markStrategies?.results, markStrategy)}
                 {renderDeadlineDateInput()}
 
                 {criterias && (
@@ -765,9 +792,9 @@ const ManageEventForm: FC = () => {
                       render={({ field }) => (
                         <MultipleSelectInput
                           description="Список критериев"
-                          items={criterias}
-                          selectedItems={field.value || []}
-                          setSelectedItems={field.onChange}
+                          items={criterias.results}
+                          selectedItemIds={field.value || []}
+                          setSelectedItemIds={field.onChange}
                           errorMessage={
                             typeof errors.criterias?.message === 'string'
                               ? errors.criterias.message
@@ -786,14 +813,26 @@ const ManageEventForm: FC = () => {
               {attachedFilesList && (
                 <EditableFileList
                   files={attachedFilesList}
+                  onFilesChange={handleFilesChange}
                   onFileDelete={handleFileDelete}
                 />
               )}
-              <FileUpload onFilesChange={handleFilesChange} />
             </div>
           </div>
 
-          <div className="flex my-5 gap-7">
+          {Object.keys(errors).length > 0 && (
+            <div className="text-base text-center text-red sm:text-left">
+              Форма содержит ошибки
+            </div>
+          )}
+
+          {errors.teams && teamsToChoose?.length === 0 && (
+            <div className="text-base text-center text-red sm:text-left">
+              В интенсиве нету команд
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 my-5 sm:flex-row mt:gap-7">
             <PrimaryButton
               buttonColor="gray"
               type="button"

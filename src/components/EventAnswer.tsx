@@ -10,7 +10,6 @@ import { validateKanban } from '../helpers/kanbanHelpers';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import {
   isUserManager,
-  isUserTeacher,
   isUserStudent,
   isUserTeamlead,
   isUserTutor,
@@ -34,7 +33,6 @@ import { IFile, INewFileObject } from '../ts/interfaces/IFile';
 import { IEvent } from '../ts/interfaces/IEvent';
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 import { IEventMark } from '../ts/interfaces/IEventMark';
-import { ICriteria } from '../ts/interfaces/ICriteria';
 
 interface EventAnswerProps {
   eventAnswerData?: IEventAnswer;
@@ -258,7 +256,7 @@ const EventAnswer: FC<EventAnswerProps> = ({
             )}
 
             <textarea
-              className="w-full p-3 text-base border-2 border-solid rounded-md border-gray_3 focus:outline-none focus:border-blue"
+              className="w-full p-3 text-base border-2 border-solid rounded-md shadow-md border-gray_3 focus:outline-none focus:border-blue"
               value={editedText}
               onChange={handleTextChange}
               rows={4}
@@ -278,10 +276,9 @@ const EventAnswer: FC<EventAnswerProps> = ({
                 <EditableFileList
                   files={attachedFilesList}
                   nameFileList="ответа"
+                  onFilesChange={handleFilesChange}
                   onFileDelete={handleFileDelete}
                 />
-
-                <FileInput onFilesChange={handleFilesChange} />
               </div>
             )}
 
@@ -296,34 +293,36 @@ const EventAnswer: FC<EventAnswerProps> = ({
                     {/* если ответа нету (он создается), то кнопки (разрешаем отправить) */}
                     {/* если ответ есть, но оценок нету, то кнопки (разрешаем редактировать) */}
                     {/* если есть ответ и он оценен, то отображаем оценки преподавателей */}
-                    {(!eventAnswerData ||
-                      eventAnswerData.marks.length === 0) && (
-                      <div className="flex items-center gap-5 mt-2">
-                        <PrimaryButton
-                          type="button"
-                          children={
-                            isEditing
-                              ? eventAnswerData
-                                ? 'Сохранить ответ'
-                                : 'Сохранить и отправить'
-                              : eventAnswerData
-                              ? 'Редактировать ответ'
-                              : 'Отправить ответ'
-                          }
-                          clickHandler={handleEditClick}
-                        />
-
-                        <div>
+                    {(!eventAnswerData || eventAnswerData.marks.length === 0) &&
+                      (event.deadlineDate
+                        ? new Date() <= event.deadlineDate
+                        : true) && (
+                        <div className="flex items-center gap-5 mt-2">
                           <PrimaryButton
-                            buttonColor="gray"
-                            children={<TrashIcon />}
-                            onClick={() => {
-                              setDeleteModal(true);
-                            }}
+                            type="button"
+                            children={
+                              isEditing
+                                ? eventAnswerData
+                                  ? 'Сохранить ответ'
+                                  : 'Сохранить и отправить'
+                                : eventAnswerData
+                                ? 'Редактировать ответ'
+                                : 'Отправить ответ'
+                            }
+                            clickHandler={handleEditClick}
                           />
+
+                          <div>
+                            <PrimaryButton
+                              buttonColor="gray"
+                              children={<TrashIcon />}
+                              onClick={() => {
+                                setDeleteModal(true);
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </>
                 )}
 
@@ -360,7 +359,6 @@ const EventAnswer: FC<EventAnswerProps> = ({
                               </div>
                             );
                           }
-                          // TODO: что за return null?
                           return null;
                         })}{' '}
                       </>
@@ -391,7 +389,8 @@ const EventAnswer: FC<EventAnswerProps> = ({
             {isUserManager(currentUser) && renderTeacherMarks()}
           </>
         ) : (
-          isUserTeamlead(currentUser, currentTeam) && (
+          isUserTeamlead(currentUser, currentTeam) &&
+          (event.deadlineDate ? new Date() <= event.deadlineDate : true) && (
             <PrimaryButton
               type="button"
               children={

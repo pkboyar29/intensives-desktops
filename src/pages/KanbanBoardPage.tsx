@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import {
   useUpdateColumnPositionMutation,
   useUpdateColumnNameMutation,
@@ -9,6 +9,7 @@ import {
 } from '../redux/api/columnApi';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import { IColumn } from '../ts/interfaces/IColumn';
+import { Helmet } from 'react-helmet-async';
 import KanbanColumn from '../components/KanbanColumn';
 import Modal from '../components/common/modals/Modal';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -17,6 +18,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { moveColumnTemporary } from '../redux/slices/kanbanSlice';
+import { isUserTeamlead } from '../helpers/userHelpers';
 
 const KanbanBoardPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -40,22 +42,17 @@ const KanbanBoardPage: FC = () => {
 
   const [deleteModal, setDeleteModal] = useState<number | null>(null);
 
-  // Локальное состояние для управления временным порядком колонок при dnd
-  const [localColumns, setLocalColumns] = useState(columns);
-
   useEffect(() => {
-    if (currentTeam) {
+    if (currentTeam && (!columns || columns?.length === 0)) {
       getColumns(currentTeam.id);
       console.log(currentTeam);
       console.log(currentUser);
     }
   }, [currentTeam]);
 
-  useEffect(() => {});
-
   useEffect(() => {
-    //console.log(columns)
-    setLocalColumns(columns);
+    console.log('columns updated', columns);
+    //console.log('render kanbanboard');
   }, [columns]);
 
   // Функция для обновления позиций после перемещения
@@ -134,6 +131,10 @@ const KanbanBoardPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{currentTeam && `Ведение задач | ${currentTeam.name}`}</title>
+      </Helmet>
+
       {deleteModal && (
         <Modal
           title="Удаление колонки"
@@ -168,7 +169,10 @@ const KanbanBoardPage: FC = () => {
           <div className="flex items-start space-x-4">
             {columns &&
               columns.map((column, index) => (
-                <div key={column.id} className="flex-shrink-0 min-w-[300px]">
+                <div
+                  key={column.id}
+                  className="flex-shrink-0 min-w-[300px] max-w-[300px]"
+                >
                   <KanbanColumn
                     key={column.id}
                     index={index}
@@ -185,24 +189,28 @@ const KanbanBoardPage: FC = () => {
                 </div>
               ))}
 
-            {isColumnCreating ? (
-              <input
-                type="text"
-                defaultValue={''}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                onChange={handleInputChange}
-                maxLength={50}
-                autoFocus
-                className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
-              />
-            ) : (
-              <button
-                className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
-                onClick={() => setColumnCreating(true)}
-              >
-                Создать колонку
-              </button>
+            {isUserTeamlead(currentUser, currentTeam) && (
+              <>
+                {isColumnCreating ? (
+                  <input
+                    type="text"
+                    defaultValue={''}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onChange={handleInputChange}
+                    maxLength={50}
+                    autoFocus
+                    className="text-xl font-semibold text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-50"
+                  />
+                ) : (
+                  <button
+                    className="w-50 p-4 bg-blue text-white rounded-[10px] duration-300"
+                    onClick={() => setColumnCreating(true)}
+                  >
+                    Создать колонку
+                  </button>
+                )}
+              </>
             )}
           </div>
         </DndProvider>

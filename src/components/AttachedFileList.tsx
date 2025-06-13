@@ -20,7 +20,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
   onFileClick,
 }) => {
   return (
-    <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w">
+    <div className="p-4 pt-2 mx-auto bg-white rounded-lg shadow-md max-w">
       <h2 className="mb-3 text-lg font-semibold">{`📄 Список файлов ${
         nameFileList ? nameFileList : ''
       }`}</h2>
@@ -55,9 +55,7 @@ const AttachedFileList: FC<AttachedFileListProps> = ({
               </li>
             ))
           ) : (
-            <p className="py-4 text-sm text-center text-gray-500">
-              Нет доступных файлов
-            </p>
+            <p className="py-4 text-sm text-center text-gray-500">Нет файлов</p>
           )}
         </ul>
       </div>

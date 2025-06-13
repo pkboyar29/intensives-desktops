@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import Modal from '../modals/Modal';
 import InputDescription from '../inputs/InputDescription';
 import PrimaryButton from '../PrimaryButton';
+import { toast } from 'react-toastify';
 
 import {
   useCreateStageMutation,
@@ -90,7 +91,7 @@ const StageModal: FC<StageModalProps> = ({
   };
 
   const handleResponseError = (error: FetchBaseQueryError) => {
-    const errorData = (error as FetchBaseQueryError).data as {
+    const errorData = error.data as {
       start_dt?: string[];
       finish_dt?: string[];
     };
@@ -99,117 +100,125 @@ const StageModal: FC<StageModalProps> = ({
         type: 'custom',
         message: errorData.start_dt[0],
       });
-    }
-    if (errorData.finish_dt) {
+    } else if (errorData.finish_dt) {
       setError('finishDate', {
         type: 'custom',
         message: errorData.finish_dt[0],
+      });
+    } else {
+      toast('Произошла серверная ошибка при создании этапа', {
+        type: 'error',
       });
     }
   };
 
   return (
-    <Modal
-      title={stage ? 'Редактирование этапа' : 'Создание этапа'}
-      onCloseModal={onClose}
-    >
-      <div>
-        <InputDescription
-          register={register}
-          fieldName="name"
-          registerOptions={{
-            required: 'Поле обязательно к заполнению',
-            minLength: {
-              value: 4,
-              message: 'Минимальное количество символов - 4',
-            },
-            maxLength: {
-              value: 50,
-              message: 'Максимальное количество символов - 50',
-            },
-          }}
-          placeholder="Название этапа"
-          errorMessage={
-            typeof errors.name?.message === 'string' ? errors.name.message : ''
-          }
-        />
-
-        <div className="mt-4">
+    <>
+      <Modal
+        title={stage ? 'Редактирование этапа' : 'Создание этапа'}
+        onCloseModal={onClose}
+      >
+        <div className="w-full">
           <InputDescription
-            isTextArea={true}
             register={register}
+            fieldName="name"
             registerOptions={{
+              required: 'Поле обязательно к заполнению',
+              minLength: {
+                value: 4,
+                message: 'Минимальное количество символов - 4',
+              },
               maxLength: {
-                value: 500,
-                message: 'Максимальное количество символов - 500',
+                value: 50,
+                message: 'Максимальное количество символов - 50',
               },
             }}
-            fieldName="description"
-            placeholder="Описание этапа"
+            placeholder="Название этапа"
             errorMessage={
-              typeof errors.description?.message === 'string'
-                ? errors.description.message
+              typeof errors.name?.message === 'string'
+                ? errors.name.message
                 : ''
             }
           />
+
+          <div className="mt-4">
+            <InputDescription
+              isTextArea={true}
+              register={register}
+              registerOptions={{
+                maxLength: {
+                  value: 500,
+                  message: 'Максимальное количество символов - 500',
+                },
+              }}
+              fieldName="description"
+              placeholder="Описание этапа"
+              errorMessage={
+                typeof errors.description?.message === 'string'
+                  ? errors.description.message
+                  : ''
+              }
+            />
+          </div>
+
+          <div className="flex flex-col w-full gap-5 mt-3 md:flex-row md:mt-7">
+            <InputDescription
+              register={register}
+              fieldName="startDate"
+              registerOptions={{
+                required: 'Поле обязательно',
+              }}
+              placeholder="Дата начала"
+              description="Выберите дату начала"
+              type="date"
+              errorMessage={
+                typeof errors.startDate?.message === 'string'
+                  ? errors.startDate.message
+                  : ''
+              }
+            />
+
+            <InputDescription
+              register={register}
+              fieldName="finishDate"
+              registerOptions={{
+                required: 'Поле обязательно',
+                validate: {
+                  lessThanStartDate: (value: string, formValues) =>
+                    new Date(value) > new Date(formValues.startDate) ||
+                    'Дата окончания должна быть позже даты начала',
+                },
+              }}
+              placeholder="Дата окончания"
+              description="Выберите дату окончания"
+              type="date"
+              errorMessage={
+                typeof errors.finishDate?.message === 'string'
+                  ? errors.finishDate.message
+                  : ''
+              }
+            />
+          </div>
         </div>
 
-        <div className="flex gap-5 mt-7">
-          <InputDescription
-            register={register}
-            fieldName="startDate"
-            registerOptions={{
-              required: 'Поле обязательно',
-            }}
-            placeholder="Дата начала"
-            description="Выберите дату начала"
-            type="date"
-            errorMessage={
-              typeof errors.startDate?.message === 'string'
-                ? errors.startDate.message
-                : ''
-            }
-          />
-          <InputDescription
-            register={register}
-            fieldName="finishDate"
-            registerOptions={{
-              required: 'Поле обязательно',
-              validate: {
-                lessThanStartDate: (value: string, formValues) =>
-                  new Date(value) > new Date(formValues.startDate) ||
-                  'Дата окончания должна быть позже даты начала',
-              },
-            }}
-            placeholder="Дата окончания"
-            description="Выберите дату окончания"
-            type="date"
-            errorMessage={
-              typeof errors.finishDate?.message === 'string'
-                ? errors.finishDate.message
-                : ''
-            }
-          />
+        <div className="flex justify-end gap-3 mt-6">
+          <div>
+            <PrimaryButton
+              buttonColor="gray"
+              clickHandler={onCancel}
+              children="Отмена"
+            />
+          </div>
+          <div>
+            <PrimaryButton
+              type="submit"
+              clickHandler={handleSubmit(onSubmit)}
+              children={stage ? 'Редактировать' : 'Создать'}
+            />
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-end gap-3 mt-6">
-        <div>
-          <PrimaryButton
-            buttonColor="gray"
-            clickHandler={onCancel}
-            children="Отмена"
-          />
-        </div>
-        <div>
-          <PrimaryButton
-            type="submit"
-            clickHandler={handleSubmit(onSubmit)}
-            children={stage ? 'Редактировать' : 'Создать'}
-          />
-        </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 

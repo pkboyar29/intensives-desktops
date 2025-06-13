@@ -11,17 +11,21 @@ import {
   ITeamsSupportMembersUpdate,
   ITeamleadChange,
   IStudentsRolesChange,
+  IProjectInfoChange,
+  ITeamShort,
 } from '../../ts/interfaces/ITeam';
 
 export const mapTeam = (unmappedTeam: any): ITeam => {
   return {
     id: unmappedTeam.id,
     name: unmappedTeam.name,
+    position: unmappedTeam.position,
     tutor: unmappedTeam.tutor === null ? null : mapTeacher(unmappedTeam.tutor),
     mentor:
       unmappedTeam.mentor === null ? null : mapStudent(unmappedTeam.mentor),
     studentsInTeam: unmappedTeam.students_in_team.map(
       (unmappedStudent: any) => ({
+        id: unmappedStudent.id && unmappedStudent.id,
         student: mapStudent(unmappedStudent.student),
         roles: unmappedStudent.roles.map((unmappedRole: any) =>
           mapStudentRole(unmappedRole)
@@ -30,6 +34,16 @@ export const mapTeam = (unmappedTeam: any): ITeam => {
     ),
     teamlead:
       unmappedTeam.teamlead === null ? null : mapStudent(unmappedTeam.teamlead),
+    projectName: unmappedTeam.project_name,
+    projectDescription: unmappedTeam.project_description,
+  };
+};
+
+export const mapTeamShort = (unmappedTeam: any): ITeamShort => {
+  return {
+    id: unmappedTeam.id,
+    name: unmappedTeam.name,
+    position: unmappedTeam.position,
   };
 };
 
@@ -37,18 +51,30 @@ export const teamApi = createApi({
   reducerPath: 'teamApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getTeams: builder.query<ITeam[], number>({
-      query: (intensiveId) => `teams/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeam[] => {
-        const teams: ITeam[] = response.results.map((team: any) =>
-          mapTeam(team)
+    getTeams: builder.query<
+      ITeam[] | ITeamShort[],
+      { intensiveId: number; short: boolean; tutor?: boolean }
+    >({
+      query: ({ intensiveId, short, tutor = false }) =>
+        `teams/?intensive_id=${intensiveId}&short=${short}&tutor=${tutor}`,
+      transformResponse: (response: any): ITeam[] | ITeamShort[] => {
+        const teams = response.map((team: any) => {
+          if ('students_in_team' in team) {
+            return mapTeam(team);
+          } else {
+            return mapTeamShort(team);
+          }
+        });
+
+        teams.sort(
+          (a: ITeam | ITeamShort, b: ITeam | ITeamShort) =>
+            a.position - b.position
         );
-        teams.sort((a, b) => a.name.localeCompare(b.name));
 
         return teams;
       },
     }),
-    getTeam: builder.query<ITeam, number>({
+    getTeam: builder.query<ITeam | null, number>({
       query: (teamId) => `teams/${teamId}`,
       transformResponse: (response: any): ITeam => mapTeam(response),
     }),
@@ -59,6 +85,7 @@ export const teamApi = createApi({
         body: data.teams.map((team) => ({
           id: team.id,
           name: team.name,
+          position: team.position,
           student_ids: team.studentIds,
         })),
       }),
@@ -95,9 +122,20 @@ export const teamApi = createApi({
         })),
       }),
     }),
-    getMyTeam: builder.query<ITeam, number>({
+    changeProjectInfo: builder.mutation<string, IProjectInfoChange>({
+      query: (data) => ({
+        url: `/teams/${data.teamId}/change_project_info/`,
+        method: 'PUT',
+        body: {
+          project_name: data.projectName,
+          project_description: data.projectDescription,
+        },
+      }),
+    }),
+    getMyTeam: builder.query<ITeam | null, number>({
       query: (intensiveId) => `/teams/my_team/?intensive_id=${intensiveId}`,
-      transformResponse: (response: any): ITeam => mapTeam(response),
+      transformResponse: (response: any): ITeam | null =>
+        response ? mapTeam(response) : null,
     }),
   }),
 });
@@ -109,6 +147,7 @@ export const {
   useUpdateSupportMembersMutation,
   useChangeTeamleadMutation,
   useChangeStudentRolesMutation,
+  useChangeProjectInfoMutation,
   useLazyGetMyTeamQuery,
   useLazyGetTeamQuery,
 } = teamApi;

@@ -6,12 +6,13 @@ import { useUpdateVisibilityMutation } from '../redux/api/eventApi';
 import { ISchedule, useGetScheduleQuery } from '../redux/api/scheduleApi';
 import { isUserManager } from '../helpers/userHelpers';
 
+import { Helmet } from 'react-helmet-async';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
 import Title from '../components/common/Title';
 import DisplaySelect from '../components/common/DisplaySelect';
 import Skeleton from 'react-loading-skeleton';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import StageInSchedule from '../components/schedule/StageInSchedule';
 import EventInSchedule from '../components/schedule/EventInSchedule';
 import StageModal from '../components/common/modals/StageModal';
@@ -24,6 +25,7 @@ const SchedulePage: FC = () => {
   const navigate = useNavigate();
 
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [deleteStageAPI] = useDeleteStageMutation();
   const [updateVisibilityAPI] = useUpdateVisibilityMutation();
@@ -130,7 +132,11 @@ const SchedulePage: FC = () => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
+      <Helmet>
+        <title>
+          {currentIntensive && `Расписание | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
 
       {stageModal.status && (
         <StageModal
@@ -200,7 +206,7 @@ const SchedulePage: FC = () => {
       )}
 
       <div className="max-w-[1280px]">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
           <Title text="Расписание интенсива" />
           {isUserManager(currentUser) && (
             <DisplaySelect
@@ -233,10 +239,10 @@ const SchedulePage: FC = () => {
         </div>
 
         {isScheduleLoading ? (
-          <Skeleton className="mt-10" />
+          <Skeleton className="mt-5 md:mt-10" />
         ) : (
           <>
-            <div className="flex flex-col gap-5 mt-10">
+            <div className="flex flex-col gap-5 mt-5 md:mt-10">
               {schedule?.stages.length === 0 ? (
                 <p className="text-xl text-black">
                   Этапы еще не определены для этого интенсива
@@ -273,8 +279,8 @@ const SchedulePage: FC = () => {
             {schedule &&
               schedule.events.filter((event) => event.stageId === null).length >
                 0 && (
-                <div className="mt-10">
-                  <div className="text-2xl font-bold text-black_2">
+                <div className="mt-5 md:mt-10">
+                  <div className="text-xl font-bold md:text-2xl text-black_2">
                     Мероприятия без этапа
                   </div>
 

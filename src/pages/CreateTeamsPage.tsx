@@ -1,29 +1,35 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAppSelector } from '../redux/store';
 
-import { useLazyGetFreeStudentsQuery } from '../redux/api/studentApi';
+import { useLazyGetFreeStudentsQuery } from '../redux/api/intensiveApi';
 import {
   useChangeAllTeamsMutation,
   useLazyGetTeamsQuery,
 } from '../redux/api/teamApi';
+import { distributeStudents } from '../helpers/distributeStudents';
 
+import { Helmet } from 'react-helmet-async';
 import TeamDragElement from '../components/DragComponents/BaseDragElement';
 import TeamDragContainer from '../components/DragComponents/TeamDragContainer';
 import Title from '../components/common/Title';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Modal from '../components/common/modals/Modal';
-import { ToastContainer, toast } from 'react-toastify';
-
+import { toast } from 'react-toastify';
+import Tooltip from '../components/common/Tooltip';
 import SearchIcon from '../components/icons/SearchIcon';
 import MembersIcon from '../components/icons/MembersIcon';
+import ShuffleIcon from '../components/icons/ShuffleIcon';
 
 import { IStudent } from '../ts/interfaces/IStudent';
-import { ITeamCreate, ITeamForManager } from '../ts/interfaces/ITeam';
+import { ITeam, ITeamCreate, ITeamManager } from '../ts/interfaces/ITeam';
 
 const CreateTeamsPage: FC = () => {
   const navigate = useNavigate();
-
   const { intensiveId } = useParams();
+
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
+
   const [getFreeStudents] = useLazyGetFreeStudentsQuery();
   const [getTeams] = useLazyGetTeamsQuery();
   const [changeAllTeams] = useChangeAllTeamsMutation();
@@ -31,12 +37,15 @@ const CreateTeamsPage: FC = () => {
   const [freeStudents, setFreeStudents] = useState<IStudent[]>([]);
 
   const [teamsCount, setTeamsCount] = useState<number>(0);
-  const [teams, setTeams] = useState<ITeamForManager[]>([]);
+  const [teamsCountError, setTeamsCountError] = useState<string | null>(null);
+  const [teams, setTeams] = useState<ITeamManager[]>([]);
 
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<IStudent[]>([]);
 
   const [teamsCountModal, setTeamsCountModal] = useState<boolean>(false);
+  const [randomDistributeModal, setRandomDistributeModal] =
+    useState<boolean>(false);
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [saveModal, setSaveModal] = useState<boolean>(false);
 
@@ -65,12 +74,15 @@ const CreateTeamsPage: FC = () => {
     const fetchTeams = async () => {
       if (intensiveId) {
         try {
-          const { data: teamsResponse } = await getTeams(parseInt(intensiveId));
+          const { data: teamsResponse } = await getTeams({
+            intensiveId: parseInt(intensiveId),
+            short: false,
+          });
 
           if (teamsResponse && teamsResponse.length > 0) {
             setTeamsCount(teamsResponse.length);
             setTeams(
-              teamsResponse.map((team) => ({
+              (teamsResponse as ITeam[]).map((team) => ({
                 ...team,
                 index: team.id,
                 studentsInTeam: team.studentsInTeam.map(
@@ -79,24 +91,28 @@ const CreateTeamsPage: FC = () => {
               }))
             );
           } else {
-            const initialTeamData: ITeamForManager[] = [
+            const initialTeamData: ITeamManager[] = [
               {
                 id: null,
                 index: 1,
                 name: 'Команда 1',
+                position: 1,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
                 teamlead: null,
+                projectName: '',
               },
               {
                 id: null,
                 index: 2,
                 name: 'Команда 2',
+                position: 2,
                 studentsInTeam: [],
                 tutor: null,
                 mentor: null,
                 teamlead: null,
+                projectName: '',
               },
             ];
 
@@ -146,11 +162,32 @@ const CreateTeamsPage: FC = () => {
   const teamsCountInputChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (teamsCountError) {
+      setTeamsCountError(null);
+    }
+
     setTeamsCount(parseInt(e.target.value));
   };
 
   const teamsCountButtonClickHandler = () => {
+    const allStudents = getAllStudents();
+    if (teamsCount > allStudents.length) {
+      setTeamsCountError(
+        `Максимальное количество команд в этом интенсиве - ${allStudents.length}`
+      );
+      return;
+    }
+
     setTeamsCountModal(true);
+  };
+
+  const getAllStudents = (): IStudent[] => {
+    let allStudents: IStudent[] = freeStudents;
+    teams.forEach((team) => {
+      allStudents = [...allStudents, ...team.studentsInTeam];
+    });
+
+    return allStudents;
   };
 
   const clearTeams = () => {
@@ -175,16 +212,18 @@ const CreateTeamsPage: FC = () => {
       if (prevTeamsCount < teamsCount) {
         // teams count will increase
 
-        const newTeams: ITeamForManager[] = [];
+        const newTeams: ITeamManager[] = [];
         for (let i = prevTeamsCount + 1; i <= teamsCount; i++) {
           newTeams.push({
             id: null,
             index: i,
             name: `Команда ${i}`,
+            position: i,
             studentsInTeam: [],
             tutor: null,
             mentor: null,
             teamlead: null,
+            projectName: '',
           });
         }
         setTeams((prevState) => [...prevState, ...newTeams]);
@@ -193,7 +232,7 @@ const CreateTeamsPage: FC = () => {
 
         setTeams((prevTeams) => {
           const reducedStudentsInTeam: IStudent[] = [];
-          const remainingTeams: ITeamForManager[] = [];
+          const remainingTeams: ITeamManager[] = [];
 
           for (let i = 0; i < prevTeamsCount; i++) {
             if (i <= teamsCount - 1) {
@@ -214,11 +253,8 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
-  const handleStudentMove = (
-    team: ITeamForManager,
-    droppedStudent: IStudent
-  ) => {
-    const sourceTeam: ITeamForManager | undefined = teams.find((team) =>
+  const handleStudentMove = (team: ITeamManager, droppedStudent: IStudent) => {
+    const sourceTeam: ITeamManager | undefined = teams.find((team) =>
       team.studentsInTeam.some((student) => student.id === droppedStudent.id)
     );
     if (sourceTeam) {
@@ -244,7 +280,7 @@ const CreateTeamsPage: FC = () => {
   };
 
   const handleStudentDelete = (
-    team: ITeamForManager,
+    team: ITeamManager,
     studentToDelete: IStudent
   ) => {
     const reducedStudentsInTeam: IStudent[] = team.studentsInTeam.filter(
@@ -255,11 +291,29 @@ const CreateTeamsPage: FC = () => {
     setFreeStudents([...freeStudents, studentToDelete]);
   };
 
+  const setDistributedStudents = () => {
+    let allStudents = getAllStudents();
+    const flowIds = currentIntensive?.flows.map((f) => f.id) ?? [];
+    const freeSpecificStudents = allStudents.filter(
+      (student) => !flowIds.includes(student.group.flowId)
+    );
+    // убираем всех отдельных студентов (они не должны участвовать в распределении)
+    allStudents = allStudents.filter((student) =>
+      flowIds.includes(student.group.flowId)
+    );
+
+    const newTeams = distributeStudents(allStudents, teams);
+
+    setTeams(newTeams);
+    setFreeStudents([...freeSpecificStudents]);
+  };
+
   const onSubmit = async () => {
     if (intensiveId) {
       const teamsForRequest: ITeamCreate[] = teams.map((team) => ({
         id: team.id,
         name: team.name,
+        position: team.position,
         studentIds: team.studentsInTeam.map(
           (studentInTeam) => studentInTeam.id
         ),
@@ -287,9 +341,31 @@ const CreateTeamsPage: FC = () => {
     }
   };
 
+  const SubmitButtons: FC = () => (
+    <div className="flex justify-end gap-3">
+      <div>
+        <PrimaryButton
+          children="Отменить"
+          buttonColor="gray"
+          clickHandler={() => {
+            setCancelModal(true);
+          }}
+        />
+      </div>
+      <div>
+        <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <ToastContainer position="top-center" />
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            `Изменение состава команд | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
 
       {teamsCountModal && (
         <Modal
@@ -301,7 +377,7 @@ const CreateTeamsPage: FC = () => {
             можете начать заполнение заново или сохранить уже добавленных
             участников в командах
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -326,6 +402,28 @@ const CreateTeamsPage: FC = () => {
         </Modal>
       )}
 
+      {randomDistributeModal && (
+        <Modal
+          title={'Случайное распределение участников по командам'}
+          onCloseModal={() => setRandomDistributeModal(false)}
+        >
+          <p className="text-lg text-bright_gray">
+            {`Все студенты из потоков интенсива будут случайно равномерно распределены среди ${teamsCount} команд`}
+          </p>
+          <div className="flex justify-end gap-3 mt-6">
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setDistributedStudents();
+                  setRandomDistributeModal(false);
+                }}
+                children="Распределить"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {cancelModal && (
         <Modal
           title="Вы уверены, что хотите прекратить редактирование?"
@@ -335,7 +433,7 @@ const CreateTeamsPage: FC = () => {
             Вы уверены, что хотите прекратить редактирование? Все сделанные вами
             изменения не будут сохранены.
           </p>
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
             <div>
               <PrimaryButton
                 buttonColor="gray"
@@ -393,16 +491,17 @@ const CreateTeamsPage: FC = () => {
         Создайте команды и распределите участников интенсива по командам
       </p>
 
-      <div className="flex items-center gap-4 mt-5">
-        <div className="relative w-[480px]">
+      <div className="mt-5 text-base text-gray_3">Количество команд</div>
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-4 mt-1.5">
+        <div className="relative">
           <input
             type="number"
             placeholder="Количество команд"
             onChange={teamsCountInputChangeHandler}
-            className="w-full p-2 border rounded-md border-gray_5"
+            className="p-2 border rounded-md border-gray_5"
             value={teamsCount}
           />
-          <MembersIcon />
+          <MembersIcon className="absolute transform -translate-y-1/2 right-3 top-1/2" />
         </div>
 
         <div>
@@ -411,10 +510,26 @@ const CreateTeamsPage: FC = () => {
             clickHandler={() => teamsCountButtonClickHandler()}
           />
         </div>
+
+        <Tooltip
+          tooltipText="Случайно распределить участников"
+          tooltipClasses="bg-gray_5 p-1 rounded"
+        >
+          <button
+            onClick={() => setRandomDistributeModal(true)}
+            className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
+          >
+            <ShuffleIcon />
+          </button>
+        </Tooltip>
       </div>
 
-      <div className="flex gap-10 mt-5">
-        <div className="flex flex-col gap-3 basis-1/3">
+      {teamsCountError && (
+        <div className="mt-2 text-red">{teamsCountError}</div>
+      )}
+
+      <div className="block mt-5 lg:flex lg:gap-5 xl:gap-10">
+        <div className="flex flex-col gap-3 lg:basis-1/2 xl:basis-1/3">
           <h2 className="text-lg font-bold text-black_2">Созданные команды</h2>
           <p className="text-base text-bright_gray">
             Для добавления участников в команды вы можете использовать
@@ -425,27 +540,19 @@ const CreateTeamsPage: FC = () => {
             <TeamDragContainer
               key={team.index}
               containerName={team.name}
-              onDrop={(droppedElement) => {
-                handleStudentMove(team, {
-                  id: droppedElement.id,
-                  nameWithGroup: droppedElement.content,
-                });
+              onDrop={(droppedStudent) => {
+                handleStudentMove(team, droppedStudent);
               }}
-              onDelete={(deletedElement) => {
-                handleStudentDelete(team, {
-                  id: deletedElement.id,
-                  nameWithGroup: deletedElement.content,
-                });
+              onDelete={(deletedStudent) => {
+                handleStudentDelete(team, deletedStudent);
               }}
-              droppedElements={team.studentsInTeam.map((studentInTeam) => ({
-                id: studentInTeam.id,
-                content: studentInTeam.nameWithGroup,
-              }))}
+              droppedStudents={team.studentsInTeam}
+              freeStudents={freeStudents}
             />
           ))}
         </div>
 
-        <div className="sticky flex flex-col gap-3 h-fit top-5 basis-2/3">
+        <div className="hidden gap-3 lg:sticky lg:flex-col h-fit top-5 lg:flex lg:basis-1/2 xl:basis-2/3">
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-bold text-black_2">
               Свободные участники
@@ -467,6 +574,7 @@ const CreateTeamsPage: FC = () => {
                 <TeamDragElement
                   key={freeStudent.id}
                   data={{
+                    ...freeStudent,
                     id: freeStudent.id,
                     content: freeStudent.nameWithGroup,
                   }}
@@ -475,20 +583,11 @@ const CreateTeamsPage: FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <div>
-              <PrimaryButton
-                children="Отменить"
-                buttonColor="gray"
-                clickHandler={() => {
-                  setCancelModal(true);
-                }}
-              />
-            </div>
-            <div>
-              <PrimaryButton children="Сохранить" clickHandler={onSubmit} />
-            </div>
-          </div>
+          <SubmitButtons />
+        </div>
+
+        <div className="block mt-3 lg:hidden">
+          <SubmitButtons />
         </div>
       </div>
     </>

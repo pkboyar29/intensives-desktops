@@ -14,7 +14,8 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   buttonColor = 'blue', // по умолчанию: "blue"
   clickHandler,
   type,
-  ...props // остальные атрибуты кнопки (например, disabled)
+  className,
+  ...props
 }) => {
   return (
     <button
@@ -24,7 +25,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
           : buttonColor === 'gray'
           ? 'text-black font-bold bg-another_white hover:bg-black_gray'
           : 'text-white font-bold bg-red hover:bg-dark_red'
-      } px-4 py-2 text-lg rounded-[10px] w-full flex justify-center items-center transition duration-300 ease-in-out`}
+      } px-2 md:px-4 py-2 text-base md:text-lg rounded-[10px] w-full flex justify-center items-center transition duration-300 ease-in-out ${className}`}
       onClick={clickHandler}
       type={type}
       {...props}

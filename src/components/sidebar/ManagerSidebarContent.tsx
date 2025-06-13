@@ -1,8 +1,12 @@
-import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { FC, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
-import { useUpdateIntensiveMutation } from '../../redux/api/intensiveApi';
+import { useLazyGetTeamQuery } from '../../redux/api/teamApi';
+import { useUpdateIntensiveVisibilityMutation } from '../../redux/api/intensiveApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
+import { resetTeamState, setTeam } from '../../redux/slices/teamSlice';
+import { setIsSidebarOpen } from '../../redux/slices/windowSlice';
+import { useWindowSize } from '../../helpers/useWindowSize';
 
 import SwitchButton from '../common/SwitchButton';
 import Skeleton from 'react-loading-skeleton';
@@ -13,25 +17,43 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   isIntensiveLoading,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
+  const { width: windowWidth } = useWindowSize();
+
+  const [getTeam] = useLazyGetTeamQuery();
+  const [updateVisibility] = useUpdateIntensiveVisibilityMutation();
+
+  const currentTeam = useAppSelector((state) => state.team.data);
   const currentIntensive = useAppSelector((state) => state.intensive.data);
 
-  const [updateIntensive] = useUpdateIntensiveMutation();
+  useEffect(() => {
+    const fetchTeam = async () => {
+      const currentTeam = Number(sessionStorage.getItem('currentTeam'));
 
-  const updateIntensiveOpenness = (isOpen: boolean) => {
+      if (currentTeam) {
+        const { data: team } = await getTeam(currentTeam);
+        if (team) {
+          dispatch(setTeam(team));
+        }
+      }
+    };
+    fetchTeam();
+  }, []);
+
+  useEffect(() => {
+    if (windowWidth < 768) {
+      dispatch(setIsSidebarOpen(false));
+    }
+  }, [pathname]);
+
+  const updateIntensiveVisibility = (isVisible: boolean) => {
     if (currentIntensive) {
-      if (isOpen !== currentIntensive.isOpen) {
-        updateIntensive({
-          name: currentIntensive.name,
-          description: currentIntensive.description,
-          openDate: currentIntensive.openDate.toISOString(),
-          closeDate: currentIntensive.closeDate.toISOString(),
-          id: currentIntensive.id,
-          flowIds: currentIntensive.flows.map((flow) => flow.id),
-          teacherIds: currentIntensive.teachers.map((teacher) => teacher.id),
-          roleIds: currentIntensive.roles.map((role) => role.id),
-          isOpen,
+      if (isVisible !== currentIntensive.isVisible) {
+        updateVisibility({
+          visibility: isVisible,
+          intensiveId: currentIntensive.id,
         });
       }
     }
@@ -39,12 +61,12 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
 
   const returnToIntensivesClickHandler = () => {
     dispatch(resetIntensiveState());
+    dispatch(resetTeamState());
     navigate(`/intensives`);
   };
 
   return (
     <>
-      {' '}
       {isIntensiveLoading ? (
         <Skeleton />
       ) : (
@@ -59,23 +81,50 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
           </div>
         </>
       )}
-      <div className="mt-3">
-        <SwitchButton
-          leftSideText="Открыт"
-          rightSideText="Закрыт"
-          currentSide={currentIntensive?.isOpen ? 'left' : 'right'}
-          onSideClick={(side) =>
-            updateIntensiveOpenness(side === 'left' ? true : false)
-          }
-        />
-      </div>
+      {!pathname.includes('editIntensive') && (
+        <div className="mt-3">
+          <SwitchButton
+            leftSideText="Видим"
+            rightSideText="Невидим"
+            currentSide={currentIntensive?.isVisible ? 'left' : 'right'}
+            onSideClick={(side) =>
+              updateIntensiveVisibility(side === 'left' ? true : false)
+            }
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-4 mt-5 mb-3">
-        <SidebarLink to="overview" text="Настройки интенсива" />
-        <SidebarLink to="teams" text="Управление командами" />
+        <SidebarLink
+          to="overview"
+          text="Просмотр интенсива"
+          className={`${pathname.includes('/editIntensive') && 'active'}`}
+        />
+        <SidebarLink
+          to="teams"
+          text="Управление командами"
+          className={`${
+            (pathname.includes('/createTeams') ||
+              pathname.includes('/createSupportTeams')) &&
+            'active'
+          }`}
+        />
         <SidebarLink to="schedule" text="Управление расписанием" />
-        <SidebarLink to="statistics" text="Статистика" />
         <SidebarLink to="tests" text="Тесты" />
+        <SidebarLink to="educationRequests" text="Образовательные запросы" />
+        <SidebarLink to="manager-marks" text="Оценки за интенсив" />
       </div>
+      {currentTeam && (
+        <div className="my-3">
+          <div className="text-xl font-bold text-black_2">
+            {currentTeam.name}
+          </div>
+
+          <div className="flex flex-col gap-4 my-3">
+            <SidebarLink to="team-overview" text="Просмотр команды" />
+            <SidebarLink to="kanban" text="Ведение задач" />
+          </div>
+        </div>
+      )}
       <PrimaryButton
         children="Вернуться к списку интенсивов"
         clickHandler={returnToIntensivesClickHandler}

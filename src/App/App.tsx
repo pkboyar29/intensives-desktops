@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { ToastContainer } from 'react-toastify';
 
 import { IUser, UserRole } from '../ts/interfaces/IUser';
 import { useLazyGetUserQuery } from '../redux/api/userApi';
@@ -16,6 +17,8 @@ import routeConfig from '../router/routeConfig';
 const App: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
   const [getUser] = useLazyGetUserQuery();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const dispatch = useAppDispatch();
 
   const location = useLocation();
@@ -30,15 +33,34 @@ const App: FC = () => {
   useEffect(() => {
     if (requiredAuth) {
       fetchCurrentUserInfo();
-    } else {
-      if (Cookies.get('refresh')) {
-        fetchCurrentUserInfo();
-      }
+    }
+
+    // в SignInPage
+    if (!requiredAuth && Cookies.get('refresh')) {
+      fetchCurrentUserInfo();
     }
   }, []);
 
+  const setCurrentRoleAndRedirect = (user: IUser, role: UserRole) => {
+    dispatch(
+      setCurrentUser({
+        ...user,
+        currentRole: role,
+      })
+    );
+    setIsLoading(false);
+    localStorage.setItem('currentRole', role.name);
+    redirectByRole(role);
+  };
+
   const fetchCurrentUserInfo = async () => {
-    const { data: userData } = await getUser();
+    setIsLoading(true);
+    const { data: userData, error } = await getUser();
+
+    if (error) {
+      setIsLoading(false);
+      return;
+    }
 
     if (userData) {
       const userRoles: UserRole[] = userData.roles.some(
@@ -61,7 +83,13 @@ const App: FC = () => {
             currentRole,
           })
         );
+        setIsLoading(false);
       } else {
+        if (userRoles.length == 1) {
+          setCurrentRoleAndRedirect(userData, userRoles[0]);
+          return;
+        }
+
         setChooseRoleModal({
           status: true,
           tempUser: {
@@ -79,35 +107,47 @@ const App: FC = () => {
 
   const onContinueButtonClick = (newRole: UserRole) => {
     if (chooseRoleModal.tempUser) {
-      dispatch(
-        setCurrentUser({
-          ...chooseRoleModal.tempUser,
-          currentRole: newRole,
-        })
-      );
-      localStorage.setItem('currentRole', newRole.name);
-      redirectByRole(newRole);
+      setCurrentRoleAndRedirect(chooseRoleModal.tempUser, newRole);
 
       disableChooseRoleModal();
     }
   };
 
+  const ChoosingRoleModal: FC = () => {
+    return (
+      <>
+        {chooseRoleModal.status && chooseRoleModal.tempUser && (
+          <Modal
+            title="Выбор роли пользователя"
+            onCloseModal={() => {}}
+            shouldHaveCrossIcon={false}
+          >
+            <ChoosingRoleComponent
+              rolesToChoose={chooseRoleModal.tempUser.roles}
+              onContinueButtonClick={onContinueButtonClick}
+            />
+          </Modal>
+        )}
+      </>
+    );
+  };
+
+  // показываем пустоту, если еще идет загрузка текущего пользователя в SignInPage
+  if (isLoading && !requiredAuth) {
+    return (
+      <>
+        <ChoosingRoleModal />
+      </>
+    );
+  }
+
   return (
     <>
-      {chooseRoleModal.status && chooseRoleModal.tempUser && (
-        <Modal
-          title="Выбор роли пользователя"
-          onCloseModal={() => {}}
-          shouldHaveCrossIcon={false}
-        >
-          <ChoosingRoleComponent
-            rolesToChoose={chooseRoleModal.tempUser.roles}
-            onContinueButtonClick={onContinueButtonClick}
-          />
-        </Modal>
-      )}
+      <ChoosingRoleModal />
 
       <div className="App">
+        <ToastContainer position="top-center" />
+
         {currentUser && currentUser.currentRole && <Header />}
 
         <Routes>

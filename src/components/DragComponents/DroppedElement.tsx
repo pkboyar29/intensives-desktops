@@ -1,18 +1,17 @@
+import { FC } from 'react';
 import { useDrag } from 'react-dnd';
 
 import CrossIcon from '../icons/CrossIcon';
 
 import { ItemTypes } from './ItemTypes';
+import { IStudent } from '../../ts/interfaces/IStudent';
 
-interface DroppedElementProps<T extends { id: number; content: string }> {
-  element: T;
-  onDelete: (elementToDelete: T) => void;
+interface DroppedElementProps {
+  element: IStudent;
+  onDelete: (studentToDelete: IStudent) => void;
 }
 
-const DroppedElement = <T extends { id: number; content: string }>({
-  element,
-  onDelete,
-}: DroppedElementProps<T>) => {
+const DroppedElement: FC<DroppedElementProps> = ({ element, onDelete }) => {
   const [, dragRef] = useDrag({
     type: ItemTypes.STUDENT,
     item: element,
@@ -25,9 +24,9 @@ const DroppedElement = <T extends { id: number; content: string }>({
   return (
     <div
       ref={dragRef}
-      className="flex items-center gap-3 px-3 py-1 text-base rounded-xl bg-gray_5"
-    > 
-      <span className="flex-grow">{element.content}</span>
+      className="flex items-center w-full gap-3 px-3 py-1 text-base rounded-xl bg-gray_5"
+    >
+      <span className="flex-grow">{element.nameWithGroup}</span>
       <button
         onClick={() => {
           onDelete(element);

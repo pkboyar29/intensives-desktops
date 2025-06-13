@@ -2,24 +2,27 @@ import { FC, useState, useEffect, useRef } from 'react';
 import { IFile } from '../ts/interfaces/IFile';
 import { formatFileSize } from '../helpers/fileHelpers';
 import DownloadFileItem from './DownloadFileItem';
+import FileInput from './common/inputs/FileInput';
 
 interface EditableFileListProps {
   files: IFile[];
   nameFileList?: string;
+  onFilesChange: (files: File[] | null) => void;
   onFileDelete: (id: number) => void;
 }
 
 const EditableFileList: FC<EditableFileListProps> = ({
   files,
   nameFileList,
+  onFilesChange,
   onFileDelete,
 }) => {
   return (
-    <div className="py-2 pt-4 mx-auto bg-white rounded-lg max-w">
+    <div className="p-4 pt-2 mx-auto bg-white rounded-lg max-w">
       <h2 className="mb-3 text-lg font-semibold">{`📄 Список файлов ${
         nameFileList ? nameFileList : ''
       }`}</h2>
-      <div className="overflow-y-auto max-h-60">
+      <div className="overflow-y-scroll border rounded-xl max-h-60">
         {files.length > 0 ? (
           <ul className="divide-y divide-gray-200">
             {files.map((file) => (
@@ -46,11 +49,13 @@ const EditableFileList: FC<EditableFileListProps> = ({
             ))}
           </ul>
         ) : (
-          <p className="py-4 text-sm text-center text-gray-500">
-            Нет доступных файлов
-          </p>
+          <p className="py-4 text-sm text-center text-gray-500">Нет файлов</p>
         )}
       </div>
+      <FileInput
+        onFilesChange={onFilesChange}
+        currentFilesCount={files.length}
+      />
     </div>
   );
 };

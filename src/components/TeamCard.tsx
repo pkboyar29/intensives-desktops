@@ -1,12 +1,12 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { setTeam } from '../redux/slices/teamSlice';
-import { isUserTutor } from '../helpers/userHelpers';
+import { isUserManager } from '../helpers/userHelpers';
 
 import TeamIcon from './icons/TeamIcon';
 import EnterIcon from './icons/EnterIcon';
 import Tag from './common/Tag';
-import Chip from './common/Chip';
 import Tooltip from './common/Tooltip';
 
 import { ITeam } from '../ts/interfaces/ITeam';
@@ -16,12 +16,28 @@ interface TeamCardProps {
 }
 
 const TeamCard: FC<TeamCardProps> = ({ team }) => {
+  const navigate = useNavigate();
+
   const currentUser = useAppSelector((state) => state.user.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
   const dispatch = useAppDispatch();
 
   const onEnterButtonClick = (team: ITeam) => {
-    localStorage.setItem('tutorTeamId', team.id.toString());
+    sessionStorage.setItem('currentTeam', team.id.toString());
     dispatch(setTeam(team));
+
+    navigate(`/intensives/${currentIntensive?.id}/team-overview`);
+  };
+
+  const EnterButton = () => {
+    return (
+      <button
+        onClick={() => onEnterButtonClick(team)}
+        className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
+      >
+        <EnterIcon />
+      </button>
+    );
   };
 
   return (
@@ -33,18 +49,12 @@ const TeamCard: FC<TeamCardProps> = ({ team }) => {
           </div>
           <h3 className="text-lg">{team.name}</h3>
         </div>
-
-        {isUserTutor(currentUser, team) && (
+        {isUserManager(currentUser) && (
           <Tooltip
-            tooltipText="Войти как тьютор"
+            tooltipText="Войти как организатор"
             tooltipClasses="bg-gray_5 p-1 rounded"
           >
-            <button
-              onClick={() => onEnterButtonClick(team)}
-              className="transition duration-300 flex items-center justify-center bg-gray_5 hover:bg-gray_6 rounded-[10px] w-12 h-12 cursor-pointer"
-            >
-              <EnterIcon />
-            </button>
+            <EnterButton />
           </Tooltip>
         )}
       </div>

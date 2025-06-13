@@ -9,7 +9,10 @@ import {
   isUserTutor,
   isUserJury,
 } from '../helpers/userHelpers';
-import { getEventDateDisplayString } from '../helpers/dateHelpers';
+import {
+  getDateTimeDisplay,
+  getEventDateDisplayString,
+} from '../helpers/dateHelpers';
 import { motion } from 'framer-motion';
 
 import { useGetEventQuery } from '../redux/api/eventApi';
@@ -18,6 +21,7 @@ import { useLazyGetEventAnswersQuery } from '../redux/api/eventAnswerApi';
 
 import { IEventAnswer } from '../ts/interfaces/IEventAnswer';
 
+import { Helmet } from 'react-helmet-async';
 import Modal from '../components/common/modals/Modal';
 import BackToScheduleButton from '../components/BackToScheduleButton';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -25,8 +29,8 @@ import TrashIcon from '../components/icons/TrashIcon';
 import BackArrowIcon from '../components/icons/BackArrowIcon';
 import Title from '../components/common/Title';
 import Skeleton from 'react-loading-skeleton';
-import Chip from '../components/common/Chip';
-import { ToastContainer, toast } from 'react-toastify';
+import ChipList from '../components/common/ChipList';
+import { toast } from 'react-toastify';
 import EventAnswer from '../components/EventAnswer';
 import EventAnswerList from '../components/EventAnswerList';
 import Accordion from '../components/common/Accordion';
@@ -38,6 +42,7 @@ const EventPage: FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.data);
   const currentTeam = useAppSelector((state) => state.team.data);
+  const currentIntensive = useAppSelector((state) => state.intensive.data);
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
@@ -166,7 +171,11 @@ const EventPage: FC = () => {
     );
 
     if (teamAnswers.length === 0) {
-      return <div className="p-4 text-lg">Команда не прислала ответа</div>;
+      return (
+        <div className="p-1.5 sm:p-4 text-base sm:text-lg">
+          Команда не прислала ответа
+        </div>
+      );
     } else {
       return renderEventAnswers(teamAnswers);
     }
@@ -174,7 +183,13 @@ const EventPage: FC = () => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
+      <Helmet>
+        <title>
+          {currentIntensive &&
+            event &&
+            `${event.name} | ${currentIntensive.name}`}
+        </title>
+      </Helmet>
 
       {deleteModal && (
         <Modal
@@ -213,7 +228,7 @@ const EventPage: FC = () => {
         </Modal>
       )}
 
-      <div className="mb-5 flex justify-center max-w-[1280px]">
+      <div className="flex justify-center max-w-[1280px]">
         <div className="max-w-[765px] w-full">
           {isLoading ? (
             <Skeleton />
@@ -242,7 +257,7 @@ const EventPage: FC = () => {
               <>
                 <Title text={event.name} />
 
-                <div className="flex flex-col gap-4 mt-3">
+                <div className="flex flex-col gap-2.5 mt-3 md:gap-4">
                   <div className="text-base font-bold">
                     {getEventDateDisplayString(
                       event.startDate,
@@ -250,42 +265,35 @@ const EventPage: FC = () => {
                     )}
                   </div>
 
-                  <p className="text-lg text-black_2">{event.description}</p>
+                  {event.description && (
+                    <p className="text-lg text-black_2">{event.description}</p>
+                  )}
 
                   <div className="flex flex-col gap-3 text-lg">
                     <div className="font-bold text-black_2">
                       Место проведения
                     </div>
-                    <div>{event.audience.name}</div>
+
+                    <div>
+                      {event.isOnline ? 'Онлайн' : event.audience?.name}
+                    </div>
                   </div>
 
                   {event.teams.length > 0 && (
-                    <div className="flex flex-col gap-3">
-                      <div className="text-lg font-bold text-black_2">
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">
                         Участвующие команды
                       </div>
-                      <div className="flex flex-wrap gap-3">
-                        {event.teams.map((team) => (
-                          <Chip key={team.id} label={team.name} />
-                        ))}
-                      </div>
+                      <ChipList items={event.teams} chipSize="small" />
                     </div>
                   )}
 
                   {event.teachers.length > 0 && (
-                    <div className="flex flex-col gap-3">
-                      <div className="text-lg font-bold text-black_2">
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">
                         Преподаватели, проводящие мероприятие
                       </div>
-                      <div className="flex flex-wrap gap-3">
-                        {event.teachers.map((teacher) => (
-                          <Chip
-                            key={teacher.id}
-                            size="small"
-                            label={teacher.name}
-                          />
-                        ))}
-                      </div>
+                      <ChipList items={event.teachers} chipSize="small" />
                     </div>
                   )}
 
@@ -310,13 +318,24 @@ const EventPage: FC = () => {
                     event.criterias.length > 0 && (
                       <div className="flex flex-col gap-3 text-lg">
                         <div className="font-bold text-black_2">Критерии</div>
-                        <div className="flex flex-wrap gap-3">
-                          {event.criterias.map((criteria) => (
-                            <Chip key={criteria.id} label={criteria.name} />
-                          ))}
-                        </div>
+                        <ChipList items={event.criterias} chipSize="small" />
                       </div>
                     )}
+
+                  {event.deadlineDate && (
+                    <div className="flex flex-col gap-3 text-lg">
+                      <div className="font-bold text-black_2">
+                        Дедлайн ответа
+                      </div>
+                      <div
+                        className={`${
+                          new Date() > event.deadlineDate && 'text-dark_red'
+                        }`}
+                      >
+                        {getDateTimeDisplay(event.deadlineDate)}
+                      </div>
+                    </div>
+                  )}
 
                   {event?.files && (
                     <div>
@@ -358,10 +377,11 @@ const EventPage: FC = () => {
 
                     {/* отображение ответов текущей команды для студентов/наставника/тьютора команды */}
                     {(isUserStudent(currentUser) ||
-                      isUserTutor(currentUser, currentTeam) ||
+                      (isUserTutor(currentUser, currentTeam) &&
+                        !isUserJury(currentUser, event)) ||
                       isUserMentor(currentUser)) && (
-                      <div className="flex flex-col gap-3 mt-10">
-                        <p className="text-xl font-bold text-black_2">
+                      <div className="flex flex-col gap-3 mt-5 md:mt-10">
+                        <p className="text-lg font-bold md:text-xl text-black_2">
                           {eventAnswers.length > 0
                             ? 'Ответы на мероприятие моей команды'
                             : 'Ответ на мероприятие не отправлен'}
@@ -384,25 +404,28 @@ const EventPage: FC = () => {
                             <EventAnswer
                               event={event}
                               onCreateAnswer={(newAnswer: IEventAnswer) => {
-                                console.log('dfkkskf');
                                 setEventAnswers((prevAnswers) => [
                                   ...prevAnswers,
                                   newAnswer,
                                 ]);
-                                console.log('dfkkskf2');
 
                                 setIsCreatingAnswer(false);
                                 setExpandedAnswer(newAnswer.id);
                               }}
                             />
                           )}
+                        {!isUserTeamlead(currentUser, currentTeam) && (
+                          <p className="text-lg md:text-xl text-black_2">
+                            Отправка ответа доступна тимлиду команды
+                          </p>
+                        )}
                       </div>
                     )}
                   </>
                 )}
 
                 {isUserManager(currentUser) && (
-                  <div className="flex items-center mt-10 text-lg font-bold gap-7">
+                  <div className="flex items-center gap-3 mt-5 text-lg font-bold md:mt-10 md:gap-7">
                     <BackToScheduleButton />
 
                     <PrimaryButton
