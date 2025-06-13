@@ -9,7 +9,7 @@ export const testApi = createApi({
   endpoints: (builder) => ({
     getTests: builder.query<ITest[], void>({
       query: () => '/tests/',
-      transformResponse: (response: any) => response.results, // Преобразуем ответ, чтобы вернуть только массив тестов
+      transformResponse: (response: any) => response.results,
       providesTags: ['Test'],
     }),
     createTest: builder.mutation<ITest, ITestCreate>({

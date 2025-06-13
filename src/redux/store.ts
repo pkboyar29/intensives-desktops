@@ -26,6 +26,8 @@ import { eventAnswerApi } from './api/eventAnswerApi';
 import { eventMarkApi } from './api/eventMarkApi';
 import { questionApi } from './api/questionApi';
 import { testApi } from './api/testApi';
+import { testIntensiveApi } from './api/testIntensiveApi';
+
 // export const resetAllStates = createAction('resetAllStates');
 
 export const store = configureStore({
@@ -54,6 +56,7 @@ export const store = configureStore({
     [eventMarkApi.reducerPath]: eventMarkApi.reducer,
     [questionApi.reducerPath]: questionApi.reducer,
     [testApi.reducerPath]: testApi.reducer,
+    [testIntensiveApi.reducerPath]: testIntensiveApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -79,6 +82,7 @@ export const store = configureStore({
       eventMarkApi.middleware,
       questionApi.middleware,
       testApi.middleware,
+      testIntensiveApi.middleware,
     ),
 });
 

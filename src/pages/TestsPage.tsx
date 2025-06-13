@@ -36,7 +36,13 @@ const TestsPage = () => {
   return (
     <div className="mt-[88px] min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
       <Title text="Список тестов" />
-      <div className="flex justify-end mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <button
+          className="text-lg font-semibold text-blue-700 hover:underline"
+          onClick={() => navigate('/intensives')}
+        >
+          ← Вернуться к списку интенсивов
+        </button>
         <div>
           <PrimaryButton
             children="Создать тест"
@@ -51,29 +57,38 @@ const TestsPage = () => {
       {tests && tests.length === 0 && <div>Нет тестов</div>}
       {tests &&
         tests.map((test) => (
-          <div key={test.id} className="p-4 mb-6 bg-white rounded shadow">
-            <div className="font-semibold">{test.name}</div>
-            <div className="text-gray-600">{test.description}</div>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => navigate(`/tests/${test.id}`)}
-                className="px-3 py-1 transition bg-blue-100 rounded text-blue hover:bg-blue-200"
-              >
-                Редактировать
-              </button>
-              <button
-                onClick={() => setDeletingTest(test)}
-                className="px-3 py-1 transition bg-red-100 rounded text-red hover:bg-red-200"
-              >
-                Удалить
-              </button>
+          <div
+            key={test.id}
+            className="flex flex-col gap-2 p-6 mb-6 bg-white border-2 border-blue-200 shadow-lg rounded-xl"
+          >
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold text-blue-900">{test.name}</div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigate(`/tests/${test.id}`)}
+                  className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue font-semibold hover:bg-blue-200 transition"
+                >
+                  Редактировать
+                </button>
+                <button
+                  onClick={() => setDeletingTest(test)}
+                  className="px-4 py-1.5 rounded-lg bg-red-100 text-red font-semibold hover:bg-red-200 transition"
+                >
+                  Удалить
+                </button>
+              </div>
             </div>
+            {test.description && (
+              <div className="mt-1 ml-1 text-base text-gray-700">{test.description}</div>
+            )}
           </div>
         ))}
       {deletingTest && (
         <ConfirmDeleteModal
           onConfirm={handleDelete}
           onCancel={() => setDeletingTest(null)}
+          title="Удалить тест?"
+          description="Вы точно хотите удалить этот тест?"
         />
       )}
     </div>

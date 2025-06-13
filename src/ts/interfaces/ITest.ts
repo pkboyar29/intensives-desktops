@@ -4,7 +4,7 @@ export interface ITest {
   description?: string;
   created_at: string;
   updated_at: string;
-  author: number; // или объект, если нужно
+  author: number;
 }
 export interface ITestCreate {
   name: string;

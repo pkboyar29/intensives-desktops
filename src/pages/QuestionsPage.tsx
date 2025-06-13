@@ -2,14 +2,16 @@ import { useState } from 'react';
 import {
   useGetQuestionsQuery,
   useDeleteQuestionMutation,
-} from '../redux/api/questionApi'; // хуки RTK Query для получения списка вопросов и удаления вопроса через API.
+} from '../redux/api/questionApi'; // хуки RTК Query для получения списка вопросов и удаления вопроса через API.
 import QuestionModal from '../components/common/modals/QuestionModal';
 import ConfirmDeleteModal from '../components/common/modals/ConfirmDeleteModal';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title'; // компонент для отображения заголовка страницы
+import { useNavigate } from 'react-router-dom';
 
 // функциональный компонент React, который отображает страницу с вопросами
 const QuestionsPage = () => {
+  const navigate = useNavigate();
   // состояния компонента
   const { data: questions, isLoading, error, refetch } = useGetQuestionsQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -42,7 +44,13 @@ const QuestionsPage = () => {
   return (
     <div className="mt-[88px] min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
       <Title text="Банк вопросов" />
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between mb-4">
+        <button
+          className="text-lg font-semibold text-blue-700 hover:underline"
+          onClick={() => navigate('/intensives')}
+        >
+          ← Вернуться к списку интенсивов
+        </button>
         <div>
           <PrimaryButton
             children="Создать вопрос"
@@ -58,13 +66,41 @@ const QuestionsPage = () => {
       {questions && questions.length === 0 && <div>Нет вопросов</div>}
       {questions &&
         questions.map((question) => (
-          <div key={question.id} className="p-4 mb-6 bg-white rounded shadow">
-            <p className="font-semibold">{question.title}</p>
-            <p className="mt-2 ml-4">{question.description}</p>
-            <div className="mt-2 ml-4">
+          <div
+            key={question.id}
+            className="flex flex-col gap-2 p-6 mb-6 bg-white border-2 shadow-lg rounded-xl"
+          >
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold">
+                {question.title}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(question)}
+                  className="px-4 py-1.5 rounded-lg text-blue font-semibold hover:text-dark_blue transition"
+                >
+                  Редактировать
+                </button>
+                <button
+                  onClick={() => setDeletingQuestion(question)}
+                  className="px-4 py-1.5 rounded-lg text-red font-semibold hover:text-dark_red transition"
+                >
+                  Удалить
+                </button>
+              </div>
+            </div>
+            {question.description && (
+              <div className="mt-1 ml-1 text-base">
+                {question.description}
+              </div>
+            )}
+            <div className="flex flex-col gap-1 mt-2 ml-1">
               {question.answerOptions?.map((answer) => (
-                <div key={answer.id} className="flex items-center mb-1">
-                  <span className="mr-2 text-lg">
+                <div
+                  key={answer.id}
+                  className="flex items-center gap-2 text-lg"
+                >
+                  <span>
                     {question.questionType === 'Один вариант ответа'
                       ? '◯'
                       : '☐'}
@@ -74,20 +110,6 @@ const QuestionsPage = () => {
                 </div>
               ))}
             </div>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => handleEdit(question)}
-                className="px-3 py-1 transition bg-blue-100 rounded text-blue hover:bg-blue-200"
-              >
-                Редактировать
-              </button>
-              <button
-                onClick={() => setDeletingQuestion(question)}
-                className="px-3 py-1 transition bg-red-100 rounded text-red hover:bg-red-200"
-              >
-                Удалить
-              </button>
-            </div>
           </div>
         ))}
       {modalOpen && (
@@ -96,7 +118,6 @@ const QuestionsPage = () => {
           onClose={() => {
             setModalOpen(false);
             setEditingQuestion(null);
-            refetch(); // обновляем список вопросов после закрытия модалки
           }}
         />
       )}

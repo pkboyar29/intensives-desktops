@@ -17,12 +17,12 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
-import AddTestPage from '../pages/AddTestPage';
 import QuestionsPage from '../pages/QuestionsPage';
 import AdminPage from '../pages/AdminPage';
 import TestsPage from '../pages/TestsPage';
 import CreateTestPage from '../pages/CreateTestPage';
 import EditTestPage from '../pages/EditTestPage'; // Импортируются страницы и компоненты, которые будут использоваться в маршрутах
+import InteniveTests from '../pages/IntensiveTests'; // Импортируется страница с тестами для интенсива
 
 type RouteType = RouteObject & {
   requiredAuth: boolean;
@@ -92,6 +92,10 @@ const routeConfig: RouteType[] = [
         path: 'statistics',
         element: <IntensiveStatisticsPage />,
       },
+      {
+        path: 'tests',
+        element: <InteniveTests/>
+      }
     ],
     requiredAuth: false,
   },
@@ -108,11 +112,6 @@ const routeConfig: RouteType[] = [
   {
     path: '/sign-in',
     element: <SignInPage />,
-    requiredAuth: false,
-  },
-  {
-    path: '/addTest',
-    element: <AddTestPage />,
     requiredAuth: false,
   },
   {

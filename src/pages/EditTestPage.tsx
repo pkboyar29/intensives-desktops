@@ -10,6 +10,7 @@ import MultipleSelectInput from '../components/common/inputs/MultipleSelectInput
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ITest } from '../ts/interfaces/ITest';
+import Modal from '../components/common/modals/Modal';
 
 const EditTestPage: FC = () => {
   const { testId } = useParams();
@@ -33,6 +34,7 @@ const EditTestPage: FC = () => {
   const [showAllErrors, setShowAllErrors] = useState(false);
   const [questionsCategoryError, setQuestionsCategoryError] = useState('');
   const [questionCategories, setQuestionCategories] = useState<Record<number, string>>({});
+  const [cancelModal, setCancelModal] = useState(false);
 
   // useForm
   const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm({ mode: 'onBlur' });
@@ -282,8 +284,45 @@ const EditTestPage: FC = () => {
             )}
           </div>
         )}
-        <PrimaryButton type="submit" children="Редактировать тест" clickHandler={handleSubmit(onSubmit)} />
+        <div className="flex my-5 gap-7">
+          <PrimaryButton
+            buttonColor="gray"
+            type="button"
+            children="Отмена"
+            clickHandler={() => setCancelModal(true)}
+          />
+          <PrimaryButton type="submit" children="Редактировать тест" clickHandler={handleSubmit(onSubmit)} />
+        </div>
       </form>
+      {cancelModal && (
+        <Modal
+          title="Вы уверены, что хотите прекратить редактирование теста?"
+          onCloseModal={() => setCancelModal(false)}
+          shouldHaveCrossIcon={true}
+        >
+          <p className="text-lg text-bright_gray">
+            Все сделанные вами изменения не будут сохранены.
+          </p>
+          <div className="flex flex-col justify-end gap-3 mt-3 md:flex-row md:mt-6">
+            <div>
+              <PrimaryButton
+                buttonColor="gray"
+                clickHandler={() => setCancelModal(false)}
+                children="Продолжить редактирование"
+              />
+            </div>
+            <div>
+              <PrimaryButton
+                clickHandler={() => {
+                  setCancelModal(false);
+                  navigate('/tests');
+                }}
+                children="Отменить"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

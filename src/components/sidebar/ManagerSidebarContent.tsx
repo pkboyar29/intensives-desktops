@@ -74,6 +74,7 @@ const ManagerSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
         <SidebarLink to="teams" text="Управление командами" />
         <SidebarLink to="schedule" text="Управление расписанием" />
         <SidebarLink to="statistics" text="Статистика" />
+        <SidebarLink to="tests" text="Тесты" />
       </div>
       <PrimaryButton
         children="Вернуться к списку интенсивов"

@@ -5,14 +5,18 @@ import PrimaryButton from '../PrimaryButton';
 interface ConfirmDeleteModalProps {
   onConfirm: () => void;
   onCancel: () => void;
+  title?: string;
+  description?: string;
 }
 
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onConfirm,
   onCancel,
+  title = 'Удалить вопрос?',
+  description = 'Вы точно хотите удалить этот вопрос?',
 }) => (
-  <Modal title="Удалить вопрос?" onCloseModal={onCancel}>
-    <p className="text-lg">Вы точно хотите удалить этот вопрос?</p>
+  <Modal title={title} onCloseModal={onCancel}>
+    <p className="text-lg">{description}</p>
     <div className="flex justify-end gap-3 mt-6">
       <PrimaryButton
         buttonColor="gray"

@@ -240,7 +240,7 @@ const QuestionModal: FC<QuestionModalProps> = ({ onClose, question }) => {
                 <button
                   type="button"
                   onClick={() => remove(index)}
-                  className="px-3 py-2 text-red-500 border border-red-500 rounded hover:text-red-700 hover:border-red-700"
+                  className="px-3 py-2 border rounded text-red hover:text-dark_red"
                 >
                   Удалить
                 </button>
@@ -249,20 +249,16 @@ const QuestionModal: FC<QuestionModalProps> = ({ onClose, question }) => {
           ))}
           {/* Глобальные ошибки */}
           {duplicateError && (
-            <div className="mb-2 text-sm" style={{ color: '#ef4444' }}>
+            <div className="text-base text-red">
               {duplicateError}
             </div>
           )}
           {noCorrectError && (
-            <div className="mb-2 text-sm" style={{ color: '#ef4444' }}>
+            <div className="text-base text-red">
               {noCorrectError}
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => append({ text: '', value: 0 })}
-            className="text-blue-500 hover:text-blue-700"
-          >
+          <button type="button" onClick={() => append({ text: '', value: 0 })}>
             Добавить вариант ответа
           </button>
         </div>

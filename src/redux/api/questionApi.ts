@@ -1,7 +1,7 @@
- import { createApi } from '@reduxjs/toolkit/query/react'; // основа RTK Query для объявления эндпоинтов (запросов и мутаций)
- import { baseQueryWithReauth } from './baseQuery'; // базовый запрос с авторизацией и логикой повторной аутентификации
+ import { createApi } from '@reduxjs/toolkit/query/react';
+ import { baseQueryWithReauth } from './baseQuery';
  import { IQuestion, IQuestionCreate } from '../../ts/interfaces/IQuestion';
-// Сервер возвращает поле question_type как "single" или "multiple" — эта функция преобразует их в человекочитаемые строки
+
  const mapQuestion = (unmappedQuestion: any): IQuestion => {
   return {
     id: unmappedQuestion.id,
@@ -17,9 +17,9 @@
 }
 
 export const questionApi = createApi({
-  reducerPath: 'questionApi', // имя редьюсера в Redux state
-  baseQuery: baseQueryWithReauth, // обёртка над fetch, включающая, например, токены
-  tagTypes: ['Question'], // Добавляем тег для кэширования
+  reducerPath: 'questionApi',
+  baseQuery: baseQueryWithReauth,
+  tagTypes: ['Question'],
   endpoints: (builder) => ({
     createQuestion: builder.mutation<IQuestion, IQuestionCreate>({
       query: (question) => ({
@@ -35,7 +35,7 @@ export const questionApi = createApi({
           }))
         },
       }),
-      invalidatesTags: ['Question'], // Указываем, что эта мутация инвалидирует кэш с тегом 'Question' - зачем?
+      invalidatesTags: ['Question'],
     }),
     updateQuestion: builder.mutation<IQuestion, { id: number; data: IQuestionCreate }>({
       query: ({ id, data }) => ({
@@ -66,15 +66,14 @@ export const questionApi = createApi({
         response.results.map((unmappedQuestion: any) =>
           mapQuestion(unmappedQuestion)
         ),
-      providesTags: ['Question'], // Указываем, что этот запрос предоставляет данные с тегом 'Question'
+      providesTags: ['Question'],
     }),
   }),
 });
-// transformResponse — преобразует "сырой" ответ от API (response.results) в формат IQuestion, понятный клиенту
 
 export const {
   useCreateQuestionMutation,
   useGetQuestionsQuery,
   useUpdateQuestionMutation,
   useDeleteQuestionMutation,
-} = questionApi; // хуки для вопросов
+} = questionApi;
