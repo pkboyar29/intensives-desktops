@@ -139,11 +139,12 @@ const IntensivesPage: FC = () => {
       <Helmet>
         <title>Интенсивы | {import.meta.env.VITE_SITE_NAME}</title>
       </Helmet>
+      <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
+        <Title text="Интенсивы" />
 
-<<<<<<< HEAD
-      <div className="mt-8">
-        {isUserManager(currentUser) && (
-          <div className="flex justify-end">
+        <div className="mt-4 sm:mt-8">
+          {isUserManager(currentUser) && (
+            <div className="flex justify-end">
             <div className="flex gap-4 ml-auto">
               <PrimaryButton
                 children="Создать интенсив"
@@ -159,23 +160,6 @@ const IntensivesPage: FC = () => {
               />
             </div>
           </div>
-        )}
-      </div>
-=======
-      <div className="pt-[88px] pb-10 min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
-        <Title text="Интенсивы" />
->>>>>>> main
-
-        <div className="mt-4 sm:mt-8">
-          {isUserManager(currentUser) && (
-            <div className="flex justify-end">
-              <div className="ml-auto">
-                <PrimaryButton
-                  children="Создать интенсив"
-                  clickHandler={() => navigate(`/createIntensive`)}
-                />
-              </div>
-            </div>
           )}
         </div>
 
