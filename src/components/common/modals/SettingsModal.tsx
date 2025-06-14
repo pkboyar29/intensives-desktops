@@ -82,7 +82,6 @@ const SettingsModal: FC<SettingsModalProps> = ({ onClose }) => {
 
             <div>
               <PrimaryButton
-                clickHandler={() => console.log('ссылка на форму')}
                 children={
                   <a
                     href="https://docs.google.com/forms/d/e/1FAIpQLSfp6VEuFBmzkhFUnEJmgdHjct8KujQP07U69emdyzPW7gdBeQ/viewform?usp=header"

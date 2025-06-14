@@ -17,6 +17,8 @@ export const UserRoleMap = {
   Mentor: 'Наставник',
 } as const;
 
+export type UserRoleKey = keyof typeof UserRoleMap;
+
 export type UserRole = {
   name: keyof typeof UserRoleMap;
   displayName: (typeof UserRoleMap)[keyof typeof UserRoleMap];

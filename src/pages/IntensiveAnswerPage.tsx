@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useAppSelector } from '../redux/store';
 import {
   useCreateIntensiveAnswerMutation,
@@ -10,14 +10,13 @@ import {
 import Skeleton from 'react-loading-skeleton';
 import { Helmet } from 'react-helmet-async';
 import Title from '../components/common/Title';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import { IIntensiveAnswerMark } from '../ts/interfaces/IIntensiveAnswer';
 import { validateKanban } from '../helpers/kanbanHelpers';
 import AttachedFileList from '../components/AttachedFileList';
 import EditableFileList from '../components/EditableFileList';
 import { useFileHandler } from '../helpers/useFileHandler';
-import FileInput from '../components/common/inputs/FileInput';
 import PrimaryButton from '../components/common/PrimaryButton';
 import { getDateTimeDisplay } from '../helpers/dateHelpers';
 import { IFile } from '../ts/interfaces/IFile';
@@ -196,7 +195,6 @@ const IntensiveAnswerPage: FC = () => {
         <title>{currentTeam && `Результат интенсива`}</title>
       </Helmet>
 
-      <ToastContainer position="top-center" />
       {deleteModal && (
         <Modal
           title="Удаление ответа на мероприятие"
