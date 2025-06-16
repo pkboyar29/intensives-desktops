@@ -18,8 +18,12 @@ import ManageIntensiveForm from '../components/forms/ManageIntensiveForm';
 import SchedulePage from '../pages/SchedulePage';
 import ManageEventForm from '../components/forms/ManageEventForm';
 import KanbanBoardPage from '../pages/KanbanBoardPage';
+import QuestionsPage from '../pages/QuestionsPage';
+import TestsPage from '../pages/TestsPage';
+import CreateTestPage from '../pages/CreateTestPage';
+import EditTestPage from '../pages/EditTestPage'; // Импортируются страницы и компоненты, которые будут использоваться в маршрутах
+import InteniveTests from '../pages/IntensiveTests'; // Импортируется страница с тестами для интенсива
 import EducationRequestsPage from '../pages/EducationRequestsPage';
-import AddTestPage from '../pages/AddTestPage';
 import AdminPage from '../pages/AdminPage';
 import AdminEntityPage from '../pages/AdminEntityPage';
 import { TableType } from '../tableConfigs';
@@ -129,6 +133,11 @@ const routeConfig: RouteType[] = [
     resolvedRoles: ['Student', 'Mentor', 'Teacher', 'Manager'],
   },
   {
+    path: '/questions',
+    element: <QuestionsPage />,
+    requiredAuth: false,
+  },
+  {
     path: '/intensives/:intensiveId',
     element: <IntensiveMainPage />,
     resolvedRoles: ['Student', 'Mentor', 'Teacher', 'Manager'],
@@ -213,6 +222,10 @@ const routeConfig: RouteType[] = [
         element: <IntensiveStatisticsPage />,
         resolvedRoles: ['Manager'],
       },
+      {
+        path: 'tests',
+        element: <InteniveTests/>
+      }
     ],
   },
   {
@@ -221,8 +234,18 @@ const routeConfig: RouteType[] = [
     resolvedRoles: ['Manager'],
   },
   {
-    path: '/addTest',
-    element: <AddTestPage />,
+    path: '/tests',
+    element: <TestsPage />,
+    resolvedRoles: ['Manager'],
+  },
+  {
+    path: '/createTestPage',
+    element: <CreateTestPage/>,
+    resolvedRoles: ['Manager'],
+  },
+  {
+    path: '/tests/:testId',
+    element: <EditTestPage />,
     resolvedRoles: ['Manager'],
   },
   {

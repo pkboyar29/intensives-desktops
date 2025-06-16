@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { ToastContainer } from 'react-toastify';
 import { RouteType } from '../router/routeConfig';

@@ -1,10 +1,8 @@
 import { useEffect, FC } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/store';
 import { useLazyGetMyTeamQuery } from '../../redux/api/teamApi';
 import { resetIntensiveState } from '../../redux/slices/intensiveSlice';
-import { setIsSidebarOpen } from '../../redux/slices/windowSlice';
-import { useWindowSize } from '../../helpers/useWindowSize';
 
 import Skeleton from 'react-loading-skeleton';
 import SidebarLink from './SidebarLink';
@@ -14,28 +12,18 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
   isIntensiveLoading,
 }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const { width: windowWidth } = useWindowSize();
+  const [getMyTeam, { isLoading: isTeamLoading }] = useLazyGetMyTeamQuery();
 
   const currentIntensive = useAppSelector((state) => state.intensive.data);
   const currentTeam = useAppSelector((state) => state.team.data);
-
-  const [getMyTeam, { data, isLoading: isTeamLoading }] =
-    useLazyGetMyTeamQuery();
 
   useEffect(() => {
     if (currentIntensive) {
       getMyTeam(currentIntensive.id);
     }
   }, [currentIntensive]);
-
-  useEffect(() => {
-    if (windowWidth < 768) {
-      dispatch(setIsSidebarOpen(false));
-    }
-  }, [pathname]);
 
   const returnToIntensivesClickHandler = () => {
     navigate(`/intensives`);
@@ -62,29 +50,23 @@ const StudentSidebarContent: FC<{ isIntensiveLoading: boolean }> = ({
       <div className="flex flex-col gap-4 my-3">
         <SidebarLink to="overview" text="Просмотр интенсива" />
         <SidebarLink to="teams" text="Команды" />
-        {currentTeam && <SidebarLink to="schedule" text="Мероприятия" />}
-        <SidebarLink to="results" text="Результат интенсива" />
+        <SidebarLink to="tests" text="Тесты" />
       </div>
       <div className="my-3">
         {isTeamLoading ? (
           <Skeleton />
         ) : (
-          currentTeam && (
-            <>
-              <div className="text-xl font-bold text-black_2">
-                {currentTeam.name}
-              </div>
+          <>
+            <div className="text-xl font-bold text-black_2">
+              {currentTeam?.name}
+            </div>
 
-              <div className="flex flex-col gap-4 my-3">
-                <SidebarLink to="team-overview" text="Просмотр команды" />
-                <SidebarLink to="kanban" text="Ведение задач" />
-                <SidebarLink
-                  to="educationRequests"
-                  text="Образовательные запросы"
-                />
-              </div>
-            </>
-          )
+            <div className="flex flex-col gap-4 my-3">
+              <SidebarLink to="team-overview" text="Просмотр команды" />
+              <SidebarLink to="schedule" text="Мероприятия команды" />
+              <SidebarLink to="kanban" text="Ведение задач" />
+            </div>
+          </>
         )}
       </div>
       <PrimaryButton
