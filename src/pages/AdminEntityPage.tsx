@@ -474,7 +474,7 @@ const AdminEntityPage: FC<AdminEntityPageProps> = ({ entityType }) => {
       <div className="flex flex-col items-start">
         <p className="text-3xl font-medium">{config.title}</p>
 
-        <div className="flex mt-3">
+        <div className="flex flex-wrap mt-3">
           {breadcrumbs.length > 1 &&
             breadcrumbs.map((breadcrumb, index, arr) => (
               <div key={breadcrumb.entityName} className="flex">
