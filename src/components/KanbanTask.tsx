@@ -20,6 +20,8 @@ import {
   setMovingPlaceholder,
 } from '../redux/slices/kanbanSlice';
 import { useDrag, useDrop } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
+
 import React from 'react';
 import { ITaskPositionUpdate } from '../ts/interfaces/ITask';
 import KanbanAssigneeMenu from './KanbanAssigneeMenu';
@@ -207,9 +209,12 @@ const KanbanTask: FC<KanbanTaskProps> = ({
   const [{ isDragging }, dragRef, previewRef] = useDrag({
     type: 'TASK',
     item: { id, index, columnId, parentTaskId },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+
+    collect: (monitor) => {
+      const isDragging = monitor.isDragging();
+      console.log('Dragging?', isDragging);
+      return { isDragging };
+    },
 
     end: (item, monitor) => {
       const didDrop = monitor.didDrop();

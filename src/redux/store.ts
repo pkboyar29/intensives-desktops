@@ -25,6 +25,9 @@ import { taskApi } from './api/taskApi';
 import { fileApi } from './api/fileApi';
 import { eventAnswerApi } from './api/eventAnswerApi';
 import { eventMarkApi } from './api/eventMarkApi';
+import { questionApi } from './api/questionApi';
+import { testApi } from './api/testApi';
+import { testIntensiveApi } from './api/testIntensiveApi';
 import { universityApi } from './api/universityApi';
 import { buildingApi } from './api/buildingApi';
 import { groupApi } from './api/groupApi';
@@ -63,6 +66,9 @@ export const store = configureStore({
     [fileApi.reducerPath]: fileApi.reducer,
     [eventAnswerApi.reducerPath]: eventAnswerApi.reducer,
     [eventMarkApi.reducerPath]: eventMarkApi.reducer,
+    [questionApi.reducerPath]: questionApi.reducer,
+    [testApi.reducerPath]: testApi.reducer,
+    [testIntensiveApi.reducerPath]: testIntensiveApi.reducer,
     [universityApi.reducerPath]: universityApi.reducer,
     [buildingApi.reducerPath]: buildingApi.reducer,
     [groupApi.reducerPath]: groupApi.reducer,
@@ -96,6 +102,9 @@ export const store = configureStore({
       fileApi.middleware,
       eventAnswerApi.middleware,
       eventMarkApi.middleware,
+      questionApi.middleware,
+      testApi.middleware,
+      testIntensiveApi.middleware,
       universityApi.middleware,
       buildingApi.middleware,
       groupApi.middleware,

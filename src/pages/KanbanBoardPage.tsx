@@ -15,6 +15,8 @@ import Modal from '../components/common/modals/Modal';
 import PrimaryButton from '../components/common/PrimaryButton';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { isMobile } from 'react-device-detect'; // или свой способ определения
 
 import { useAppSelector, useAppDispatch } from '../redux/store';
 import { moveColumnTemporary } from '../redux/slices/kanbanSlice';
@@ -49,6 +51,10 @@ const KanbanBoardPage: FC = () => {
       console.log(currentUser);
     }
   }, [currentTeam]);
+
+  useEffect(() => {
+    console.log(isMobile);
+  }, [isMobile]);
 
   useEffect(() => {
     console.log('columns updated', columns);
@@ -165,7 +171,10 @@ const KanbanBoardPage: FC = () => {
       )}
 
       <div className="w-full">
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider
+          backend={isMobile ? TouchBackend : HTML5Backend}
+          options={isMobile ? { enableMouseEvents: true } : undefined}
+        >
           <div className="flex items-start space-x-4">
             {columns &&
               columns.map((column, index) => (

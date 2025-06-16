@@ -222,7 +222,7 @@ const IntensiveAnswerPage: FC = () => {
       )}
       <Title text="Мой результат интенсива" />
       <div className="mt-8 max-w">
-        <div className="mt-3 lg:w-1/2">
+        <div className="mt-3 lg:w-1/2 md:w-max">
           <h1 className="mb-3 text-2xl font-semibold">Ответ на интенсив</h1>
           {!intensiveAnswerMark ? (
             <Skeleton />
@@ -294,25 +294,27 @@ const IntensiveAnswerPage: FC = () => {
                       />
                     </div>
                   )}
-                <PrimaryButton
-                  type="button"
-                  //buttonColor={isEditing ? 'red' : 'blue'}
-                  children={
-                    isEditing
-                      ? intensiveAnswerMark?.intensiveAnswer
-                        ? 'Сохранить ответ'
-                        : 'Сохранить и отправить'
-                      : intensiveAnswerMark?.intensiveAnswer
-                      ? 'Редактировать ответ'
-                      : 'Отправить новый ответ'
-                  }
-                  clickHandler={() => {
-                    if (isEditing) {
-                      sendAnswer();
+                {!intensiveAnswerMark.intensiveMark && (
+                  <PrimaryButton
+                    type="button"
+                    //buttonColor={isEditing ? 'red' : 'blue'}
+                    children={
+                      isEditing
+                        ? intensiveAnswerMark?.intensiveAnswer
+                          ? 'Сохранить ответ'
+                          : 'Сохранить и отправить'
+                        : intensiveAnswerMark?.intensiveAnswer
+                        ? 'Редактировать ответ'
+                        : 'Отправить новый ответ'
                     }
-                    setIsEditing((prev) => !prev);
-                  }}
-                />
+                    clickHandler={() => {
+                      if (isEditing) {
+                        sendAnswer();
+                      }
+                      setIsEditing((prev) => !prev);
+                    }}
+                  />
+                )}
               </div>
             </>
           )}
