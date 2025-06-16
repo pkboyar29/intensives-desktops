@@ -135,7 +135,7 @@ const routeConfig: RouteType[] = [
   {
     path: '/questions',
     element: <QuestionsPage />,
-    requiredAuth: false,
+    resolvedRoles: ['Manager'],
   },
   {
     path: '/intensives/:intensiveId',
@@ -224,8 +224,9 @@ const routeConfig: RouteType[] = [
       },
       {
         path: 'tests',
-        element: <InteniveTests/>
-      }
+        element: <InteniveTests />,
+        resolvedRoles: ['Manager'],
+      },
     ],
   },
   {
@@ -240,7 +241,7 @@ const routeConfig: RouteType[] = [
   },
   {
     path: '/createTestPage',
-    element: <CreateTestPage/>,
+    element: <CreateTestPage />,
     resolvedRoles: ['Manager'],
   },
   {
