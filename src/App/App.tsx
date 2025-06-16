@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { ToastContainer } from 'react-toastify';
 import { RouteType } from '../router/routeConfig';
@@ -14,6 +14,7 @@ import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 import Modal from '../components/common/modals/Modal';
 import Header from '../components/Header';
 import SignInPage from '../pages/SignInPage';
+import NotFoundPage from '../pages/NotFoundPage';
 import routeConfig from '../router/routeConfig';
 import ProtectedRoute from '../router/ProtectedRoute';
 
@@ -153,7 +154,7 @@ const App: FC = () => {
 
         {currentUser && currentUser.currentRole && <Header />}
 
-        {/* TODO: избавиться от двух предупреждений при первом рендере */}
+        {/* TODO: избавиться от двух предупреждений при первом рендере (они появляются из-за того, что последний роут в routeConfig появляется только когда роуты загружается текущий пользоватлеь) */}
 
         <Routes>
           {currentUser &&
