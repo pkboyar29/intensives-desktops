@@ -144,22 +144,28 @@ const IntensivesPage: FC = () => {
 
         <div className="mt-4 sm:mt-8">
           {isUserManager(currentUser) && (
-            <div className="flex justify-end">
-            <div className="flex gap-4 ml-auto">
-              <PrimaryButton
-                children="Создать интенсив"
-                clickHandler={() => navigate(`/createIntensive`)}
-              />
-              <PrimaryButton
-                children="Банк вопросов"
-                clickHandler={() => navigate(`/questions`)}
-              />
-              <PrimaryButton
-                children="Список тестов"
-                clickHandler={() => navigate(`/tests`)}
-              />
+            <div className="flex justify-end flex-wrap gap-2.5 md:gap-4 ml-auto">
+              <div className="">
+                <PrimaryButton
+                  children="Банк вопросов"
+                  clickHandler={() => navigate(`/questions`)}
+                />
+              </div>
+
+              <div className="">
+                <PrimaryButton
+                  children="Список тестов"
+                  clickHandler={() => navigate(`/tests`)}
+                />
+              </div>
+
+              <div className="">
+                <PrimaryButton
+                  children="Создать интенсив"
+                  clickHandler={() => navigate(`/createIntensive`)}
+                />
+              </div>
             </div>
-          </div>
           )}
         </div>
 
