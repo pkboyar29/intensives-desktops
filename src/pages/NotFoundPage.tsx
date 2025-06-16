@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const NotFoundPage: FC = () => {
-  console.log('404page');
   return (
     <>
       <Helmet>

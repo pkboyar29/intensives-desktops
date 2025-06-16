@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { ToastContainer } from 'react-toastify';
+import { RouteType } from '../router/routeConfig';
 
 import { IUser, UserRole } from '../ts/interfaces/IUser';
 import { useLazyGetUserQuery } from '../redux/api/userApi';
@@ -12,7 +13,9 @@ import { redirectByRole } from '../helpers/urlHelpers';
 import ChoosingRoleComponent from '../components/ChoosingRoleComponent';
 import Modal from '../components/common/modals/Modal';
 import Header from '../components/Header';
+import SignInPage from '../pages/SignInPage';
 import routeConfig from '../router/routeConfig';
+import ProtectedRoute from '../router/ProtectedRoute';
 
 const App: FC = () => {
   const currentUser = useAppSelector((state) => state.user.data);
@@ -146,22 +149,42 @@ const App: FC = () => {
       <ChoosingRoleModal />
 
       <div className="App">
-        <ToastContainer position="top-center" />
+        <ToastContainer position="top-center" limit={3} />
 
         {currentUser && currentUser.currentRole && <Header />}
 
+        {/* TODO: избавиться от двух предупреждений при первом рендере */}
+
         <Routes>
-          {routeConfig.map((route, index) => (
-            <Route key={index} path={route.path} element={route.element}>
-              {route.children?.map((childRoute, index) => (
-                <Route
-                  key={index}
-                  path={childRoute.path}
-                  element={childRoute.element}
-                />
-              ))}
-            </Route>
-          ))}
+          {currentUser &&
+            currentUser.currentRole &&
+            routeConfig.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <ProtectedRoute resolvedRoles={route.resolvedRoles}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
+              >
+                {route.children?.map((childRoute, index) => (
+                  <Route
+                    key={index}
+                    path={childRoute.path}
+                    element={
+                      <ProtectedRoute
+                        resolvedRoles={(childRoute as RouteType).resolvedRoles}
+                      >
+                        {childRoute.element}
+                      </ProtectedRoute>
+                    }
+                  />
+                ))}
+              </Route>
+            ))}
+
+          <Route path="/sign-in" element={<SignInPage />} />
         </Routes>
       </div>
     </>
