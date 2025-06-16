@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { useGetTestsQuery, useDeleteTestMutation } from '../redux/api/testApi';
 import PrimaryButton from '../components/common/PrimaryButton';
 import Title from '../components/common/Title';
@@ -34,64 +35,73 @@ const TestsPage = () => {
   }, [refetching]);
 
   return (
-    <div className="mt-[88px] min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
-      <Title text="Список тестов" />
-      <div className="flex items-center justify-between mb-4">
-        <button
-          className="text-lg font-semibold text-blue-700 hover:underline"
-          onClick={() => navigate('/intensives')}
-        >
-          ← Вернуться к списку интенсивов
-        </button>
-        <div>
-          <PrimaryButton
-            children="Создать тест"
-            clickHandler={() => {
-              navigate('/createTestPage'); // переходим на страницу создания теста
-            }}
-          />
-        </div>
-      </div>
-      {isLoading && <div>Загрузка...</div>}
-      {error && <div>Ошибка загрузки</div>}
-      {tests && tests.length === 0 && <div>Нет тестов</div>}
-      {tests &&
-        tests.map((test) => (
-          <div
-            key={test.id}
-            className="flex flex-col gap-2 p-6 mb-6 bg-white border-2 border-blue-200 shadow-lg rounded-xl"
+    <>
+      <Helmet>
+        <title>Список тестов</title>
+      </Helmet>
+      <div className="mt-[88px] min-h-screen overflow-y-auto max-w-[1280px] mx-auto px-4">
+        <Title text="Список тестов" />
+        <div className="flex items-center justify-between mb-4">
+          <button
+            className="text-lg font-semibold text-blue-700 hover:underline"
+            onClick={() => navigate('/intensives')}
           >
-            <div className="flex items-center justify-between">
-              <div className="text-xl font-bold text-blue-900">{test.name}</div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigate(`/tests/${test.id}`)}
-                  className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue font-semibold hover:bg-blue-200 transition"
-                >
-                  Редактировать
-                </button>
-                <button
-                  onClick={() => setDeletingTest(test)}
-                  className="px-4 py-1.5 rounded-lg bg-red-100 text-red font-semibold hover:bg-red-200 transition"
-                >
-                  Удалить
-                </button>
+            ← Вернуться к списку интенсивов
+          </button>
+          <div>
+            <PrimaryButton
+              children="Создать тест"
+              clickHandler={() => {
+                navigate('/createTestPage'); // переходим на страницу создания теста
+              }}
+            />
+          </div>
+        </div>
+        {isLoading && <div>Загрузка...</div>}
+        {error && <div>Ошибка загрузки</div>}
+        {tests && tests.length === 0 && <div>Нет тестов</div>}
+        {tests &&
+          tests.map((test) => (
+            <div
+              key={test.id}
+              className="flex flex-col gap-2 p-6 mb-6 bg-white border-2 border-blue-200 shadow-lg rounded-xl"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-xl font-bold text-blue-900">{test.name}</div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigate(`/tests/${test.id}`)}
+                    className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue font-semibold hover:bg-blue-200 transition"
+                  >
+                    Редактировать
+                  </button>
+                  <button
+                    onClick={() => setDeletingTest(test)}
+                    className="px-4 py-1.5 rounded-lg bg-red-100 text-red font-semibold hover:bg-red-200 transition"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+              {test.description && (
+                <div className="mt-1 ml-1 text-base">{test.description}</div>
+              )}
+              <div className="flex gap-4 mt-2 ml-1 text-sm">
+                <span>Создан: {test.created_at ? new Date(test.created_at).toLocaleString() : '-'}</span>
+                <span>Обновлён: {test.updated_at ? new Date(test.updated_at).toLocaleString() : '-'}</span>
               </div>
             </div>
-            {test.description && (
-              <div className="mt-1 ml-1 text-base text-gray-700">{test.description}</div>
-            )}
-          </div>
-        ))}
-      {deletingTest && (
-        <ConfirmDeleteModal
-          onConfirm={handleDelete}
-          onCancel={() => setDeletingTest(null)}
-          title="Удалить тест?"
-          description="Вы точно хотите удалить этот тест?"
-        />
-      )}
-    </div>
+          ))}
+        {deletingTest && (
+          <ConfirmDeleteModal
+            onConfirm={handleDelete}
+            onCancel={() => setDeletingTest(null)}
+            title="Удалить тест?"
+            description="Вы точно хотите удалить этот тест?"
+          />
+        )}
+      </div>
+    </>
   );
 };
 

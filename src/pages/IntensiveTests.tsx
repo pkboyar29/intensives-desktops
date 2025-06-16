@@ -11,6 +11,7 @@ import {
   useLazyGetIntensiveTestQuery,
   useEditTestMutation,
 } from '../redux/api/testIntensiveApi';
+import { Helmet } from 'react-helmet-async';
 
 const IntensiveTests = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -62,109 +63,104 @@ useEffect(() => {getTests(intensiveId)}, [intensiveId, getTests]);
   };
 
   return (
-    <div>
-      <Title text="Тесты" />
-      {/*
-      <div className="flex justify-end">
-        <div>
-          <PrimaryButton clickHandler={() => setModalOpen(true)}>
-            Прикрепить тест
-          </PrimaryButton>
+    <>
+      <Helmet>
+        <title>Тесты | Интенсив</title>
+      </Helmet>
+      <div>
+        <Title text="Тесты" />
+        
+        <div className="flex justify-end">
+          <div>
+            <PrimaryButton clickHandler={() => setModalOpen(true)}>
+              Прикрепить тест
+            </PrimaryButton>
+          </div>
+        </div>
+        <AttachTestModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onAttach={handleAttach}
+        />
+        {editModal && (
+          <EditAttachTestModal
+            isOpen={editModal.open}
+            onClose={() => setEditModal(null)}
+            onEdit={values => handleEdit(editModal.test, values)}
+            initial={editModal.test}
+          />
+        )}
+        {deleteModal && (
+          <ConfirmDeleteModal
+            title="Удалить привязку теста?"
+            description={`Вы точно хотите удалить привязку теста "${deleteModal.test.test?.name || deleteModal.test.name}" к интенсиву?`}
+            onConfirm={() => handleDelete(deleteModal.test)}
+            onCancel={() => setDeleteModal(null)}
+          />
+        )}
+       
+        <div className="mt-6">
+          {isLoading && <div>Загрузка...</div>}
+          {tests && tests.results && tests.results.length === 0 && (
+            <div>Нет прикрепленных тестов</div>
+          )}
+          {tests && tests.results && tests.results.length > 0 && (
+            <ul className="space-y-6">
+              {tests.results.map((test: any) => (
+                <li
+                  key={test.id}
+                  className="flex flex-col gap-3 p-6 mb-4 transition bg-white border-2 border-blue-200 shadow-sm rounded-xl hover:shadow-lg"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-blue-900">
+                      {test.test?.name || test.name}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setEditModal({ open: true, test })}
+                        className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue font-semibold hover:bg-blue-200 transition"
+                      >
+                        Редактировать
+                      </button>
+                      <button
+                        onClick={() => setDeleteModal({ open: true, test })}
+                        className="px-4 py-1.5 rounded-lg bg-red-100 text-red font-semibold hover:bg-red-200 transition"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                   
+                  </div>
+                  {test.test?.description || test.description ? (
+                    <div className="mt-1 ml-1 text-lg text-gray-700">
+                      {test.test?.description || test.description}
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap gap-6 mt-2 ml-1 text-base text-gray-500">
+                    {test.start_date && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Доступен с:</span> {new Date(test.start_date).toLocaleString()}
+                      </div>
+                    )}
+                    {test.end_date && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Доступен до:</span> {new Date(test.end_date).toLocaleString()}
+                      </div>
+                    )}
+                    {test.attempts_allowed && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Попыток:</span> {test.attempts_allowed}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
-      <AttachTestModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onAttach={handleAttach}
-      />
-      {editModal && (
-        <EditAttachTestModal
-          isOpen={editModal.open}
-          onClose={() => setEditModal(null)}
-          onEdit={values => handleEdit(editModal.test, values)}
-          initial={editModal.test}
-        />
-      )}
-      {deleteModal && (
-        <ConfirmDeleteModal
-          title="Удалить привязку теста?"
-          description={`Вы точно хотите удалить привязку теста "${deleteModal.test.test?.name || deleteModal.test.name}" к интенсиву?`}
-          onConfirm={() => handleDelete(deleteModal.test)}
-          onCancel={() => setDeleteModal(null)}
-        />
-      )}
-      */}
-      <div className="mt-6">
-        {isLoading && <div>Загрузка...</div>}
-        {tests && tests.results && tests.results.length === 0 && (
-          <div>Нет прикрепленных тестов</div>
-        )}
-        {tests && tests.results && tests.results.length > 0 && (
-          <ul className="space-y-6">
-            {tests.results.map((test: any) => (
-              <li
-                key={test.id}
-                className="flex flex-col gap-3 p-6 mb-4 transition bg-white border-2 border-blue-200 shadow-sm rounded-xl hover:shadow-lg"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-blue-900">
-                    {test.test?.name || test.name}
-                  </div>
-                  {/*
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditModal({ open: true, test })}
-                      className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue font-semibold hover:bg-blue-200 transition"
-                    >
-                      Редактировать
-                    </button>
-                    <button
-                      onClick={() => setDeleteModal({ open: true, test })}
-                      className="px-4 py-1.5 rounded-lg bg-red-100 text-red font-semibold hover:bg-red-200 transition"
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                  */}
-                  <div>
-                    <PrimaryButton
-                    clickHandler={() => {
-                      // Здесь можно реализовать переход на страницу прохождения теста
-                      // Например: navigate(`/intensive/${intensiveId}/test/${test.test?.id || test.id}/pass`);
-                    }}
-                  >
-                    Пройти тест
-                  </PrimaryButton>
-                  </div>
-                </div>
-                {test.test?.description || test.description ? (
-                  <div className="mt-1 ml-1 text-lg text-gray-700">
-                    {test.test?.description || test.description}
-                  </div>
-                ) : null}
-                <div className="flex flex-wrap gap-6 mt-2 ml-1 text-base text-gray-500">
-                  {test.start_date && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Доступен с:</span> {new Date(test.start_date).toLocaleString()}
-                    </div>
-                  )}
-                  {test.end_date && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Доступен до:</span> {new Date(test.end_date).toLocaleString()}
-                    </div>
-                  )}
-                  {test.attempts_allowed && (
-                    <div>
-                      <span className="font-semibold text-gray-700">Попыток:</span> {test.attempts_allowed}
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 

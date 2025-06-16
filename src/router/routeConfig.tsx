@@ -204,7 +204,7 @@ const routeConfig: RouteType[] = [
     requiredAuth: false,
   },
   {
-    path: 'createTestPage',
+    path: '/createTestPage',
     element: <CreateTestPage/>,
     requiredAuth: false,
   },

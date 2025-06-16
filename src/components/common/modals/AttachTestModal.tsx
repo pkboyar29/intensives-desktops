@@ -7,9 +7,10 @@ interface AttachTestModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAttach: (data: { testId: number; startDate: string; endDate: string; attempts: number }) => void;
+  attachedTestIds?: number[]; // id уже прикреплённых тестов
 }
 
-const AttachTestModal: React.FC<AttachTestModalProps> = ({ isOpen, onClose, onAttach }) => {
+const AttachTestModal: React.FC<AttachTestModalProps> = ({ isOpen, onClose, onAttach, attachedTestIds = [] }) => {
   const { data: tests, isLoading } = useGetTestsQuery();
   const [selectedTest, setSelectedTest] = useState<number | null>(null);
   const [startDate, setStartDate] = useState('');
@@ -66,9 +67,11 @@ const AttachTestModal: React.FC<AttachTestModalProps> = ({ isOpen, onClose, onAt
           onChange={e => setSelectedTest(Number(e.target.value))}
         >
           <option value="">Выберите тест</option>
-          {tests && tests.map((test: any) => (
-            <option key={test.id} value={test.id}>{test.name}</option>
-          ))}
+          {tests && tests
+            .filter((test: any) => !attachedTestIds.includes(test.id))
+            .map((test: any) => (
+              <option key={test.id} value={test.id}>{test.name}</option>
+            ))}
         </select>
       </div>
       <div className="mb-5">
@@ -100,7 +103,7 @@ const AttachTestModal: React.FC<AttachTestModalProps> = ({ isOpen, onClose, onAt
         />
       </div>
       {error && (
-        <div className="mb-2 text-base font-semibold text-red">{error}</div>
+        <div className="text-base text-red">{error}</div>
       )}
       <div className="flex justify-end gap-4 mt-6">
         <PrimaryButton type="button" clickHandler={handleAttach}>

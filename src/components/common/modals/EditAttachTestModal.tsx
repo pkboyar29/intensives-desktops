@@ -47,19 +47,19 @@ const EditAttachTestModal: React.FC<EditAttachTestModalProps> = ({ isOpen, onClo
       shouldHaveCrossIcon={true}
     >
       <div className="mb-5">
-        <label className="block mb-2 text-lg font-semibold text-gray-700">Дата начала</label>
-        <input type="datetime-local" className="w-full px-4 py-2 text-lg border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        <label className="block mb-2 text-lg font-semibold">Дата начала</label>
+        <input type="datetime-local" className="w-full px-4 py-2 text-lg border-2 rounded-lg focus:outline-none focus:ring-2" value={startDate} onChange={e => setStartDate(e.target.value)} />
       </div>
       <div className="mb-5">
-        <label className="block mb-2 text-lg font-semibold text-gray-700">Дата окончания</label>
-        <input type="datetime-local" className="w-full px-4 py-2 text-lg border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300" value={endDate} onChange={e => setEndDate(e.target.value)} />
+        <label className="block mb-2 text-lg font-semibold">Дата окончания</label>
+        <input type="datetime-local" className="w-full px-4 py-2 text-lg border-2 rounded-lg focus:outline-none focus:ring-2" value={endDate} onChange={e => setEndDate(e.target.value)} />
       </div>
       <div className="mb-6">
-        <label className="block mb-2 text-lg font-semibold text-gray-700">Попытки</label>
-        <input type="number" min={1} className="w-full px-4 py-2 text-lg border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300" value={attempts} onChange={e => setAttempts(Number(e.target.value))} />
+        <label className="block mb-2 text-lg font-semibold">Попытки</label>
+        <input type="number" min={1} className="w-full px-4 py-2 text-lg border-2 rounded-lg focus:outline-none focus:ring-2" value={attempts} onChange={e => setAttempts(Number(e.target.value))} />
       </div>
       {error && (
-        <div className="mb-2 text-base font-semibold text-red">{error}</div>
+        <div className="text-base text-red">{error}</div>
       )}
       <div className="flex justify-end gap-4 mt-6">
         <PrimaryButton type="button" clickHandler={handleSave}>
